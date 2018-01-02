@@ -1,0 +1,28 @@
+dependencies: \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTBridge.m \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTBridge.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTBridgeDelegate.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTJavaScriptLoader.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTDefines.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTBridgeModule.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTFrameUpdate.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTInvalidating.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTBridge+Private.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTConvert.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Views/RCTAnimationType.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Views/RCTBorderStyle.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTLog.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTAssert.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTUtils.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Views/RCTPointerEvents.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Views/RCTTextDecorationLineType.h \
+  /Users/test/Dev/progress_tracker/ios/build/Build/Products/Debug-iphonesimulator/include/yoga/Yoga.h \
+  /Users/test/Dev/progress_tracker/ios/build/Build/Products/Debug-iphonesimulator/include/yoga/YGEnums.h \
+  /Users/test/Dev/progress_tracker/ios/build/Build/Products/Debug-iphonesimulator/include/yoga/YGMacros.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTEventDispatcher.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/DevSupport/RCTInspectorDevServerHelper.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTJSEnvironment.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTModuleData.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTPerformanceLogger.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Profiler/RCTProfile.h \
+  /Users/test/Dev/progress_tracker/node_modules/react-native/React/Base/RCTReloadCommand.h
