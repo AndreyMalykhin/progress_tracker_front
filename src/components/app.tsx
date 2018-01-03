@@ -1,25 +1,29 @@
 import Hello from "components/hello";
+import Home from "components/home";
 import "intl";
 import * as React from "react";
 import { addLocaleData, IntlProvider } from "react-intl";
 import * as ru from "react-intl/locale-data/ru";
 import { StyleSheet, Text, View } from "react-native";
+import { Link, NativeRouter, Route, Switch } from "react-router-native";
 
 addLocaleData(ru);
 const messages = {
   hello: "Привет {platform}!",
 };
 
-export default class App extends React.Component<{}, {}> {
+export default class App extends React.Component {
   public render() {
     return (
       <IntlProvider locale="ru" textComponent={Text} messages={messages}>
-        <View style={styles.container}>
-          <Hello/>
-          <Text>Open up App.js to start working on your app!</Text>
-          <Text>Changes you make will automatically reload.</Text>
-          <Text>Shake your phone to open the developer menu.</Text>
-        </View>
+        <NativeRouter>
+          <View style={styles.container}>
+            <Switch>
+              <Route exact={true} path="/hello" component={Hello}/>
+              <Route component={Home}/>
+            </Switch>
+          </View>
+        </NativeRouter>
       </IntlProvider>
     );
   }
