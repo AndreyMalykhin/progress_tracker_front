@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import Hello from "components/hello";
+import * as React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 export default class App extends React.Component<{}, {}> {
-  render() {
+  public render() {
     return (
       <View style={styles.container}>
         <Hello/>
@@ -17,9 +17,9 @@ export default class App extends React.Component<{}, {}> {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
+    backgroundColor: "#fff",
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: "center",
   },
 });
