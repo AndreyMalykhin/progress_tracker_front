@@ -3,9 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "@types/enzyme": "^3.1.6",
+    "@types/jest": "^22.0.0",
+    "@types/react": "^16.0.31",
+    "@types/react-native": "^0.51.7",
+    "@types/react-test-renderer": "^16.0.0",
+    "babel-plugin-module-resolver": "^3.0.0",
     "babel-preset-react-native-stage-0": "^1.0.1",
+    "enzyme": "^3.3.0",
     "jest-expo": "23.0.0",
-    "react-test-renderer": "16.0.0"
+    "react-addons-test-utils": "^15.6.2",
+    "react-dom": "^16.2.0",
+    "react-native-cli": "^2.0.1",
+    "react-test-renderer": "16.0.0",
+    "ts-jest": "^22.0.0",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2"
   },
   "scripts": {
     "start": "react-native start",
@@ -14,7 +27,30 @@
     "test": "node node_modules/jest/bin/jest.js --watch"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "react-native",
+    "moduleDirectories": ["node_modules", "src"],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "android.js",
+      "android.ts",
+      "android.tsx",
+      "ios.js",
+      "ios.ts",
+      "ios.tsx"
+    ],
+    "transform": {
+      "^.+\\.(js)$": "<rootDir>/node_modules/babel-jest",
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testPathIgnorePatterns": [
+      "\\.snap$",
+      "<rootDir>/node_modules/",
+      "<rootDir>/build/"
+    ],
+    "cacheDirectory": ".jest/cache"
   },
   "dependencies": {
     "react": "16.0.0",

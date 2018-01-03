@@ -5,7 +5,14 @@
   "env": {
     "development": {
       "plugins": [
-        "transform-react-jsx-source"
+        "transform-react-jsx-source",
+        [
+          "module-resolver",
+          {
+            "root": ["build"],
+            "extensions": [".js", ".ios.js", ".android.js"]
+          }
+        ]
       ]
     }
   }
