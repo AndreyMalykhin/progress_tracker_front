@@ -1,8 +1,15 @@
 import * as React from "react";
+import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { Text } from "react-native";
 
-export default class Hello extends React.Component<{}, {}> {
+interface IProps {
+    test?: string;
+}
+
+class Hello extends React.Component<IProps & InjectedIntlProps, {}> {
     public render() {
-        return <Text>Hello Android!</Text>;
+        return <FormattedMessage id={"hello"} values={{platform: "Android"}}/>;
     }
 }
+
+export default injectIntl<IProps>(Hello);
