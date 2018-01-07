@@ -1,3 +1,3 @@
-import App from "components/app";
+import AppContainer from "components/app-container";
 import { AppRegistry } from "react-native";
-AppRegistry.registerComponent("progress_tracker", () => App);
+AppRegistry.registerComponent("progress_tracker", () => AppContainer);
