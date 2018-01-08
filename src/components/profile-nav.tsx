@@ -1,12 +1,12 @@
-import NavBar, { INavBarRoute } from "components/nav-bar";
+import NavBar, { INavBarProps, INavBarRoute } from "components/nav-bar";
 import TabBar from "components/tab-bar";
 import * as React from "react";
 
-interface IGlobalNavProps {
+interface IProfileNavProps {
     routes: INavBarRoute[];
 }
 
-class GlobalNav extends React.Component<IGlobalNavProps> {
+class ProfileNav extends React.Component<IProfileNavProps> {
     public render() {
         return <NavBar {...this.props} renderItem={this.renderItem} />;
     }
@@ -20,5 +20,4 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
     }
 }
 
-export { IGlobalNavProps };
-export default GlobalNav;
+export default ProfileNav;

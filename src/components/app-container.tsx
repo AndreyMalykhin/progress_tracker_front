@@ -10,7 +10,7 @@ import graphql from "react-apollo/graphql";
 import { addLocaleData } from "react-intl";
 import * as en from "react-intl/locale-data/en";
 import { getDeviceLocale } from "react-native-device-info";
-import apolloFactory from "store/apollo-factory";
+import apolloFactory from "utils/apollo-factory";
 import withApolloProvider from "utils/with-apollo-provider";
 
 interface IGetAppDataResponse {

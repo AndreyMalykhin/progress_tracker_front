@@ -3,8 +3,7 @@ import { ApolloClient } from "apollo-client";
 import { ApolloLink } from "apollo-link";
 import { HttpLink } from "apollo-link-http";
 import { withClientState } from "apollo-link-state";
-import messageResolver from "store/message-resolver";
-import stateResolvers from "store/state-resolvers";
+import stateResolvers from "resolvers/state-resolvers";
 
 export default function() {
     const cache = new InMemoryCache();
