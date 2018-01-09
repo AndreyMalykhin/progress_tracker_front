@@ -7,4 +7,7 @@ export default {
     "globalNavigation.leaders": "Leaders",
     "globalNavigation.profile": "Profile",
     "globalNavigation.reviews": "Reviews",
+
+    "intro.login": "Login",
+    "intro.skip": "Skip",
 };

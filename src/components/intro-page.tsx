@@ -1,5 +1,5 @@
+import Button from "components/button";
 import * as React from "react";
-import { Button } from "react-native";
 import { Text, View } from "react-native";
 import { withRouter } from "react-router";
 
@@ -13,8 +13,12 @@ class IntroPage extends React.Component<IIntroPageProps> {
         return (
             <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
                 <Text>INTRO PAGE</Text>
-                <Button title="Login" onPress={this.props.onLogin} />
-                <Button title="Skip" onPress={this.props.onClose} />
+                <Button onPress={this.props.onLogin}>
+                    <Button.Title msgId="intro.login" />
+                </Button>
+                <Button onPress={this.props.onClose}>
+                    <Button.Title msgId="intro.skip" />
+                </Button>
             </View>
         );
     }

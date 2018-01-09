@@ -1,9 +1,13 @@
-import NavBar, { INavBarProps, INavBarRoute } from "components/nav-bar";
+import NavBar, {
+    INavBarItem,
+    INavBarItemRenderer,
+    INavBarProps,
+} from "components/nav-bar";
 import TabBar from "components/tab-bar";
 import * as React from "react";
 
 interface IProfileNavProps {
-    routes: INavBarRoute[];
+    items: INavBarItem[];
 }
 
 class ProfileNav extends React.Component<IProfileNavProps> {
@@ -11,13 +15,14 @@ class ProfileNav extends React.Component<IProfileNavProps> {
         return <NavBar {...this.props} renderItem={this.renderItem} />;
     }
 
-    private renderItem = (title: string, path: string, isActive: boolean) => {
+    private renderItem: INavBarItemRenderer = (path, isActive, title, icon) => {
         return (
             <TabBar.Item key={path} id={path} active={isActive}>
-                <TabBar.ItemTitle>{title}</TabBar.ItemTitle>
+                <TabBar.ItemTitle msgId={title!} />
             </TabBar.Item>
         );
     }
 }
 
+export { IProfileNavProps };
 export default ProfileNav;

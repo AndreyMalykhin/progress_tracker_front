@@ -1,9 +1,10 @@
-import NavBar, { INavBarRoute } from "components/nav-bar";
+import NavBar, { INavBarItem, INavBarItemRenderer } from "components/nav-bar";
 import TabBar from "components/tab-bar";
 import * as React from "react";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface IGlobalNavProps {
-    routes: INavBarRoute[];
+    items: INavBarItem[];
 }
 
 class GlobalNav extends React.Component<IGlobalNavProps> {
@@ -11,10 +12,11 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
         return <NavBar {...this.props} renderItem={this.renderItem} />;
     }
 
-    private renderItem = (title: string, path: string, isActive: boolean) => {
+    private renderItem: INavBarItemRenderer = (path, isActive, title, icon) => {
         return (
             <TabBar.Item key={path} id={path} active={isActive}>
-                <TabBar.ItemTitle>{title}</TabBar.ItemTitle>
+                <TabBar.ItemIcon component={Icon} name={icon!} />
+                <TabBar.ItemTitle msgId={title!} />
             </TabBar.Item>
         );
     }

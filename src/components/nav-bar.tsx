@@ -2,27 +2,40 @@ import TabBar from "components/tab-bar";
 import * as React from "react";
 import { matchPath, RouteComponentProps, withRouter } from "react-router";
 
+type INavBarItemRenderer = (
+    path: string,
+    isActive: boolean,
+    title?: string,
+    icon?: string,
+) => JSX.Element;
+
 interface INavBarProps extends RouteComponentProps<{}> {
-    routes: INavBarRoute[];
-    renderItem: (title: string, path: string, isActive: boolean) => JSX.Element;
+    items: INavBarItem[];
+    renderItem: INavBarItemRenderer;
 }
 
-interface INavBarRoute {
-    exact: boolean;
+interface INavBarItem {
+    matchExact: boolean;
     matchPath: string;
     navigateToPath: string;
-    title: string;
+    title?: string;
+    icon?: string;
 }
 
 class NavBar extends React.PureComponent<INavBarProps> {
     public render() {
-        const tabs = this.props.routes.map((route) => {
-            const { matchPath: pathToMatch, navigateToPath, exact, title } =
-                route;
-            const match = matchPath(
-                this.props.location.pathname, { path: pathToMatch, exact });
+        const tabs = this.props.items.map((item) => {
+            const {
+                matchPath: pathToMatch,
+                navigateToPath,
+                matchExact,
+                title,
+                icon,
+            } = item;
+            const match = matchPath(this.props.location.pathname,
+                { path: pathToMatch, exact: matchExact });
             const isActive = match != null;
-            return this.props.renderItem(title, navigateToPath, isActive);
+            return this.props.renderItem(navigateToPath, isActive, title, icon);
         });
         return <TabBar onSelect={this.onSelect}>{tabs}</TabBar>;
     }
@@ -30,5 +43,5 @@ class NavBar extends React.PureComponent<INavBarProps> {
     private onSelect = (path: string) => this.props.history.replace(path);
 }
 
-export { INavBarProps, INavBarRoute };
+export { INavBarProps, INavBarItem, INavBarItemRenderer };
 export default withRouter(NavBar);

@@ -1,20 +1,22 @@
+import Touchable, { ITouchableProps } from "components/touchable";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import {
     StyleSheet,
     Text,
-    TouchableOpacity,
-    TouchableOpacityProperties,
+    TextProperties,
     View,
     ViewProperties,
 } from "react-native";
+import { IconProps } from "react-native-vector-icons/Icon";
 
-interface ITabBarItemTitleProps {
+interface ITabBarItemTitleProps extends TextProperties {
     active?: boolean;
-    children: string;
+    msgId: string;
+    msgValues?: { [key: string]: string };
 }
 
-interface ITabBarItemProps extends TouchableOpacityProperties {
+interface ITabBarItemProps extends ITouchableProps {
     active?: boolean;
     id: string;
     onSelect?: (itemId: string) => void;
@@ -24,20 +26,26 @@ interface ITabBarProps extends ViewProperties {
     onSelect: (itemId: string) => void;
 }
 
+interface ITabBarItemIconProps extends IconProps {
+    active?: boolean;
+    component: React.ComponentClass<IconProps>;
+}
+
 class Item extends React.Component<ITabBarItemProps> {
     public render() {
-        const children = React.Children.map(this.props.children, (child) => {
-            return React.cloneElement(child as React.ReactElement<any>,
-                { active: this.props.active });
+        const { id, active, onSelect, children, ...restProps} = this.props;
+        const newChildren = React.Children.map(children, (child) => {
+            return React.cloneElement(
+                child as React.ReactElement<any>, { active });
         });
         return (
-            <TouchableOpacity
-                style={[styles.item]}
+            <Touchable
+                style={styles.item}
                 onPress={this.onPress}
-                {...this.props}
+                {...restProps}
             >
-                {children}
-            </TouchableOpacity>
+                <View style={styles.itemInner}>{newChildren}</View>
+            </Touchable>
         );
     }
 
@@ -48,11 +56,23 @@ class Item extends React.Component<ITabBarItemProps> {
 // tslint:disable-next-line:max-classes-per-file
 class ItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
     public render() {
+        const { active, msgId, msgValues, ...restProps } = this.props;
+        const style =
+            [styles.itemTitle, active ? styles.itemTitleActive : null];
         return (
-            <Text style={this.props.active ? styles.itemTitleActive : null}>
-                <FormattedMessage id={this.props.children} />
+            <Text style={style}>
+                <FormattedMessage id={msgId} values={msgValues} />
             </Text>
         );
+    }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class ItemIcon extends React.PureComponent<ITabBarItemIconProps> {
+    public render() {
+        const { component: Component, active, ...restProps } = this.props;
+        const color = active ? itemTitleActiveColor : undefined;
+        return <Component size={32} color={color} {...restProps} />;
     }
 }
 
@@ -60,17 +80,21 @@ class ItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
 class TabBar extends React.Component<ITabBarProps> {
     public static Item = Item;
     public static ItemTitle = ItemTitle;
+    public static ItemIcon = ItemIcon;
 
     public render() {
-        const children = React.Children.map(this.props.children, (child) => {
-            return React.cloneElement(child as React.ReactElement<any>,
-                { onSelect: this.props.onSelect });
+        const { children, onSelect, ...restProps } = this.props;
+        const newChildren = React.Children.map(children, (child) => {
+            return React.cloneElement(
+                child as React.ReactElement<any>, { onSelect });
         });
         return (
-            <View style={styles.container} {...this.props}>{children}</View>
+            <View style={styles.container} {...restProps}>{newChildren}</View>
         );
     }
 }
+
+const itemTitleActiveColor = "#0076ff";
 
 const styles = StyleSheet.create({
     container: {
@@ -83,10 +107,21 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
     },
+    itemInner: {
+        alignItems: "center",
+    },
+    itemTitle: {
+        flexDirection: "column",
+    },
     itemTitleActive: {
-        color: "blue",
+        color: itemTitleActiveColor,
     },
 });
 
-export { ITabBarItemTitleProps, ITabBarItemProps, ITabBarProps };
+export {
+    ITabBarItemTitleProps,
+    ITabBarItemProps,
+    ITabBarProps,
+    ITabBarItemIconProps,
+};
 export default TabBar;

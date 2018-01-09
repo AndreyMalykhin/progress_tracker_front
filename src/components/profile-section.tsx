@@ -9,17 +9,17 @@ import routes from "utils/routes";
 type IProfileSectionProps = RouteComponentProps<{ id: string }>;
 
 class ProfileSection extends React.Component<IProfileSectionProps> {
-    private routeDefinitions = [
+    private navItems = [
         {
             component: ActiveTrackables,
-            exact: routes.profileActiveTrackables.exact,
+            matchExact: routes.profileActiveTrackables.exact,
             matchPath: routes.profileActiveTrackables.path,
             navigateToPath: routes.profileMyActiveTrackables.path,
             title: "profile.activeTrackables",
         },
         {
             component: ArchivedTrackables,
-            exact: routes.profileArchive.exact,
+            matchExact: routes.profileArchive.exact,
             matchPath: routes.profileArchive.path,
             navigateToPath: routes.profileMyArchive.path,
             title: "profile.archive",
@@ -27,11 +27,11 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
     ];
 
     public render() {
-        const routElements = this.routeDefinitions.map((route) => {
+        const routElements = this.navItems.map((route) => {
             return (
                 <Route
                     key={route.matchPath}
-                    exact={route.exact}
+                    exact={route.matchExact}
                     path={route.matchPath}
                     component={route.component}
                 />
@@ -40,7 +40,7 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
 
         return (
             <View style={{ flex: 1 }}>
-                <ProfileNav routes={this.routeDefinitions} />
+                <ProfileNav items={this.navItems} />
                 <View style={{ flex: 1 }}>
                     <Switch>{routElements}</Switch>
                 </View>
@@ -55,7 +55,7 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
             return;
         }
 
-        this.routeDefinitions = this.routeDefinitions.map((route) => {
+        this.navItems = this.navItems.map((route) => {
             return {
                 ...route,
                 navigateToPath: route.matchPath.replace(":id", nextUserId),

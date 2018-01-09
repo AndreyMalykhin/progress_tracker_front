@@ -10,38 +10,43 @@ import { View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
 import routes from "utils/routes";
 
-const routeDefinitions = [
+const navItems = [
     {
         component: ProfileSection,
-        exact: routes.profile.exact,
+        icon: "account",
+        matchExact: routes.profile.exact,
         matchPath: routes.profile.path,
         navigateToPath: routes.profileMyActiveTrackables.path,
         title: "globalNavigation.profile",
     },
     {
         component: LeadersSection,
-        exact: routes.leaders.exact,
+        icon: "trophy",
+        matchExact: routes.leaders.exact,
         matchPath: routes.leaders.path,
         navigateToPath: routes.leadersGlobal.path,
         title: "globalNavigation.leaders",
     },
     {
         component: ReviewsSection,
-        exact: routes.reviews.exact,
+        icon: "approval",
+        matchExact: routes.reviews.exact,
         matchPath: routes.reviews.path,
         navigateToPath: routes.reviewsGlobal.path,
         title: "globalNavigation.reviews",
     },
     {
         component: FriendsSection,
-        exact: routes.friends.exact,
+        icon: "account-multiple",
+        matchExact: routes.friends.exact,
         matchPath: routes.friends.path,
         navigateToPath: routes.friends.path,
         title: "globalNavigation.friends",
     },
     {
         component: ActivitiesSection,
-        exact: routes.activities.exact,
+        icon: "calendar",
+        matchExact: routes.activities.exact,
         matchPath: routes.activities.path,
         navigateToPath: routes.activitiesFriends.path,
         title: "globalNavigation.activities",
@@ -50,11 +55,11 @@ const routeDefinitions = [
 
 class HomePage extends React.Component {
     public render() {
-        const routeElements = routeDefinitions.map((route) => {
+        const routeElements = navItems.map((route) => {
             return (
                 <Route
                     key={route.matchPath}
-                    exact={route.exact}
+                    exact={route.matchExact}
                     path={route.matchPath}
                     component={route.component}
                 />
@@ -69,7 +74,7 @@ class HomePage extends React.Component {
                         <Redirect to={routes.profileMyActiveTrackables.path} />
                     </Switch>
                 </View>
-                <GlobalNav routes={routeDefinitions} />
+                <GlobalNav items={navItems} />
             </View>
         );
     }
