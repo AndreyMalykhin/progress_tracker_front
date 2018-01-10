@@ -1,6 +1,7 @@
 import { ApolloCacheClient } from "apollo-link-state";
 import gql from "graphql-tag";
 import { MutationFunc } from "react-apollo/types";
+import Type from "utils/type";
 
 // tslint:disable-next-line:no-empty-interface
 interface ICompleteIntroResponse {}
@@ -21,7 +22,7 @@ const completeIntroResolver = {
                 (cache as ApolloCacheClient).writeData({
                     data: {
                         settings: {
-                            __typename: "Settings",
+                            __typename: Type.Settings,
                             showIntro: false,
                         },
                     },

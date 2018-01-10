@@ -10,4 +10,9 @@ export default {
 
     "intro.login": "Login",
     "intro.skip": "Skip",
+
+    "commands.back": "Back",
+    "commands.edit": "Edit",
+    "commands.new": "New",
+    "commands.profile": "Profile",
 };

@@ -1,9 +1,9 @@
-import { ApolloCacheClient } from "apollo-link-state";
+import Type from "utils/type";
 
 export default {
     defaults: {
         settings: {
-            __typename: "Settings",
+            __typename: Type.Settings,
             locale: null,
             showIntro: true,
         },

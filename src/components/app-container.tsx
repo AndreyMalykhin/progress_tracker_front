@@ -115,7 +115,7 @@ const withAppData = graphql<IGetAppDataResponse, IWithAppDataProps, IAppProps>(
                     accumulator[message.key] = message.text;
                     return accumulator;
                 }, transformedMessages),
-            };
+            } as IAppProps;
         },
     },
 );

@@ -31,7 +31,7 @@ interface ITabBarItemIconProps extends IconProps {
     component: React.ComponentClass<IconProps>;
 }
 
-class Item extends React.Component<ITabBarItemProps> {
+class TabBarItem extends React.Component<ITabBarItemProps> {
     public render() {
         const { id, active, onSelect, children, ...restProps} = this.props;
         const newChildren = React.Children.map(children, (child) => {
@@ -54,7 +54,7 @@ class Item extends React.Component<ITabBarItemProps> {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class ItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
+class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
     public render() {
         const { active, msgId, msgValues, ...restProps } = this.props;
         const style =
@@ -68,7 +68,7 @@ class ItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class ItemIcon extends React.PureComponent<ITabBarItemIconProps> {
+class TabBarItemIcon extends React.PureComponent<ITabBarItemIconProps> {
     public render() {
         const { component: Component, active, ...restProps } = this.props;
         const color = active ? itemTitleActiveColor : undefined;
@@ -78,18 +78,16 @@ class ItemIcon extends React.PureComponent<ITabBarItemIconProps> {
 
 // tslint:disable-next-line:max-classes-per-file
 class TabBar extends React.Component<ITabBarProps> {
-    public static Item = Item;
-    public static ItemTitle = ItemTitle;
-    public static ItemIcon = ItemIcon;
-
     public render() {
-        const { children, onSelect, ...restProps } = this.props;
+        const { children, onSelect, style, ...restProps } = this.props;
         const newChildren = React.Children.map(children, (child) => {
             return React.cloneElement(
                 child as React.ReactElement<any>, { onSelect });
         });
         return (
-            <View style={styles.container} {...restProps}>{newChildren}</View>
+            <View style={[styles.container, style]} {...restProps}>
+                {newChildren}
+            </View>
         );
     }
 }
@@ -119,6 +117,9 @@ const styles = StyleSheet.create({
 });
 
 export {
+    TabBarItem,
+    TabBarItemIcon,
+    TabBarItemTitle,
     ITabBarItemTitleProps,
     ITabBarItemProps,
     ITabBarProps,

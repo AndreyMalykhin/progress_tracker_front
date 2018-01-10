@@ -3,7 +3,7 @@ import NavBar, {
     INavBarItemRenderer,
     INavBarProps,
 } from "components/nav-bar";
-import TabBar from "components/tab-bar";
+import TabBar, { TabBarItem, TabBarItemTitle } from "components/tab-bar";
 import * as React from "react";
 
 interface IProfileNavProps {
@@ -17,9 +17,9 @@ class ProfileNav extends React.Component<IProfileNavProps> {
 
     private renderItem: INavBarItemRenderer = (path, isActive, title, icon) => {
         return (
-            <TabBar.Item key={path} id={path} active={isActive}>
-                <TabBar.ItemTitle msgId={title!} />
-            </TabBar.Item>
+            <TabBarItem key={path} id={path} active={isActive}>
+                <TabBarItemTitle msgId={title!} />
+            </TabBarItem>
         );
     }
 }

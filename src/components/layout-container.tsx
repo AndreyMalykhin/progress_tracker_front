@@ -19,7 +19,7 @@ export default graphql<IGetLayoutDataResponse, {}, ILayoutProps>(
     getLayoutDataQuery,
     {
         props: ({ data }) => {
-            return { showIntro: data!.settings.showIntro };
+            return { showIntro: data!.settings.showIntro } as ILayoutProps;
         },
     },
 )(Layout);

@@ -3,7 +3,7 @@ import FriendsSection from "components/friends-section";
 import GlobalNav from "components/global-nav";
 import Header from "components/header";
 import LeadersSection from "components/leaders-section";
-import ProfileSection from "components/profile-section";
+import ProfileSectionContainer from "components/profile-section-container";
 import ReviewsSection from "components/reviews-section";
 import * as React from "react";
 import { View } from "react-native";
@@ -12,7 +12,7 @@ import routes from "utils/routes";
 
 const navItems = [
     {
-        component: ProfileSection,
+        component: ProfileSectionContainer,
         icon: "account",
         matchExact: routes.profile.exact,
         matchPath: routes.profile.path,
@@ -67,7 +67,7 @@ class HomePage extends React.Component {
         });
         return (
             <View style={{ flex: 1 }}>
-                <Header/>
+                <Header />
                 <View style={{ flex: 1 }}>
                     <Switch>
                         {routeElements}

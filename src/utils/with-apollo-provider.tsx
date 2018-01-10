@@ -3,7 +3,7 @@ import { ApolloClient } from "apollo-client";
 import * as React from "react";
 import { ApolloProvider } from "react-apollo";
 
-export default (apollo: ApolloClient<NormalizedCacheObject>) => {
+function withApolloProvider(apollo: ApolloClient<NormalizedCacheObject>) {
     return <P extends {}>(Component: React.ComponentClass<P>) => {
         return (props: P) => {
             return (
@@ -13,4 +13,6 @@ export default (apollo: ApolloClient<NormalizedCacheObject>) => {
             );
         };
     };
-};
+}
+
+export default withApolloProvider;

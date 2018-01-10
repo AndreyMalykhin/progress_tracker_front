@@ -1,6 +1,11 @@
 import NavBar, { INavBarItem, INavBarItemRenderer } from "components/nav-bar";
-import TabBar from "components/tab-bar";
+import TabBar, {
+    TabBarItem,
+    TabBarItemIcon,
+    TabBarItemTitle,
+} from "components/tab-bar";
 import * as React from "react";
+import { StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface IGlobalNavProps {
@@ -9,18 +14,30 @@ interface IGlobalNavProps {
 
 class GlobalNav extends React.Component<IGlobalNavProps> {
     public render() {
-        return <NavBar {...this.props} renderItem={this.renderItem} />;
+        return (
+            <NavBar
+                renderItem={this.renderItem}
+                style={styles.container}
+                {...this.props}
+            />
+        );
     }
 
     private renderItem: INavBarItemRenderer = (path, isActive, title, icon) => {
         return (
-            <TabBar.Item key={path} id={path} active={isActive}>
-                <TabBar.ItemIcon component={Icon} name={icon!} />
-                <TabBar.ItemTitle msgId={title!} />
-            </TabBar.Item>
+            <TabBarItem key={path} id={path} active={isActive}>
+                <TabBarItemIcon component={Icon} name={icon!} />
+                <TabBarItemTitle msgId={title!} />
+            </TabBarItem>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        borderTopWidth: 1,
+    },
+});
 
 export { IGlobalNavProps };
 export default GlobalNav;
