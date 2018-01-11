@@ -56,7 +56,7 @@ class TabBarItem extends React.Component<ITabBarItemProps> {
 // tslint:disable-next-line:max-classes-per-file
 class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
     public render() {
-        const { active, msgId, msgValues, ...restProps } = this.props;
+        const { active, msgId, msgValues } = this.props;
         const style =
             [styles.itemTitle, active ? styles.itemTitleActive : null];
         return (
@@ -70,7 +70,8 @@ class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
 // tslint:disable-next-line:max-classes-per-file
 class TabBarItemIcon extends React.PureComponent<ITabBarItemIconProps> {
     public render() {
-        const { component: Component, active, ...restProps } = this.props;
+        const { component: Component, active, children, ...restProps } =
+            this.props;
         const color = active ? itemTitleActiveColor : undefined;
         return <Component size={32} color={color} {...restProps} />;
     }

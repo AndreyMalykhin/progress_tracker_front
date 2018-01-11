@@ -6,6 +6,7 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { RouteComponentProps, withRouter } from "react-router";
 import myId from "utils/my-id";
+import routes from "utils/routes";
 
 interface IGetDataResponse {
     getUser: {
@@ -49,11 +50,14 @@ const withData = graphql<IGetDataResponse, IOwnProps, IProfileSectionProps>(
             return {
                 isMe: userId === myId,
                 loading,
-                newTrackable: () => null,
-                openProfileForm: () => null,
-                reportUser: () => null,
-                updateHeader: (state) => {
-                    ownProps.history.replace({ ...ownProps.location, state });
+                onNewTrackableSelect: (trackableType) => {
+                    ownProps.history.push(routes.trackableNew.path.replace(
+                        ":type", trackableType.toString()));
+                },
+                onOpenProfileForm: () => null,
+                onReportUser: (id) => null,
+                onUpdateHeader: (state) => {
+                    ownProps.history.replace({ state });
                 },
                 userId,
                 userName: user.name,

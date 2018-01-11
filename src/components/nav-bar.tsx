@@ -10,9 +10,11 @@ type INavBarItemRenderer = (
     icon?: string,
 ) => JSX.Element;
 
-interface INavBarProps extends Partial<ITabBarProps>, RouteComponentProps<{}> {
+interface INavBarProps extends RouteComponentProps<{}> {
     items: INavBarItem[];
+    keepState: boolean;
     renderItem: INavBarItemRenderer;
+    style?: StyleProp<ViewStyle>;
 }
 
 interface INavBarItem {
@@ -25,7 +27,7 @@ interface INavBarItem {
 
 class NavBar extends React.PureComponent<INavBarProps> {
     public render() {
-        const { location, renderItem, ...restProps } = this.props;
+        const { location, renderItem, style } = this.props;
         const tabs = this.props.items.map((item) => {
             const {
                 matchPath: pathToMatch,
@@ -39,10 +41,15 @@ class NavBar extends React.PureComponent<INavBarProps> {
             const isActive = match != null;
             return renderItem(navigateToPath, isActive, title, icon);
         });
-        return <TabBar onSelect={this.onSelect} {...restProps}>{tabs}</TabBar>;
+        return <TabBar onSelect={this.onSelect} style={style}>{tabs}</TabBar>;
     }
 
-    private onSelect = (path: string) => this.props.history.replace(path);
+    private onSelect = (path: string) => {
+        const { history, location, keepState } = this.props;
+        const newLocation =
+            keepState ? { ...location, pathname: path } : { pathname: path };
+        history.replace(newLocation);
+    }
 }
 
 export { INavBarProps, INavBarItem, INavBarItemRenderer };

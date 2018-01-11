@@ -1,18 +1,21 @@
 export default {
-    "profile.activeTrackables": "In Progress",
-    "profile.archive": "Archive",
-
+    "commands.back": "Back",
+    "commands.edit": "Edit",
+    "commands.new": "New",
+    "commands.profile": "Profile",
+    "common.cancel": "Cancel",
     "globalNavigation.activities": "Activities",
     "globalNavigation.friends": "Friends",
     "globalNavigation.leaders": "Leaders",
     "globalNavigation.profile": "Profile",
     "globalNavigation.reviews": "Reviews",
-
     "intro.login": "Login",
     "intro.skip": "Skip",
-
-    "commands.back": "Back",
-    "commands.edit": "Edit",
-    "commands.new": "New",
-    "commands.profile": "Profile",
+    "newTrackable.title": "Please select the goal type",
+    "profile.activeTrackables": "In Progress",
+    "profile.archive": "Archive",
+    "trackableTypes.counter": "Counter",
+    "trackableTypes.gymExercise": "Gym Exercise",
+    "trackableTypes.numericalGoal": "Numerical Goal",
+    "trackableTypes.taskGoal": "Task Goal",
 };

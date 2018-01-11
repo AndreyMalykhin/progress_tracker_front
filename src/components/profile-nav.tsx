@@ -12,7 +12,13 @@ interface IProfileNavProps {
 
 class ProfileNav extends React.Component<IProfileNavProps> {
     public render() {
-        return <NavBar {...this.props} renderItem={this.renderItem} />;
+        return (
+            <NavBar
+                keepState={true}
+                renderItem={this.renderItem}
+                {...this.props}
+            />
+        );
     }
 
     private renderItem: INavBarItemRenderer = (path, isActive, title, icon) => {

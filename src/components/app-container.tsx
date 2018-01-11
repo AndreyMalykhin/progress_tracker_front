@@ -32,7 +32,7 @@ interface IWithAppDataProps {
 
 function bootstrap(client: ApolloClient<NormalizedCacheObject>) {
     // Apollo bug workaround
-    console.ignoredYellowBox = ["Missing field"];
+    console.ignoredYellowBox = ["Missing field", "Remote debugger is in"];
 
     initLocale(apollo);
 }

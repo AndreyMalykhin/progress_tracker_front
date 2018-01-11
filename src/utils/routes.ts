@@ -51,4 +51,8 @@ export default {
         exact: true,
         path: "/reviews/global",
     },
+    trackableNew: {
+        exact: true,
+        path: "/goal/new/:type",
+    },
 };

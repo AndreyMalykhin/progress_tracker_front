@@ -6,6 +6,7 @@ import Header, {
     IHeaderCmd,
     IHeaderState,
 } from "components/header";
+import NewTrackablePicker from "components/new-trackable-picker";
 import ProfileNav from "components/profile-nav";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
@@ -13,6 +14,7 @@ import { Text, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Route, Switch } from "react-router";
 import routes from "utils/routes";
+import TrackableType from "utils/trackable-type";
 
 interface IProfileSectionProps {
     loading: boolean;
@@ -21,13 +23,21 @@ interface IProfileSectionProps {
     userName: string;
     userRating: number;
     userSmallAvatarUrl: string;
-    openProfileForm: () => void;
-    reportUser: () => void;
-    newTrackable: () => void;
-    updateHeader: (state: IHeaderState|null) => void;
+    onOpenProfileForm: () => void;
+    onReportUser: (id: string) => void;
+    onNewTrackableSelect: (trackableType: TrackableType) => void;
+    onUpdateHeader: (state: IHeaderState|null) => void;
 }
 
-class ProfileSection extends React.Component<IProfileSectionProps> {
+interface IProfileSectionState {
+    isNewTrackablePickerOpen: boolean;
+}
+
+class ProfileSection
+    extends React.Component<IProfileSectionProps, IProfileSectionState> {
+    public state: IProfileSectionState = {
+        isNewTrackablePickerOpen: false,
+    };
     private navItems = [
         {
             component: ActiveTrackables,
@@ -63,14 +73,19 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
                 <View style={{ flex: 1 }}>
                     <Switch>{routeElements}</Switch>
                 </View>
+                <NewTrackablePicker
+                    isOpen={this.state.isNewTrackablePickerOpen}
+                    onSelect={this.onNewTrackablePickerSelect}
+                />
             </View>
         );
     }
 
     public componentWillReceiveProps(nextProps: IProfileSectionProps) {
         const nextUserId = nextProps.userId;
+        const { userId, userRating, userName, loading } = this.props;
 
-        if (this.props.userId !== nextUserId) {
+        if (userId !== nextUserId) {
             this.navItems = this.navItems.map((route) => {
                 return {
                     ...route,
@@ -79,7 +94,12 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
             });
         }
 
-        this.updateHeader(nextProps.loading);
+        if (userId !== nextUserId
+            || userRating !== nextProps.userRating
+            || loading !== nextProps.loading
+        ) {
+            this.updateHeader(nextProps.loading);
+        }
     }
 
     public componentWillMount() {
@@ -91,16 +111,12 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
             isMe,
             userRating,
             userName,
-            userId,
             userSmallAvatarUrl,
-            openProfileForm,
-            updateHeader,
-            newTrackable,
-            reportUser,
+            onUpdateHeader,
         } = this.props;
 
         if (isLoading) {
-            updateHeader(null);
+            onUpdateHeader(null);
             return;
         }
 
@@ -110,7 +126,7 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
             </HeaderSubtitle>
         );
         const profileCmd = {
-            action: () => isMe && openProfileForm(),
+            action: this.openProfileForm,
             imgUrl: userSmallAvatarUrl,
             msgId: isMe ? "commands.edit" : "commands.profile",
         } as IHeaderCmd;
@@ -118,26 +134,55 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
 
         if (isMe) {
             const newTrackableCmd = {
-                action: newTrackable,
+                action: this.onNewTrackable,
                 iconName: "plus",
                 msgId: "commands.new",
             } as IHeaderCmd;
             rightCommands.push(newTrackableCmd);
         } else {
             const reportCmd = {
-                action: reportUser,
+                action: this.reportUser,
                 iconName: "exclamation",
                 msgId: "commands.report",
             } as IHeaderCmd;
             rightCommands.push(reportCmd);
         }
 
-        updateHeader({
+        onUpdateHeader({
             leftCommand: profileCmd,
             rightCommands,
             subtitle,
             title: <HeaderTitle>{userName}</HeaderTitle>,
         });
+    }
+
+    private openProfileForm = () => {
+        const { isMe, onOpenProfileForm } = this.props;
+
+        if (!isMe) {
+            return;
+        }
+
+        onOpenProfileForm();
+    }
+
+    private reportUser = () => {
+        const { userId, onReportUser } = this.props;
+        onReportUser(userId);
+    }
+
+    private onNewTrackable = () => {
+        this.setState({ isNewTrackablePickerOpen: true });
+    }
+
+    private onNewTrackablePickerSelect = (trackableType?: TrackableType) => {
+        this.setState({ isNewTrackablePickerOpen: false });
+
+        if (trackableType == null) {
+            return;
+        }
+
+        this.props.onNewTrackableSelect(trackableType);
     }
 }
 
