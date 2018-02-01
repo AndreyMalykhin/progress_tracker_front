@@ -15,11 +15,9 @@ import { MutationFunc } from "react-apollo/types";
 const withLogin = graphql<ILoginResponse, {}, IIntroPageProps>(
     loginQuery,
     {
-        name: "loginMutation",
-        props: ({ loginMutation }: any) => {
+        props: ({ mutate }) => {
             return {
-                onLogin: () =>
-                    login(loginMutation as MutationFunc<ILoginResponse>),
+                onLogin: () => login(mutate!),
             };
         },
     },
@@ -28,11 +26,9 @@ const withLogin = graphql<ILoginResponse, {}, IIntroPageProps>(
 const withCompleteIntro = graphql<ICompleteIntroResponse, {}, IIntroPageProps>(
     completeIntroQuery,
     {
-        name: "completeIntroMutation",
-        props: ({ completeIntroMutation }: any) => {
+        props: ({ mutate }) => {
             return {
-                onClose: () => completeIntro(
-                    completeIntroMutation as MutationFunc<ICompleteIntroResponse>),
+                onClose: () => completeIntro(mutate!),
             };
         },
     },

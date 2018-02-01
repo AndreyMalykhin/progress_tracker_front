@@ -1,4 +1,5 @@
 import en from "messages/en";
+import Type from "models/type";
 
 interface IMessage {
     __typename: string;
@@ -23,7 +24,12 @@ function transformMessages(input: ITransformInput) {
 
         // tslint:disable-next-line:forin
         for (const key in inputMessages) {
-            outputMessages.push({ __typename: "Message", id: `${locale}_${key}`, key, text: inputMessages[key] });
+            outputMessages.push({
+                __typename: Type.Message,
+                id: `${locale}_${key}`,
+                key,
+                text: inputMessages[key],
+            });
         }
 
         output[locale] = outputMessages;
@@ -38,7 +44,7 @@ export default {
     defaults: {},
     resolvers: {
         Query: {
-            messages: (rootValue: any, args: any) => {
+            getMessages: (rootValue: any, args: any) => {
                 return messages[args.locale];
             },
         },

@@ -1,6 +1,6 @@
-import Button from "components/button";
+import Button, { ButtonTitle } from "components/button";
 import * as React from "react";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { withRouter } from "react-router";
 
 interface IIntroPageProps  {
@@ -11,18 +11,25 @@ interface IIntroPageProps  {
 class IntroPage extends React.Component<IIntroPageProps> {
     public render() {
         return (
-            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                <Text>INTRO PAGE</Text>
+            <View style={styles.container}>
                 <Button onPress={this.props.onLogin}>
-                    <Button.Title msgId="intro.login" />
+                    <ButtonTitle msgId="intro.login" />
                 </Button>
                 <Button onPress={this.props.onClose}>
-                    <Button.Title msgId="intro.skip" />
+                    <ButtonTitle msgId="intro.skip" />
                 </Button>
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        alignItems: "center",
+        flex: 1,
+        justifyContent: "center",
+    },
+});
 
 export { IIntroPageProps };
 export default IntroPage;

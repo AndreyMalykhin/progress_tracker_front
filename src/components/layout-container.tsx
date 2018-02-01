@@ -2,24 +2,26 @@ import Layout, { ILayoutProps } from "components/layout";
 import gql from "graphql-tag";
 import graphql from "react-apollo/graphql";
 
-interface IGetLayoutDataResponse {
+interface IGetDataResponse {
     settings: {
+        id: string;
         showIntro: boolean;
     };
 }
 
-const getLayoutDataQuery = gql`
-query GetLayoutData {
+const getDataQuery = gql`
+query GetData {
     settings @client {
+        id
         showIntro
     }
 }`;
 
-export default graphql<IGetLayoutDataResponse, {}, ILayoutProps>(
-    getLayoutDataQuery,
+export default graphql<IGetDataResponse, {}, ILayoutProps>(
+    getDataQuery,
     {
         props: ({ data }) => {
-            return { showIntro: data!.settings.showIntro } as ILayoutProps;
+            return { showIntro: data!.settings.showIntro };
         },
     },
 )(Layout);

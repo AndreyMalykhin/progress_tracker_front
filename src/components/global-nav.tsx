@@ -19,16 +19,30 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
                 keepState={false}
                 renderItem={this.renderItem}
                 style={styles.container}
-                {...this.props}
+                items={this.props.items}
             />
         );
     }
 
-    private renderItem: INavBarItemRenderer = (path, isActive, title, icon) => {
+    private renderItem: INavBarItemRenderer = (
+        path, isActive, onSelect, titleMsgId, iconName,
+    ) => {
         return (
-            <TabBarItem key={path} id={path} active={isActive}>
-                <TabBarItemIcon component={Icon} name={icon!} />
-                <TabBarItemTitle msgId={title!} />
+            <TabBarItem
+                key={path}
+                id={path}
+                active={isActive}
+                onSelect={onSelect}
+            >
+                <TabBarItemIcon
+                    active={isActive}
+                    component={Icon}
+                    name={iconName!}
+                />
+                <TabBarItemTitle
+                    active={isActive}
+                    msgId={titleMsgId!}
+                />
             </TabBarItem>
         );
     }

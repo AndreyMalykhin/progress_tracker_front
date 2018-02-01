@@ -1,3 +1,5 @@
+import myId from "utils/my-id";
+
 export default {
     activities: {
         exact: false,
@@ -35,13 +37,17 @@ export default {
         exact: true,
         path: "/profile/:id/archive",
     },
+    profileEdit: {
+        exact: true,
+        path: `/profile/${myId}/edit`,
+    },
     profileMyActiveTrackables: {
         exact: true,
-        path: "/profile/me/in-progress",
+        path: `/profile/${myId}/in-progress`,
     },
     profileMyArchive: {
         exact: true,
-        path: "/profile/me/archive",
+        path: `/profile/${myId}/archive`,
     },
     reviews: {
         exact: false,
@@ -50,6 +56,10 @@ export default {
     reviewsGlobal: {
         exact: true,
         path: "/reviews/global",
+    },
+    trackableEdit: {
+        exact: true,
+        path: "/goal/:id/edit",
     },
     trackableNew: {
         exact: true,

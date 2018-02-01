@@ -1,4 +1,4 @@
-import Touchable, { ITouchableProps } from "components/touchable";
+import TouchableWithFeedback, { ITouchableWithFeedbackProps } from "components/touchable-with-feedback";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import {
@@ -16,51 +16,56 @@ interface ITabBarItemTitleProps extends TextProperties {
     msgValues?: { [key: string]: string };
 }
 
-interface ITabBarItemProps extends ITouchableProps {
+interface ITabBarItemProps extends ITouchableWithFeedbackProps {
     active?: boolean;
     id: string;
-    onSelect?: (itemId: string) => void;
+    onSelect: (id: string) => void;
 }
 
-interface ITabBarProps extends ViewProperties {
-    onSelect: (itemId: string) => void;
-}
+type ITabBarProps = ViewProperties;
 
 interface ITabBarItemIconProps extends IconProps {
     active?: boolean;
     component: React.ComponentClass<IconProps>;
 }
 
+class TabBar extends React.Component<ITabBarProps> {
+    public render() {
+        const { children, style, ...restProps } = this.props;
+        return (
+            <View style={[styles.container, style]} {...restProps}>
+                {children}
+            </View>
+        );
+    }
+}
+
+// tslint:disable-next-line:max-classes-per-file
 class TabBarItem extends React.Component<ITabBarItemProps> {
     public render() {
-        const { id, active, onSelect, children, ...restProps} = this.props;
-        const newChildren = React.Children.map(children, (child) => {
-            return React.cloneElement(
-                child as React.ReactElement<any>, { active });
-        });
+        const { id, active, style, onSelect, children, ...restProps} = this.props;
         return (
-            <Touchable
-                style={styles.item}
+            <TouchableWithFeedback
+                style={[styles.item, style]}
+                disabled={this.props.active}
                 onPress={this.onPress}
                 {...restProps}
             >
-                <View style={styles.itemInner}>{newChildren}</View>
-            </Touchable>
+                <View style={styles.itemContent}>{children}</View>
+            </TouchableWithFeedback>
         );
     }
 
-    private onPress = () =>
-        !this.props.active && this.props.onSelect!(this.props.id)
+    private onPress = () => this.props.onSelect!(this.props.id);
 }
 
 // tslint:disable-next-line:max-classes-per-file
 class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
     public render() {
-        const { active, msgId, msgValues } = this.props;
-        const style =
-            [styles.itemTitle, active ? styles.itemTitleActive : null];
+        const { style, active, msgId, msgValues } = this.props;
+        const baseStyle = active ? itemTitleActiveStyle : styles.itemTitle;
         return (
-            <Text style={style}>
+            <Text style={[baseStyle, style]}>
                 <FormattedMessage id={msgId} values={msgValues} />
             </Text>
         );
@@ -70,30 +75,18 @@ class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
 // tslint:disable-next-line:max-classes-per-file
 class TabBarItemIcon extends React.PureComponent<ITabBarItemIconProps> {
     public render() {
-        const { component: Component, active, children, ...restProps } =
+        const { component: Component, style, active, children, ...restProps } =
             this.props;
-        const color = active ? itemTitleActiveColor : undefined;
-        return <Component size={32} color={color} {...restProps} />;
-    }
-}
-
-// tslint:disable-next-line:max-classes-per-file
-class TabBar extends React.Component<ITabBarProps> {
-    public render() {
-        const { children, onSelect, style, ...restProps } = this.props;
-        const newChildren = React.Children.map(children, (child) => {
-            return React.cloneElement(
-                child as React.ReactElement<any>, { onSelect });
-        });
+        const baseStyle = active ? itemIconActiveStyle : styles.itemIcon;
         return (
-            <View style={[styles.container, style]} {...restProps}>
-                {newChildren}
-            </View>
+            <Component
+                size={32}
+                style={[baseStyle, style]}
+                {...restProps}
+            />
         );
     }
 }
-
-const itemTitleActiveColor = "#0076ff";
 
 const styles = StyleSheet.create({
     container: {
@@ -105,17 +98,25 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flex: 1,
         justifyContent: "center",
+        paddingVertical: 8,
     },
-    itemInner: {
+    itemContent: {
         alignItems: "center",
+    },
+    itemIcon: {},
+    itemIconActive: {
+        color: "#0076ff",
     },
     itemTitle: {
         flexDirection: "column",
     },
     itemTitleActive: {
-        color: itemTitleActiveColor,
+        color: "#0076ff",
     },
 });
+
+const itemTitleActiveStyle = [styles.itemTitle, styles.itemTitleActive];
+const itemIconActiveStyle = [styles.itemIcon, styles.itemIconActive];
 
 export {
     TabBarItem,

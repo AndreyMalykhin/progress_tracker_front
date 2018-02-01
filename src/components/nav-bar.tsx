@@ -6,8 +6,9 @@ import { matchPath, RouteComponentProps, withRouter } from "react-router";
 type INavBarItemRenderer = (
     path: string,
     isActive: boolean,
-    title?: string,
-    icon?: string,
+    onSelect: (path: string) => void,
+    titleMsgId?: string,
+    iconName?: string,
 ) => JSX.Element;
 
 interface INavBarProps extends RouteComponentProps<{}> {
@@ -21,27 +22,28 @@ interface INavBarItem {
     matchExact: boolean;
     matchPath: string;
     navigateToPath: string;
-    title?: string;
-    icon?: string;
+    titleMsgId?: string;
+    iconName?: string;
 }
 
 class NavBar extends React.PureComponent<INavBarProps> {
     public render() {
-        const { location, renderItem, style } = this.props;
-        const tabs = this.props.items.map((item) => {
+        const { location, renderItem, style, items } = this.props;
+        const tabs = items.map((item) => {
             const {
                 matchPath: pathToMatch,
                 navigateToPath,
                 matchExact,
-                title,
-                icon,
+                titleMsgId,
+                iconName,
             } = item;
             const match = matchPath(location.pathname,
                 { path: pathToMatch, exact: matchExact });
             const isActive = match != null;
-            return renderItem(navigateToPath, isActive, title, icon);
+            return renderItem(
+                navigateToPath, isActive, this.onSelect, titleMsgId, iconName);
         });
-        return <TabBar onSelect={this.onSelect} style={style}>{tabs}</TabBar>;
+        return <TabBar style={style}>{tabs}</TabBar>;
     }
 
     private onSelect = (path: string) => {

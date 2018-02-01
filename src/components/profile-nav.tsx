@@ -3,8 +3,14 @@ import NavBar, {
     INavBarItemRenderer,
     INavBarProps,
 } from "components/nav-bar";
-import TabBar, { TabBarItem, TabBarItemTitle } from "components/tab-bar";
+import TabBar, {
+    TabBarItem,
+    TabBarItemIcon,
+    TabBarItemTitle,
+} from "components/tab-bar";
 import * as React from "react";
+import { StyleSheet } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface IProfileNavProps {
     items: INavBarItem[];
@@ -16,19 +22,38 @@ class ProfileNav extends React.Component<IProfileNavProps> {
             <NavBar
                 keepState={true}
                 renderItem={this.renderItem}
-                {...this.props}
+                items={this.props.items}
+                style={styles.container}
             />
         );
     }
 
-    private renderItem: INavBarItemRenderer = (path, isActive, title, icon) => {
+    private renderItem: INavBarItemRenderer = (
+        path, isActive, onSelect, titleMsgId, iconName,
+    ) => {
         return (
-            <TabBarItem key={path} id={path} active={isActive}>
-                <TabBarItemTitle msgId={title!} />
+            <TabBarItem
+                key={path}
+                id={path}
+                active={isActive}
+                onSelect={onSelect}
+            >
+                <TabBarItemIcon
+                    active={isActive}
+                    component={Icon}
+                    name={iconName!}
+                />
+                <TabBarItemTitle active={isActive} msgId={titleMsgId!} />
             </TabBarItem>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        borderBottomWidth: 1,
+    },
+});
 
 export { IProfileNavProps };
 export default ProfileNav;

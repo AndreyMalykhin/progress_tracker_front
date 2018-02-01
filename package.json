@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "@types/": "yfuks/react-native-action-sheet",
     "@types/enzyme": "^3.1.6",
     "@types/jest": "^22.0.0",
     "@types/lodash": "^4.14.91",
@@ -14,8 +15,11 @@
     "@types/react-native-vector-icons": "^4.4.2",
     "@types/react-router-native": "^4.0.2",
     "@types/react-test-renderer": "^16.0.0",
+    "@types/uuid": "^3.4.3",
     "babel-plugin-module-resolver": "^3.0.0",
+    "babel-plugin-transform-inline-environment-variables": "^0.2.0",
     "babel-preset-react-native-stage-0": "^1.0.1",
+    "env-cmd": "^7.0.0",
     "enzyme": "^3.3.0",
     "husky": "^0.14.3",
     "jest-expo": "23.0.0",
@@ -24,19 +28,21 @@
     "react-dom": "^16.2.0",
     "react-native-cli": "^2.0.1",
     "react-test-renderer": "16.0.0",
+    "reactotron-react-native": "^1.14.0",
     "ts-jest": "^22.0.0",
     "tslint": "^5.8.0",
     "tslint-react": "^3.3.3",
     "typescript": "^2.6.2"
   },
   "scripts": {
-    "start": "react-native start",
+    "start": "env-cmd ./.env react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "test": "node node_modules/jest/bin/jest.js --watch",
-    "dev": "tsc --watch",
+    "dev": "yarn extract-fragment-types && tsc --watch",
     "lint": "tslint -p . --fix",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "extract-fragment-types": "node src/scripts/extract-fragment-types.js"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -74,6 +80,7 @@
     "cacheDirectory": ".jest/cache"
   },
   "dependencies": {
+    "@yfuks/react-native-action-sheet": "^0.0.4",
     "apollo-cache-inmemory": "^1.1.4",
     "apollo-client": "^2.0.4",
     "apollo-link": "^1.0.7",
@@ -88,10 +95,16 @@
     "react-apollo": "^2.0.4",
     "react-intl": "^2.4.0",
     "react-native": "0.51.0",
+    "react-native-config": "^0.11.5",
     "react-native-device-info": "^0.13.0",
     "react-native-fbsdk": "^0.7.0",
+    "react-native-image-crop-picker": "^0.19.1",
+    "react-native-keyboard-aware-scroll-view": "^0.4.3",
     "react-native-modal": "^4.1.1",
+    "react-native-modal-datetime-picker": "^4.13.0",
+    "react-native-progress": "^3.4.0",
     "react-native-vector-icons": "^4.4.3",
-    "react-router-native": "^4.2.0"
+    "react-router-native": "^4.2.0",
+    "uuid": "^3.1.0"
   }
 }
