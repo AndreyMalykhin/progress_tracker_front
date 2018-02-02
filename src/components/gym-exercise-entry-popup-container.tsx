@@ -72,7 +72,7 @@ class GymExerciseEntryPopupContainer extends
         this.setState((prevState) => {
             const repetitionCount = parseInt(prevState.repetitionCount!, 10);
             const repetitionCountError = isNaN(repetitionCount!) ||
-                repetitionCount! <= 0 ? "errors.zeroOrNegativeInteger" : null;
+                repetitionCount! <= 0 ? "errors.zeroOrNegativeOrNotInteger" : null;
             return { repetitionCountError };
         });
     }
@@ -86,7 +86,7 @@ class GymExerciseEntryPopupContainer extends
         this.setState((prevState) => {
             const setCount = parseInt(prevState.setCount!, 10);
             const setCountError = isNaN(setCount!) || setCount! <= 0 ?
-                "errors.zeroOrNegativeInteger" : null;
+                "errors.zeroOrNegativeOrNotInteger" : null;
             return { setCountError };
         });
     }
@@ -100,7 +100,7 @@ class GymExerciseEntryPopupContainer extends
         this.setState((prevState) => {
             const weight = parseFloat(prevState.weight!);
             const weightError = isNaN(weight!) || weight! < 0 ?
-                "errors.negativeNumber" : null;
+                "errors.negativeOrNotNumber" : null;
             return { weightError };
         });
     }

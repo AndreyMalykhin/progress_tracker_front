@@ -18,6 +18,7 @@ yarn-error.log*
 
 build/
 ios/build/
+ios/Pods/
 .jest/
 .vscode/
 

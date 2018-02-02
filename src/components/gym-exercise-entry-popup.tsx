@@ -52,21 +52,21 @@ class GymExerciseEntryPopup
                 <FormBody>
                     <FormTextInput
                         autoFocus={true}
-                        placeholderMsgId="gymExerciseEntryForm.setCount"
+                        placeholderMsgId="gymExerciseEntryForm.setCountPlaceholder"
                         keyboardType="numeric"
                         onChangeText={onChangeSetCount}
                         value={setCount}
                         errorMsgId={setCountError}
                     />
                     <FormTextInput
-                        placeholderMsgId="gymExerciseEntryForm.repetitionCount"
+                        placeholderMsgId="gymExerciseEntryForm.repetitionCountPlaceholder"
                         keyboardType="numeric"
                         onChangeText={onChangeRepetitionCount}
                         value={repetitionCount}
                         errorMsgId={repetitionCountError}
                     />
                     <FormTextInput
-                        placeholderMsgId="gymExerciseEntryForm.weight"
+                        placeholderMsgId="gymExerciseEntryForm.weightPlaceholder"
                         keyboardType="numeric"
                         onChangeText={onChangeWeight}
                         value={weight}

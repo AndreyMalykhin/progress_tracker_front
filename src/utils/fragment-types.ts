@@ -7,7 +7,7 @@ export default {
                 "name": "ITrackable",
                 "possibleTypes": [
                     {
-                        "name": "GymExercise"
+                        "name": "NumericalGoal"
                     },
                     {
                         "name": "Aggregate"
@@ -16,10 +16,10 @@ export default {
                         "name": "TaskGoal"
                     },
                     {
-                        "name": "Counter"
+                        "name": "GymExercise"
                     },
                     {
-                        "name": "NumericalGoal"
+                        "name": "Counter"
                     }
                 ]
             },
@@ -28,16 +28,16 @@ export default {
                 "name": "IPrimitiveTrackable",
                 "possibleTypes": [
                     {
-                        "name": "GymExercise"
+                        "name": "NumericalGoal"
                     },
                     {
                         "name": "TaskGoal"
                     },
                     {
-                        "name": "Counter"
+                        "name": "GymExercise"
                     },
                     {
-                        "name": "NumericalGoal"
+                        "name": "Counter"
                     }
                 ]
             },
@@ -46,13 +46,13 @@ export default {
                 "name": "IAggregatable",
                 "possibleTypes": [
                     {
+                        "name": "NumericalGoal"
+                    },
+                    {
                         "name": "TaskGoal"
                     },
                     {
                         "name": "Counter"
-                    },
-                    {
-                        "name": "NumericalGoal"
                     }
                 ]
             },
@@ -61,10 +61,10 @@ export default {
                 "name": "IGoal",
                 "possibleTypes": [
                     {
-                        "name": "TaskGoal"
+                        "name": "NumericalGoal"
                     },
                     {
-                        "name": "NumericalGoal"
+                        "name": "TaskGoal"
                     }
                 ]
             }

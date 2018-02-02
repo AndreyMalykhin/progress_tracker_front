@@ -7,8 +7,8 @@ import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
 import Difficulty from "utils/difficulty";
 
-interface IEditTaskGoalResponse {
-    editTaskGoal: {
+interface IEditNumericalGoalResponse {
+    editNumericalGoal: {
         trackable: {
             id: string;
             title: string;
@@ -20,7 +20,7 @@ interface IEditTaskGoalResponse {
     };
 }
 
-interface IEditTaskGoalFragment {
+interface IEditNumericalGoalFragment {
     id: string;
     title?: string;
     deadlineDate?: number|null;
@@ -30,7 +30,7 @@ interface IEditTaskGoalFragment {
 }
 
 const goalFragment = gql`
-fragment EditTaskGoalFragment on TaskGoal {
+fragment EditNumericalGoalFragment on NumericalGoal {
     id
     title
     deadlineDate
@@ -39,20 +39,21 @@ fragment EditTaskGoalFragment on TaskGoal {
     progressDisplayMode
 }`;
 
-const editTaskGoalQuery = gql`
+const editNumericalGoalQuery = gql`
 ${goalFragment}
 
-mutation EditTaskGoal($goal: EditTaskGoalInput!) {
-    editTaskGoal(goal: $goal) {
+mutation EditNumericalGoal($goal: EditNumericalGoalInput!) {
+    editNumericalGoal(goal: $goal) {
         trackable {
-            ...EditTaskGoalFragment
+            ...EditNumericalGoalFragment
         }
     }
-}`;
+}
+`;
 
-async function editTaskGoal(
-    goal: IEditTaskGoalFragment,
-    mutate: MutationFunc<IEditTaskGoalResponse>,
+async function editNumericalGoal(
+    goal: IEditNumericalGoalFragment,
+    mutate: MutationFunc<IEditNumericalGoalResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     await mutate({
@@ -62,25 +63,26 @@ async function editTaskGoal(
 }
 
 function getOptimisticResponse(
-    goal: IEditTaskGoalFragment, apollo: ApolloClient<NormalizedCacheObject>,
+    goal: IEditNumericalGoalFragment,
+    apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     const fragmentId =
-        dataIdFromObject({ __typename: Type.TaskGoal, id: goal.id })!;
-    const storedGoal = apollo.readFragment<IEditTaskGoalFragment>(
+        dataIdFromObject({ __typename: Type.NumericalGoal, id: goal.id })!;
+    const storedGoal = apollo.readFragment<IEditNumericalGoalFragment>(
         { id: fragmentId, fragment: goalFragment })!;
     Object.assign(storedGoal, goal);
     return {
         __typename: Type.Mutation,
-        editTaskGoal: {
-            __typename: Type.EditTaskGoalResponse,
+        editNumericalGoal: {
+            __typename: Type.EditNumericalGoalResponse,
             trackable: storedGoal,
         },
-    } as IEditTaskGoalResponse;
+    } as IEditNumericalGoalResponse;
 }
 
 export {
-    editTaskGoal,
-    editTaskGoalQuery,
-    IEditTaskGoalResponse,
-    IEditTaskGoalFragment,
+    editNumericalGoal,
+    editNumericalGoalQuery,
+    IEditNumericalGoalResponse,
+    IEditNumericalGoalFragment,
 };

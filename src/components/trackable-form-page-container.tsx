@@ -59,6 +59,7 @@ query GetData($trackableId: ID!) {
             difficulty
             deadlineDate
             progressDisplayMode
+            maxProgress
         }
         ... on TaskGoal {
             tasks {

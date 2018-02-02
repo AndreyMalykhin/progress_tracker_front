@@ -33,7 +33,7 @@ class NumericalEntryPopup
             <Modal isVisible={true} onBackdropPress={onCancel}>
                 <FormBody>
                     <FormTextInput
-                        placeholderMsgId="numericalEntryForm.entry"
+                        placeholderMsgId="numericalEntryForm.entryPlaceholder"
                         autoFocus={true}
                         keyboardType="numeric"
                         onChangeText={onChangeEntry}

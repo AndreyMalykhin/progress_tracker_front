@@ -17,6 +17,11 @@ import {
 } from "actions/edit-task-goal-action";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
+import GoalFormContainer, {
+    IGoal,
+    IGoalFormContainerProps,
+    IGoalFormContainerState,
+} from "components/goal-form-container";
 import { HeaderTitle, IHeaderState } from "components/header";
 import TaskGoalForm, { ITask } from "components/task-goal-form";
 import { debounce, throttle } from "lodash";
@@ -31,39 +36,21 @@ import { RouteComponentProps, withRouter } from "react-router";
 import Difficulty from "utils/difficulty";
 import uuid from "utils/uuid";
 
-interface ITaskGoal {
-    id: string;
-    title: string;
-    iconName: string;
-    isPublic: boolean;
-    difficulty: Difficulty;
+interface ITaskGoal extends IGoal {
     tasks: ITask[];
-    progressDisplayMode: ProgressDisplayMode;
-    deadlineDate?: number;
 }
 
-type ITaskGoalFormContainerProps = RouteComponentProps<{}> & {
-    trackable?: ITaskGoal;
-    isUserLoggedIn: boolean;
-    onAddTaskGoal: (goal: IAddTaskGoalFragment) => Promise<void>;
-    onEditTaskGoal: (goal: IEditTaskGoalFragment) => void;
+type ITaskGoalFormContainerProps = IGoalFormContainerProps<ITaskGoal> & {
+    onAddGoal: (goal: IAddTaskGoalFragment) => Promise<void>;
+    onEditGoal: (goal: IEditTaskGoalFragment) => void;
     onEditTask: (id: string, title: string) => void;
 };
 
-interface ITaskGoalFormContainerState {
-    title?: string;
-    titleError?: string|null;
-    iconName: string;
-    isPublic: boolean;
-    difficulty: Difficulty;
+interface ITaskGoalFormContainerState extends IGoalFormContainerState {
     tasks: ITask[];
     taskListError?: string|null;
     taskErrors: { [id: string]: string|null|undefined };
-    deadlineDate?: Date;
-    progressDisplayMode: ProgressDisplayMode;
-    isExpanded?: boolean;
     newTaskTitle?: string;
-    isIconPickerOpen?: boolean;
     focusedTaskId?: string;
 }
 
@@ -77,7 +64,7 @@ const withAddGoal =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onAddTaskGoal: (goal: IAddTaskGoalFragment) => {
+                    onAddGoal: (goal: IAddTaskGoalFragment) => {
                         addTaskGoal(goal, mutate!, ownProps.client);
                     },
                 };
@@ -91,7 +78,7 @@ const withEditGoal =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onEditTaskGoal: (goal: IEditTaskGoalFragment) => {
+                    onEditGoal: (goal: IEditTaskGoalFragment) => {
                         editTaskGoal(goal, mutate!, ownProps.client);
                     },
                 };
@@ -113,58 +100,19 @@ const withEditTask =
         },
     );
 
-const icons = [
-    "access-point", "access-point-network", "account", "account-alert",
-    "account-box", "account-box-outline", "account-card-details",
-    "account-check", "account-circle", "account-convert", "account-edit",
-    "account-key", "account-location", "account-minus", "account-multiple",
-    "account-multiple-minus",
-];
-
-const difficultyToNumber: { [difficulty: string]: number } = {
-    [Difficulty.Easy]: 0,
-    [Difficulty.Medium]: 1,
-    [Difficulty.Hard]: 2,
-    [Difficulty.Impossible]: 3,
-};
-
-const numberToDifficulty: { [num: number]: Difficulty } = {
-    0: Difficulty.Easy,
-    1: Difficulty.Medium,
-    2: Difficulty.Hard,
-    3: Difficulty.Impossible,
-};
-
-const difficultyToMsgId: { [difficulty: string]: string } = {
-    [Difficulty.Easy]: "difficulties.easy",
-    [Difficulty.Medium]: "difficulties.medium",
-    [Difficulty.Hard]: "difficulties.hard",
-    [Difficulty.Impossible]: "difficulties.impossible",
-};
-
-const saveDelay = 512;
-
-class TaskGoalFormContainer extends
-    React.Component<ITaskGoalFormContainerProps, ITaskGoalFormContainerState> {
-    public state: ITaskGoalFormContainerState = {
-        difficulty: Difficulty.Easy,
-        iconName: "access-point",
-        isPublic: false,
-        progressDisplayMode: ProgressDisplayMode.Percentage,
-        taskErrors: {},
-        tasks: [],
-    };
-    private minDeadlineDate: Date;
-
+class TaskGoalFormContainer extends GoalFormContainer<
+    ITaskGoal,
+    ITaskGoalFormContainerProps,
+    ITaskGoalFormContainerState
+> {
     public constructor(props: ITaskGoalFormContainerProps, context: any) {
         super(props, context);
-        this.onChangeDifficulty = throttle(this.onChangeDifficulty, 256);
-        this.saveDifficulty = debounce(this.saveDifficulty, saveDelay);
-        this.saveTitle = debounce(this.saveTitle, saveDelay);
-        this.saveTaskTitle = debounce(this.saveTaskTitle, saveDelay);
-        this.saveTask = debounce(this.saveTask, saveDelay);
-        this.minDeadlineDate = new Date();
-        this.minDeadlineDate.setDate(this.minDeadlineDate.getDate() + 1);
+        this.saveTaskTitle = debounce(this.saveTaskTitle, this.saveDelay);
+        this.saveTask = debounce(this.saveTask, this.saveDelay);
+        Object.assign(this.state, {
+            taskErrors: {},
+            tasks: [],
+        });
     }
 
     public render() {
@@ -185,15 +133,17 @@ class TaskGoalFormContainer extends
             focusedTaskId,
         } = this.state;
         const isNew = this.isNew();
+        const isPublicDisabled = this.isPublicDisabled(
+            isNew, this.props.isUserLoggedIn);
         return (
             <TaskGoalForm
                 isValid={this.isValid(this.state)}
                 title={title!}
                 titleError={titleError}
-                availableIconNames={icons}
+                availableIconNames={this.icons}
                 iconName={iconName!}
                 isPublic={isPublic!}
-                isPublicDisabled={!isNew || !this.props.isUserLoggedIn}
+                isPublicDisabled={isPublicDisabled}
                 difficulty={difficulty!}
                 tasks={tasks!}
                 taskListError={taskListError}
@@ -226,124 +176,11 @@ class TaskGoalFormContainer extends
         );
     }
 
-    public componentWillMount() {
-        this.updateHeader(this.isValid(this.state));
-
-        if (this.isNew()) {
-            this.setState({ isPublic: this.props.isUserLoggedIn });
-            return;
-        }
-
-        const {
-            deadlineDate,
-            difficulty,
-            iconName,
-            isPublic,
-            progressDisplayMode,
-            tasks,
-            title,
-        } = this.props.trackable!;
-        this.setState({
-            deadlineDate: deadlineDate ? new Date(deadlineDate) : undefined,
-            difficulty,
-            iconName,
-            isPublic,
-            progressDisplayMode,
-            tasks,
-            title,
-        });
+    protected getTitleMsgId() {
+        return "trackableTypes.taskGoal";
     }
 
-    public componentWillUpdate(
-        nextProps: ITaskGoalFormContainerProps,
-        nextState: ITaskGoalFormContainerState,
-    ) {
-        const nextIsValid = this.isValid(nextState);
-
-        if (this.isValid(this.state) !== nextIsValid) {
-            this.updateHeader(nextIsValid);
-        }
-    }
-
-    private isValid(state: ITaskGoalFormContainerState) {
-        if (this.isNew()) {
-            if (state.titleError !== null || state.taskListError !== null) {
-                return false;
-            }
-
-            for (const taskId in state.taskErrors) {
-                if (state.taskErrors[taskId] !== null) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        if (state.titleError || state.taskListError) {
-            return false;
-        }
-
-        for (const taskId in state.taskErrors) {
-            if (state.taskErrors[taskId]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private isNew() {
-        return !this.props.trackable;
-    }
-
-    private updateHeader(isValid: boolean) {
-        const title = (
-            <HeaderTitle>
-                <FormattedMessage id="trackableTypes.taskGoal" />
-            </HeaderTitle>
-        );
-        this.props.history.replace({
-            ...this.props.location,
-            state: {
-                hideBackCommand: !this.isNew(),
-                rightCommands: [
-                    {
-                        isDisabled: !isValid,
-                        msgId: "common.done",
-                        onRun: this.onDone,
-                    },
-                ],
-                title,
-            } as IHeaderState,
-        });
-    }
-
-    private pushHeader(state: IHeaderState) {
-        this.props.history.push({
-            ...this.props.location,
-            state,
-        });
-    }
-
-    private popHeader() {
-        this.props.history.goBack();
-    }
-
-    private onDone = async () => {
-        if (this.isNew()) {
-            try {
-                await this.saveTaskGoal();
-            } catch (e) {
-                // TODO
-                throw e;
-            }
-        }
-
-        this.props.history.goBack();
-    }
-
-    private saveTaskGoal() {
+    protected addTrackable() {
         const {
             title,
             iconName,
@@ -353,7 +190,7 @@ class TaskGoalFormContainer extends
             deadlineDate,
             progressDisplayMode,
         } = this.state;
-        return this.props.onAddTaskGoal({
+        return this.props.onAddGoal({
             deadlineDate: deadlineDate && deadlineDate.getTime(),
             difficulty,
             iconName,
@@ -366,37 +203,77 @@ class TaskGoalFormContainer extends
         });
     }
 
-    private onChangeExpanded = (isExpanded: boolean) => {
-        this.setState({ isExpanded });
+    protected saveTitle(title: string) {
+        this.props.onEditGoal({ id: this.props.trackable!.id, title });
     }
 
-    private onChangeDifficulty = (difficulty: Difficulty) => {
-        this.setState({ difficulty });
-        this.saveDifficulty(difficulty);
+    protected saveIconName(iconName: string) {
+        this.props.onEditGoal({ id: this.props.trackable!.id, iconName });
     }
 
-    private saveDifficulty = (difficulty: Difficulty) => {
-        if (this.isNew()) {
-            return;
+    protected isValidForAdd(state: ITaskGoalFormContainerState) {
+        if (state.taskListError !== null) {
+            return false;
         }
 
-        this.props.onEditTaskGoal({ difficulty, id: this.props.trackable!.id });
-    }
-
-    private onChangeTitle = (title: string) => {
-        this.setState({ title });
-        this.saveTitle(title);
-    }
-
-    private saveTitle = (title: string) => {
-        const titleError = !title ? "errors.emptyValue" : null;
-        this.setState({ titleError });
-
-        if (titleError || this.isNew()) {
-            return;
+        for (const taskId in state.taskErrors) {
+            if (state.taskErrors[taskId] !== null) {
+                return false;
+            }
         }
 
-        this.props.onEditTaskGoal({ id: this.props.trackable!.id, title });
+        return true;
+    }
+
+    protected isValidForEdit(state: ITaskGoalFormContainerState) {
+        if (state.taskListError) {
+            return false;
+        }
+
+        for (const taskId in state.taskErrors) {
+            if (state.taskErrors[taskId]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected getInitialStateForAdd() {
+        return {
+            iconName: "access-point",
+        } as ITaskGoalFormContainerState;
+    }
+
+    protected getInitialStateForEdit() {
+        const {
+            deadlineDate,
+            difficulty,
+            progressDisplayMode,
+            tasks,
+        } = this.props.trackable!;
+        return {
+            deadlineDate: deadlineDate ? new Date(deadlineDate) : undefined,
+            difficulty,
+            progressDisplayMode,
+            tasks,
+        } as ITaskGoalFormContainerState;
+    }
+
+    protected saveDifficulty(difficulty: Difficulty) {
+        this.props.onEditGoal({ difficulty, id: this.props.trackable!.id });
+    }
+
+    protected saveDeadlineDate(deadlineDate: number|null) {
+        this.props.onEditGoal(
+            { deadlineDate, id: this.props.trackable!.id });
+    }
+
+    protected saveProgressDisplayMode(
+        progressDisplayMode: ProgressDisplayMode,
+    ) {
+        this.props.onEditGoal(
+            { id: this.props.trackable!.id, progressDisplayMode });
     }
 
     private onChangeNewTaskTitle = (title: string) => {
@@ -464,87 +341,8 @@ class TaskGoalFormContainer extends
         });
     }
 
-    private onChangeIcon = (iconName: string) => {
-        this.setState({ iconName, isIconPickerOpen: false });
-        this.popHeader();
-
-        if (this.isNew()) {
-            return;
-        }
-
-        this.props.onEditTaskGoal({ id: this.props.trackable!.id, iconName });
-    }
-
-    private onToggleIconPicker = () => {
-        this.setState((prevState) => {
-            const isIconPickerOpen = !prevState.isIconPickerOpen;
-
-            if (isIconPickerOpen) {
-                const title = (
-                    <HeaderTitle>
-                        <FormattedMessage id="trackableForm.iconLabel" />
-                    </HeaderTitle>
-                );
-                this.pushHeader({
-                    onBack: this.onCloseIconPicker,
-                    rightCommands: [],
-                    title,
-                });
-            }
-
-            return { isIconPickerOpen };
-        });
-    }
-
-    private onCloseIconPicker = () => {
-        this.popHeader();
-        this.onToggleIconPicker();
-    }
-
-    private onChangePublic = (isPublic: boolean) => {
-        this.setState({ isPublic });
-    }
-
-    private onChangeDeadlineDate = (deadlineDate?: Date) => {
-        this.setState({ deadlineDate });
-
-        if (this.isNew()) {
-            return;
-        }
-
-        this.props.onEditTaskGoal({
-            deadlineDate: deadlineDate ? deadlineDate.getTime() : null,
-            id: this.props.trackable!.id,
-        });
-    }
-
-    private onChangeProgressDisplayMode = (
-        progressDisplayMode: ProgressDisplayMode,
-    ) => {
-        this.setState({ progressDisplayMode });
-
-        if (this.isNew()) {
-            return;
-        }
-
-        this.props.onEditTaskGoal(
-            { id: this.props.trackable!.id, progressDisplayMode });
-    }
-
     private onFocusTask = (focusedTaskId?: string) => {
         this.setState({ focusedTaskId });
-    }
-
-    private onDifficultyToNumber = (difficulty: Difficulty) => {
-        return difficultyToNumber[difficulty];
-    }
-
-    private onNumberToDifficulty = (difficulty: number) => {
-        return numberToDifficulty[Math.round(difficulty)];
-    }
-
-    private onGetDifficultyTitleMsgId = (difficulty: Difficulty) => {
-        return difficultyToMsgId[difficulty];
     }
 }
 

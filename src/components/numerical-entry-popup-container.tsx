@@ -46,7 +46,7 @@ class NumericalEntryPopupContainer extends
         this.setState((prevState) => {
             const entry = parseFloat(prevState.entry!);
             const entryError = isNaN(entry!) || entry === 0 ?
-                "errors.zeroNumber" : null;
+                "errors.zeroOrNotNumber" : null;
             return { entryError };
         });
     }

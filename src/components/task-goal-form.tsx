@@ -14,6 +14,7 @@ import {
 import FormSlider from "components/form-slider";
 import FormSwitch from "components/form-switch";
 import FormTextInput from "components/form-text-input";
+import GoalForm from "components/goal-form";
 import TextInput from "components/text-input";
 import ProgressDisplayMode from "models/progress-display-mode";
 import Type from "models/type";
@@ -65,6 +66,8 @@ interface ITaskGoalFormProps {
     availableIconNames: string[];
     isPublic: boolean;
     isPublicDisabled: boolean;
+    isValid: boolean;
+    isIconPickerOpen?: boolean;
     difficulty: Difficulty;
     tasks: ITask[];
     taskListError?: string|null;
@@ -72,19 +75,17 @@ interface ITaskGoalFormProps {
     deadlineDate?: Date;
     minDeadlineDate: Date;
     progressDisplayMode: ProgressDisplayMode;
-    isValid: boolean;
     isExpanded: boolean;
     newTaskTitle?: string;
     isAddTaskDisabled: boolean;
     isRemoveTaskDisabled: boolean;
-    isIconPickerOpen?: boolean;
     focusedTaskId?: string;
     onOpenIconPicker: () => void;
     onChangeTitle: (value: string) => void;
-    onChangeDifficulty: (value: Difficulty) => void;
     onChangePublic: (value: boolean) => void;
-    onChangeExpanded: (value: boolean) => void;
     onChangeIcon: (name: string) => void;
+    onChangeDifficulty: (value: Difficulty) => void;
+    onChangeExpanded: (value: boolean) => void;
     onChangeDeadlineDate: (value?: Date) => void;
     onChangeProgressDisplayMode: (value: ProgressDisplayMode) => void;
     onRemoveTask: (id: string) => void;
@@ -99,144 +100,48 @@ interface ITaskGoalFormProps {
 class TaskGoalForm extends
     React.Component<ITaskGoalFormProps & InjectedIntlProps> {
     public render() {
+        return (
+            <GoalForm
+                onRenderChildren={this.onRenderChildren}
+                {...this.props}
+            />
+        );
+    }
+
+    private onRenderChildren = () => {
         const {
-            isIconPickerOpen,
-            title,
-            titleError,
-            iconName,
-            isPublic,
-            isPublicDisabled,
-            isExpanded,
             isAddTaskDisabled,
             isRemoveTaskDisabled,
             tasks,
             taskListError,
             taskErrors,
             newTaskTitle,
-            difficulty,
             intl,
             focusedTaskId,
-            availableIconNames,
-            onChangeExpanded,
-            onChangeTitle,
-            onChangeIcon,
-            onOpenIconPicker,
-            onChangePublic,
             onRemoveTask,
             onChangeTaskTitle,
             onChangeNewTaskTitle,
             onFocusTask,
-            onDifficultyToNumber,
-        } = this.props;
-
-        if (isIconPickerOpen) {
-            return (
-                <FormIconPickerExpanded
-                    availableIconNames={availableIconNames}
-                    iconName={iconName}
-                    onSelect={onChangeIcon}
-                />
-            );
-        }
-
-        return (
-            <FormBody>
-                <FormTextInput
-                    labelMsgId="trackableForm.titleLabel"
-                    placeholderMsgId="trackableForm.titlePlaceholder"
-                    value={title}
-                    errorMsgId={titleError}
-                    onChangeText={onChangeTitle}
-                />
-                <FormIconPickerCollapsed
-                    iconName={iconName}
-                    onExpand={onOpenIconPicker}
-                />
-                <FormSwitch
-                    labelMsgId="trackableForm.isPublicLabel"
-                    hintMsgId="trackableForm.isPublicHint"
-                    disabled={isPublicDisabled}
-                    value={isPublic}
-                    onValueChange={onChangePublic}
-                />
-                <FormSlider
-                    labelMsgId="trackableForm.difficultyLabel"
-                    value={onDifficultyToNumber(difficulty)}
-                    minimumValue={0}
-                    maximumValue={3}
-                    step={1}
-                    onValueChange={this.onChangeDifficulty}
-                    onRenderValueFeedback={this.onRenderDifficultyTitle}
-                />
-                <FormGroup
-                    labelMsgId="taskGoalForm.tasksLabel"
-                    errorMsgId={taskListError}
-                >
-                    <TaskList
-                        intl={intl}
-                        items={tasks}
-                        newItemTitle={newTaskTitle}
-                        isAddDisabled={isAddTaskDisabled}
-                        isRemoveDisabled={isRemoveTaskDisabled}
-                        focusedItemId={focusedTaskId}
-                        errors={taskErrors}
-                        onRemoveItem={onRemoveTask}
-                        onChangeItemTitle={onChangeTaskTitle}
-                        onChangeNewItemTitle={onChangeNewTaskTitle}
-                        onFocusItem={onFocusTask}
-                    />
-                </FormGroup>
-                <FormSection
-                    msgId="trackableForm.advancedSection"
-                    isExpanded={isExpanded}
-                    onChangeExpanded={onChangeExpanded}
-                    onRenderChildren={this.onRenderAdvancedControls}
-                />
-            </FormBody>
-        );
-    }
-
-    private onChangeDifficulty = (value: number) => {
-        this.props.onChangeDifficulty(this.props.onNumberToDifficulty(value));
-    }
-
-    private onChangeProgressDisplayMode = (isValue: boolean) => {
-        this.props.onChangeProgressDisplayMode(isValue ?
-            ProgressDisplayMode.Value : ProgressDisplayMode.Percentage);
-    }
-
-    private onRenderDifficultyTitle = () => {
-        const msgId =
-            this.props.onGetDifficultyTitleMsgId(this.props.difficulty);
-        return (
-            <Text style={styles.difficultyTitle}>
-                <FormattedMessage id={msgId} />
-            </Text>
-        );
-    }
-
-    private onRenderAdvancedControls = () => {
-        const {
-            deadlineDate,
-            minDeadlineDate,
-            progressDisplayMode,
-            onChangeDeadlineDate,
         } = this.props;
         return (
-            <View>
-                <FormDateInput
-                    labelMsgId="trackableForm.deadlineDateLabel"
-                    placeholderMsgId="trackableForm.deadlineDatePlaceholder"
-                    value={deadlineDate}
-                    minValue={minDeadlineDate}
-                    onValueChange={onChangeDeadlineDate}
+            <FormGroup
+                labelMsgId="taskGoalForm.tasksLabel"
+                errorMsgId={taskListError}
+            >
+                <TaskList
+                    intl={intl}
+                    items={tasks}
+                    newItemTitle={newTaskTitle}
+                    isAddDisabled={isAddTaskDisabled}
+                    isRemoveDisabled={isRemoveTaskDisabled}
+                    focusedItemId={focusedTaskId}
+                    errors={taskErrors}
+                    onRemoveItem={onRemoveTask}
+                    onChangeItemTitle={onChangeTaskTitle}
+                    onChangeNewItemTitle={onChangeNewTaskTitle}
+                    onFocusItem={onFocusTask}
                 />
-                <FormSwitch
-                    labelMsgId="trackableForm.progressDisplayModeLabel"
-                    value={progressDisplayMode === ProgressDisplayMode.Value}
-                    onValueChange={this.onChangeProgressDisplayMode}
-                />
-            </View>
+            </FormGroup>
         );
     }
 }
@@ -355,10 +260,6 @@ class TaskListItem extends React.PureComponent<ITaskListItemProps> {
 }
 
 const styles = StyleSheet.create({
-    difficultyTitle: {
-        flexBasis: 96,
-        textAlign: "center",
-    },
     taskListItem: {
         borderColor: "transparent",
     },

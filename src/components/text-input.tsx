@@ -11,6 +11,7 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface ITextInputProps extends TextInputProperties {
+    disabled?: boolean;
     containerStyle?: StyleProp<ViewStyle>;
     clearable?: boolean;
     invalid?: boolean;
@@ -25,6 +26,8 @@ class TextInput extends React.Component<ITextInputProps> {
             clearable,
             style,
             containerStyle,
+            disabled,
+            editable,
             onRef,
             ...restProps,
         } = this.props;
@@ -32,12 +35,25 @@ class TextInput extends React.Component<ITextInputProps> {
             styles.container,
             containerStyle,
             invalid ? styles.containerInvalid : null,
+            disabled ? styles.containerDisabled : null,
+        ];
+        let newEditable = editable;
+
+        if (disabled) {
+            newEditable = false;
+        }
+
+        const controlStyle = [
+            styles.control,
+            style,
+            disabled ? styles.controlDisabled : null,
         ];
         return (
             <View style={newContainerStyle as any}>
                 <TextInputImpl
                     ref={onRef as any}
-                    style={[styles.control, style]}
+                    style={controlStyle as any}
+                    editable={newEditable}
                     underlineColorAndroid="transparent"
                     {...restProps}
                 />
@@ -61,6 +77,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         flexDirection: "row",
     },
+    containerDisabled: {
+        borderColor: "#ccc",
+    },
     containerInvalid: {
         borderColor: "#f00",
     },
@@ -69,6 +88,9 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 32,
         marginTop: 4,
+    },
+    controlDisabled: {
+        color: "#ccc",
     },
 });
 

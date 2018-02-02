@@ -19,13 +19,19 @@ class FormTextInput extends
             errorMsgId,
             placeholderMsgId,
             placeholder,
+            disabled,
             ...restProps,
         } = this.props;
         const newPlaceholder = placeholderMsgId ?
             intl.formatMessage({ id: placeholderMsgId }) : placeholder;
         return (
-            <FormGroup labelMsgId={labelMsgId} errorMsgId={errorMsgId}>
+            <FormGroup
+                disabled={disabled}
+                labelMsgId={labelMsgId}
+                errorMsgId={errorMsgId}
+            >
                 <TextInput
+                    disabled={disabled}
                     placeholder={newPlaceholder}
                     invalid={errorMsgId != null}
                     {...restProps}
