@@ -42,6 +42,7 @@ interface IGoalFormProps extends ITrackableFormProps {
     onNumberToDifficulty: (difficulty: number) => Difficulty;
     onDifficultyToNumber: (difficulty: Difficulty) => number;
     onGetDifficultyTitleMsgId: (difficulty: Difficulty) => string;
+    onRenderChildren: () => JSX.Element;
 }
 
 class GoalForm extends

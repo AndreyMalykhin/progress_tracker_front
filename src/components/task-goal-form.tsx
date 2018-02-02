@@ -28,6 +28,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Difficulty from "utils/difficulty";
+import memoizedStyle from "utils/memoized-style";
 
 interface ITask {
     id: string;
@@ -66,7 +67,6 @@ interface ITaskGoalFormProps {
     availableIconNames: string[];
     isPublic: boolean;
     isPublicDisabled: boolean;
-    isValid: boolean;
     isIconPickerOpen?: boolean;
     difficulty: Difficulty;
     tasks: ITask[];
@@ -102,6 +102,8 @@ class TaskGoalForm extends
     public render() {
         return (
             <GoalForm
+                titleLabelMsgId="goalForm.titleLabel"
+                titlePlaceholderMsgId="goalForm.titlePlaceholder"
                 onRenderChildren={this.onRenderChildren}
                 {...this.props}
             />
@@ -213,11 +215,11 @@ class TaskListItem extends React.PureComponent<ITaskListItemProps> {
             onChangeTitle,
             onRemove,
         } = this.props;
-        const inputStyle = [
+        const inputStyle = memoizedStyle([
             styles.taskListItem,
             id ? styles.taskListItemNew : null,
             isFocused ? styles.taskListItemFocused : null,
-        ];
+        ]);
         return (
             <View>
                 <TextInput

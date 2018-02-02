@@ -113,7 +113,6 @@ class NumericalGoalFormContainer extends GoalFormContainer<
             isNew, this.props.isUserLoggedIn);
         return (
             <NumericalGoalForm
-                isValid={this.isValid(this.state)}
                 maxProgress={maxProgress}
                 maxProgressError={maxProgressError}
                 isMaxProgressDisabled={!isNew}

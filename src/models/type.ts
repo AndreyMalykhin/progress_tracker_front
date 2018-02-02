@@ -1,5 +1,7 @@
 enum Type {
+    AddCounterResponse = "AddCounterResponse",
     AddCounterProgressResponse = "AddCounterProgressResponse",
+    AddGymExerciseResponse = "AddGymExerciseResponse",
     AddGymExerciseEntryResponse = "AddGymExerciseEntryResponse",
     AddNumericalGoalProgressResponse = "AddNumericalGoalProgressResponse",
     AddNumericalGoalResponse = "AddNumericalGoalResponse",
@@ -9,6 +11,8 @@ enum Type {
     BreakAggregateResponse = "BreakAggregateResponse",
     Counter = "Counter",
     CompleteIntroResponse = "CompleteIntroResponse",
+    EditCounterResponse = "EditCounterResponse",
+    EditGymExerciseResponse = "EditGymExerciseResponse",
     EditNumericalGoalResponse = "EditNumericalGoalResponse",
     EditTaskGoalResponse = "EditTaskGoalResponse",
     EditTaskResponse = "EditTaskResponse",

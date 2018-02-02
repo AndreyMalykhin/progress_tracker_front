@@ -18,7 +18,6 @@ interface INumericalGoalFormProps {
     maxProgressError?: string|null;
     isMaxProgressDisabled?: boolean;
     isExpanded: boolean;
-    isValid: boolean;
     minDeadlineDate: Date;
     isIconPickerOpen?: boolean;
     onChangeTitle: (value: string) => void;
@@ -39,6 +38,8 @@ class NumericalGoalForm extends React.Component<INumericalGoalFormProps> {
     public render() {
         return (
             <GoalForm
+                titleLabelMsgId="goalForm.titleLabel"
+                titlePlaceholderMsgId="goalForm.titlePlaceholder"
                 onRenderChildren={this.onRenderChildren}
                 {...this.props}
             />

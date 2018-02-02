@@ -27,13 +27,14 @@ interface ITrackableFormProps {
     availableIconNames: string[];
     isPublic: boolean;
     isPublicDisabled: boolean;
-    isValid: boolean;
     isIconPickerOpen?: boolean;
+    titleLabelMsgId: string;
+    titlePlaceholderMsgId: string;
     onOpenIconPicker: () => void;
     onChangeTitle: (value: string) => void;
     onChangePublic: (value: boolean) => void;
     onChangeIcon: (name: string) => void;
-    onRenderChildren: () => JSX.Element;
+    onRenderChildren?: () => JSX.Element;
 }
 
 class TrackableForm extends React.Component<ITrackableFormProps> {
@@ -46,6 +47,8 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
             isPublic,
             isPublicDisabled,
             availableIconNames,
+            titleLabelMsgId,
+            titlePlaceholderMsgId,
             onRenderChildren,
             onChangeTitle,
             onChangeIcon,
@@ -66,8 +69,8 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
         return (
             <FormBody>
                 <FormTextInput
-                    labelMsgId="trackableForm.titleLabel"
-                    placeholderMsgId="trackableForm.titlePlaceholder"
+                    labelMsgId={titleLabelMsgId}
+                    placeholderMsgId={titlePlaceholderMsgId}
                     value={title}
                     errorMsgId={titleError}
                     onChangeText={onChangeTitle}
@@ -83,7 +86,7 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
                     value={isPublic}
                     onValueChange={onChangePublic}
                 />
-                {onRenderChildren()}
+                {onRenderChildren && onRenderChildren()}
             </FormBody>
         );
     }

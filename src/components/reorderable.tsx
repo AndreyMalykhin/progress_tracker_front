@@ -60,7 +60,7 @@ class Reorderable extends React.Component<IReorderableProps> {
                 transform: this.pan.getTranslateTransform(),
                 width,
             };
-            stub = <Animated.View style={[styles.stub, style]} />;
+            stub = <Animated.View style={[styles.placeholder, style]} />;
         }
 
         return (
@@ -160,7 +160,7 @@ class Reorderable extends React.Component<IReorderableProps> {
 
 const styles = StyleSheet.create({
     container: {},
-    stub: {
+    placeholder: {
         backgroundColor: "#000",
         position: "absolute",
     },

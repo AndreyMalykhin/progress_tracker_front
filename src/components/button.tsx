@@ -62,9 +62,12 @@ class ButtonIcon extends React.PureComponent<IButtonIconProps> {
     public render() {
         const { component: Component, style, disabled, ...restProps } =
             this.props;
-        const newStyle =
-            [styles.text, style, disabled ? styles.iconDisabled : null] as any;
-        return <Component style={newStyle} size={32} {...restProps} />;
+        const newStyle = [
+            styles.text,
+            style,
+            disabled ? styles.iconDisabled : null,
+        ];
+        return <Component style={newStyle as any} size={32} {...restProps} />;
     }
 }
 

@@ -1,3 +1,4 @@
+import TrackableForm from "components/trackable-form";
 import Type from "models/type";
 import * as React from "react";
 
@@ -5,8 +6,11 @@ interface ICounterFormProps {
     title: string;
     titleError?: string|null;
     iconName: string;
+    availableIconNames: string[];
     isPublic: boolean;
-    isNew: boolean;
+    isPublicDisabled: boolean;
+    isIconPickerOpen?: boolean;
+    onOpenIconPicker: () => void;
     onChangeTitle: (value: string) => void;
     onChangePublic: (value: boolean) => void;
     onChangeIcon: (name: string) => void;
@@ -14,8 +18,13 @@ interface ICounterFormProps {
 
 class CounterForm extends React.Component<ICounterFormProps> {
     public render() {
-        // TODO
-        return null;
+        return (
+            <TrackableForm
+                titleLabelMsgId="counterForm.titleLabel"
+                titlePlaceholderMsgId="counterForm.titlePlaceholder"
+                {...this.props}
+            />
+        );
     }
 }
 

@@ -137,7 +137,6 @@ class TaskGoalFormContainer extends GoalFormContainer<
             isNew, this.props.isUserLoggedIn);
         return (
             <TaskGoalForm
-                isValid={this.isValid(this.state)}
                 title={title!}
                 titleError={titleError}
                 availableIconNames={this.icons}

@@ -26,7 +26,9 @@ interface ICardIconProps extends IconProps {
     component: React.ComponentType<IconProps>;
 }
 
-type ICardCommandBarProps = ICommandBarProps;
+type ICardCommandBarProps = ICommandBarProps & {
+    style?: null;
+};
 
 class Card extends React.Component<ICardProps> {
     public render() {
@@ -96,7 +98,12 @@ class CardIcon extends React.PureComponent<ICardIconProps> {
 class CardCommandBar extends React.PureComponent<ICardCommandBarProps> {
     public render() {
         const { style, ...restProps } = this.props;
-        return <CommandBar style={[styles.commandBar, style]} {...restProps}/>;
+        return (
+            <CommandBar
+                style={styles.commandBar}
+                {...restProps}
+            />
+        );
     }
 }
 
