@@ -12,6 +12,8 @@ import {
     HeaderTitle,
     IHeaderCmd,
     IHeaderState,
+    IWithHeaderProps,
+    withHeader,
 } from "components/header";
 import Loader from "components/loader";
 import ProfileSection, {
@@ -37,6 +39,7 @@ import withLoader from "utils/with-loader";
 type IProfileSectionContainerProps =
     RouteComponentProps<IRouteParams>
     & InjectedIntlProps
+    & IWithHeaderProps
     & {
     data: QueryProps & IGetDataResponse;
     onCommitReportUser: (id: string, reportReason: ReportReason) => void;
@@ -193,11 +196,11 @@ class ProfileSectionContainer
     }
 
     private updateHeader() {
-        const { data, history } = this.props;
+        const { data, header } = this.props;
         const { getUserById: user, networkStatus } = data;
 
         if (isLoading(networkStatus)) {
-            history.replace({ state: null });
+            header.replace(null);
             return;
         }
 
@@ -207,37 +210,33 @@ class ProfileSectionContainer
                 <Icon name="star-circle" />{user.rating}
             </HeaderSubtitle>
         );
-        const profileCmd = {
-            imgUrl: user.avatarUrlSmall,
-            msgId: isMe ? "commands.edit" : "commands.profile",
-            onRun: this.onEditProfile,
-        } as IHeaderCmd;
         const rightCommands: IHeaderCmd[] = [];
 
         if (isMe) {
-            const newTrackableCmd = {
+            rightCommands.push({
                 iconName: "plus",
                 msgId: "commands.new",
                 onRun: this.onStartNewTrackable,
-            } as IHeaderCmd;
-            rightCommands.push(newTrackableCmd);
+            });
         } else if (!user.isReported) {
-            const reportCmd = {
+            rightCommands.push({
                 iconName: "exclamation",
                 msgId: "commands.report",
                 onRun: this.onStartReportUser,
-            } as IHeaderCmd;
-            rightCommands.push(reportCmd);
+            });
         }
 
-        history.replace({
-            state: {
-                hideBackCommand: true,
-                leftCommand: profileCmd,
-                rightCommands,
-                subtitle,
-                title: <HeaderTitle>{user.name}</HeaderTitle>,
-            } as IHeaderState,
+        const leftCommand = {
+            imgUrl: user.avatarUrlSmall,
+            msgId: isMe ? "commands.edit" : "commands.profile",
+            onRun: this.onEditProfile,
+        };
+        header.replace({
+            hideBackCommand: true,
+            leftCommand,
+            rightCommands,
+            subtitle,
+            title: <HeaderTitle>{user.name}</HeaderTitle>,
         });
     }
 
@@ -295,4 +294,5 @@ export default compose(
     withError(Error),
     withReportUser,
     injectIntl,
+    withHeader,
 )(ProfileSectionContainer);

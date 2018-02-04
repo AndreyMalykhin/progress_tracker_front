@@ -1,5 +1,6 @@
 declare module "react-native-progress/Bar" {
     import * as React from "react";
+    import { Animated } from "react-native";
 
     interface IProgressBarProps {
         animated?: boolean;
@@ -13,10 +14,9 @@ declare module "react-native-progress/Bar" {
         height?: number;
         borderRadius?: number;
         useNativeDriver?: boolean;
-        animationConfig?: {
-            bounciness?: number;
-        };
-        animationType?: "decay" | "timeing" | "spring";
+        animationConfig?: Animated.TimingAnimationConfig
+            | Animated.SpringAnimationConfig | Animated.DecayAnimationConfig;
+        animationType?: "decay" | "timing" | "spring";
     }
 
     declare class ProgressBar extends React.Component<IProgressBarProps> {}

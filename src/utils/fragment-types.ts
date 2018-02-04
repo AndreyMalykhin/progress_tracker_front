@@ -7,19 +7,19 @@ export default {
                 "name": "ITrackable",
                 "possibleTypes": [
                     {
-                        "name": "NumericalGoal"
+                        "name": "GymExercise"
+                    },
+                    {
+                        "name": "Counter"
                     },
                     {
                         "name": "Aggregate"
                     },
                     {
+                        "name": "NumericalGoal"
+                    },
+                    {
                         "name": "TaskGoal"
-                    },
-                    {
-                        "name": "GymExercise"
-                    },
-                    {
-                        "name": "Counter"
                     }
                 ]
             },
@@ -28,16 +28,16 @@ export default {
                 "name": "IPrimitiveTrackable",
                 "possibleTypes": [
                     {
-                        "name": "NumericalGoal"
-                    },
-                    {
-                        "name": "TaskGoal"
-                    },
-                    {
                         "name": "GymExercise"
                     },
                     {
                         "name": "Counter"
+                    },
+                    {
+                        "name": "NumericalGoal"
+                    },
+                    {
+                        "name": "TaskGoal"
                     }
                 ]
             },
@@ -46,13 +46,13 @@ export default {
                 "name": "IAggregatable",
                 "possibleTypes": [
                     {
+                        "name": "Counter"
+                    },
+                    {
                         "name": "NumericalGoal"
                     },
                     {
                         "name": "TaskGoal"
-                    },
-                    {
-                        "name": "Counter"
                     }
                 ]
             },

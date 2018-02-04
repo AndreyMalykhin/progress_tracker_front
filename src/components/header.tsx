@@ -26,6 +26,14 @@ interface IHeaderState {
 
 type IHeaderProps = RouteComponentProps<{}>;
 
+interface IWithHeaderProps {
+    header: {
+        push: (state: IHeaderState) => void;
+        replace: (state: IHeaderState|null) => void;
+        pop: () => void;
+    };
+}
+
 const cmdSize = 32;
 
 class Header extends React.Component<IHeaderProps> {
@@ -127,7 +135,7 @@ class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
                 uri: imgUrl,
                 width: cmdSize,
             };
-            content = <Image source={source} />;
+            content = <Image style={styles.cmdImg} source={source} />;
         } else {
             content = <ButtonTitle disabled={isDisabled} msgId={msgId} />;
         }
@@ -150,7 +158,37 @@ class HeaderSubtitle extends React.Component {
     }
 }
 
+function withHeader<T extends IWithHeaderProps>(
+    Component: React.ComponentClass<T>,
+) {
+    // tslint:disable-next-line:max-classes-per-file
+    return class EnchancedComponent extends
+        React.Component< T & RouteComponentProps<{}> > {
+        public render() {
+            return <Component header={this} {...this.props} />;
+        }
+
+        public replace(state: IHeaderState|null) {
+            this.props.history.replace(
+                Object.assign({}, this.props.location, { state } ));
+        }
+
+        public push(state: IHeaderState) {
+            this.props.history.push(
+                Object.assign({}, this.props.location, { state } ));
+        }
+
+        public pop() {
+            this.props.history.goBack();
+        }
+    };
+}
+
 const styles = StyleSheet.create({
+    cmdImg: {
+        borderRadius: cmdSize / 2,
+        borderWidth: 1,
+    },
     container: {
         borderBottomWidth: 1,
         flexDirection: "row",
@@ -176,5 +214,12 @@ const styles = StyleSheet.create({
     },
 });
 
-export { HeaderTitle, HeaderSubtitle, IHeaderState, IHeaderCmd };
+export {
+    HeaderTitle,
+    HeaderSubtitle,
+    IHeaderState,
+    IHeaderCmd,
+    withHeader,
+    IWithHeaderProps,
+};
 export default withRouter(Header);

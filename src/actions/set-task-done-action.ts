@@ -145,7 +145,7 @@ function getOptimisticResponse(
     addProgress(task.goal, isDone ? 1 : -1);
     return {
         __typename: Type.Mutation,
-        setTaskDone: { __typename: Type.UpdateTaskResponse, task },
+        setTaskDone: { __typename: Type.SetTaskDoneResponse, task },
     } as ISetTaskDoneResponse;
 }
 

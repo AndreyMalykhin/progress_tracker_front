@@ -1,6 +1,13 @@
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
+import {
+    Animated,
+    StyleProp,
+    StyleSheet,
+    Text,
+    View,
+    ViewStyle,
+} from "react-native";
 import ProgressBarImpl from "react-native-progress/Bar";
 
 interface IProgressBarProps {
@@ -9,6 +16,8 @@ interface IProgressBarProps {
     mode: ProgressDisplayMode;
     style?: StyleProp<ViewStyle>;
 }
+
+const animationConfig = { duration: 1000 } as Animated.TimingAnimationConfig;
 
 class ProgressBar extends React.PureComponent<IProgressBarProps> {
     public render() {
@@ -19,6 +28,8 @@ class ProgressBar extends React.PureComponent<IProgressBarProps> {
         return (
             <View style={[styles.container, style]}>
                 <ProgressBarImpl
+                    animationType="timing"
+                    animationConfig={animationConfig}
                     progress={normalizedValue}
                     width={null}
                     height={height}

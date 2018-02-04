@@ -15,6 +15,7 @@ import { Config } from "react-native-config";
 import { Image } from "react-native-image-crop-picker";
 import dataIdFromObject from "utils/data-id-from-object";
 import myId from "utils/my-id";
+import uploadFile from "utils/upload-file";
 
 interface IProveTrackableResponse {
     proveTrackable: {
@@ -99,7 +100,8 @@ async function proveTrackable(
     let assetId;
 
     try {
-        assetId = await uploadAsset(photo.path, photo.mime);
+        const response = await uploadFile(photo.path, photo.mime, "/assets");
+        assetId = response.payload.id;
     } catch (e) {
         // TODO
         throw e;
@@ -112,22 +114,6 @@ async function proveTrackable(
         },
         variables: { id, assetId },
     });
-}
-
-async function uploadAsset(filePath: string, mimeType: string) {
-    const body = new FormData();
-    body.append("file", {
-        name: null,
-        type: mimeType,
-        uri: filePath,
-    } as any);
-    const response = await fetch(process.env.SERVER_URL + "/assets", {
-        body,
-        headers: { Authorization: "Bearer TODO" },
-        method: "POST",
-    });
-    const jsonResponse = await response.json();
-    return jsonResponse.payload.id;
 }
 
 function updateActiveTrackables(

@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         padding: 0,
     },
     container: {
-        marginVertical: 8,
+        marginVertical: 16,
     },
     containerDragged: {
         opacity: 0,

@@ -13,6 +13,7 @@ import {
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
 import CounterForm from "components/counter-form";
+import { withHeader } from "components/header";
 import TrackableFormContainer, {
     ITrackable,
     ITrackableFormContainerProps,
@@ -147,4 +148,5 @@ export default compose(
     withApollo,
     withAddCounter,
     withEditCounter,
+    withHeader,
 )(CounterFormContainer);

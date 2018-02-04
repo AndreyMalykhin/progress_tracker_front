@@ -13,7 +13,7 @@ class IntroPage extends React.Component<IIntroPageProps> {
         return (
             <View style={styles.container}>
                 <Button onPress={this.props.onLogin}>
-                    <ButtonTitle msgId="intro.login" />
+                    <ButtonTitle msgId="common.login" />
                 </Button>
                 <Button onPress={this.props.onClose}>
                     <ButtonTitle msgId="intro.skip" />

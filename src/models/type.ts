@@ -16,6 +16,7 @@ enum Type {
     EditNumericalGoalResponse = "EditNumericalGoalResponse",
     EditTaskGoalResponse = "EditTaskGoalResponse",
     EditTaskResponse = "EditTaskResponse",
+    EditUserResponse = "EditUserResponse",
     GymExercise = "GymExercise",
     GymExerciseEntry = "GymExerciseEntry",
     NumericalGoal = "NumericalGoal",
@@ -26,11 +27,12 @@ enum Type {
     ReorderTrackableResponse = "ReorderTrackableResponse",
     ReportUserResponse = "ReportUserResponse",
     Settings = "Settings",
+    SetUserAvatarResponse = "SetUserAvatarResponse",
+    SetTaskDoneResponse = "UpdateTaskResponse",
     Task = "Task",
     TaskGoal = "TaskGoal",
     TrackableEdge = "TrackableEdge",
     User = "User",
-    UpdateTaskResponse = "UpdateTaskResponse",
     UnaggregateTrackableResponse = "UnaggregateTrackableResponse",
 }
 

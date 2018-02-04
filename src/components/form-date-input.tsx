@@ -39,11 +39,18 @@ class FormDateInput extends
     }
 
     private renderPicker() {
+        const { intl } = this.props;
+        const cancelLabel = intl.formatMessage({ id: "common.cancel" });
+        const confirmLabel = intl.formatMessage({ id: "common.ok" });
+        const title = intl.formatMessage({ id: "datePicker.title" });
         return (
             <DateTimePicker
                 isVisible={true}
                 date={this.props.value}
                 minimumDate={this.props.minValue}
+                cancelTextIOS={cancelLabel}
+                confirmTextIOS={confirmLabel}
+                titleIOS={title}
                 onCancel={this.onCancel}
                 onConfirm={this.onConfirm}
             />

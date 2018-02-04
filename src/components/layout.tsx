@@ -1,6 +1,6 @@
 import HomePage from "components/home-page";
 import IntroPageContainer from "components/intro-page-container";
-import ProfileEditPage from "components/profile-edit-page";
+import ProfileFormPage from "components/profile-form-page";
 import TrackableFormPageContainer from "components/trackable-form-page-container";
 import * as React from "react";
 import { StatusBar, StyleSheet, View } from "react-native";
@@ -30,7 +30,7 @@ class Layout extends React.Component<ILayoutProps> {
                     <Route
                         exact={routes.profileEdit.exact}
                         path={routes.profileEdit.path}
-                        component={ProfileEditPage}
+                        component={ProfileFormPage}
                     />
                     <Route render={this.renderHomePage}/>
                 </Switch>

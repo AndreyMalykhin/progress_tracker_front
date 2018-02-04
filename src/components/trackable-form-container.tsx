@@ -1,4 +1,4 @@
-import { HeaderTitle, IHeaderState } from "components/header";
+import { HeaderTitle, IHeaderState, IWithHeaderProps } from "components/header";
 import { debounce, throttle } from "lodash";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
@@ -11,8 +11,8 @@ interface ITrackable {
     isPublic: boolean;
 }
 
-interface ITrackableFormContainerProps<T extends ITrackable> extends
-    RouteComponentProps<{}> {
+interface ITrackableFormContainerProps<T extends ITrackable>
+    extends RouteComponentProps<{}>, IWithHeaderProps {
     trackable?: T;
     isUserLoggedIn: boolean;
 }
@@ -83,20 +83,6 @@ abstract class TrackableFormContainer<
     protected abstract getInitialStateForAdd(): TState;
     protected abstract getInitialStateForEdit(): TState;
 
-    protected replaceHeader(state: IHeaderState) {
-        this.props.history.replace(
-            Object.assign({}, this.props.location, { state } ));
-    }
-
-    protected pushHeader(state: IHeaderState) {
-        this.props.history.push(
-            Object.assign({}, this.props.location, { state } ));
-    }
-
-    protected popHeader() {
-        this.goBack();
-    }
-
     protected goBack() {
         this.props.history.goBack();
     }
@@ -124,7 +110,7 @@ abstract class TrackableFormContainer<
 
     protected onChangeIcon = (iconName: string) => {
         this.setState({ iconName, isIconPickerOpen: false });
-        this.popHeader();
+        this.props.header.pop();
 
         if (this.isNew()) {
             return;
@@ -143,7 +129,7 @@ abstract class TrackableFormContainer<
                         <FormattedMessage id="trackableForm.iconLabel" />
                     </HeaderTitle>
                 );
-                this.pushHeader({
+                this.props.header.push({
                     onBack: this.onCloseIconPicker,
                     rightCommands: [],
                     title,
@@ -170,7 +156,7 @@ abstract class TrackableFormContainer<
     }
 
     private onCloseIconPicker = () => {
-        this.popHeader();
+        this.props.header.pop();
         this.onToggleIconPicker();
     }
 
@@ -180,7 +166,7 @@ abstract class TrackableFormContainer<
                 <FormattedMessage id={this.getTitleMsgId()} />
             </HeaderTitle>
         );
-        this.replaceHeader({
+        this.props.header.replace({
             hideBackCommand: !this.isNew(),
             rightCommands: [
                 {

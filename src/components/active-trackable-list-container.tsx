@@ -65,7 +65,7 @@ import { IGymExerciseEntry, IGymExerciseItem } from "components/gym-exercise";
 import {
     IGymExerciseEntryPopupResult,
 } from "components/gym-exercise-entry-popup";
-import { IHeaderState } from "components/header";
+import { IHeaderState, IWithHeaderProps, withHeader } from "components/header";
 import Loader from "components/loader";
 import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
@@ -96,7 +96,11 @@ import routes from "utils/routes";
 import withError from "utils/with-error";
 import withLoader from "utils/with-loader";
 
-type IActiveTrackableListContainerProps = {
+type IActiveTrackableListContainerProps =
+    RouteComponentProps<IRouteParams>
+    & InjectedIntlProps
+    & IWithHeaderProps
+    & {
     data: QueryProps & IGetDataResponse;
     onSetTaskDone: (taskId: string, isDone: boolean) => void;
     onBreakItem: (id: string) => void;
@@ -110,7 +114,7 @@ type IActiveTrackableListContainerProps = {
     onCommitAddCounterProgress: (id: string, amount: number) => void;
     onReorderItem: (sourceId: string, destinationId: string) => void;
     onLongPressItem: (id: string) => void;
-} & RouteComponentProps<IRouteParams> & InjectedIntlProps;
+};
 
 interface IActiveTrackableListContainerState {
     itemsMeta: IActiveTrackableListItemsMeta;
@@ -915,7 +919,7 @@ class ActiveTrackableListContainer extends
             const itemsMeta = this.updateItemMeta(
                 id, { isSelected: true }, prevState.itemsMeta);
             this.updateAggregationTargets(itemsMeta);
-            this.pushHeader({
+            this.props.header.push({
                 hideBackCommand: true,
                 leftCommand: {
                     msgId: "common.cancel",
@@ -935,7 +939,7 @@ class ActiveTrackableListContainer extends
     private onCancelAggregateItem = () => {
         this.setState((prevState) => {
             const itemsMeta = this.unselectAndEnableItems(prevState.itemsMeta);
-            this.popHeader();
+            this.props.header.pop();
             return { isAggregationMode: false, itemsMeta };
         });
     }
@@ -1089,14 +1093,6 @@ class ActiveTrackableListContainer extends
             routes.trackableEdit.path.replace(":id", id));
     }
 
-    private popHeader() {
-        this.props.history.goBack();
-    }
-
-    private pushHeader(state: IHeaderState) {
-        this.props.history.push({ ...this.props.location, state });
-    }
-
     private onGetTaskGoalExpandable = (taskCount: number) => {
         return taskCount > collapsedTaskCount;
     }
@@ -1201,5 +1197,6 @@ export default compose(
     withUnaggregate,
     withBreak,
     withAggregate,
+    withHeader,
     injectIntl,
 )(ActiveTrackableListContainer);
