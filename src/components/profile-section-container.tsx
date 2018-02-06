@@ -5,11 +5,9 @@ import {
 } from "actions/report-user-action";
 import ActionSheet, { IActionSheetOption } from "components/action-sheet";
 import ActiveTrackableListContainer from "components/active-trackable-list-container";
-import ArchivedTrackables from "components/archived-trackables";
+import ArchiveContainer from "components/archive-container";
 import Error from "components/error";
 import {
-    HeaderSubtitle,
-    HeaderTitle,
     IHeaderCmd,
     IHeaderState,
     IWithHeaderProps,
@@ -21,6 +19,7 @@ import ProfileSection, {
 } from "components/profile-section";
 import gql from "graphql-tag";
 import ReportReason from "models/report-reason";
+import TrackableStatus from "models/trackable-status";
 import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
@@ -145,24 +144,12 @@ const trackableTypes: Array< IActionSheetOption<Type> > = [
 
 class ProfileSectionContainer
     extends React.Component<IProfileSectionContainerProps> {
-    private navItems: IProfileSectionNavItem[] = [
-        {
-            component: ActiveTrackableListContainer,
-            iconName: "format-list-checks",
-            matchExact: routes.profileActiveTrackables.exact,
-            matchPath: routes.profileActiveTrackables.path,
-            navigateToPath: routes.profileMyActiveTrackables.path,
-            titleMsgId: "profile.activeTrackables",
-        },
-        {
-            component: ArchivedTrackables,
-            iconName: "archive",
-            matchExact: routes.profileArchive.exact,
-            matchPath: routes.profileArchive.path,
-            navigateToPath: routes.profileMyArchive.path,
-            titleMsgId: "profile.archive",
-        },
-    ];
+    private navItems: IProfileSectionNavItem[];
+
+    public constructor(props: IProfileSectionContainerProps, context: any) {
+        super(props, context);
+        this.initNavItems(props.match.params.id);
+    }
 
     public render() {
         return <ProfileSection navItems={this.navItems} />;
@@ -174,13 +161,7 @@ class ProfileSectionContainer
         const nextUserId = nextUser.id;
 
         if (prevUser.id !== nextUserId) {
-            this.navItems = this.navItems.map((navItem) => {
-                return {
-                    ...navItem,
-                    navigateToPath:
-                        navItem.matchPath.replace(":id", nextUserId),
-                };
-            });
+            this.initNavItems(nextUserId);
         }
 
         if (prevUser.id !== nextUserId
@@ -195,6 +176,29 @@ class ProfileSectionContainer
         this.updateHeader();
     }
 
+    private initNavItems(userId: string) {
+        this.navItems = [
+            {
+                component: ActiveTrackableListContainer,
+                iconName: "format-list-checks",
+                matchExact: routes.profileActiveTrackables.exact,
+                matchPath: routes.profileActiveTrackables.path,
+                navigateToPath: routes.profileActiveTrackables.path.replace(
+                    ":id", userId),
+                titleMsgId: "profile.activeTrackables",
+            },
+            {
+                component: ArchiveContainer,
+                iconName: "archive",
+                matchExact: routes.profileArchive.exact,
+                matchPath: routes.profileArchive.path,
+                navigateToPath: routes.profileArchiveApprovedTrackables.path
+                    .replace(":id", userId),
+                titleMsgId: "profile.archive",
+            },
+        ];
+    }
+
     private updateHeader() {
         const { data, header } = this.props;
         const { getUserById: user, networkStatus } = data;
@@ -205,11 +209,6 @@ class ProfileSectionContainer
         }
 
         const isMe = user.id === myId;
-        const subtitle = (
-            <HeaderSubtitle>
-                <Icon name="star-circle" />{user.rating}
-            </HeaderSubtitle>
-        );
         const rightCommands: IHeaderCmd[] = [];
 
         if (isMe) {
@@ -235,8 +234,9 @@ class ProfileSectionContainer
             hideBackCommand: true,
             leftCommand,
             rightCommands,
-            subtitle,
-            title: <HeaderTitle>{user.name}</HeaderTitle>,
+            subtitleIcon: "star-circle",
+            subtitleText: user.rating,
+            title: user.name,
         });
     }
 

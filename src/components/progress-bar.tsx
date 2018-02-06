@@ -35,7 +35,7 @@ class ProgressBar extends React.PureComponent<IProgressBarProps> {
                     height={height}
                     color={"#0076ff"}
                     unfilledColor={"#000"}
-                    borderRadius={0}
+                    borderRadius={8}
                     borderWidth={0}
                 />
                 <Text style={styles.value}>{formattedValue}</Text>
@@ -47,7 +47,9 @@ class ProgressBar extends React.PureComponent<IProgressBarProps> {
 const height = 16;
 
 const styles = StyleSheet.create({
-    container: {},
+    container: {
+        marginBottom: 8,
+    },
     value: {
         backgroundColor: "transparent",
         bottom: 0,

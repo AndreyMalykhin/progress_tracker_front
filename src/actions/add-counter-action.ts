@@ -22,6 +22,7 @@ interface IAddCounterResponse {
             progress: number;
             status: TrackableStatus;
             statusChangeDate: null;
+            creationDate: number;
             title: string;
         };
     };
@@ -47,6 +48,7 @@ mutation AddCounter($counter: AddCounterInput!) {
             progress
             status
             statusChangeDate
+            creationDate
             title
         }
     }
@@ -75,16 +77,18 @@ function updateActiveTrackables(
 }
 
 function getOptimisticResponse(counter: IAddCounterFragment) {
+    const currentDate = Date.now();
     return {
         __typename: Type.Mutation,
         addCounter: {
             __typename: Type.AddCounterResponse,
             trackable: {
                 __typename: Type.Counter,
+                creationDate: currentDate,
                 iconName: counter.iconName,
                 id: uuid(),
                 isPublic: counter.isPublic,
-                order: Date.now(),
+                order: currentDate,
                 parent: null,
                 progress: 0,
                 status: TrackableStatus.Active,

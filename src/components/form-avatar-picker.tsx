@@ -19,15 +19,16 @@ const imgSize = 256;
 class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
     public render() {
         const { errorMsgId, uri, disabled, style } = this.props;
-        const imgSource = {
-            height: imgSize, method: "cover", uri, width: imgSize,
-        };
         return (
             <FormGroup
                 style={[styles.container, style]}
                 errorMsgId={errorMsgId}
             >
-                <Image style={styles.image} source={imgSource} />
+                <Image
+                    resizeMode="cover"
+                    style={styles.image}
+                    source={{ height: imgSize, uri, width: imgSize }}
+                />
                 <View style={styles.buttonsContainer}>
                     <Button onPress={this.onSelect} disabled={disabled}>
                         <ButtonTitle

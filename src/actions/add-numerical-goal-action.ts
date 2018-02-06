@@ -24,9 +24,10 @@ interface IAddNumericalGoalResponse {
             parent: null;
             progress: number;
             progressDisplayMode: ProgressDisplayMode;
-            proofPhotoUrlSmall: null;
+            proofPhotoUrlMedium: null;
             status: TrackableStatus;
             statusChangeDate: null;
+            creationDate: number;
             title: string;
         };
     };
@@ -58,9 +59,10 @@ mutation AddNumericalGoal($goal: AddNumericalGoalInput!) {
             }
             progress
             progressDisplayMode
-            proofPhotoUrlSmall
+            proofPhotoUrlMedium
             status
             statusChangeDate
+            creationDate
             title
         }
     }
@@ -89,23 +91,25 @@ function updateActiveTrackables(
 }
 
 function getOptimisticResponse(goal: IAddNumericalGoalFragment) {
+    const currentDate = Date.now();
     return {
         __typename: Type.Mutation,
         addNumericalGoal: {
             __typename: Type.AddNumericalGoalResponse,
             trackable: {
                 __typename: Type.NumericalGoal,
+                creationDate: currentDate,
                 deadlineDate: goal.deadlineDate || null,
                 difficulty: goal.difficulty,
                 iconName: goal.iconName,
                 id: uuid(),
                 isPublic: goal.isPublic,
                 maxProgress: goal.maxProgress,
-                order: Date.now(),
+                order: currentDate,
                 parent: null,
                 progress: 0,
                 progressDisplayMode: goal.progressDisplayMode,
-                proofPhotoUrlSmall: null,
+                proofPhotoUrlMedium: null,
                 status: TrackableStatus.Active,
                 statusChangeDate: null,
                 title: goal.title,

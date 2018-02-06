@@ -34,20 +34,24 @@ export default {
         path: "/profile/:id/in-progress",
     },
     profileArchive: {
-        exact: true,
+        exact: false,
         path: "/profile/:id/archive",
+    },
+    profileArchiveApprovedTrackables: {
+        exact: true,
+        path: "/profile/:id/archive/approved",
+    },
+    profileArchiveExpiredTrackables: {
+        exact: true,
+        path: "/profile/:id/archive/expired",
+    },
+    profileArchiveRejectedTrackables: {
+        exact: true,
+        path: "/profile/:id/archive/rejected",
     },
     profileEdit: {
         exact: true,
         path: `/profile/${myId}/edit`,
-    },
-    profileMyActiveTrackables: {
-        exact: true,
-        path: `/profile/${myId}/in-progress`,
-    },
-    profileMyArchive: {
-        exact: true,
-        path: `/profile/${myId}/archive`,
     },
     reviews: {
         exact: false,

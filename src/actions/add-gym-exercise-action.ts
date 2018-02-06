@@ -20,6 +20,7 @@ interface IAddGymExerciseResponse {
             order: number;
             status: TrackableStatus;
             statusChangeDate: null;
+            creationDate: number;
             title: string;
             entries: Array<{
                 id: string;
@@ -51,6 +52,7 @@ mutation AddGymExercise($gymExercise: AddGymExerciseInput!) {
             order
             status
             statusChangeDate
+            creationDate
             title
             entries {
                 id
@@ -89,17 +91,19 @@ function updateActiveTrackables(
 }
 
 function getOptimisticResponse(gymExercise: IAddGymExerciseFragment) {
+    const currentDate = Date.now();
     return {
         __typename: Type.Mutation,
         addGymExercise: {
             __typename: Type.AddGymExerciseResponse,
             trackable: {
                 __typename: Type.GymExercise,
+                creationDate: currentDate,
                 entries: [],
                 iconName: gymExercise.iconName,
                 id: uuid(),
                 isPublic: gymExercise.isPublic,
-                order: Date.now(),
+                order: currentDate,
                 status: TrackableStatus.Active,
                 statusChangeDate: null,
                 title: gymExercise.title,

@@ -24,6 +24,7 @@ class Counter extends React.PureComponent<ICounterProps> {
 
 const styles = StyleSheet.create({
     progress: {
+        lineHeight: 32,
         textAlign: "center",
     },
 });

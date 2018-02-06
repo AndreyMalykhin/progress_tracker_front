@@ -1,5 +1,6 @@
 import Button, { ButtonTitle } from "components/button";
 import Card, {
+    CardBody,
     CardCommandBar,
     CardHeader,
     CardIcon,
@@ -10,7 +11,9 @@ import { ICommandBarItem } from "components/command-bar";
 import ITrackableBaseProps from "components/trackable-base-props";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
+import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import {
+    Image,
     LayoutRectangle,
     PanResponderGestureState,
     StyleProp,
@@ -28,10 +31,27 @@ interface ITrackableProps extends ITrackableBaseProps {
     isExpandable?: boolean;
     isExpanded?: boolean;
     cardStyle?: StyleProp<ViewStyle>;
+    cardHeaderStyle?: StyleProp<ViewStyle>;
+    cardBodyStyle?: StyleProp<ViewStyle>;
     style?: StyleProp<ViewStyle>;
+    rating?: number;
+    approveCount?: number;
+    rejectCount?: number;
+    proofPhotoUrl?: string;
     onExpandChange?: (id: string, isExpanded: boolean) => void;
     onProve?: (id: string) => void;
     onGetLayoutRef?: () => View|undefined;
+}
+
+interface IAchievementDetailsProps {
+    rejectCount?: number;
+    approveCount?: number;
+    rating?: number;
+}
+
+interface IStatusProps {
+    status: TrackableStatus;
+    duration: number;
 }
 
 interface IExpandButtonProps {
@@ -42,89 +62,64 @@ interface IExpandButtonProps {
 
 interface IProveButtonProps {
     isDisabled?: boolean;
-    onPress: () => void;
+    onPress?: () => void;
 }
+
+const millisecondsInDay = 86400 * 1000;
 
 class Trackable extends React.Component<ITrackableProps> {
     private card?: View;
 
     public render() {
         const {
-            index,
             children,
             title,
-            id,
             status,
             iconName,
             isBatchEditMode,
-            isSelected,
-            isDisabled,
             isDragged,
             isExpandable,
-            isExpanded,
             commands,
             cardStyle,
+            cardHeaderStyle,
+            cardBodyStyle,
             style,
-            onSelectChange,
+            duration,
+            proofPhotoUrl,
+            onLayout,
+            onLongPress,
+            onPressOut,
         } = this.props;
-        let checkBox;
-
-        if (isBatchEditMode) {
-            checkBox = (
-                <CheckBox
-                    isChecked={isSelected}
-                    isDisabled={isDisabled}
-                    style={styles.checkBox}
-                    onPress={this.onSelectChange}
-                />
-            );
-        }
-
-        let expandButton;
-
-        if (isExpandable) {
-            expandButton = (
-                <ExpandButton
-                    isDisabled={isBatchEditMode || isDisabled}
-                    isExpanded={isExpanded}
-                    onExpandChange={this.onExpandChange}
-                />
-            );
-        }
-
-        let proveButton;
-
-        if (status === TrackableStatus.PendingProof) {
-            proveButton = (
-                <ProveButton isDisabled={isDisabled} onPress={this.onProve} />
-            );
-        }
-
+        const proveButton =
+            status === TrackableStatus.PendingProof && this.renderProveBtn();
         const icon = iconName && <CardIcon name={iconName} component={Icon} />;
+        const statusElement =
+            duration != null && <Status duration={duration} status={status} />;
         const baseStyle =
             isDragged ? containerDraggedStyle : styles.container;
         return (
             <View style={[baseStyle, style]}>
-                {checkBox}
+                {isBatchEditMode && this.renderCheckBox()}
                 <Card
                     onRef={this.onCardRef}
-                    onLongPress={this.onLongPress}
-                    onPressIn={this.onPressIn}
-                    onPressOut={this.onPressOut}
+                    onLongPress={onLongPress && this.onLongPress}
+                    onPressIn={onLayout && this.onPressIn}
+                    onPressOut={onPressOut && this.onPressOut}
                     style={([styles.card, cardStyle])}
                 >
-                    <CardHeader>
+                    <CardHeader style={cardHeaderStyle}>
                         {icon}
                         <CardTitle text={title} />
-                        <CardCommandBar
-                            items={commands}
-                            isDisabled={isDisabled || isBatchEditMode}
-                            titleMsgId="common.chooseAction"
-                        />
+                        {commands && commands.length && this.renderCmdBar()}
                     </CardHeader>
-                    {children}
-                    {expandButton}
-                    {proveButton}
+                    {proofPhotoUrl && this.renderProofPhoto()}
+                    <CardBody style={cardBodyStyle}>
+                        {children}
+                        {isExpandable && this.renderExpandBtn()}
+                        {this.renderAchievementDetails()}
+                        {statusElement}
+                        {proveButton}
+                    </CardBody>
                 </Card>
             </View>
         );
@@ -141,14 +136,84 @@ class Trackable extends React.Component<ITrackableProps> {
         }
     }
 
+    private renderProofPhoto() {
+        return (
+            <Image
+                style={styles.proofPhoto}
+                resizeMode="cover"
+                source={{ uri: this.props.proofPhotoUrl }}
+            />
+        );
+    }
+
+    private renderAchievementDetails() {
+        const { rating, approveCount, rejectCount} = this.props;
+
+        if (rating == null && approveCount == null && rejectCount == null) {
+            return null;
+        }
+
+        return (
+            <AchievementDetails
+                approveCount={approveCount}
+                rejectCount={rejectCount}
+                rating={rating}
+            />
+        );
+    }
+
+    private renderCmdBar() {
+        const { commands, isDisabled, isBatchEditMode } = this.props;
+        return (
+            <CardCommandBar
+                items={commands!}
+                isDisabled={isDisabled || isBatchEditMode}
+                titleMsgId="common.chooseAction"
+            />
+        );
+    }
+
+    private renderCheckBox() {
+        const { isSelected, isDisabled, onSelectChange } = this.props;
+        return (
+            <CheckBox
+                isChecked={isSelected}
+                isDisabled={isDisabled}
+                style={styles.checkBox}
+                onPress={onSelectChange && this.onSelectChange}
+            />
+        );
+    }
+
+    private renderExpandBtn() {
+        const { isBatchEditMode, isDisabled, isExpanded } = this.props;
+        return (
+            <ExpandButton
+                isDisabled={isBatchEditMode || isDisabled}
+                isExpanded={isExpanded}
+                onExpandChange={this.onExpandChange}
+            />
+        );
+    }
+
+    private renderProveBtn() {
+        const { isDisabled, onProve } = this.props;
+        return (
+            <ProveButton
+                isDisabled={isDisabled}
+                onPress={onProve && this.onProve}
+            />
+        );
+    }
+
     private onProve = () => this.props.onProve!(this.props.id);
 
     private onLongPress = () =>
-        this.props.onLongPress(this.props.id, this.props.parentId)
+        this.props.onLongPress!(this.props.id, this.props.parentId)
 
     private onPressIn = () => this.calculateLayout();
 
-    private onPressOut = () => this.props.onPressOut(this.props.id);
+    private onPressOut = () => this.props.onPressOut!(this.props.id);
 
     private onExpandChange = () => {
         const { onExpandChange, id, isExpanded } = this.props;
@@ -156,7 +221,7 @@ class Trackable extends React.Component<ITrackableProps> {
     }
 
     private onSelectChange = (isSelected: boolean) => {
-        this.props.onSelectChange(this.props.id, isSelected);
+        this.props.onSelectChange!(this.props.id, isSelected);
     }
 
     private onCardRef = (ref?: View) => this.card = ref;
@@ -171,10 +236,41 @@ class Trackable extends React.Component<ITrackableProps> {
 
         requestAnimationFrame(() => {
             container.measure((x, y, width, height, pageX, pageY) => {
-                this.props.onLayout(
+                this.props.onLayout!(
                     this.props.id, { x: pageX, y: pageY, width, height });
             });
         });
+    }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class AchievementDetails extends React.PureComponent<IAchievementDetailsProps> {
+    public render() {
+        const {rating, approveCount, rejectCount} = this.props;
+        return (
+            <View style={styles.achievementDetails}>
+                {this.renderItem("star-circle", rating)}
+                {this.renderItem("check", approveCount)}
+                {this.renderItem("close", rejectCount)}
+            </View>
+        );
+    }
+
+    private renderItem(iconName: string, value?: number) {
+        if (value == null) {
+            return null;
+        }
+
+        return (
+            <View style={styles.achievementDetailsItem}>
+                <Icon
+                    style={styles.achievementDetailsItemIcon}
+                    name={iconName}
+                    size={32}
+                />
+                <Text style={styles.achievementDetailsItemValue}>{value}</Text>
+            </View>
+        );
     }
 }
 
@@ -217,7 +313,53 @@ class ProveButton extends React.PureComponent<IProveButtonProps> {
     }
 }
 
+// tslint:disable-next-line:max-classes-per-file
+class Status extends React.PureComponent<IStatusProps> {
+    public render() {
+        const { status, duration } = this.props;
+        let msgId;
+
+        switch (status) {
+            case TrackableStatus.Expired:
+            msgId = "trackable.expirationPeriod";
+            break;
+            case TrackableStatus.Active:
+            msgId = "trackable.activePeriod";
+            break;
+            default:
+            msgId = "trackable.achievementPeriod";
+        }
+
+        const period = Math.floor(duration! / millisecondsInDay);
+        return (
+            <View style={styles.status}>
+                <Icon style={styles.statusIcon} name="clock" size={16} />
+                <Text style={styles.statusMsg}>
+                    <FormattedMessage id={msgId} values={{ period }} />
+                </Text>
+            </View>
+        );
+    }
+}
+
 const styles = StyleSheet.create({
+    achievementDetails: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        paddingBottom: 8,
+        paddingTop: 16,
+    },
+    achievementDetailsItem: {
+        alignItems: "flex-start",
+        flexDirection: "row",
+    },
+    achievementDetailsItemIcon: {
+        lineHeight: 32,
+        marginRight: 8,
+    },
+    achievementDetailsItemValue: {
+        lineHeight: 32,
+    },
     card: {
         backgroundColor: "#fff",
         flex: 1,
@@ -228,7 +370,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flexDirection: "row",
-        marginVertical: 8,
+        marginBottom: 8,
     },
     containerDragged: {
         opacity: 0,
@@ -236,8 +378,26 @@ const styles = StyleSheet.create({
     expandBtn: {
         alignSelf: "center",
     },
+    proofPhoto: {
+        height: 256,
+    },
     proveBtn: {
         alignSelf: "center",
+        marginBottom: 8,
+    },
+    status: {
+        alignItems: "flex-start",
+        flexDirection: "row",
+    },
+    statusIcon: {
+        color: "#888",
+        lineHeight: 32,
+        marginRight: 8,
+    },
+    statusMsg: {
+        color: "#888",
+        fontSize: 10,
+        lineHeight: 32,
     },
 });
 

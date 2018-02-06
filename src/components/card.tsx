@@ -18,6 +18,8 @@ interface ICardProps extends ViewProperties {
 
 type ICardHeaderProps = ViewProperties;
 
+type ICardBodyProps = ViewProperties;
+
 interface ICardTitleProps {
     text: string;
 }
@@ -60,9 +62,18 @@ class Card extends React.Component<ICardProps> {
 }
 
 // tslint:disable-next-line:max-classes-per-file
+class CardBody extends React.Component<ICardBodyProps> {
+    public render() {
+        const { style, ...restProps } = this.props;
+        return <View style={[styles.body, style]} {...restProps}/>;
+    }
+}
+
+// tslint:disable-next-line:max-classes-per-file
 class CardHeader extends React.Component<ICardHeaderProps> {
     public render() {
-        return <View style={styles.header}>{this.props.children}</View>;
+        const { style, ...restProps } = this.props;
+        return <View style={[styles.header, style]} {...restProps} />;
     }
 }
 
@@ -108,15 +119,23 @@ class CardCommandBar extends React.PureComponent<ICardCommandBarProps> {
 }
 
 const styles = StyleSheet.create({
+    body: {
+        paddingLeft: 8,
+        paddingRight: 8,
+    },
     commandBar: {
         paddingLeft: 8,
     },
     container: {
+        borderRadius: 8,
         borderWidth: 1,
-        padding: 8,
     },
     header: {
         flexDirection: "row",
+        paddingBottom: 4,
+        paddingLeft: 8,
+        paddingRight: 8,
+        paddingTop: 8,
     },
     icon: {
         paddingRight: 8,
@@ -127,5 +146,12 @@ const styles = StyleSheet.create({
     },
 });
 
-export { CardHeader, CardTitle, CardIcon, CardCommandBar, ICardProps };
+export {
+    CardHeader,
+    CardTitle,
+    CardIcon,
+    CardCommandBar,
+    CardBody,
+    ICardProps,
+};
 export default Card;

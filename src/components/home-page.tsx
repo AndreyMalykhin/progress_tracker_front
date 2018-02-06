@@ -9,19 +9,22 @@ import ReviewsSection from "components/reviews-section";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
+import myId from "utils/my-id";
 import routes from "utils/routes";
 
 type INavItem = INavBarItem & {
     component: React.ComponentType;
 };
 
+const myActiveTrackablesRoute = routes.profileActiveTrackables.path.replace(
+    ":id", myId);
 const navItems: INavItem[] = [
     {
         component: ProfileSectionContainer,
         iconName: "account",
         matchExact: routes.profile.exact,
         matchPath: routes.profile.path,
-        navigateToPath: routes.profileMyActiveTrackables.path,
+        navigateToPath: myActiveTrackablesRoute,
         titleMsgId: "globalNavigation.profile",
     },
     {
@@ -76,7 +79,7 @@ class HomePage extends React.Component {
                 <View style={styles.content}>
                     <Switch>
                         {routeElements}
-                        <Redirect to={routes.profileMyActiveTrackables.path} />
+                        <Redirect to={myActiveTrackablesRoute} />
                     </Switch>
                 </View>
                 <GlobalNav items={navItems} />

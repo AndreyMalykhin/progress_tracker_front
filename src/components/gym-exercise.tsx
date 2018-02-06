@@ -130,11 +130,16 @@ const styles = StyleSheet.create({
     },
     tableCell: {
         flex: 1,
-        padding: 4,
+        fontSize: 10,
+        lineHeight: 16,
+        paddingLeft: 8,
+        paddingRight: 8,
         textAlign: "center",
     },
     tableCellHeader: {
+        fontSize: 12,
         fontWeight: "bold",
+        lineHeight: 32,
     },
     tableColumn: {
         flex: 1,

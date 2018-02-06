@@ -184,9 +184,9 @@ class FormLabel extends React.PureComponent<IFormLabelProps> {
         const { invalid, msgId, msgValues, disabled, style } = this.props;
         const newStyle = [
             styles.label,
+            style,
             disabled ? styles.labelDisabled : null,
             invalid ? styles.labelInvalid : null,
-            style,
         ];
         return (
             <Text style={newStyle as any}>
@@ -263,6 +263,7 @@ const styles = StyleSheet.create({
         color: "#ccc",
     },
     label: {
+        fontWeight: "bold",
         lineHeight: 32,
     },
     labelDisabled: {
@@ -276,6 +277,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         color: "#0076ff",
+        fontWeight: "normal",
     },
 });
 

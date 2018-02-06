@@ -4,6 +4,7 @@ import {
     removeChild,
     removeChildFragment,
 } from "actions/aggregate-helpers";
+import { spliceArchivedTrackables } from "actions/archived-trackables-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -28,11 +29,15 @@ interface IProveTrackableResponse {
             }>;
         },
         trackable: {
+            __typename: Type;
             id: string;
-            proofPhotoUrlSmall: string;
+            proofPhotoUrlMedium: string;
             status: TrackableStatus;
             statusChangeDate: number;
             parent: null;
+            approveCount: number|null;
+            rejectCount: number|null;
+            rating: number|null;
         },
     };
 }
@@ -63,7 +68,10 @@ mutation ProveTrackable($id: ID!, $assetId: ID!) {
         trackable {
             id
             ... on IGoal {
-                proofPhotoUrlSmall
+                proofPhotoUrlMedium
+                approveCount
+                rejectCount
+                rating
             }
             status
             statusChangeDate
@@ -111,6 +119,7 @@ async function proveTrackable(
         optimisticResponse: getOptimisticResponse(id, photo, apollo),
         update: (proxy, response) => {
             updateActiveTrackables(response.data, proxy);
+            updateApprovedTrackables(response.data, proxy);
         },
         variables: { id, assetId },
     });
@@ -127,6 +136,15 @@ function updateActiveTrackables(
     }
 
     spliceActiveTrackables(idsToRemove, [], apollo);
+}
+
+function updateApprovedTrackables(
+    response: IProveTrackableResponse, apollo: DataProxy,
+) {
+    const trackablesToAdd = [response.proveTrackable.trackable];
+    const idsToRemove: string[] = [];
+    spliceArchivedTrackables(
+        idsToRemove, trackablesToAdd, TrackableStatus.Approved, apollo);
 }
 
 function getOptimisticResponse(
@@ -150,9 +168,12 @@ function getOptimisticResponse(
             removedAggregateId,
             trackable: {
                 __typename,
+                approveCount: status === TrackableStatus.Approved ? null : 0,
                 id: trackableId,
                 parent: null,
-                proofPhotoUrlSmall: photo.path,
+                proofPhotoUrlMedium: photo.path,
+                rating: null,
+                rejectCount: status === TrackableStatus.Approved ? null : 0,
                 status,
                 statusChangeDate: Date.now(),
             },

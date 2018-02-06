@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 interface ITrackableBaseProps {
-    index: number;
+    index?: number;
     id: string;
     parentId?: string;
     status: TrackableStatus;
@@ -17,11 +17,12 @@ interface ITrackableBaseProps {
     isDisabled?: boolean;
     isReorderMode?: boolean;
     isDragged?: boolean;
-    commands: ICommandBarItem[];
-    onSelectChange: (id: string, isSelected: boolean) => void;
-    onLongPress: (id: string, parentId?: string) => void;
-    onPressOut: (id: string) => void;
-    onLayout: (id: string, layout?: LayoutRectangle) => void;
+    commands?: ICommandBarItem[];
+    duration?: number;
+    onSelectChange?: (id: string, isSelected: boolean) => void;
+    onLongPress?: (id: string, parentId?: string) => void;
+    onPressOut?: (id: string) => void;
+    onLayout?: (id: string, layout?: LayoutRectangle) => void;
 }
 
 export default ITrackableBaseProps;

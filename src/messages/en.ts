@@ -1,5 +1,8 @@
 export default {
     "aggregate.total": "Total: {progress}",
+    "archiveNavigation.approvedTrackables": "Approved",
+    "archiveNavigation.expiredTrackables": "Expired",
+    "archiveNavigation.rejectedTrackables": "Rejected",
     "commands.addProgress": "Add progress",
     "commands.aggregate": "Aggregate",
     "commands.back": "Back",
@@ -63,6 +66,9 @@ export default {
     "reportUser.title": "Please select a reason",
     "taskGoalForm.newTaskTitlePlaceholder": "Do something small",
     "taskGoalForm.tasksLabel": "Tasks",
+    "trackable.achievementPeriod": "Achieved in {period} day(s)",
+    "trackable.activePeriod": "Created {period} day(s) ago",
+    "trackable.expirationPeriod": "Expired in {period} day(s)",
     "trackable.prove": "Prove",
     "trackableForm.advancedSection": "Advanced",
     "trackableForm.deadlineDateLabel": "Until",

@@ -11,28 +11,27 @@ import dataIdFromObject from "utils/data-id-from-object";
 import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
-interface IAggregateFragment {
-    __typename: Type;
-    id: string;
-    progress: number;
-    maxProgress?: number;
-    status: TrackableStatus;
-    statusChangeDate?: number|null;
-    order: number;
-    isPublic: boolean;
-    children: Array<{
-        id: string;
-        parent: {
-            __typename: Type;
-            id: string;
-        };
-    }>;
-}
-
 interface IAggregateTrackablesResponse {
     aggregateTrackables: {
         isNewTrackable: boolean;
-        trackable: IAggregateFragment;
+        trackable: {
+            __typename: Type;
+            id: string;
+            progress: number;
+            maxProgress?: number;
+            status: TrackableStatus;
+            statusChangeDate?: number|null;
+            creationDate: number;
+            order: number;
+            isPublic: boolean;
+            children: Array<{
+                id: string;
+                parent: {
+                    __typename: Type;
+                    id: string;
+                };
+            }>;
+        }
     };
 }
 
@@ -43,6 +42,7 @@ interface ITrackable {
     maxProgress?: number;
     order: number;
     isPublic: boolean;
+    creationDate: number;
     parent?: {
         __typename: Type;
         id: string;
@@ -60,20 +60,19 @@ mutation AggregateTrackables($ids: [ID!]!) {
     aggregateTrackables(ids: $ids) {
         isNewTrackable
         trackable {
-            ... on Aggregate {
+            id
+            status
+            statusChangeDate
+            creationDate
+            progress
+            maxProgress
+            order
+            isPublic
+            children {
                 id
-                status
-                statusChangeDate
-                progress
-                maxProgress
-                order
-                isPublic
-                children {
-                    id
-                    ... on IAggregatable {
-                        parent {
-                            id
-                        }
+                ... on IAggregatable {
+                    parent {
+                        id
                     }
                 }
             }
@@ -152,6 +151,7 @@ function getOptimisticResponse(
     let aggregateId = "";
     let order = 0;
     let isPublic = false;
+    let creationDate;
     let children: ITrackable[] = [];
     const targetTrackables = apollo.readQuery<IGetTrackablesByIdsResponse>({
         query: getTrackablesByIdsQuery,
@@ -163,6 +163,7 @@ function getOptimisticResponse(
             aggregateId = targetTrackable.id;
             order = targetTrackable.order;
             isPublic = targetTrackable.isPublic;
+            creationDate = targetTrackable.creationDate;
             children = targetTrackable.children!.concat(children);
         } else {
             children.push(targetTrackable);
@@ -176,7 +177,8 @@ function getOptimisticResponse(
     if (!aggregateId) {
         isNewTrackable = true;
         aggregateId = uuid();
-        order = Date.now();
+        creationDate = Date.now();
+        order = creationDate;
     }
 
     for (const child of children) {
@@ -192,6 +194,7 @@ function getOptimisticResponse(
             trackable: {
                 __typename: Type.Aggregate,
                 children,
+                creationDate,
                 id: aggregateId,
                 isPublic,
                 maxProgress: maxProgress === undefined ? null : maxProgress,

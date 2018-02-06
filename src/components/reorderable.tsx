@@ -8,14 +8,17 @@ import {
     PanResponder,
     PanResponderGestureState,
     PanResponderInstance,
+    StyleProp,
     StyleSheet,
     Text,
     View,
+    ViewStyle,
     ViewToken,
 } from "react-native";
 
 interface IReorderableProps {
     isActive?: boolean;
+    placeholderStyle?: StyleProp<ViewStyle>;
     onStartReorder: () => void;
     onReorder: (sourceId: string, destinationId: string) => void;
     onEndReorder: () => void;
@@ -44,25 +47,11 @@ class Reorderable extends React.Component<IReorderableProps> {
             onPanResponderRelease: this.onPanResponderRelease,
             onPanResponderTerminate: this.onPanResponderTerminate,
         });
-        this.tryReorder = throttle(this.tryReorder, 128);
+        this.tryReorder = throttle(this.tryReorder, 256);
     }
 
     public render() {
         const { children, isActive } = this.props;
-        let stub;
-
-        if (isActive) {
-            const { x, y, width, height } = this.draggedItemLayout!;
-            const style = {
-                height,
-                left: x - this.x,
-                top: y - this.y,
-                transform: this.pan.getTranslateTransform(),
-                width,
-            };
-            stub = <Animated.View style={[styles.placeholder, style]} />;
-        }
-
         return (
             <View
                 style={styles.container}
@@ -71,7 +60,7 @@ class Reorderable extends React.Component<IReorderableProps> {
                 {...this.panResponder.panHandlers}
             >
                 {children}
-                {stub}
+                {isActive && this.renderPlaceholder()}
             </View>
         );
     }
@@ -84,6 +73,23 @@ class Reorderable extends React.Component<IReorderableProps> {
             this.draggedItemId = onGetDraggedItemId();
             this.draggedItemLayout = onGetItemLayout(this.draggedItemId);
         }
+    }
+
+    private renderPlaceholder() {
+        const { placeholderStyle } = this.props;
+        const { x, y, width, height } = this.draggedItemLayout!;
+        const style = {
+            height,
+            left: x - this.x,
+            top: y - this.y,
+            transform: this.pan.getTranslateTransform(),
+            width,
+        };
+        return (
+            <Animated.View
+                style={[styles.placeholder, placeholderStyle, style]}
+            />
+        );
     }
 
     private onPanResponderRelease = () => this.props.onEndReorder();

@@ -1,4 +1,4 @@
-import { HeaderTitle, IHeaderState, IWithHeaderProps } from "components/header";
+import { IHeaderState, IWithHeaderProps } from "components/header";
 import { debounce, throttle } from "lodash";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
@@ -124,15 +124,10 @@ abstract class TrackableFormContainer<
             const isIconPickerOpen = !prevState.isIconPickerOpen;
 
             if (isIconPickerOpen) {
-                const title = (
-                    <HeaderTitle>
-                        <FormattedMessage id="trackableForm.iconLabel" />
-                    </HeaderTitle>
-                );
                 this.props.header.push({
                     onBack: this.onCloseIconPicker,
                     rightCommands: [],
-                    title,
+                    title: <FormattedMessage id="trackableForm.iconLabel" />,
                 });
             }
 
@@ -161,11 +156,6 @@ abstract class TrackableFormContainer<
     }
 
     private updateHeader(isValid: boolean) {
-        const title = (
-            <HeaderTitle>
-                <FormattedMessage id={this.getTitleMsgId()} />
-            </HeaderTitle>
-        );
         this.props.header.replace({
             hideBackCommand: !this.isNew(),
             rightCommands: [
@@ -175,7 +165,7 @@ abstract class TrackableFormContainer<
                     onRun: this.onDone,
                 },
             ],
-            title,
+            title: <FormattedMessage id={this.getTitleMsgId()} />,
         });
     }
 

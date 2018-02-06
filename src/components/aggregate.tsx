@@ -9,6 +9,9 @@ import { InjectedIntlProps, injectIntl } from "react-intl";
 import { LayoutRectangle, StyleSheet, View } from "react-native";
 
 type IAggregateProps = InjectedIntlProps & ITrackableBaseProps & {
+    isAfterAggregate?: boolean;
+    isBeforeAggregate?: boolean;
+    isLast?: boolean;
     progress: number;
     maxProgress?: number;
 };
@@ -23,6 +26,9 @@ class Aggregate extends React.Component<IAggregateProps> {
             progress,
             maxProgress,
             isDragged,
+            isAfterAggregate,
+            isBeforeAggregate,
+            isLast,
             ...restProps,
         } = this.props;
         let progressBar;
@@ -41,15 +47,24 @@ class Aggregate extends React.Component<IAggregateProps> {
             );
         }
 
+        const style = [
+            styles.container,
+            isDragged ? styles.containerDragged : null,
+            isAfterAggregate ? styles.containerAfterAggregate : null,
+            isBeforeAggregate ? styles.containerBeforeAggregate : null,
+            isLast ? styles.containerLast : null,
+        ];
         const title = intl.formatMessage(
             { id: "aggregate.total" }, { progress: progressValue });
         return (
-            <View style={isDragged ? containerDraggedStyle : styles.container}>
+            <View style={style}>
                 <View ref={this.onLayoutContainerRef as any}>
                     <Trackable
                         isDragged={isDragged}
                         title={title}
                         cardStyle={styles.card}
+                        cardHeaderStyle={styles.cardHeader}
+                        cardBodyStyle={styles.cardBody}
                         style={styles.trackable}
                         onGetLayoutRef={this.onGetLayoutRef}
                         {...restProps}
@@ -70,23 +85,42 @@ class Aggregate extends React.Component<IAggregateProps> {
 const styles = StyleSheet.create({
     card: {
         borderWidth: 0,
-        padding: 0,
+    },
+    cardBody: {
+        paddingBottom: 0,
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
+    },
+    cardHeader: {
+        paddingBottom: 0,
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
     },
     container: {
-        marginVertical: 16,
+        marginBottom: 32,
+        marginTop: 24,
+    },
+    containerAfterAggregate: {
+        marginTop: 0,
+    },
+    containerBeforeAggregate: {
+        marginBottom: 24,
     },
     containerDragged: {
         opacity: 0,
     },
+    containerLast: {
+        marginBottom: 0,
+    },
     progressBar: {
-        marginBottom: 8,
+        marginTop: 0,
     },
     trackable: {
-        marginVertical: 0,
+        marginBottom: 0,
     },
 });
-
-const containerDraggedStyle = [styles.container, styles.containerDragged];
 
 export { IAggregateProps };
 export default injectIntl(Aggregate);

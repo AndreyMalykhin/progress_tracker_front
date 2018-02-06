@@ -13,7 +13,7 @@ import {
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import Error from "components/error";
-import { HeaderTitle, IWithHeaderProps, withHeader } from "components/header";
+import { IWithHeaderProps, withHeader } from "components/header";
 import Loader from "components/loader";
 import ProfileForm from "components/profile-form";
 import gql from "graphql-tag";
@@ -191,11 +191,6 @@ class ProfileFormContainer extends
     }
 
     private updateHeader(isValid: boolean) {
-        const title = (
-            <HeaderTitle>
-                <FormattedMessage id="profileForm.title" />
-            </HeaderTitle>
-        );
         this.props.header.replace({
             hideBackCommand: true,
             rightCommands: [
@@ -205,7 +200,7 @@ class ProfileFormContainer extends
                     onRun: this.onDone,
                 },
             ],
-            title,
+            title: <FormattedMessage id="profileForm.title" />,
         });
     }
 

@@ -6,7 +6,7 @@ export default {
     defaults: {
         user: {
             __typename: Type.User,
-            accessToken: "null",
+            accessToken: null,
             avatarUrlMedium: defaultAvatar.urlMedium,
             avatarUrlSmall: defaultAvatar.urlSmall,
             id: myId,

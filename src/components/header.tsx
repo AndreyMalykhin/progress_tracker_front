@@ -1,5 +1,6 @@
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import * as React from "react";
+import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -8,6 +9,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 interface IHeaderCmd {
     iconName?: string;
     imgUrl?: string;
+    isPrimary?: boolean;
     isDisabled?: boolean;
     msgId: string;
     onRun: () => void;
@@ -16,12 +18,22 @@ interface IHeaderCmd {
 type IHeaderCmdProps = IHeaderCmd;
 
 interface IHeaderState {
-    title?: JSX.Element;
-    subtitle?: JSX.Element;
+    title?: ReactNode;
+    subtitleIcon?: string;
+    subtitleText?: string|number;
     leftCommand?: IHeaderCmd;
     rightCommands: IHeaderCmd[];
     hideBackCommand?: boolean;
     onBack?: () => void;
+}
+
+interface ITitleProps {
+    text: ReactNode;
+}
+
+interface ISubtitleProps {
+    text?: string|number;
+    iconName?: string;
 }
 
 type IHeaderProps = RouteComponentProps<{}>;
@@ -52,42 +64,29 @@ class Header extends React.Component<IHeaderProps> {
             ++cmdIndex;
         }
 
-        const { leftCommand, rightCommands, title, subtitle } =
-            state as IHeaderState;
+        const { leftCommand, rightCommands, title, subtitleIcon, subtitleText }
+            = state as IHeaderState;
         let leftCmdElement;
 
         if (leftCommand) {
-            leftCmdElement = (
-                <HeaderCmd
-                    key={cmdIndex}
-                    iconName={leftCommand.iconName}
-                    imgUrl={leftCommand.imgUrl}
-                    msgId={leftCommand.msgId}
-                    isDisabled={leftCommand.isDisabled}
-                    onRun={leftCommand.onRun}
-                />
-            );
+            leftCmdElement = <HeaderCmd key={cmdIndex} {...leftCommand} />;
             ++cmdIndex;
         }
 
         const rightCommandElements = rightCommands.map((cmd, i) => {
-            return (
-                <HeaderCmd
-                    key={i}
-                    iconName={cmd.iconName}
-                    imgUrl={cmd.imgUrl}
-                    msgId={cmd.msgId}
-                    isDisabled={cmd.isDisabled}
-                    onRun={cmd.onRun}
-                />
-            );
+            return <HeaderCmd key={i} {...cmd} />;
         });
+        const subtitle = subtitleText != null || subtitleIcon != null ?
+            <Subtitle text={subtitleText} iconName={subtitleIcon} /> : null;
         return (
             <View style={styles.container}>
                 <View style={styles.leftSection}>
                     {backCmd}{leftCmdElement}
                 </View>
-                <View style={styles.middleSection}>{title}{subtitle}</View>
+                <View style={styles.middleSection}>
+                    {title && <Title text={title} />}
+                    {subtitle}
+                </View>
                 <View style={styles.rightSection}>{rightCommandElements}</View>
             </View>
         );
@@ -116,7 +115,8 @@ class Header extends React.Component<IHeaderProps> {
 // tslint:disable-next-line:max-classes-per-file
 class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
     public render() {
-        const { msgId, iconName, imgUrl, isDisabled, onRun } = this.props;
+        const { isPrimary, msgId, iconName, imgUrl, isDisabled, onRun } =
+            this.props;
         let content;
 
         if (iconName) {
@@ -131,13 +131,25 @@ class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
         } else if (imgUrl) {
             const source = {
                 height: cmdSize,
-                method: "cover",
                 uri: imgUrl,
                 width: cmdSize,
             };
-            content = <Image style={styles.cmdImg} source={source} />;
+            content = (
+                <Image
+                    resizeMode="cover"
+                    style={styles.cmdImg}
+                    source={source}
+                />
+            );
         } else {
-            content = <ButtonTitle disabled={isDisabled} msgId={msgId} />;
+            const style = isPrimary ? cmdTitlePrimaryStyle : styles.cmdTitle;
+            content = (
+                <ButtonTitle
+                    style={style}
+                    disabled={isDisabled}
+                    msgId={msgId}
+                />
+            );
         }
 
         return <Button disabled={isDisabled} onPress={onRun}>{content}</Button>;
@@ -145,16 +157,29 @@ class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class HeaderTitle extends React.Component {
+class Title extends React.PureComponent<ITitleProps> {
     public render() {
-        return <Text>{this.props.children}</Text>;
+        return <Text style={styles.title}>{this.props.text}</Text>;
     }
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class HeaderSubtitle extends React.Component {
+class Subtitle extends React.PureComponent<ISubtitleProps> {
     public render() {
-        return <Text>{this.props.children}</Text>;
+        const { text, iconName } = this.props;
+        const icon = iconName && (
+            <Icon
+                style={styles.subtitleIcon}
+                name={iconName}
+                size={12}
+            />
+        );
+        return (
+            <View style={styles.subtitle}>
+                {icon}
+                <Text style={styles.subtitleText}>{text}</Text>
+            </View>
+        );
     }
 }
 
@@ -189,12 +214,16 @@ const styles = StyleSheet.create({
         borderRadius: cmdSize / 2,
         borderWidth: 1,
     },
+    cmdTitle: {},
+    cmdTitlePrimary: {
+        fontWeight: "bold",
+    },
     container: {
         borderBottomWidth: 1,
         flexDirection: "row",
         height: 48,
-        justifyContent: "space-between",
-        paddingHorizontal: 8,
+        paddingLeft: 8,
+        paddingRight: 8,
     },
     leftSection: {
         alignItems: "center",
@@ -212,11 +241,27 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "flex-end",
     },
+    subtitle: {
+        alignItems: "flex-start",
+        flexDirection: "row",
+    },
+    subtitleIcon: {
+        color: "#888",
+        lineHeight: 16,
+        marginLeft: 4,
+        marginRight: 4,
+    },
+    subtitleText: {
+        color: "#888",
+        fontSize: 12,
+        lineHeight: 16,
+    },
+    title: {},
 });
 
+const cmdTitlePrimaryStyle = [styles.cmdTitle, styles.cmdTitlePrimary];
+
 export {
-    HeaderTitle,
-    HeaderSubtitle,
     IHeaderState,
     IHeaderCmd,
     withHeader,

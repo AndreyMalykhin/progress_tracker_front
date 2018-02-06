@@ -8,13 +8,19 @@ interface ICheckBoxProps {
     isDisabled?: boolean;
     isAnimationDisabled?: boolean;
     style?: StyleProp<ViewStyle>;
-    onPress: (isChecked: boolean) => void;
+    onPress?: (isChecked: boolean) => void;
 }
 
 class CheckBox extends React.PureComponent<ICheckBoxProps> {
     public render() {
-        const { isChecked, isDisabled, isAnimationDisabled, children, style } =
-            this.props;
+        const {
+            isChecked,
+            isDisabled,
+            isAnimationDisabled,
+            children,
+            style,
+            onPress,
+        } = this.props;
         const iconName = isChecked ? "check-circle" :
             "checkbox-blank-circle-outline";
         const iconStyle = isChecked ? iconCheckedStyle : styles.icon;
@@ -22,7 +28,7 @@ class CheckBox extends React.PureComponent<ICheckBoxProps> {
             <Button
                 disabled={isDisabled}
                 isAnimationDisabled={isAnimationDisabled}
-                onPress={this.onPress}
+                onPress={onPress && this.onPress}
                 style={[styles.container, style]}
             >
                 <ButtonIcon
@@ -36,7 +42,7 @@ class CheckBox extends React.PureComponent<ICheckBoxProps> {
         );
     }
 
-    private onPress = () => this.props.onPress(!this.props.isChecked);
+    private onPress = () => this.props.onPress!(!this.props.isChecked);
 }
 
 const styles = StyleSheet.create({

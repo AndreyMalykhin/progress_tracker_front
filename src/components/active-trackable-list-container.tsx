@@ -88,7 +88,7 @@ import {
 import ImagePicker, { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
 import DragStatus from "utils/drag-status";
-import { IFetchMore } from "utils/interfaces";
+import { IConnection, IFetchMore } from "utils/interfaces";
 import myId from "utils/my-id";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
@@ -139,13 +139,7 @@ type IOwnProps = RouteComponentProps<IRouteParams> & {
 };
 
 interface IGetDataResponse {
-    getActiveTrackables: {
-        edges: IActiveTrackableListItem[];
-        pageInfo: {
-            hasNextPage: boolean;
-            endCursor: number;
-        };
-    };
+    getActiveTrackables: IConnection<IActiveTrackableListItemNode, number>;
 }
 
 const withReorder =
@@ -303,6 +297,7 @@ const getDataQuery = gql`
         order
         status
         statusChangeDate
+        creationDate
         isPublic
     }
 
@@ -927,6 +922,7 @@ class ActiveTrackableListContainer extends
                 },
                 rightCommands: [
                     {
+                        isPrimary: true,
                         msgId: "common.done",
                         onRun: this.onCommitAggregateItem,
                     },

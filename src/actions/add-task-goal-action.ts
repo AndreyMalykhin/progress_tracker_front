@@ -24,9 +24,10 @@ interface IAddTaskGoalResponse {
             parent: null;
             progress: number;
             progressDisplayMode: ProgressDisplayMode;
-            proofPhotoUrlSmall: null;
+            proofPhotoUrlMedium: null;
             status: TrackableStatus;
             statusChangeDate: null;
+            creationDate: number;
             tasks: Array<{
                 id: string;
                 title: string;
@@ -68,9 +69,10 @@ mutation AddTaskGoal($goal: AddTaskGoalInput!) {
             }
             progress
             progressDisplayMode
-            proofPhotoUrlSmall
+            proofPhotoUrlMedium
             status
             statusChangeDate
+            creationDate
             tasks {
                 id
                 title
@@ -120,23 +122,25 @@ function getOptimisticResponse(goal: IAddTaskGoalFragment) {
             title: task.title,
         };
     });
+    const currentDate = Date.now();
     return {
         __typename: Type.Mutation,
         addTaskGoal: {
             __typename: Type.AddTaskGoalResponse,
             trackable: {
                 __typename: Type.TaskGoal,
+                creationDate: currentDate,
                 deadlineDate: goal.deadlineDate || null,
                 difficulty: goal.difficulty,
                 iconName: goal.iconName,
                 id: goalId,
                 isPublic: goal.isPublic,
                 maxProgress: goal.tasks.length,
-                order: Date.now(),
+                order: currentDate,
                 parent: null,
                 progress: 0,
                 progressDisplayMode: goal.progressDisplayMode,
-                proofPhotoUrlSmall: null,
+                proofPhotoUrlMedium: null,
                 status: TrackableStatus.Active,
                 statusChangeDate: null,
                 tasks,

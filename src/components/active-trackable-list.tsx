@@ -50,6 +50,7 @@ interface IBaseNode {
     status: TrackableStatus;
     statusChangeDate?: number;
     isPublic: boolean;
+    creationDate: number;
     parent?: {
         id: string;
     };
@@ -159,7 +160,7 @@ interface IActiveTrackableListProps extends IExtraData {
 }
 
 class ActiveTrackableList extends
-    React.Component<IActiveTrackableListProps, {}> {
+    React.Component<IActiveTrackableListProps> {
     private extraData: IExtraData;
 
     public constructor(props: IActiveTrackableListProps, context: any) {
@@ -191,7 +192,6 @@ class ActiveTrackableList extends
         }
 
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
-
         let numericalEntryPopup;
 
         if (isNumericalEntryPopupOpen) {
@@ -216,6 +216,7 @@ class ActiveTrackableList extends
             <View style={styles.container}>
                 <Reorderable
                     isActive={isReorderMode}
+                    placeholderStyle={styles.reorderablePlaceholder}
                     onReorder={onReorderItem}
                     onGetItemLayout={onGetItemLayout}
                     onGetDraggedItemId={onGetDraggedItemId}
@@ -224,14 +225,15 @@ class ActiveTrackableList extends
                     onEndReorder={onEndReorderItem}
                 >
                     <FlatList
-                        windowSize={16}
-                        initialNumToRender={8}
+                        windowSize={8}
+                        initialNumToRender={4}
                         scrollEnabled={!isReorderMode}
                         keyExtractor={this.getItemKey}
                         data={items}
                         extraData={this.extraData}
                         renderItem={this.renderItem}
                         ListFooterComponent={loader}
+                        contentContainerStyle={styles.listContent}
                         onEndReached={onEndReached}
                         onEndReachedThreshold={0.5}
                         onViewableItemsChanged={onVisibleItemsChange}
@@ -299,7 +301,8 @@ class ActiveTrackableList extends
     }
 
     private renderCounter(item: ICounter, index: number) {
-        const { id, parent, iconName, title, progress, status } = item;
+        const { id, parent, iconName, title, progress, status, creationDate } =
+            item;
         const {
             itemsMeta,
             isAggregationMode,
@@ -328,6 +331,7 @@ class ActiveTrackableList extends
                 isReorderMode={isReorderMode && !isAggregated}
                 status={status}
                 commands={onGetCounterCommands(id, isAggregated)}
+                duration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
                 onPressOut={onPressOutItem}
@@ -337,7 +341,7 @@ class ActiveTrackableList extends
     }
 
     private renderGymExercise(item: IGymExercise, index: number) {
-        const { id, iconName, title, entries, status } = item;
+        const { id, iconName, title, entries, status, creationDate } = item;
         const {
             isAggregationMode,
             isReorderMode,
@@ -371,6 +375,7 @@ class ActiveTrackableList extends
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode}
                 status={status}
+                duration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
                 onExpandChange={onToggleItemExpand}
@@ -390,6 +395,7 @@ class ActiveTrackableList extends
             maxProgress,
             progressDisplayMode,
             status,
+            creationDate,
         } = item;
         const {
             isAggregationMode,
@@ -424,6 +430,7 @@ class ActiveTrackableList extends
                 isReorderMode={isReorderMode && !isAggregated}
                 status={status}
                 commands={commands}
+                duration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
                 onProve={onProveItem}
@@ -444,6 +451,7 @@ class ActiveTrackableList extends
             maxProgress,
             progressDisplayMode,
             status,
+            creationDate,
         } = item;
         const {
             isAggregationMode,
@@ -487,6 +495,7 @@ class ActiveTrackableList extends
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode && !isAggregated}
                 status={status}
+                duration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
                 onExpandChange={onToggleItemExpand}
@@ -501,6 +510,7 @@ class ActiveTrackableList extends
     private renderAggregate(item: IAggregate, index: number): JSX.Element {
         const { id, progress, maxTotalProgress, children, status } = item;
         const {
+            items,
             isAggregationMode,
             isReorderMode,
             itemsMeta,
@@ -511,6 +521,10 @@ class ActiveTrackableList extends
             onPressOutItem,
         } = this.props;
         const { isDisabled, isSelected, dragStatus } = itemsMeta[id];
+        const isAfterAggregate = index > 0
+            && items[index - 1].node.__typename === Type.Aggregate;
+        const isBeforeAggregate = index < items.length - 1
+            && items[index + 1].node.__typename === Type.Aggregate;
         return (
             <Aggregate
                 key={id}
@@ -524,6 +538,9 @@ class ActiveTrackableList extends
                 isDisabled={isDisabled}
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode}
+                isAfterAggregate={isAfterAggregate}
+                isBeforeAggregate={isBeforeAggregate}
+                isLast={index === items.length - 1}
                 commands={onGetAggregateCommands(id)}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
@@ -543,7 +560,14 @@ class ActiveTrackableList extends
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: 8,
+    },
+    listContent: {
+        paddingLeft: 8,
+        paddingRight: 8,
+        paddingTop: 8,
+    },
+    reorderablePlaceholder: {
+        borderRadius: 8,
     },
 });
 

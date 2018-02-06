@@ -83,15 +83,11 @@ const styles = StyleSheet.create({
     text: {
         color: "#0076ff",
     },
-    textContainerDisabled: {
-        opacity: 0.33,
-    },
     textContainerVertical: {
         flexDirection: "column",
     },
     title: {
         lineHeight: 32,
-        paddingHorizontal: 4,
     },
     titleDisabled: {
         color: "#ccc",
