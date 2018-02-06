@@ -1,8 +1,9 @@
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
+import Image from "components/image";
 import * as React from "react";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
 
@@ -129,16 +130,11 @@ class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
                 />
             );
         } else if (imgUrl) {
-            const source = {
-                height: cmdSize,
-                uri: imgUrl,
-                width: cmdSize,
-            };
             content = (
                 <Image
                     resizeMode="cover"
                     style={styles.cmdImg}
-                    source={source}
+                    source={{ uri: imgUrl }}
                 />
             );
         } else {
@@ -213,6 +209,8 @@ const styles = StyleSheet.create({
     cmdImg: {
         borderRadius: cmdSize / 2,
         borderWidth: 1,
+        height: cmdSize,
+        width: cmdSize,
     },
     cmdTitle: {},
     cmdTitlePrimary: {

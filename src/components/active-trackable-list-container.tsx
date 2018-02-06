@@ -89,6 +89,7 @@ import ImagePicker, { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
 import DragStatus from "utils/drag-status";
 import { IConnection, IFetchMore } from "utils/interfaces";
+import loadMore from "utils/load-more";
 import myId from "utils/my-id";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
@@ -1020,44 +1021,8 @@ class ActiveTrackableListContainer extends
     }
 
     private onEndReached = () => {
-        const { getActiveTrackables, networkStatus } = this.props.data;
-
-        if (getActiveTrackables.pageInfo.hasNextPage
-            && !isLoading(networkStatus)
-        ) {
-            this.loadMore();
-        }
-    }
-
-    private loadMore() {
-        const { fetchMore, getActiveTrackables } = this.props.data;
-        fetchMore({
-            updateQuery: (previousResult, { fetchMoreResult }) => {
-                const { edges, pageInfo } =
-                    (fetchMoreResult as IGetDataResponse).getActiveTrackables;
-
-                if (!edges.length) {
-                    return {
-                        ...previousResult,
-                        getActiveTrackables: {
-                            ...previousResult.getActiveTrackables,
-                            pageInfo,
-                        },
-                    } as IGetDataResponse;
-                }
-
-                const previousEdges = (previousResult as IGetDataResponse)
-                    .getActiveTrackables.edges;
-                return {
-                    ...fetchMoreResult,
-                    getActiveTrackables: {
-                        ...fetchMoreResult!.getActiveTrackables,
-                        edges: previousEdges.concat(edges),
-                    },
-                } as IGetDataResponse;
-            },
-            variables: { cursor: getActiveTrackables.pageInfo.endCursor },
-        });
+        const responseField = "getActiveTrackables";
+        loadMore(this.props.data, responseField);
     }
 
     private onStartProveItem = async (id: string) => {

@@ -1,8 +1,8 @@
 import Button, { ButtonTitle } from "components/button";
+import Image from "components/image";
 import * as React from "react";
 import {
     Dimensions,
-    Image,
     ImageURISource,
     StyleSheet,
     Text,
@@ -16,21 +16,13 @@ interface IIntroPageProps  {
 }
 
 class IntroPage extends React.Component<IIntroPageProps> {
-    private logoSource: ImageURISource;
-
-    public constructor(props: IIntroPageProps, context: any) {
-        super(props, context);
-        this.logoSource = {
-            height: 128,
-            uri: "https://loremflickr.com/128/128/cat",
-            width: 128,
-        };
-    }
-
     public render() {
         return (
             <View style={styles.container}>
-                <Image source={this.logoSource} style={styles.logo} />
+                <Image
+                    source={{ uri: "https://loremflickr.com/512/512/cat" }}
+                    style={styles.logo}
+                />
                 <Button style={styles.btn} onPress={this.props.onLogin}>
                     <ButtonTitle msgId="common.login" />
                 </Button>
@@ -52,7 +44,9 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     logo: {
-        marginBottom: 24,
+        height: 128,
+        marginBottom: 64,
+        width: 128,
     },
 });
 

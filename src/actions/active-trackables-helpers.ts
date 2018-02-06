@@ -1,6 +1,8 @@
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
 import Type from "models/type";
+import { sortConnection, spliceConnection } from "utils/connection-utils";
+import { IConnection } from "utils/interfaces";
 import myId from "utils/my-id";
 
 interface ISpliceActiveTrackablesFragment {
@@ -10,18 +12,7 @@ interface ISpliceActiveTrackablesFragment {
 }
 
 interface IGetActiveTrackablesResponse {
-    getActiveTrackables: {
-        edges: Array<{
-            cursor: number;
-            node: {
-                id: string;
-                order: number;
-            };
-        }>;
-        pageInfo: {
-            endCursor?: number;
-        };
-    };
+    getActiveTrackables: IConnection<ISpliceActiveTrackablesFragment, number>;
 }
 
 const getActiveTrackablesQuery = gql`
@@ -48,35 +39,35 @@ function spliceActiveTrackables(
     apollo: DataProxy,
 ) {
     const activeTrackablesResponse = getActiveTrackables(apollo);
-    const activeTrackables =
-        activeTrackablesResponse.getActiveTrackables.edges;
-
-    if (idsToRemove.length) {
-        for (let i = activeTrackables.length - 1; i >= 0; --i) {
-            if (idsToRemove.indexOf(activeTrackables[i].node.id) !== -1) {
-                activeTrackables.splice(i, 1);
-            }
-        }
-    }
-
-    if (trackablesToAdd.length) {
-        const edgesToAdd = trackablesToAdd.map((trackable) => {
-            return {
-                __typename: Type.TrackableEdge,
-                cursor: trackable.order,
-                node: trackable,
-            };
-        });
-        activeTrackables.push(...edgesToAdd);
-    }
-
-    updateOrder(activeTrackablesResponse);
+    const cursorField = "order";
+    spliceConnection(
+        activeTrackablesResponse.getActiveTrackables,
+        idsToRemove,
+        trackablesToAdd,
+        cursorField,
+        Type.TrackableEdge,
+        compareTrackables,
+    );
     setActiveTrackables(activeTrackablesResponse, apollo);
 }
 
-function updateActiveTrackablesOrder(apollo: DataProxy) {
+function compareTrackables(
+    lhs: ISpliceActiveTrackablesFragment, rhs: ISpliceActiveTrackablesFragment,
+) {
+    const result = rhs.order - lhs.order;
+
+    if (result === 0) {
+        return 0;
+    }
+
+    return result < 0 ? -1 : 1;
+}
+
+function sortActiveTrackables(apollo: DataProxy) {
     const activeTrackablesResponse = getActiveTrackables(apollo);
-    updateOrder(activeTrackablesResponse);
+    const cursorField = "order";
+    sortConnection(activeTrackablesResponse.getActiveTrackables, cursorField,
+        compareTrackables);
     setActiveTrackables(activeTrackablesResponse, apollo);
 }
 
@@ -97,33 +88,9 @@ function setActiveTrackables(
     });
 }
 
-function updateOrder(activeTrackablesResponse: IGetActiveTrackablesResponse) {
-    activeTrackablesResponse.getActiveTrackables.edges.sort((lhs, rhs) => {
-        const result = rhs.node.order - lhs.node.order;
-
-        if (result === 0) {
-            return 0;
-        }
-
-        return result < 0 ? -1 : 1;
-    });
-    updateCursors(activeTrackablesResponse);
-}
-
-function updateCursors(activeTrackablesResponse: IGetActiveTrackablesResponse) {
-    const { edges, pageInfo } = activeTrackablesResponse.getActiveTrackables;
-
-    for (const edge of edges) {
-        edge.cursor = edge.node.order;
-    }
-
-    pageInfo.endCursor =
-        edges.length ? edges[edges.length - 1].cursor : undefined;
-}
-
 export {
     spliceActiveTrackables,
-    updateActiveTrackablesOrder,
+    sortActiveTrackables,
     getActiveTrackables,
     ISpliceActiveTrackablesFragment,
 };

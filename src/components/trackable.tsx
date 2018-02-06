@@ -8,12 +8,12 @@ import Card, {
 } from "components/card";
 import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
+import Image from "components/image";
 import ITrackableBaseProps from "components/trackable-base-props";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import {
-    Image,
     LayoutRectangle,
     PanResponderGestureState,
     StyleProp,

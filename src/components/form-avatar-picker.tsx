@@ -1,7 +1,8 @@
 import Button, { ButtonTitle } from "components/button";
 import { FormGroup } from "components/form";
+import Image from "components/image";
 import * as React from "react";
-import { Image, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import ImagePicker, {
     Image as ImageInfo,
 } from "react-native-image-crop-picker";
@@ -27,7 +28,7 @@ class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
                 <Image
                     resizeMode="cover"
                     style={styles.image}
-                    source={{ height: imgSize, uri, width: imgSize }}
+                    source={{ uri }}
                 />
                 <View style={styles.buttonsContainer}>
                     <Button onPress={this.onSelect} disabled={disabled}>
@@ -86,6 +87,8 @@ const styles = StyleSheet.create({
     image: {
         borderRadius: imgSize / 2,
         borderWidth: 1,
+        height: imgSize,
+        width: imgSize,
     },
 });
 

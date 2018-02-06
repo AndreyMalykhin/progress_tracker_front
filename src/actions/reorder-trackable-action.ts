@@ -1,7 +1,7 @@
 import {
     getActiveTrackables,
+    sortActiveTrackables,
     spliceActiveTrackables,
-    updateActiveTrackablesOrder,
 } from "actions/active-trackables-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -49,7 +49,7 @@ async function reorderTrackable(
         optimisticResponse: getOptimisticResponse(
             sourceId, destinationId, apollo),
         update: (proxy, response) => {
-            updateActiveTrackablesOrder(proxy);
+            sortActiveTrackables(proxy);
         },
         variables: { sourceId, destinationId },
     });

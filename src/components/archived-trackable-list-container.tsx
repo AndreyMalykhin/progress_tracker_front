@@ -11,6 +11,7 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/interfaces";
+import loadMore from "utils/load-more";
 import myId from "utils/my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
 import withError from "utils/with-error";
@@ -107,46 +108,8 @@ class ArchivedTrackableListContainer extends
     }
 
     private onEndReached = () => {
-        const { data } = this.props;
-
-        if (!data.getArchivedTrackables.pageInfo.hasNextPage
-            || isLoading(data.networkStatus)
-        ) {
-            return;
-        }
-
-        this.loadMore();
-    }
-
-    private loadMore() {
-        const { fetchMore, getArchivedTrackables } = this.props.data;
-        fetchMore({
-            updateQuery: (previousResult, { fetchMoreResult }) => {
-                const { edges, pageInfo } =
-                    (fetchMoreResult as IGetDataResponse).getArchivedTrackables;
-
-                if (!edges.length) {
-                    return {
-                        ...previousResult,
-                        getArchivedTrackables: {
-                            ...previousResult.getArchivedTrackables,
-                            pageInfo,
-                        },
-                    } as IGetDataResponse;
-                }
-
-                const previousEdges = (previousResult as IGetDataResponse)
-                    .getArchivedTrackables.edges;
-                return {
-                    ...fetchMoreResult,
-                    getArchivedTrackables: {
-                        ...fetchMoreResult!.getArchivedTrackables,
-                        edges: previousEdges.concat(edges),
-                    },
-                } as IGetDataResponse;
-            },
-            variables: { cursor: getArchivedTrackables.pageInfo.endCursor },
-        });
+        const responseField = "getArchivedTrackables";
+        loadMore(this.props.data, responseField);
     }
 }
 

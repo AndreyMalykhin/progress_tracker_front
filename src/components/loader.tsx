@@ -1,14 +1,9 @@
 import * as React from "react";
-import { FormattedMessage } from "react-intl";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 class Loader extends React.Component {
     public render() {
-        return (
-            <View style={styles.container}>
-                <Text>...</Text>
-            </View>
-        );
+        return <ActivityIndicator style={styles.container} />;
     }
 }
 

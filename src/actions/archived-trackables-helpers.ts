@@ -2,6 +2,8 @@ import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
+import { spliceConnection } from "utils/connection-utils";
+import { IConnection } from "utils/interfaces";
 import makeLog from "utils/make-log";
 import myId from "utils/my-id";
 
@@ -14,18 +16,8 @@ interface ISpliceArchivedTrackablesFragment {
 }
 
 interface IGetActiveTrackablesResponse {
-    getArchivedTrackables: {
-        edges: Array<{
-            cursor: number;
-            node: {
-                id: string;
-                statusChangeDate: number;
-            };
-        }>;
-        pageInfo: {
-            endCursor?: number;
-        };
-    };
+    getArchivedTrackables:
+        IConnection<ISpliceArchivedTrackablesFragment, number>;
 }
 
 const getArchivedTrackablesQuery = gql`
@@ -58,29 +50,15 @@ function spliceArchivedTrackables(
         return;
     }
 
-    const archivedTrackables =
-        archivedTrackablesResponse.getArchivedTrackables.edges;
-
-    if (idsToRemove.length) {
-        for (let i = archivedTrackables.length - 1; i >= 0; --i) {
-            if (idsToRemove.indexOf(archivedTrackables[i].node.id) !== -1) {
-                archivedTrackables.splice(i, 1);
-            }
-        }
-    }
-
-    if (trackablesToAdd.length) {
-        const edgesToAdd = trackablesToAdd.map((trackable) => {
-            return {
-                __typename: Type.TrackableEdge,
-                cursor: trackable.statusChangeDate,
-                node: trackable,
-            };
-        });
-        archivedTrackables.push(...edgesToAdd);
-    }
-
-    updateOrder(archivedTrackablesResponse);
+    const cursorField = "statusChangeDate";
+    spliceConnection(
+        archivedTrackablesResponse.getArchivedTrackables,
+        idsToRemove,
+        trackablesToAdd,
+        cursorField,
+        Type.TrackableEdge,
+        compareTrackables,
+    );
     setArchivedTrackables(archivedTrackablesResponse, status, apollo);
 }
 
@@ -108,31 +86,17 @@ function setArchivedTrackables(
     });
 }
 
-function updateOrder(archivedTrackablesResponse: IGetActiveTrackablesResponse) {
-    archivedTrackablesResponse.getArchivedTrackables.edges.sort((lhs, rhs) => {
-        const result = rhs.node.statusChangeDate - lhs.node.statusChangeDate;
-
-        if (result === 0) {
-            return 0;
-        }
-
-        return result < 0 ? -1 : 1;
-    });
-    updateCursors(archivedTrackablesResponse);
-}
-
-function updateCursors(
-    archivedTrackablesResponse: IGetActiveTrackablesResponse,
+function compareTrackables(
+    lhs: ISpliceArchivedTrackablesFragment,
+    rhs: ISpliceArchivedTrackablesFragment,
 ) {
-    const { edges, pageInfo } =
-        archivedTrackablesResponse.getArchivedTrackables;
+    const result = rhs.statusChangeDate - lhs.statusChangeDate;
 
-    for (const edge of edges) {
-        edge.cursor = edge.node.statusChangeDate;
+    if (result === 0) {
+        return 0;
     }
 
-    pageInfo.endCursor =
-        edges.length ? edges[edges.length - 1].cursor : undefined;
+    return result < 0 ? -1 : 1;
 }
 
 export {
