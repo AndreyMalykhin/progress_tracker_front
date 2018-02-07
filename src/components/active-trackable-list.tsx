@@ -16,11 +16,12 @@ import NumericalEntryPopupContainer from "components/numerical-entry-popup-conta
 import NumericalGoal from "components/numerical-goal";
 import Reorderable from "components/reorderable";
 import TaskGoal, { ITask } from "components/task-goal";
+import Toast from "components/toast";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import * as React from "react";
-import { ReactElement } from "react";
+import { ReactElement, ReactNode } from "react";
 import {
     Alert,
     FlatList,
@@ -117,6 +118,7 @@ interface IActiveTrackableListProps extends IExtraData {
     items: IActiveTrackableListItem[];
     isNumericalEntryPopupOpen?: boolean;
     isGymExerciseEntryPopupOpen?: boolean;
+    toastMsg?: ReactNode;
     onNumericalEntryPopupClose: (entry?: number) => void;
     onGymExerciseEntryPopupClose: (entry?: IGymExerciseEntryPopupResult) =>
         void;
@@ -157,6 +159,7 @@ interface IActiveTrackableListProps extends IExtraData {
     onVisibleItemsChange: (info: IVisibleItemsChangeInfo) => void;
     onGetVisibleItemIds: () => string[];
     onGetDraggedItemId: () => string;
+    onCloseToast: () => void;
 }
 
 class ActiveTrackableList extends
@@ -176,6 +179,7 @@ class ActiveTrackableList extends
             itemsMeta,
             queryStatus,
             isReorderMode,
+            toastMsg,
             onNumericalEntryPopupClose,
             onGymExerciseEntryPopupClose,
             onEndReached,
@@ -186,32 +190,23 @@ class ActiveTrackableList extends
             onVisibleItemsChange,
             onGetVisibleItemIds,
             onGetDraggedItemId,
+            onCloseToast,
         } = this.props;
         if (!items.length) {
             return <EmptyList/>;
         }
 
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
-        let numericalEntryPopup;
-
-        if (isNumericalEntryPopupOpen) {
-            numericalEntryPopup = (
-                <NumericalEntryPopupContainer
-                    onClose={onNumericalEntryPopupClose}
-                />
-            );
-        }
-
-        let gymExerciseEntryPopup;
-
-        if (isGymExerciseEntryPopupOpen) {
-            gymExerciseEntryPopup = (
-                <GymExerciseEntryPopupContainer
-                    onClose={onGymExerciseEntryPopupClose}
-                />
-            );
-        }
-
+        const numericalEntryPopup = isNumericalEntryPopupOpen && (
+            <NumericalEntryPopupContainer
+                onClose={onNumericalEntryPopupClose}
+            />
+        );
+        const gymExerciseEntryPopup = isGymExerciseEntryPopupOpen && (
+            <GymExerciseEntryPopupContainer
+                onClose={onGymExerciseEntryPopupClose}
+            />
+        );
         return (
             <View style={styles.container}>
                 <Reorderable
@@ -241,6 +236,7 @@ class ActiveTrackableList extends
                 </Reorderable>
                 {numericalEntryPopup}
                 {gymExerciseEntryPopup}
+                {toastMsg && <Toast onClose={onCloseToast}>{toastMsg}</Toast>}
             </View>
         );
     }

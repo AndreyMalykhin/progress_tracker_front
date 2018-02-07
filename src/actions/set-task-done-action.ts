@@ -109,7 +109,7 @@ async function setTaskDone(
     mutate: MutationFunc<ISetTaskDoneResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    const result = await mutate({
         optimisticResponse: getOptimisticResponse(id, isDone, apollo),
         update: (proxy, response) => {
             const fragmentId = dataIdFromObject(
@@ -128,6 +128,7 @@ async function setTaskDone(
         },
         variables: { id, isDone },
     });
+    return result.data;
 }
 
 function getOptimisticResponse(

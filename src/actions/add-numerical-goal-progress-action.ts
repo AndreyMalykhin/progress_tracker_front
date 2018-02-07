@@ -74,10 +74,11 @@ async function addNumericalGoalProgress(
     mutate: MutationFunc<IAddNumericalGoalProgressResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    const result = await mutate({
         optimisticResponse: getOptimisticResponse(id, value, apollo),
         variables: { id, value },
     });
+    return result.data;
 }
 
 function getOptimisticResponse(

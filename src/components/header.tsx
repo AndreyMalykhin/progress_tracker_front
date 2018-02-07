@@ -138,10 +138,10 @@ class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
                 />
             );
         } else {
-            const style = isPrimary ? cmdTitlePrimaryStyle : styles.cmdTitle;
             content = (
                 <ButtonTitle
-                    style={style}
+                    primary={isPrimary}
+                    style={styles.cmdTitle}
                     disabled={isDisabled}
                     msgId={msgId}
                 />
@@ -213,9 +213,6 @@ const styles = StyleSheet.create({
         width: cmdSize,
     },
     cmdTitle: {},
-    cmdTitlePrimary: {
-        fontWeight: "bold",
-    },
     container: {
         borderBottomWidth: 1,
         flexDirection: "row",
@@ -256,8 +253,6 @@ const styles = StyleSheet.create({
     },
     title: {},
 });
-
-const cmdTitlePrimaryStyle = [styles.cmdTitle, styles.cmdTitlePrimary];
 
 export {
     IHeaderState,

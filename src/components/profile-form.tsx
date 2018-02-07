@@ -4,7 +4,7 @@ import FormAvatarPicker from "components/form-avatar-picker";
 import FormTextInput from "components/form-text-input";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { Image } from "react-native-image-crop-picker";
 
 interface IProfileFormProps {
@@ -34,18 +34,16 @@ class ProfileForm extends React.Component<IProfileFormProps> {
             onChangeName,
             onLogin,
         } = this.props;
-        let loginGroup;
-
-        if (!isUserLoggedIn) {
-            loginGroup = (
-                <FormGroup style={styles.loginGroup}>
+        const loginGroup = !isUserLoggedIn && (
+            <FormGroup style={styles.loginGroup}>
+                <Text style={styles.loginGroupMsg}>
                     <FormattedMessage id="profileForm.loginMessage" />
-                    <Button style={styles.loginGroupBtn} onPress={onLogin}>
-                        <ButtonTitle msgId="common.login" />
-                    </Button>
-                </FormGroup>
-            );
-        }
+                </Text>
+                <Button style={styles.loginGroupBtn} onPress={onLogin}>
+                    <ButtonTitle msgId="common.login" />
+                </Button>
+            </FormGroup>
+        );
 
         return (
             <FormBody>
@@ -78,6 +76,9 @@ const styles = StyleSheet.create({
     },
     loginGroupBtn: {
         alignSelf: "center",
+    },
+    loginGroupMsg: {
+        lineHeight: 32,
     },
 });
 

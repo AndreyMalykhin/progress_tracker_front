@@ -1,3 +1,5 @@
+import Config from "utils/config";
+
 async function uploadFile(
     filePath: string, mimeType: string, endpointUrl: string,
 ) {
@@ -7,7 +9,7 @@ async function uploadFile(
         type: mimeType,
         uri: filePath,
     } as any);
-    const response = await fetch(process.env.SERVER_URL + endpointUrl, {
+    const response = await fetch(Config.serverUrl + endpointUrl, {
         body,
         headers: { Authorization: "Bearer TODO" },
         method: "POST",

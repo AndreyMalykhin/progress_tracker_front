@@ -72,11 +72,12 @@ import { debounce, memoize, throttle } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import * as React from "react";
+import { ReactNode } from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { withApollo } from "react-apollo/withApollo";
-import { InjectedIntlProps, injectIntl } from "react-intl";
+import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import {
     Alert,
     LayoutRectangle,
@@ -103,12 +104,14 @@ type IActiveTrackableListContainerProps =
     & IWithHeaderProps
     & {
     data: QueryProps & IGetDataResponse;
-    onSetTaskDone: (taskId: string, isDone: boolean) => void;
+    onSetTaskDone: (taskId: string, isDone: boolean) =>
+        Promise<ISetTaskDoneResponse>;
     onBreakItem: (id: string) => void;
     onUnaggregateItem: (id: string) => void;
     onCommitProveItem: (id: string, photo: Image) => void;
     onCommitRemoveItem: (id: string) => void;
-    onCommitAddNumericalGoalProgress: (id: string, amount: number) => void;
+    onCommitAddNumericalGoalProgress: (id: string, amount: number) =>
+        Promise<IAddNumericalGoalProgressResponse>;
     onCommitNewGymExerciseEntry:
         (id: string, entry: IGymExerciseEntryPopupResult) => void;
     onCommitAggregateItems: (ids: string[]) => void;
@@ -129,6 +132,7 @@ interface IActiveTrackableListContainerState {
         isOpen?: boolean;
         onClose: (entry?: IGymExerciseEntryPopupResult) => void;
     };
+    toastMsg?: ReactNode;
 }
 
 interface IRouteParams {
@@ -155,7 +159,7 @@ const withReorder =
                         reorderTrackable(
                             sourceId, destinationId, mutate!, ownProps.client);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
@@ -167,9 +171,10 @@ const withSetTaskDone =
             props: ({ ownProps, mutate }) => {
                 return {
                     onSetTaskDone: (taskId: string, isDone: boolean) => {
-                        setTaskDone(taskId, isDone, mutate!, ownProps.client);
+                        return setTaskDone(
+                            taskId, isDone, mutate!, ownProps.client);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
@@ -183,7 +188,7 @@ const withProve =
                     onCommitProveItem: (id: string, photo: Image) => {
                         proveTrackable(id, photo, mutate!, ownProps.client);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
@@ -197,7 +202,7 @@ const withRemove =
                     onCommitRemoveItem: (id: string) => {
                         removeTrackable(id, mutate!, ownProps.client);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
@@ -211,7 +216,7 @@ const withAddCounterProgress =
                     onCommitAddCounterProgress: (id: string, value: number) => {
                         addCounterProgress(id, value, mutate!, ownProps.client);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
@@ -225,10 +230,10 @@ const withAddNumericalGoalProgress =
                     onCommitAddNumericalGoalProgress: (
                         id: string, value: number,
                     ) => {
-                        addNumericalGoalProgress(
+                        return addNumericalGoalProgress(
                             id, value, mutate!, ownProps.client);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
@@ -245,7 +250,7 @@ const withNewGymExerciseEntry =
                         addGymExerciseEntry(trackableId, entry.setCount,
                             entry.repetitionCount, entry.weight, mutate!);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
@@ -259,7 +264,7 @@ const withAggregate =
                     onCommitAggregateItems: (ids: string[]) => {
                         aggregateTrackables(ids, mutate!, ownProps.client);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
@@ -273,7 +278,7 @@ const withUnaggregate =
                     onUnaggregateItem: (id: string) => {
                         unaggregateTrackable(id, mutate!, ownProps.client);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
@@ -287,109 +292,109 @@ const withBreak =
                     onBreakItem: (id: string) => {
                         breakAggregate(id, mutate!, ownProps.client);
                     },
-                };
+                } as Partial<IActiveTrackableListContainerProps>;
             },
         },
     );
 
 const getDataQuery = gql`
-    fragment ActiveTrackableListTrackableFragment on ITrackable {
+fragment ActiveTrackableListTrackableFragment on ITrackable {
+    id
+    order
+    status
+    statusChangeDate
+    creationDate
+    isPublic
+}
+
+fragment ActiveTrackableListCounterFragment on Counter {
+    parent {
         id
-        order
-        status
-        statusChangeDate
-        creationDate
-        isPublic
     }
+    iconName
+    title
+    progress
+}
 
-    fragment ActiveTrackableListCounterFragment on Counter {
-        parent {
+fragment ActiveTrackableListGymExerciseFragment on GymExercise {
+    iconName
+    title
+    entries {
+        id
+        date
+        setCount
+        repetitionCount
+        weight
+    }
+}
+
+fragment ActiveTrackableListTaskGoalFragment on TaskGoal {
+    parent {
+        id
+    }
+    iconName
+    title
+    progress
+    maxProgress
+    progressDisplayMode
+    difficulty
+    deadlineDate
+    tasks {
+        id
+        goal {
             id
         }
-        iconName
         title
-        progress
+        isDone
     }
+}
 
-    fragment ActiveTrackableListGymExerciseFragment on GymExercise {
-        iconName
-        title
-        entries {
-            id
-            date
-            setCount
-            repetitionCount
-            weight
-        }
+fragment ActiveTrackableListNumericalGoalFragment on NumericalGoal {
+    parent {
+        id
     }
+    iconName
+    title
+    progress
+    maxProgress
+    progressDisplayMode
+    difficulty
+    deadlineDate
+}
 
-    fragment ActiveTrackableListTaskGoalFragment on TaskGoal {
-        parent {
-            id
-        }
-        iconName
-        title
-        progress
-        maxProgress
-        progressDisplayMode
-        difficulty
-        deadlineDate
-        tasks {
-            id
-            goal {
-                id
-            }
-            title
-            isDone
-        }
+fragment ActiveTrackableListAggregateFragment on Aggregate {
+    progress
+    maxTotalProgress: maxProgress
+    children {
+        ...ActiveTrackableListTrackableFragment
+        ...ActiveTrackableListTaskGoalFragment
+        ...ActiveTrackableListNumericalGoalFragment
+        ...ActiveTrackableListCounterFragment
     }
+}
 
-    fragment ActiveTrackableListNumericalGoalFragment on NumericalGoal {
-        parent {
-            id
-        }
-        iconName
-        title
-        progress
-        maxProgress
-        progressDisplayMode
-        difficulty
-        deadlineDate
-    }
-
-    fragment ActiveTrackableListAggregateFragment on Aggregate {
-        progress
-        maxTotalProgress: maxProgress
-        children {
-            ...ActiveTrackableListTrackableFragment
-            ...ActiveTrackableListTaskGoalFragment
-            ...ActiveTrackableListNumericalGoalFragment
-            ...ActiveTrackableListCounterFragment
-        }
-    }
-
-    query GetData($userId: ID!, $cursor: Float) {
-        getActiveTrackables(
-            userId: $userId,
-            after: $cursor
-        ) @connection(key: "getActiveTrackables", filter: ["userId"]) {
-            edges {
-                cursor
-                node {
-                    ...ActiveTrackableListTrackableFragment
-                    ...ActiveTrackableListCounterFragment
-                    ...ActiveTrackableListGymExerciseFragment
-                    ...ActiveTrackableListNumericalGoalFragment
-                    ...ActiveTrackableListTaskGoalFragment
-                    ...ActiveTrackableListAggregateFragment
-                }
-            }
-            pageInfo {
-                hasNextPage
-                endCursor
+query GetData($userId: ID!, $cursor: Float) {
+    getActiveTrackables(
+        userId: $userId,
+        after: $cursor
+    ) @connection(key: "getActiveTrackables", filter: ["userId"]) {
+        edges {
+            cursor
+            node {
+                ...ActiveTrackableListTrackableFragment
+                ...ActiveTrackableListCounterFragment
+                ...ActiveTrackableListGymExerciseFragment
+                ...ActiveTrackableListNumericalGoalFragment
+                ...ActiveTrackableListTaskGoalFragment
+                ...ActiveTrackableListAggregateFragment
             }
         }
-    }`;
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+    }
+}`;
 
 const withData =
     graphql<IGetDataResponse, IOwnProps, IActiveTrackableListContainerProps>(
@@ -456,8 +461,9 @@ class ActiveTrackableListContainer extends
             isAggregationMode,
             isReorderMode,
             itemsMeta,
+            toastMsg,
         } = this.state;
-        const { onSetTaskDone, onReorderItem, data } = this.props;
+        const { onReorderItem, data } = this.props;
         const { getActiveTrackables, networkStatus } = data;
         return (
             <ActiveTrackableList
@@ -468,10 +474,11 @@ class ActiveTrackableListContainer extends
                 itemsMeta={itemsMeta}
                 items={data.getActiveTrackables.edges}
                 queryStatus={data.networkStatus}
+                toastMsg={toastMsg}
                 onNumericalEntryPopupClose={numericalEntryPopup.onClose}
                 onGymExerciseEntryPopupClose={gymExerciseEntryPopup.onClose}
                 onProveItem={this.onStartProveItem}
-                onSetTaskDone={onSetTaskDone}
+                onSetTaskDone={this.onSetTaskDone}
                 onGetAggregateCommands={this.getAggregateCommands}
                 onGetCounterCommands={this.getCounterCommands}
                 onGetGymExerciseCommands={this.getGymExerciseCommands}
@@ -494,6 +501,7 @@ class ActiveTrackableListContainer extends
                 onVisibleItemsChange={this.onVisibleItemsChange}
                 onGetDraggedItemId={this.onGetDraggedItemId}
                 onGetVisibleItemIds={this.onGetVisibleItemIds}
+                onCloseToast={this.onCloseToast}
             />
         );
     }
@@ -1005,11 +1013,26 @@ class ActiveTrackableListContainer extends
     }
 
     private onStartAddNumericalGoalProgress = (id: string) => {
-        this.openNumericalEntryPopup((entry) => {
-            if (entry) {
-                this.props.onCommitAddNumericalGoalProgress(id, entry);
+        this.openNumericalEntryPopup(async (entry) => {
+            if (!entry) {
+                return;
             }
+
+            const response =
+                await this.props.onCommitAddNumericalGoalProgress(id, entry);
+            this.tryShowGoalAchievedToast(
+                response.addNumericalGoalProgress.trackable.status);
         });
+    }
+
+    private tryShowGoalAchievedToast(goalStatus: TrackableStatus) {
+        if (goalStatus !== TrackableStatus.PendingProof) {
+            return;
+        }
+
+        const toastMsg =
+            <FormattedMessage id="notifications.goalAchieved" />;
+        this.setState({ toastMsg });
     }
 
     private onStartNewGymExerciseEntry = (id: string) => {
@@ -1046,7 +1069,15 @@ class ActiveTrackableListContainer extends
             return;
         }
 
-        this.props.onCommitProveItem(id, image);
+        const response = await this.props.onCommitProveItem(id, image);
+
+        /* if (response.proveTrackable.trackable.status ===
+                TrackableStatus.Approved
+        ) {
+            this.showGoalApprovedToast();
+        } else {
+            this.showGoalPendingReviewToast();
+        } */
     }
 
     private onEditItem = (id: string) => {
@@ -1139,6 +1170,13 @@ class ActiveTrackableListContainer extends
     private onVisibleItemsChange = (info: IVisibleItemsChangeInfo) => {
         this.visibleItemIds = info.viewableItems.map(
             (item) => (item.item as IActiveTrackableListItem).node.id);
+    }
+
+    private onCloseToast = () => this.setState({ toastMsg: undefined });
+
+    private onSetTaskDone = async (taskId: string, isDone: boolean) => {
+        const response = await this.props.onSetTaskDone(taskId, isDone);
+        this.tryShowGoalAchievedToast(response.setTaskDone.task.goal.status);
     }
 }
 

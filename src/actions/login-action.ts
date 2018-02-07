@@ -25,12 +25,7 @@ mutation LoginMutation($facebookAccessToken: String!) {
             accessToken
         }
     }
-    completeIntro @client {
-        settings {
-            id
-            showIntro
-        }
-    }
+    completeIntro @client
 }`;
 
 async function login(mutate: MutationFunc<ILoginResponse>) {

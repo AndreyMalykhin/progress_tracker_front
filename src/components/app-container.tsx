@@ -1,4 +1,3 @@
-import "intl";
 // tslint:disable-next-line:ordered-imports
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -6,6 +5,7 @@ import App, { IAppProps } from "components/app";
 import Error from "components/error";
 import Loader from "components/loader";
 import gql from "graphql-tag";
+import "intl";
 import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
@@ -14,6 +14,7 @@ import * as en from "react-intl/locale-data/en";
 import { getDeviceLocale } from "react-native-device-info";
 import Reactotron from "reactotron-react-native";
 import apolloFactory from "utils/apollo-factory";
+import Config from "utils/config";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 import withApolloProvider from "utils/with-apollo-provider";
@@ -40,7 +41,7 @@ interface IWithAppDataProps {
 }
 
 function bootstrap(client: ApolloClient<NormalizedCacheObject>) {
-    if (process.env.NODE_ENV === "development") {
+    if (Config.isDevEnv) {
         Reactotron.configure().useReactNative().connect();
     }
 

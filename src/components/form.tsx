@@ -215,8 +215,11 @@ class FormButtonOk extends React.PureComponent<IFormButtonOkProps> {
         const { disabled } = this.props;
         return (
             <Button {...this.props}>
-                <ButtonIcon disabled={disabled} name="check" component={Icon} />
-                <ButtonTitle disabled={disabled} msgId="common.ok" />
+                <ButtonTitle
+                    primary={true}
+                    disabled={disabled}
+                    msgId="common.ok"
+                />
             </Button>
         );
     }
@@ -228,7 +231,6 @@ class FormButtonCancel extends React.PureComponent<IFormButtonCancelProps> {
         const { disabled } = this.props;
         return (
             <Button {...this.props}>
-                <ButtonIcon disabled={disabled} name="close" component={Icon} />
                 <ButtonTitle disabled={disabled} msgId="common.cancel" />
             </Button>
         );

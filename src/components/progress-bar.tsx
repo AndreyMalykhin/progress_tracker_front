@@ -2,6 +2,7 @@ import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
 import {
     Animated,
+    Easing,
     StyleProp,
     StyleSheet,
     Text,
@@ -17,11 +18,27 @@ interface IProgressBarProps {
     style?: StyleProp<ViewStyle>;
 }
 
-const animationConfig = { duration: 1000 } as Animated.TimingAnimationConfig;
+interface IProgressBarState {
+    isInitialRender: boolean;
+}
 
-class ProgressBar extends React.PureComponent<IProgressBarProps> {
+const animationConfig = {
+    duration: 2000,
+    easing: Easing.out(Easing.sin),
+} as Animated.TimingAnimationConfig;
+
+class ProgressBar extends
+    React.PureComponent<IProgressBarProps, IProgressBarState> {
+    public state: IProgressBarState = { isInitialRender: true };
+
     public render() {
-        const { value, maxValue, mode, style } = this.props;
+        const { maxValue, mode, style } = this.props;
+        let value = 0;
+
+        if (!this.state.isInitialRender) {
+            value = this.props.value;
+        }
+
         const normalizedValue = value / maxValue;
         const formattedValue = mode === ProgressDisplayMode.Percentage ?
             `${(normalizedValue * 100).toFixed(2)} %` : value;
@@ -41,6 +58,10 @@ class ProgressBar extends React.PureComponent<IProgressBarProps> {
                 <Text style={styles.value}>{formattedValue}</Text>
             </View>
         );
+    }
+
+    public componentDidMount() {
+        this.setState({ isInitialRender: false });
     }
 }
 

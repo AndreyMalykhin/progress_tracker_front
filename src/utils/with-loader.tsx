@@ -13,6 +13,7 @@ function withLoader<T>(loader: React.ComponentClass<T>, minDuration?: number) {
     return <P extends {}>(Component: React.ComponentClass<P>) => {
         return class EnchancedComponent extends React.Component<P & IProps, IState> {
             public state: IState;
+            private timeoutId: NodeJS.Timer;
 
             public render() {
                 return this.state.isVisible ? React.createElement(loader) :
@@ -38,13 +39,17 @@ function withLoader<T>(loader: React.ComponentClass<T>, minDuration?: number) {
                 this.updateVisibility(nextProps.queryStatus);
             }
 
+            public componentWillUnmount() {
+                clearTimeout(this.timeoutId);
+            }
+
             private updateVisibility(queryStatus: QueryStatus) {
                 let isVisible = false;
 
                 if (queryStatus === QueryStatus.Ready) {
                     if (minDuration) {
                         isVisible = true;
-                        setTimeout(() => {
+                        this.timeoutId = setTimeout(() => {
                             this.setState({ isVisible: false });
                         }, minDuration);
                     } else {

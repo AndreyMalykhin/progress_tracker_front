@@ -15,6 +15,7 @@ interface IButtonProps extends ITouchableWithFeedbackProps {
 }
 
 interface IButtonTitleProps {
+    primary?: boolean;
     disabled?: boolean;
     style?: StyleProp<TextStyle>;
     msgId: string;
@@ -47,10 +48,16 @@ class Button extends React.Component<IButtonProps> {
 // tslint:disable-next-line:max-classes-per-file
 class ButtonTitle extends React.PureComponent<IButtonTitleProps> {
     public render() {
-        const { msgId, msgValues, disabled, style } = this.props;
-        const baseStyle = disabled ? titleDisabledStyle : titleStyle;
+        const { msgId, msgValues, disabled, style, primary } = this.props;
+        const newStyle = [
+            styles.text,
+            styles.title,
+            style,
+            disabled ? styles.textDisabled : null,
+            primary ? styles.titlePrimary : null,
+        ];
         return (
-            <Text style={[baseStyle, style]}>
+            <Text style={newStyle as any}>
                 <FormattedMessage id={msgId} values={msgValues} />
             </Text>
         );
@@ -65,7 +72,7 @@ class ButtonIcon extends React.PureComponent<IButtonIconProps> {
         const newStyle = [
             styles.text,
             style,
-            disabled ? styles.iconDisabled : null,
+            disabled ? styles.textDisabled : null,
         ];
         return <Component style={newStyle as any} size={32} {...restProps} />;
     }
@@ -77,25 +84,23 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flexDirection: "row",
     },
-    iconDisabled: {
-        color: "#ccc",
-    },
     text: {
         color: "#0076ff",
     },
     textContainerVertical: {
         flexDirection: "column",
     },
+    textDisabled: {
+        color: "#ccc",
+    },
     title: {
         lineHeight: 32,
     },
-    titleDisabled: {
-        color: "#ccc",
+    titlePrimary: {
+        fontWeight: "bold",
     },
 });
 
-const titleStyle = [styles.text, styles.title];
-const titleDisabledStyle = [titleStyle, styles.titleDisabled];
 const contentVerticalStyle =
     [styles.content, styles.textContainerVertical];
 

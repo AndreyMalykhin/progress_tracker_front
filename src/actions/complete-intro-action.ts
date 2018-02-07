@@ -5,23 +5,11 @@ import { MutationFunc } from "react-apollo/types";
 import myId from "utils/my-id";
 
 // tslint:disable-next-line:no-empty-interface
-interface ICompleteIntroResponse {
-    completeIntro: {
-        settings: {
-            id: string;
-            showIntro: boolean;
-        };
-    };
-}
+interface ICompleteIntroResponse {}
 
 const completeIntroQuery = gql`
 mutation CompleteIntro {
-    completeIntro @client {
-        settings {
-            id
-            showIntro
-        }
-    }
+    completeIntro @client
 }`;
 
 function completeIntro(mutate: MutationFunc<ICompleteIntroResponse>) {
@@ -32,14 +20,15 @@ const completeIntroResolver = {
     resolvers: {
         Mutation: {
             completeIntro: (rootValue: any, args: any, { cache }: any) => {
-                return {
-                    __typename: Type.CompleteIntroResponse,
+                const data = {
                     settings: {
                         __typename: Type.Settings,
                         id: myId,
                         showIntro: false,
                     },
                 };
+                (cache as ApolloCacheClient).writeData({ data });
+                return null;
             },
         },
     },

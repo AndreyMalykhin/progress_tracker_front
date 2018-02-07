@@ -55,7 +55,7 @@ class GymExercise extends React.PureComponent<IGymExerciseProps> {
 class Table extends React.PureComponent<ITableProps> {
     public render() {
         return (
-            <View>
+            <View style={styles.table}>
                 {this.renderHeader()}
                 {this.renderBody()}
             </View>
@@ -63,13 +63,11 @@ class Table extends React.PureComponent<ITableProps> {
     }
 
     private renderHeader() {
-        const date = new Date();
         const cells = this.props.items.map((item) => {
             const cellContent = item.entries.length ?
-                <FormattedDate value={date} weekday="short" /> : "---";
-            const timestamp = date.setTime(item.date);
+                <FormattedDate value={item.date} weekday="short" /> : "---";
             const inHeader = true;
-            return this.renderCell(cellContent, timestamp, inHeader);
+            return this.renderCell(cellContent, item.date, inHeader);
         });
         return <View style={styles.tableHeader}>{cells}</View>;
     }
@@ -125,12 +123,15 @@ class Table extends React.PureComponent<ITableProps> {
 }
 
 const styles = StyleSheet.create({
+    table: {
+        marginBottom: 8,
+    },
     tableBody: {
         flexDirection: "row",
     },
     tableCell: {
         flex: 1,
-        fontSize: 10,
+        fontSize: 8,
         lineHeight: 16,
         paddingLeft: 8,
         paddingRight: 8,

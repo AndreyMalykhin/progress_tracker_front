@@ -52,6 +52,7 @@ export default {
     "gymExerciseForm.titlePlaceholder": "Deadlift",
     "intro.skip": "Skip",
     "newTrackable.title": "What would you like to add?",
+    "notifications.goalAchieved": "Goal achieved!",
     "numericalEntryForm.entryPlaceholder": "1",
     "numericalGoalForm.maxProgressLabel": "Max progress",
     "numericalGoalForm.maxProgressPlaceholder": "0",
