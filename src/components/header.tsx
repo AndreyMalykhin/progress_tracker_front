@@ -23,7 +23,7 @@ interface IHeaderState {
     subtitleIcon?: string;
     subtitleText?: string|number;
     leftCommand?: IHeaderCmd;
-    rightCommands: IHeaderCmd[];
+    rightCommands?: IHeaderCmd[];
     hideBackCommand?: boolean;
     onBack?: () => void;
 }
@@ -38,14 +38,6 @@ interface ISubtitleProps {
 }
 
 type IHeaderProps = RouteComponentProps<{}>;
-
-interface IWithHeaderProps {
-    header: {
-        push: (state: IHeaderState) => void;
-        replace: (state: IHeaderState|null) => void;
-        pop: () => void;
-    };
-}
 
 const cmdSize = 32;
 
@@ -74,9 +66,8 @@ class Header extends React.Component<IHeaderProps> {
             ++cmdIndex;
         }
 
-        const rightCommandElements = rightCommands.map((cmd, i) => {
-            return <HeaderCmd key={i} {...cmd} />;
-        });
+        const rightCommandElements = rightCommands && rightCommands.map(
+            (cmd, i) => <HeaderCmd key={i} {...cmd} />);
         const subtitle = subtitleText != null || subtitleIcon != null ?
             <Subtitle text={subtitleText} iconName={subtitleIcon} /> : null;
         return (
@@ -179,32 +170,6 @@ class Subtitle extends React.PureComponent<ISubtitleProps> {
     }
 }
 
-function withHeader<T extends IWithHeaderProps>(
-    Component: React.ComponentClass<T>,
-) {
-    // tslint:disable-next-line:max-classes-per-file
-    return class EnchancedComponent extends
-        React.Component< T & RouteComponentProps<{}> > {
-        public render() {
-            return <Component header={this} {...this.props} />;
-        }
-
-        public replace(state: IHeaderState|null) {
-            this.props.history.replace(
-                Object.assign({}, this.props.location, { state } ));
-        }
-
-        public push(state: IHeaderState) {
-            this.props.history.push(
-                Object.assign({}, this.props.location, { state } ));
-        }
-
-        public pop() {
-            this.props.history.goBack();
-        }
-    };
-}
-
 const styles = StyleSheet.create({
     cmdImg: {
         borderRadius: cmdSize / 2,
@@ -254,10 +219,5 @@ const styles = StyleSheet.create({
     title: {},
 });
 
-export {
-    IHeaderState,
-    IHeaderCmd,
-    withHeader,
-    IWithHeaderProps,
-};
+export { IHeaderState, IHeaderCmd };
 export default withRouter(Header);

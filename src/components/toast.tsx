@@ -42,7 +42,10 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         margin: 8,
         minWidth: 256,
-        padding: 8,
+        paddingBottom: 8,
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingTop: 8,
     },
     msg: {
         color: "#fff",

@@ -60,13 +60,18 @@ import ActiveTrackableList, {
     IVisibleItemsChangeInfo,
 } from "components/active-trackable-list";
 import { ICommandBarItem } from "components/command-bar";
+import EmptyList from "components/empty-list";
 import Error from "components/error";
 import { IGymExerciseEntry, IGymExerciseItem } from "components/gym-exercise";
 import {
     IGymExerciseEntryPopupResult,
 } from "components/gym-exercise-entry-popup";
-import { IHeaderState, IWithHeaderProps, withHeader } from "components/header";
+import { IHeaderState } from "components/header";
 import Loader from "components/loader";
+import withEmptyList from "components/with-empty-list";
+import withError from "components/with-error";
+import withHeader, { IWithHeaderProps } from "components/with-header";
+import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
 import TrackableStatus from "models/trackable-status";
@@ -95,20 +100,18 @@ import myId from "utils/my-id";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
-import withError from "utils/with-error";
-import withLoader from "utils/with-loader";
 
-type IActiveTrackableListContainerProps =
-    RouteComponentProps<IRouteParams>
-    & InjectedIntlProps
-    & IWithHeaderProps
-    & {
+interface IActiveTrackableListContainerProps extends
+    RouteComponentProps<IRouteParams>,
+    InjectedIntlProps,
+    IWithHeaderProps {
     data: QueryProps & IGetDataResponse;
     onSetTaskDone: (taskId: string, isDone: boolean) =>
         Promise<ISetTaskDoneResponse>;
     onBreakItem: (id: string) => void;
     onUnaggregateItem: (id: string) => void;
-    onCommitProveItem: (id: string, photo: Image) => void;
+    onCommitProveItem: (id: string, photo: Image) =>
+        Promise<IProveTrackableResponse>;
     onCommitRemoveItem: (id: string) => void;
     onCommitAddNumericalGoalProgress: (id: string, amount: number) =>
         Promise<IAddNumericalGoalProgressResponse>;
@@ -118,7 +121,7 @@ type IActiveTrackableListContainerProps =
     onCommitAddCounterProgress: (id: string, amount: number) => void;
     onReorderItem: (sourceId: string, destinationId: string) => void;
     onLongPressItem: (id: string) => void;
-};
+}
 
 interface IActiveTrackableListContainerState {
     itemsMeta: IActiveTrackableListItemsMeta;
@@ -186,7 +189,8 @@ const withProve =
             props: ({ ownProps, mutate }) => {
                 return {
                     onCommitProveItem: (id: string, photo: Image) => {
-                        proveTrackable(id, photo, mutate!, ownProps.client);
+                        return proveTrackable(
+                            id, photo, mutate!, ownProps.client);
                     },
                 } as Partial<IActiveTrackableListContainerProps>;
             },
@@ -439,18 +443,24 @@ class ActiveTrackableListContainer extends
     ) {
         super(props, context);
         this.initItemsMeta(props.data.getActiveTrackables.edges);
-        this.getGymExerciseItems = memoize(
-            this.getGymExerciseItems, this.resolveGetGymExerciseItemsCacheKey);
-        this.getTaskGoalCommands = memoize(
-            this.getTaskGoalCommands, this.resolveGetGoalCommandsCacheKey);
-        this.getNumericalGoalCommands = memoize(
-            this.getNumericalGoalCommands, this.resolveGetGoalCommandsCacheKey);
-        this.getCounterCommands = memoize(
-            this.getCounterCommands, this.resolveGetCounterCommandsCacheKey);
-        this.getAggregateCommands = memoize(this.getAggregateCommands,
-            this.resolveGetAggregateCommandsCacheKey);
-        this.getGymExerciseCommands = memoize(this.getGymExerciseCommands,
-            this.resolveGetGymExerciseCommandsCacheKey);
+        this.onGetGymExerciseItems = memoize(
+            this.onGetGymExerciseItems,
+            this.resolveOnGetGymExerciseItemsCacheKey,
+        );
+        this.onGetTaskGoalCommands = memoize(
+            this.onGetTaskGoalCommands, this.resolveOnGetGoalCommandsCacheKey);
+        this.onGetNumericalGoalCommands = memoize(
+            this.onGetNumericalGoalCommands,
+            this.resolveOnGetGoalCommandsCacheKey,
+        );
+        this.onGetCounterCommands = memoize(
+            this.onGetCounterCommands,
+            this.resolveOnGetCounterCommandsCacheKey,
+        );
+        this.onGetAggregateCommands = memoize(this.onGetAggregateCommands,
+            this.resolveOnGetAggregateCommandsCacheKey);
+        this.onGetGymExerciseCommands = memoize(this.onGetGymExerciseCommands,
+            this.resolveOnGetGymExerciseCommandsCacheKey);
         this.onEndReached = throttle(this.onEndReached, 1024);
     }
 
@@ -479,18 +489,18 @@ class ActiveTrackableListContainer extends
                 onGymExerciseEntryPopupClose={gymExerciseEntryPopup.onClose}
                 onProveItem={this.onStartProveItem}
                 onSetTaskDone={this.onSetTaskDone}
-                onGetAggregateCommands={this.getAggregateCommands}
-                onGetCounterCommands={this.getCounterCommands}
-                onGetGymExerciseCommands={this.getGymExerciseCommands}
-                onGetNumericalGoalCommands={this.getNumericalGoalCommands}
-                onGetTaskGoalCommands={this.getTaskGoalCommands}
-                onGetGymExerciseItems={this.getGymExerciseItems}
+                onGetAggregateCommands={this.onGetAggregateCommands}
+                onGetCounterCommands={this.onGetCounterCommands}
+                onGetGymExerciseCommands={this.onGetGymExerciseCommands}
+                onGetNumericalGoalCommands={this.onGetNumericalGoalCommands}
+                onGetTaskGoalCommands={this.onGetTaskGoalCommands}
+                onGetGymExerciseItems={this.onGetGymExerciseItems}
                 onEndReached={this.onEndReached}
                 onToggleItemSelect={this.onToggleItemSelect}
                 onToggleItemExpand={this.onToggleItemExpand}
-                onGetTaskGoalExpandable={this.onGetTaskGoalExpandable}
+                onIsTaskGoalExpandable={this.onIsTaskGoalExpandable}
                 onGetVisibleTaskCount={this.onGetVisibleTaskCount}
-                onGetGymExerciseExpandable={this.onGetGymExerciseExpandable}
+                onIsGymExerciseExpandable={this.onIsGymExerciseExpandable}
                 onReorderItem={onReorderItem}
                 onStartReorderItem={this.onStartReorderItem}
                 onEndReorderItem={this.onEndReorderItem}
@@ -502,6 +512,7 @@ class ActiveTrackableListContainer extends
                 onGetDraggedItemId={this.onGetDraggedItemId}
                 onGetVisibleItemIds={this.onGetVisibleItemIds}
                 onCloseToast={this.onCloseToast}
+                onIsItemProveable={this.onIsItemProveable}
             />
         );
     }
@@ -534,7 +545,11 @@ class ActiveTrackableListContainer extends
         }
     }
 
-    private getGymExerciseCommands = (id: string) => {
+    private onGetGymExerciseCommands = (id: string) => {
+        if (!this.isMy()) {
+            return undefined;
+        }
+
         return [
             {
                 msgId: "commands.remove",
@@ -551,17 +566,17 @@ class ActiveTrackableListContainer extends
         ] as ICommandBarItem[];
     }
 
-    private resolveGetGymExerciseCommandsCacheKey(id: string) {
+    private resolveOnGetGymExerciseCommandsCacheKey(id: string) {
         return id;
     }
 
-    private getTaskGoalCommands = (
+    private onGetTaskGoalCommands = (
         id: string, isAggregated: boolean, status: TrackableStatus,
     ) => {
         return this.getGoalCommands(id, isAggregated, status);
     }
 
-    private getNumericalGoalCommands = (
+    private onGetNumericalGoalCommands = (
         id: string, isAggregated: boolean, status: TrackableStatus,
     ) => {
         const additionalCommand = {
@@ -572,7 +587,7 @@ class ActiveTrackableListContainer extends
             id, isAggregated, status, additionalCommand);
     }
 
-    private resolveGetGoalCommandsCacheKey(
+    private resolveOnGetGoalCommandsCacheKey(
         id: string, isAggregated: boolean, status: TrackableStatus,
     ) {
         return `${id}_${isAggregated ? 1 : 0}_${status}`;
@@ -584,6 +599,10 @@ class ActiveTrackableListContainer extends
         status: TrackableStatus,
         additionalCommand?: ICommandBarItem,
     ) {
+        if (!this.isMy()) {
+            return undefined;
+        }
+
         const commands: ICommandBarItem[] = [
             {
                 msgId: "commands.remove",
@@ -619,7 +638,11 @@ class ActiveTrackableListContainer extends
         return commands;
     }
 
-    private getCounterCommands = (id: string, isAggregated: boolean) => {
+    private onGetCounterCommands = (id: string, isAggregated: boolean) => {
+        if (!this.isMy()) {
+            return undefined;
+        }
+
         const commands: ICommandBarItem[] = [
             {
                 msgId: "commands.remove",
@@ -650,13 +673,17 @@ class ActiveTrackableListContainer extends
         return commands;
     }
 
-    private resolveGetCounterCommandsCacheKey = (
+    private resolveOnGetCounterCommandsCacheKey = (
         id: string, isAggregated: boolean,
     ) => {
         return `${id}_${isAggregated ? 1 : 0}`;
     }
 
-    private getAggregateCommands = (id: string) => {
+    private onGetAggregateCommands = (id: string) => {
+        if (!this.isMy()) {
+            return undefined;
+        }
+
         return [
             {
                 msgId: "commands.break",
@@ -665,11 +692,11 @@ class ActiveTrackableListContainer extends
         ] as ICommandBarItem[];
     }
 
-    private resolveGetAggregateCommandsCacheKey = (id: string) => {
+    private resolveOnGetAggregateCommandsCacheKey = (id: string) => {
         return id;
     }
 
-    private getGymExerciseItems = (
+    private onGetGymExerciseItems = (
         id: string, entries: IGymExerciseEntry[], isExpanded?: boolean,
     ) => {
         const items = new Array<IGymExerciseItem>(gymExerciseDayCount);
@@ -732,7 +759,7 @@ class ActiveTrackableListContainer extends
         }
     }
 
-    private resolveGetGymExerciseItemsCacheKey(
+    private resolveOnGetGymExerciseItemsCacheKey(
         id: string, entries: IGymExerciseEntry[], isExpanded?: boolean,
     ) {
         const entriesKey = entries.length ? entries[0].id : "";
@@ -1030,8 +1057,10 @@ class ActiveTrackableListContainer extends
             return;
         }
 
-        const toastMsg =
-            <FormattedMessage id="notifications.goalAchieved" />;
+        this.showToast(<FormattedMessage id="notifications.goalAchieved" />);
+    }
+
+    private showToast(toastMsg: ReactNode) {
         this.setState({ toastMsg });
     }
 
@@ -1070,14 +1099,17 @@ class ActiveTrackableListContainer extends
         }
 
         const response = await this.props.onCommitProveItem(id, image);
+        let msgId;
 
-        /* if (response.proveTrackable.trackable.status ===
+        if (response.proveTrackable.trackable.status ===
                 TrackableStatus.Approved
         ) {
-            this.showGoalApprovedToast();
+            msgId = "notifications.goalApproved";
         } else {
-            this.showGoalPendingReviewToast();
-        } */
+            msgId = "notifications.goalPendingReview";
+        }
+
+        this.showToast(<FormattedMessage id={msgId} />);
     }
 
     private onEditItem = (id: string) => {
@@ -1085,11 +1117,11 @@ class ActiveTrackableListContainer extends
             routes.trackableEdit.path.replace(":id", id));
     }
 
-    private onGetTaskGoalExpandable = (taskCount: number) => {
+    private onIsTaskGoalExpandable = (taskCount: number) => {
         return taskCount > collapsedTaskCount;
     }
 
-    private onGetGymExerciseExpandable = (items: IGymExerciseItem[]) => {
+    private onIsGymExerciseExpandable = (items: IGymExerciseItem[]) => {
         for (const item of items) {
             if (item.entries.length) {
                 return true;
@@ -1106,6 +1138,10 @@ class ActiveTrackableListContainer extends
     }
 
     private onLongPressItem = (id: string, parentId?: string) => {
+        if (!this.isMy()) {
+            return;
+        }
+
         this.setState((prevState) => {
             const { isAggregationMode, itemsMeta } = prevState;
             const { isDisabled, dragStatus } = itemsMeta[id];
@@ -1126,6 +1162,10 @@ class ActiveTrackableListContainer extends
     }
 
     private onPressOutItem = (id: string) => {
+        if (!this.isMy()) {
+            return;
+        }
+
         // delay handler to get correct drag status
         requestAnimationFrame(() => {
             if (this.state.itemsMeta[id].dragStatus === DragStatus.WillDrag) {
@@ -1144,6 +1184,10 @@ class ActiveTrackableListContainer extends
     }
 
     private onStartReorderItem = () => {
+        if (!this.isMy()) {
+            return;
+        }
+
         this.setState((prevState) => {
             const itemsMeta = this.updateItemMeta(this.draggedItemId!,
                 { dragStatus: DragStatus.Dragged }, prevState.itemsMeta);
@@ -1175,8 +1219,20 @@ class ActiveTrackableListContainer extends
     private onCloseToast = () => this.setState({ toastMsg: undefined });
 
     private onSetTaskDone = async (taskId: string, isDone: boolean) => {
+        if (!this.isMy()) {
+            return;
+        }
+
         const response = await this.props.onSetTaskDone(taskId, isDone);
         this.tryShowGoalAchievedToast(response.setTaskDone.task.goal.status);
+    }
+
+    private isMy() {
+        return this.props.match.params.id === myId;
+    }
+
+    private onIsItemProveable = (status: TrackableStatus) => {
+        return status === TrackableStatus.PendingProof && this.isMy();
     }
 }
 
@@ -1185,6 +1241,8 @@ export default compose(
     withData,
     withLoader(Loader, 512),
     withError(Error),
+    withEmptyList<IActiveTrackableListContainerProps>(
+        EmptyList, (props) => props.data.getActiveTrackables.edges),
     withApollo,
     withReorder,
     withSetTaskDone,

@@ -10,13 +10,14 @@ import Error from "components/error";
 import {
     IHeaderCmd,
     IHeaderState,
-    IWithHeaderProps,
-    withHeader,
 } from "components/header";
 import Loader from "components/loader";
 import ProfileSection, {
     IProfileSectionNavItem, IProfileSectionProps,
 } from "components/profile-section";
+import withError from "components/with-error";
+import withHeader, { IWithHeaderProps } from "components/with-header";
+import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import ReportReason from "models/report-reason";
 import TrackableStatus from "models/trackable-status";
@@ -32,8 +33,6 @@ import { RouteComponentProps, withRouter } from "react-router";
 import myId from "utils/my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
 import routes from "utils/routes";
-import withError from "utils/with-error";
-import withLoader from "utils/with-loader";
 
 type IProfileSectionContainerProps =
     RouteComponentProps<IRouteParams>
@@ -74,7 +73,7 @@ const withReportUser =
     );
 
 const getDataQuery = gql`
-query GetDataQuery($userId: ID!) {
+query GetData($userId: ID!) {
     getUserById(id: $userId) {
         id
         name
@@ -121,6 +120,10 @@ const reportReasons: Array< IActionSheetOption<ReportReason> > = [
         id: ReportReason.Spam,
         msgId: "reasons.spam",
     },
+    {
+        id: ReportReason.Other,
+        msgId: "reasons.other",
+    },
 ];
 
 const trackableTypes: Array< IActionSheetOption<Type> > = [
@@ -148,7 +151,8 @@ class ProfileSectionContainer
 
     public constructor(props: IProfileSectionContainerProps, context: any) {
         super(props, context);
-        this.initNavItems(props.match.params.id);
+        this.initNavItems(props.data.getUserById.id);
+        this.updateHeader(props);
     }
 
     public render() {
@@ -167,13 +171,10 @@ class ProfileSectionContainer
         if (prevUser.id !== nextUserId
             || prevUser.rating !== nextUser.rating
             || prevUser.name !== nextUser.name
+            || prevUser.isReported !== nextUser.isReported
         ) {
-            this.updateHeader();
+            this.updateHeader(nextProps);
         }
-    }
-
-    public componentWillMount() {
-        this.updateHeader();
     }
 
     private initNavItems(userId: string) {
@@ -199,15 +200,9 @@ class ProfileSectionContainer
         ];
     }
 
-    private updateHeader() {
-        const { data, header } = this.props;
-        const { getUserById: user, networkStatus } = data;
-
-        if (isLoading(networkStatus)) {
-            header.replace(null);
-            return;
-        }
-
+    private updateHeader(props: IProfileSectionContainerProps) {
+        const { data, header } = props;
+        const { getUserById: user } = data;
         const isMe = user.id === myId;
         const rightCommands: IHeaderCmd[] = [];
 
@@ -266,6 +261,7 @@ class ProfileSectionContainer
 
         this.props.onCommitReportUser(
             this.props.data.getUserById.id, reportReason);
+        // TODO toast
     }
 
     private onStartNewTrackable = () => {

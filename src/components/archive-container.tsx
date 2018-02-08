@@ -38,7 +38,7 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
                 matchExact: routes.profileArchiveApprovedTrackables.exact,
                 matchPath: routes.profileArchiveApprovedTrackables.path,
                 navigateToPath: routes.profileArchiveApprovedTrackables.path
-                    .replace(":id", myId),
+                    .replace(":id", userId),
                 render: () => this.renderList(userId, TrackableStatus.Approved),
                 titleMsgId: "archiveNavigation.approvedTrackables",
             },
@@ -46,7 +46,7 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
                 matchExact: routes.profileArchiveRejectedTrackables.exact,
                 matchPath: routes.profileArchiveRejectedTrackables.path,
                 navigateToPath: routes.profileArchiveRejectedTrackables.path
-                    .replace(":id", myId),
+                    .replace(":id", userId),
                 render: () => this.renderList(userId, TrackableStatus.Rejected),
                 titleMsgId: "archiveNavigation.rejectedTrackables",
             },
@@ -54,7 +54,7 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
                 matchExact: routes.profileArchiveExpiredTrackables.exact,
                 matchPath: routes.profileArchiveExpiredTrackables.path,
                 navigateToPath: routes.profileArchiveExpiredTrackables.path
-                    .replace(":id", myId),
+                    .replace(":id", userId),
                 render: () => this.renderList(userId, TrackableStatus.Expired),
                 titleMsgId: "archiveNavigation.expiredTrackables",
             },

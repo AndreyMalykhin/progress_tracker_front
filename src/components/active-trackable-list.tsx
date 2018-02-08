@@ -124,31 +124,31 @@ interface IActiveTrackableListProps extends IExtraData {
         void;
     onProveItem: (id: string) => void;
     onSetTaskDone: (taskId: string, isDone: boolean) => void;
-    onGetAggregateCommands: (id: string) => ICommandBarItem[];
+    onGetAggregateCommands: (id: string) => ICommandBarItem[]|undefined;
     onGetCounterCommands: (id: string, isAggregated: boolean) =>
-        ICommandBarItem[];
+        ICommandBarItem[]|undefined;
     onGetGymExerciseItems: (
         id: string,
         entries: IGymExerciseEntry[],
         isExpanded: boolean,
     ) => IGymExerciseItem[];
-    onGetGymExerciseCommands: (id: string) => ICommandBarItem[];
+    onGetGymExerciseCommands: (id: string) => ICommandBarItem[]|undefined;
     onGetNumericalGoalCommands: (
         id: string,
         isAggregated: boolean,
         status: TrackableStatus,
-    ) => ICommandBarItem[];
+    ) => ICommandBarItem[]|undefined;
     onGetTaskGoalCommands: (
         id: string,
         isAggregated: boolean,
         status: TrackableStatus,
-    ) => ICommandBarItem[];
+    ) => ICommandBarItem[]|undefined;
     onEndReached?: () => void;
     onToggleItemSelect: (id: string, isSelected: boolean) => void;
     onToggleItemExpand: (id: string, isExpanded: boolean) => void;
     onGetVisibleTaskCount: (isExpanded: boolean, taskCount: number) => number;
-    onGetTaskGoalExpandable: (taskCount: number) => boolean;
-    onGetGymExerciseExpandable: (items: IGymExerciseItem[]) => boolean;
+    onIsTaskGoalExpandable: (taskCount: number) => boolean;
+    onIsGymExerciseExpandable: (items: IGymExerciseItem[]) => boolean;
     onReorderItem: (sourceId: string, destinationId: string) => void;
     onStartReorderItem: () => void;
     onEndReorderItem: () => void;
@@ -160,6 +160,7 @@ interface IActiveTrackableListProps extends IExtraData {
     onGetVisibleItemIds: () => string[];
     onGetDraggedItemId: () => string;
     onCloseToast: () => void;
+    onIsItemProveable: (status: TrackableStatus) => boolean;
 }
 
 class ActiveTrackableList extends
@@ -192,10 +193,6 @@ class ActiveTrackableList extends
             onGetDraggedItemId,
             onCloseToast,
         } = this.props;
-        if (!items.length) {
-            return <EmptyList/>;
-        }
-
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         const numericalEntryPopup = isNumericalEntryPopupOpen && (
             <NumericalEntryPopupContainer
@@ -220,7 +217,7 @@ class ActiveTrackableList extends
                     onEndReorder={onEndReorderItem}
                 >
                     <FlatList
-                        windowSize={8}
+                        windowSize={4}
                         initialNumToRender={4}
                         scrollEnabled={!isReorderMode}
                         keyExtractor={this.getItemKey}
@@ -347,7 +344,7 @@ class ActiveTrackableList extends
             onToggleItemSelect,
             onLongPressItem,
             onToggleItemExpand,
-            onGetGymExerciseExpandable,
+            onIsGymExerciseExpandable,
             onItemLayout,
             onPressOutItem,
         } = this.props;
@@ -367,7 +364,7 @@ class ActiveTrackableList extends
                 isDisabled={isDisabled}
                 isDragged={dragStatus != null}
                 isExpanded={isExpanded}
-                isExpandable={onGetGymExerciseExpandable(items)}
+                isExpandable={onIsGymExerciseExpandable(items)}
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode}
                 status={status}
@@ -403,6 +400,7 @@ class ActiveTrackableList extends
             onProveItem,
             onItemLayout,
             onPressOutItem,
+            onIsItemProveable,
         } = this.props;
         const { isDisabled, isSelected, dragStatus } = itemsMeta[id];
         const isAggregated = parent != null;
@@ -424,6 +422,7 @@ class ActiveTrackableList extends
                 isDisabled={isDisabled}
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode && !isAggregated}
+                isProveable={onIsItemProveable(status)}
                 status={status}
                 commands={commands}
                 duration={Date.now() - creationDate}
@@ -460,9 +459,10 @@ class ActiveTrackableList extends
             onProveItem,
             onLongPressItem,
             onGetVisibleTaskCount,
-            onGetTaskGoalExpandable,
+            onIsTaskGoalExpandable,
             onItemLayout,
             onPressOutItem,
+            onIsItemProveable,
         } = this.props;
         const { isExpanded, isSelected, isDisabled, dragStatus } =
             itemsMeta[id];
@@ -483,11 +483,12 @@ class ActiveTrackableList extends
                 tasks={tasks}
                 visibleTaskCount={visibleTaskCount}
                 progressDisplayMode={progressDisplayMode}
+                isProveable={onIsItemProveable(status)}
                 isDragged={dragStatus != null}
                 isSelected={isSelected}
                 isDisabled={isDisabled}
                 isExpanded={isExpanded}
-                isExpandable={onGetTaskGoalExpandable(tasks.length)}
+                isExpandable={onIsTaskGoalExpandable(tasks.length)}
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode && !isAggregated}
                 status={status}

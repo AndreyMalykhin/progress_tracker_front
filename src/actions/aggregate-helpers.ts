@@ -84,8 +84,6 @@ function removeChild(id: string, parent: IRemoveChildFragment) {
         return false;
     }
 
-    /* const idsToRemove = [parentId];
-    spliceActiveTrackables(idsToRemove, [], apollo); */
     return true;
 }
 

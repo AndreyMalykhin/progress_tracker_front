@@ -4,8 +4,8 @@ import GlobalNav from "components/global-nav";
 import Header from "components/header";
 import LeadersSection from "components/leaders-section";
 import { INavBarItem } from "components/nav-bar";
+import PendingReviewSectionContainer from "components/pending-review-section-container";
 import ProfileSectionContainer from "components/profile-section-container";
-import ReviewsSection from "components/reviews-section";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
@@ -36,12 +36,12 @@ const navItems: INavItem[] = [
         titleMsgId: "globalNavigation.leaders",
     },
     {
-        component: ReviewsSection,
+        component: PendingReviewSectionContainer,
         iconName: "approval",
         matchExact: routes.reviews.exact,
         matchPath: routes.reviews.path,
         navigateToPath: routes.reviewsGlobal.path,
-        titleMsgId: "globalNavigation.reviews",
+        titleMsgId: "globalNavigation.pendingReview",
     },
     {
         component: FriendsSection,

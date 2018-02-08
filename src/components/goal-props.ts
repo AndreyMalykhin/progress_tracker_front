@@ -1,16 +1,35 @@
 import { ICommandBarItem } from "components/command-bar";
-import ITrackableBaseProps from "components/trackable-base-props";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
-import { LayoutRectangle } from "react-native";
+import { LayoutRectangle, StyleProp, ViewStyle } from "react-native";
 
-interface IGoalProps extends ITrackableBaseProps {
+interface IGoalProps {
+    index?: number;
+    id: string;
+    parentId?: string;
+    status: TrackableStatus;
+    isProveable?: boolean;
+    isBatchEditMode?: boolean;
+    isSelected?: boolean;
+    isDisabled?: boolean;
+    isReorderMode?: boolean;
+    isDragged?: boolean;
+    commands?: ICommandBarItem[];
+    duration?: number;
+    cardStyle?: StyleProp<ViewStyle>;
+    cardHeaderStyle?: StyleProp<ViewStyle>;
+    cardBodyStyle?: StyleProp<ViewStyle>;
+    style?: StyleProp<ViewStyle>;
     iconName: string;
     title: string;
     progress: number;
     maxProgress: number;
     progressDisplayMode: ProgressDisplayMode;
     onProve: (id: string) => void;
+    onSelectChange?: (id: string, isSelected: boolean) => void;
+    onLongPress?: (id: string, parentId?: string) => void;
+    onPressOut?: (id: string) => void;
+    onLayout?: (id: string, layout?: LayoutRectangle) => void;
 }
 
 export default IGoalProps;

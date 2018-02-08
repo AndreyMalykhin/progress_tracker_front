@@ -2,7 +2,9 @@ import { QueryProps } from "react-apollo/types";
 import { IConnection } from "utils/interfaces";
 import { isLoading } from "utils/query-status";
 
-function loadMore(data: QueryProps, responseField: string) {
+function loadMore<TResponse>(
+    data: QueryProps & TResponse, responseField: keyof TResponse,
+) {
     const { fetchMore, networkStatus } = data;
     const response = (data as any)[responseField] as IConnection<any, any>;
 
@@ -19,7 +21,7 @@ function loadMore(data: QueryProps, responseField: string) {
                 return {
                     ...previousResult,
                     [responseField]: {
-                        ...previousResult[responseField],
+                        ...previousResult[responseField] as object,
                         pageInfo,
                     },
                 };
@@ -30,7 +32,7 @@ function loadMore(data: QueryProps, responseField: string) {
             return {
                 ...fetchMoreResult,
                 [responseField]: {
-                    ...fetchMoreResult![responseField],
+                    ...fetchMoreResult![responseField] as object,
                     edges: previousEdges.concat(edges),
                 },
             };

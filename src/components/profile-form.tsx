@@ -2,6 +2,7 @@ import Button, { ButtonTitle } from "components/button";
 import { FormBody, FormGroup } from "components/form";
 import FormAvatarPicker from "components/form-avatar-picker";
 import FormTextInput from "components/form-text-input";
+import LoginContainer from "components/login-container";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import { StyleSheet, Text } from "react-native";
@@ -35,18 +36,11 @@ class ProfileForm extends React.Component<IProfileFormProps> {
             onLogin,
         } = this.props;
         const loginGroup = !isUserLoggedIn && (
-            <FormGroup style={styles.loginGroup}>
-                <Text style={styles.loginGroupMsg}>
-                    <FormattedMessage id="profileForm.loginMessage" />
-                </Text>
-                <Button style={styles.loginGroupBtn} onPress={onLogin}>
-                    <ButtonTitle msgId="common.login" />
-                </Button>
-            </FormGroup>
+            <LoginContainer msgId="profileForm.loginMessage" />
         );
 
         return (
-            <FormBody>
+            <FormBody style={styles.container}>
                 <FormAvatarPicker
                     style={styles.avatarContainer}
                     errorMsgId={avatarError}
@@ -71,15 +65,14 @@ const styles = StyleSheet.create({
     avatarContainer: {
         borderBottomWidth: 1,
     },
-    loginGroup: {
-        alignItems: "center",
+    container: {
+        flex: 1,
     },
-    loginGroupBtn: {
-        alignSelf: "center",
-    },
-    loginGroupMsg: {
-        lineHeight: 32,
-    },
+    loginGroup: {},
 });
+
+{/* <FormGroup style={styles.loginGroup}>
+                <LoginContainer msgId="profileForm.loginMessage" />
+            </FormGroup> */}
 
 export default ProfileForm;

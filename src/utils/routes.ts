@@ -57,9 +57,17 @@ export default {
         exact: false,
         path: "/reviews",
     },
+    reviewsFriends: {
+        exact: true,
+        path: "/reviews/friends",
+    },
     reviewsGlobal: {
         exact: true,
         path: "/reviews/global",
+    },
+    reviewsMy: {
+        exact: true,
+        path: `/reviews/${myId}`,
     },
     trackableEdit: {
         exact: true,

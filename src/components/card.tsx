@@ -1,9 +1,11 @@
 import CommandBar, { ICommandBarProps } from "components/command-bar";
+import Image from "components/image";
 import * as React from "react";
 import {
     StyleSheet,
     Text,
     TouchableWithoutFeedback,
+    TouchableWithoutFeedbackProperties,
     View,
     ViewProperties,
 } from "react-native";
@@ -16,12 +18,21 @@ interface ICardProps extends ViewProperties {
     onRef?: (ref?: View) => void;
 }
 
-type ICardHeaderProps = ViewProperties;
+interface ICardAvatarProps {
+    uri: string;
+    onPress?: () => void;
+}
+
+interface ICardHeaderProps extends ViewProperties {
+    isPrimary?: boolean;
+}
 
 type ICardBodyProps = ViewProperties;
 
 interface ICardTitleProps {
     text: string;
+    isPrimary?: boolean;
+    onPress?: () => void;
 }
 
 interface ICardIconProps extends IconProps {
@@ -72,21 +83,46 @@ class CardBody extends React.Component<ICardBodyProps> {
 // tslint:disable-next-line:max-classes-per-file
 class CardHeader extends React.Component<ICardHeaderProps> {
     public render() {
-        const { style, ...restProps } = this.props;
-        return <View style={[styles.header, style]} {...restProps} />;
+        const { style, isPrimary, children, ...restProps } = this.props;
+        const newStyle = [
+            styles.header,
+            style,
+            isPrimary && styles.headerPrimary,
+        ];
+        return (
+            <View style={newStyle as any} {...restProps}>{children}</View>
+        );
     }
 }
 
 // tslint:disable-next-line:max-classes-per-file
 class CardTitle extends React.PureComponent<ICardTitleProps> {
     public render() {
+        const { isPrimary, text, onPress } = this.props;
         return (
             <Text
                 numberOfLines={1}
-                style={styles.title}
+                style={[styles.title, isPrimary && styles.titlePrimary]}
+                onPress={onPress}
             >
                 {this.props.text}
             </Text>
+        );
+    }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class CardAvatar extends React.PureComponent<ICardAvatarProps> {
+    public render() {
+        const { uri, onPress } = this.props;
+        return (
+            <TouchableWithoutFeedback onPress={onPress}>
+                <Image
+                    resizeMode="cover"
+                    style={styles.avatar}
+                    source={{ uri }}
+                />
+            </TouchableWithoutFeedback>
         );
     }
 }
@@ -119,6 +155,12 @@ class CardCommandBar extends React.PureComponent<ICardCommandBarProps> {
 }
 
 const styles = StyleSheet.create({
+    avatar: {
+        borderRadius: 16,
+        height: 32,
+        marginRight: 8,
+        width: 32,
+    },
     body: {
         paddingLeft: 8,
         paddingRight: 8,
@@ -127,8 +169,10 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
     },
     container: {
+        backgroundColor: "#fff",
         borderRadius: 8,
         borderWidth: 1,
+        overflow: "hidden",
     },
     header: {
         flexDirection: "row",
@@ -137,12 +181,19 @@ const styles = StyleSheet.create({
         paddingRight: 8,
         paddingTop: 8,
     },
+    headerPrimary: {
+        borderBottomWidth: 1,
+        paddingBottom: 8,
+    },
     icon: {
         paddingRight: 8,
     },
     title: {
         flex: 1,
         lineHeight: 32,
+    },
+    titlePrimary: {
+        fontWeight: "bold",
     },
 });
 
@@ -152,6 +203,7 @@ export {
     CardIcon,
     CardCommandBar,
     CardBody,
+    CardAvatar,
     ICardProps,
 };
 export default Card;

@@ -13,12 +13,12 @@ import {
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
 import CounterForm from "components/counter-form";
-import { withHeader } from "components/header";
 import TrackableFormContainer, {
     ITrackable,
     ITrackableFormContainerProps,
     ITrackableFormContainerState,
 } from "components/trackable-form-container";
+import withHeader from "components/with-header";
 import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";

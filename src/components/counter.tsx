@@ -1,14 +1,38 @@
 import { ICommandBarItem } from "components/command-bar";
 import Trackable from "components/trackable";
-import ITrackableBaseProps from "components/trackable-base-props";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
-import { LayoutRectangle, StyleSheet, Text } from "react-native";
+import {
+    LayoutRectangle,
+    StyleProp,
+    StyleSheet,
+    Text,
+    ViewStyle,
+} from "react-native";
 
-interface ICounterProps extends ITrackableBaseProps {
+interface ICounterProps {
+    index?: number;
+    id: string;
+    parentId?: string;
+    status: TrackableStatus;
+    isBatchEditMode?: boolean;
+    isSelected?: boolean;
+    isDisabled?: boolean;
+    isReorderMode?: boolean;
+    isDragged?: boolean;
+    commands?: ICommandBarItem[];
+    duration?: number;
+    cardStyle?: StyleProp<ViewStyle>;
+    cardHeaderStyle?: StyleProp<ViewStyle>;
+    cardBodyStyle?: StyleProp<ViewStyle>;
+    style?: StyleProp<ViewStyle>;
     iconName: string;
     title: string;
     progress: number;
+    onSelectChange?: (id: string, isSelected: boolean) => void;
+    onLongPress?: (id: string, parentId?: string) => void;
+    onPressOut?: (id: string) => void;
+    onLayout?: (id: string, layout?: LayoutRectangle) => void;
 }
 
 class Counter extends React.PureComponent<ICounterProps> {

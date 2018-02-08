@@ -12,7 +12,6 @@ import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
-import { Config } from "react-native-config";
 import { Image } from "react-native-image-crop-picker";
 import dataIdFromObject from "utils/data-id-from-object";
 import myId from "utils/my-id";
@@ -115,7 +114,7 @@ async function proveTrackable(
         throw e;
     }
 
-    await mutate({
+    const result = await mutate({
         optimisticResponse: getOptimisticResponse(id, photo, apollo),
         update: (proxy, response) => {
             updateActiveTrackables(response.data, proxy);
@@ -123,6 +122,7 @@ async function proveTrackable(
         },
         variables: { id, assetId },
     });
+    return result.data;
 }
 
 function updateActiveTrackables(

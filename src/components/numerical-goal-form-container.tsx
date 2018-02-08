@@ -17,8 +17,9 @@ import GoalFormContainer, {
     IGoalFormContainerProps,
     IGoalFormContainerState,
 } from "components/goal-form-container";
-import { IHeaderState, withHeader } from "components/header";
+import { IHeaderState } from "components/header";
 import NumericalGoalForm from "components/numerical-goal-form";
+import withHeader from "components/with-header";
 import { debounce, throttle } from "lodash";
 import ProgressDisplayMode from "models/progress-display-mode";
 import Type from "models/type";

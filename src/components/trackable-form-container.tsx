@@ -1,4 +1,5 @@
-import { IHeaderState, IWithHeaderProps } from "components/header";
+import { IHeaderState } from "components/header";
+import { IWithHeaderProps } from "components/with-header";
 import { debounce, throttle } from "lodash";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";

@@ -1,5 +1,6 @@
 import Button, { ButtonTitle } from "components/button";
 import Card, {
+    CardAvatar,
     CardBody,
     CardCommandBar,
     CardHeader,
@@ -9,7 +10,6 @@ import Card, {
 import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
 import Image from "components/image";
-import ITrackableBaseProps from "components/trackable-base-props";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
@@ -25,22 +25,48 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-interface ITrackableProps extends ITrackableBaseProps {
-    title: string;
-    iconName?: string;
+interface ITrackableProps {
+    index?: number;
+    id: string;
+    parentId?: string;
+    status: TrackableStatus;
+    isProveable?: boolean;
+    isReviewable?: boolean;
+    isBatchEditMode?: boolean;
+    isSelected?: boolean;
+    isDisabled?: boolean;
+    isReorderMode?: boolean;
+    isDragged?: boolean;
     isExpandable?: boolean;
     isExpanded?: boolean;
-    cardStyle?: StyleProp<ViewStyle>;
-    cardHeaderStyle?: StyleProp<ViewStyle>;
-    cardBodyStyle?: StyleProp<ViewStyle>;
+    isNoCard?: boolean;
+    commands?: ICommandBarItem[];
+    duration?: number;
     style?: StyleProp<ViewStyle>;
+    title: string;
+    iconName?: string;
     rating?: number;
     approveCount?: number;
     rejectCount?: number;
     proofPhotoUrl?: string;
+    userId?: string;
+    userAvatarUrl?: string;
+    userName?: string;
     onExpandChange?: (id: string, isExpanded: boolean) => void;
     onProve?: (id: string) => void;
     onGetLayoutRef?: () => View|undefined;
+    onSelectChange?: (id: string, isSelected: boolean) => void;
+    onLongPress?: (id: string, parentId?: string) => void;
+    onPressOut?: (id: string) => void;
+    onLayout?: (id: string, layout?: LayoutRectangle) => void;
+    onPressUser?: (id: string) => void;
+    onApprove?: (id: string) => void;
+    onReject?: (id: string) => void;
+}
+
+interface IReviewControlsProps {
+    onApprove: () => void;
+    onReject: () => void;
 }
 
 interface IAchievementDetailsProps {
@@ -80,45 +106,50 @@ class Trackable extends React.Component<ITrackableProps> {
             isDragged,
             isExpandable,
             commands,
-            cardStyle,
-            cardHeaderStyle,
-            cardBodyStyle,
             style,
             duration,
             proofPhotoUrl,
+            isProveable,
+            isReviewable,
+            isNoCard,
+            userName,
+            userAvatarUrl,
             onLayout,
             onLongPress,
             onPressOut,
         } = this.props;
-        const proveButton =
-            status === TrackableStatus.PendingProof && this.renderProveBtn();
         const icon = iconName && <CardIcon name={iconName} component={Icon} />;
         const statusElement =
             duration != null && <Status duration={duration} status={status} />;
-        const baseStyle =
-            isDragged ? containerDraggedStyle : styles.container;
+        const newContainerStyle = [
+            styles.container,
+            style,
+            isDragged && styles.containerDragged,
+        ];
         return (
-            <View style={[baseStyle, style]}>
+            <View style={newContainerStyle as any}>
                 {isBatchEditMode && this.renderCheckBox()}
                 <Card
                     onRef={this.onCardRef}
                     onLongPress={onLongPress && this.onLongPress}
                     onPressIn={onLayout && this.onPressIn}
                     onPressOut={onPressOut && this.onPressOut}
-                    style={([styles.card, cardStyle])}
+                    style={[styles.card, isNoCard && styles.cardAbsent]}
                 >
-                    <CardHeader style={cardHeaderStyle}>
+                    {(userName || userAvatarUrl) && this.renderUser()}
+                    <CardHeader style={isNoCard && styles.cardHeaderAbsent}>
                         {icon}
                         <CardTitle text={title} />
                         {commands && commands.length && this.renderCmdBar()}
                     </CardHeader>
                     {proofPhotoUrl && this.renderProofPhoto()}
-                    <CardBody style={cardBodyStyle}>
+                    <CardBody style={isNoCard && styles.cardBodyAbsent}>
                         {children}
                         {isExpandable && this.renderExpandBtn()}
                         {this.renderAchievementDetails()}
+                        {isProveable && this.renderProveBtn()}
+                        {isReviewable && this.renderReviewControls()}
                         {statusElement}
-                        {proveButton}
                     </CardBody>
                 </Card>
             </View>
@@ -134,6 +165,34 @@ class Trackable extends React.Component<ITrackableProps> {
         ) {
             this.calculateLayout();
         }
+    }
+
+    private renderUser() {
+        const { userName, userAvatarUrl } = this.props;
+        const nameElement = userName && (
+            <CardTitle
+                isPrimary={true}
+                text={userName}
+                onPress={this.onPressUser}
+            />
+        );
+        const avatar = userAvatarUrl &&
+            <CardAvatar uri={userAvatarUrl} onPress={this.onPressUser} />;
+        return (
+            <CardHeader isPrimary={true}>
+                {avatar}
+                {nameElement}
+            </CardHeader>
+        );
+    }
+
+    private renderReviewControls() {
+        return (
+            <ReviewControls
+                onApprove={this.onApprove}
+                onReject={this.onReject}
+            />
+        );
     }
 
     private renderProofPhoto() {
@@ -206,6 +265,8 @@ class Trackable extends React.Component<ITrackableProps> {
         );
     }
 
+    private onPressUser = () => this.props.onPressUser!(this.props.userId!);
+
     private onProve = () => this.props.onProve!(this.props.id);
 
     private onLongPress = () =>
@@ -240,6 +301,34 @@ class Trackable extends React.Component<ITrackableProps> {
                     this.props.id, { x: pageX, y: pageY, width, height });
             });
         });
+    }
+
+    private onApprove = () => this.props.onApprove!(this.props.id);
+
+    private onReject = () => this.props.onReject!(this.props.id);
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class ReviewControls extends React.PureComponent<IReviewControlsProps> {
+    public render() {
+        const { onApprove, onReject } = this.props;
+        return (
+            <View style={styles.reviewControls}>
+                <Button onPress={onApprove}>
+                    <ButtonTitle
+                        style={styles.approveBtnTitle}
+                        msgId="trackable.approve"
+                    />
+                </Button>
+                <Button onPress={onReject}>
+                    <ButtonTitle
+                        dangerous={true}
+                        style={styles.rejectBtnTitle}
+                        msgId="trackable.reject"
+                    />
+                </Button>
+            </View>
+        );
     }
 }
 
@@ -360,9 +449,26 @@ const styles = StyleSheet.create({
     achievementDetailsItemValue: {
         lineHeight: 32,
     },
+    approveBtnTitle: {
+        color: "#0076ff",
+    },
     card: {
-        backgroundColor: "#fff",
         flex: 1,
+    },
+    cardAbsent: {
+        borderWidth: 0,
+    },
+    cardBodyAbsent: {
+        paddingBottom: 0,
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
+    },
+    cardHeaderAbsent: {
+        paddingBottom: 0,
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
     },
     checkBox: {
         alignSelf: "center",
@@ -385,6 +491,12 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         marginBottom: 8,
     },
+    rejectBtnTitle: {},
+    reviewControls: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        marginBottom: 8,
+    },
     status: {
         alignItems: "flex-start",
         flexDirection: "row",
@@ -400,8 +512,6 @@ const styles = StyleSheet.create({
         lineHeight: 32,
     },
 });
-
-const containerDraggedStyle = [styles.container, styles.containerDragged];
 
 export { ITrackableProps };
 export default Trackable;

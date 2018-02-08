@@ -39,6 +39,7 @@ class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
                     </Button>
                     <Button onPress={this.onRemove} disabled={disabled}>
                         <ButtonTitle
+                            dangerous={true}
                             disabled={disabled}
                             msgId="common.remove"
                         />

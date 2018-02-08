@@ -11,12 +11,13 @@ import {
 import { IconProps } from "react-native-vector-icons/Icon";
 
 interface IButtonProps extends ITouchableWithFeedbackProps {
-    isVertical?: boolean;
+    vertical?: boolean;
 }
 
 interface IButtonTitleProps {
     primary?: boolean;
     disabled?: boolean;
+    dangerous?: boolean;
     style?: StyleProp<TextStyle>;
     msgId: string;
     msgValues?: { [key: string]: string };
@@ -29,10 +30,10 @@ interface IButtonIconProps extends IconProps {
 
 class Button extends React.Component<IButtonProps> {
     public render() {
-        const { children, disabled, style, isVertical, ...restProps } =
+        const { children, disabled, style, vertical, ...restProps } =
             this.props;
         const contentStyle =
-            isVertical ? contentVerticalStyle : styles.content;
+            vertical ? contentVerticalStyle : styles.content;
         return (
             <TouchableWithFeedback
                 disabled={disabled}
@@ -48,13 +49,15 @@ class Button extends React.Component<IButtonProps> {
 // tslint:disable-next-line:max-classes-per-file
 class ButtonTitle extends React.PureComponent<IButtonTitleProps> {
     public render() {
-        const { msgId, msgValues, disabled, style, primary } = this.props;
+        const { msgId, msgValues, disabled, style, primary, dangerous } =
+            this.props;
         const newStyle = [
             styles.text,
             styles.title,
             style,
-            disabled ? styles.textDisabled : null,
             primary ? styles.titlePrimary : null,
+            dangerous ? styles.titleDangerous : null,
+            disabled ? styles.textDisabled : null,
         ];
         return (
             <Text style={newStyle as any}>
@@ -95,6 +98,9 @@ const styles = StyleSheet.create({
     },
     title: {
         lineHeight: 32,
+    },
+    titleDangerous: {
+        color: "#ff3b30",
     },
     titlePrimary: {
         fontWeight: "bold",

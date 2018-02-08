@@ -1,6 +1,5 @@
 import { ICommandBarItem } from "components/command-bar";
 import Trackable from "components/trackable";
-import ITrackableBaseProps from "components/trackable-base-props";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { FormattedDate } from "react-intl";
@@ -11,6 +10,7 @@ import {
     Text,
     TextStyle,
     View,
+    ViewStyle,
 } from "react-native";
 
 interface IGymExerciseItem {
@@ -31,13 +31,31 @@ interface IGymExerciseEntry {
     weight: number;
 }
 
-interface IGymExerciseProps extends ITrackableBaseProps {
+interface IGymExerciseProps {
+    index?: number;
+    id: string;
+    status: TrackableStatus;
+    isBatchEditMode?: boolean;
+    isSelected?: boolean;
+    isDisabled?: boolean;
+    isReorderMode?: boolean;
+    isDragged?: boolean;
+    commands?: ICommandBarItem[];
+    duration?: number;
+    cardStyle?: StyleProp<ViewStyle>;
+    cardHeaderStyle?: StyleProp<ViewStyle>;
+    cardBodyStyle?: StyleProp<ViewStyle>;
+    style?: StyleProp<ViewStyle>;
     iconName: string;
     title: string;
     isExpanded?: boolean;
     isExpandable?: boolean;
     items: IGymExerciseItem[];
     onExpandChange: (id: string, isExpanded: boolean) => void;
+    onSelectChange?: (id: string, isSelected: boolean) => void;
+    onLongPress?: (id: string, parentId?: string) => void;
+    onPressOut?: (id: string) => void;
+    onLayout?: (id: string, layout?: LayoutRectangle) => void;
 }
 
 class GymExercise extends React.PureComponent<IGymExerciseProps> {

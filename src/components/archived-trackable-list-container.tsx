@@ -1,8 +1,12 @@
 import ArchivedTrackableList, {
     IArchivedTrackableListItemNode,
 } from "components/archived-trackable-list";
+import EmptyList from "components/empty-list";
 import Error from "components/error";
 import Loader from "components/loader";
+import withEmptyList from "components/with-empty-list";
+import withError from "components/with-error";
+import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -14,8 +18,6 @@ import { IConnection } from "utils/interfaces";
 import loadMore from "utils/load-more";
 import myId from "utils/my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
-import withError from "utils/with-error";
-import withLoader from "utils/with-loader";
 
 interface IGetDataResponse {
     getArchivedTrackables: IConnection<IArchivedTrackableListItemNode, number>;
@@ -118,4 +120,6 @@ export default compose(
     withData,
     withLoader(Loader, 512),
     withError(Error),
+    withEmptyList<IArchivedTrackableListContainerProps>(
+        EmptyList, (props) => props.data.getArchivedTrackables.edges),
 )(ArchivedTrackableListContainer);

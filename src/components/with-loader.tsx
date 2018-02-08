@@ -11,7 +11,7 @@ interface IState {
 
 function withLoader<T>(loader: React.ComponentClass<T>, minDuration?: number) {
     return <P extends {}>(Component: React.ComponentClass<P>) => {
-        return class EnchancedComponent extends React.Component<P & IProps, IState> {
+        return class WithLoader extends React.Component<P & IProps, IState> {
             public state: IState;
             private timeoutId: NodeJS.Timer;
 

@@ -3,6 +3,8 @@ import Loader from "components/loader";
 import TrackableFormPage, {
     ITrackable, ITrackableFormPageProps,
 } from "components/trackable-form-page";
+import withError from "components/with-error";
+import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import ProgressDisplayMode from "models/progress-display-mode";
 import Type from "models/type";
@@ -14,8 +16,6 @@ import { RouteComponentProps, withRouter } from "react-router";
 import Difficulty from "utils/difficulty";
 import myId from "utils/my-id";
 import QueryStatus from "utils/query-status";
-import withError from "utils/with-error";
-import withLoader from "utils/with-loader";
 
 interface IRouteParams {
     type?: Type;

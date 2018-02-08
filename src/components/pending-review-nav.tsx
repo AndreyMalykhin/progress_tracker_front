@@ -1,4 +1,8 @@
-import NavBar, { INavBarItem, INavBarItemRenderer } from "components/nav-bar";
+import NavBar, {
+    INavBarItem,
+    INavBarItemRenderer,
+    INavBarProps,
+} from "components/nav-bar";
 import TabBar, {
     TabBarItem,
     TabBarItemIcon,
@@ -8,18 +12,18 @@ import * as React from "react";
 import { StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-interface IGlobalNavProps {
+interface IPendingReviewNavProps {
     items: INavBarItem[];
 }
 
-class GlobalNav extends React.Component<IGlobalNavProps> {
+class PendingReviewNav extends React.Component<IPendingReviewNavProps> {
     public render() {
         return (
             <NavBar
-                keepState={false}
+                keepState={true}
                 renderItem={this.renderItem}
-                style={styles.container}
                 items={this.props.items}
+                style={styles.container}
             />
         );
     }
@@ -34,11 +38,7 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
                 active={isActive}
                 onSelect={onSelect}
             >
-                <TabBarItemIcon
-                    active={isActive}
-                    component={Icon}
-                    name={iconName!}
-                />
+                <TabBarItemTitle active={isActive} msgId={titleMsgId!} />
             </TabBarItem>
         );
     }
@@ -46,9 +46,9 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
 
 const styles = StyleSheet.create({
     container: {
-        borderTopWidth: 1,
+        borderBottomWidth: 1,
     },
 });
 
-export { IGlobalNavProps };
-export default GlobalNav;
+export { IPendingReviewNavProps };
+export default PendingReviewNav;

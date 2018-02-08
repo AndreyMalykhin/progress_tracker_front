@@ -4,7 +4,6 @@ import {
     IEditUserFragment,
     IEditUserResponse,
 } from "actions/edit-user-action";
-import { ILoginResponse, login, loginQuery } from "actions/login-action";
 import {
     ISetUserAvatarResponse,
     setUserAvatar,
@@ -13,9 +12,11 @@ import {
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import Error from "components/error";
-import { IWithHeaderProps, withHeader } from "components/header";
 import Loader from "components/loader";
 import ProfileForm from "components/profile-form";
+import withError from "components/with-error";
+import withHeader, { IWithHeaderProps } from "components/with-header";
+import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import { debounce } from "lodash";
 import * as React from "react";
@@ -28,8 +29,6 @@ import { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
 import myId from "utils/my-id";
 import QueryStatus from "utils/query-status";
-import withError from "utils/with-error";
-import withLoader from "utils/with-loader";
 
 interface IGetDataResponse {
     getUserById: {
@@ -58,18 +57,6 @@ interface IProfileFormContainerState {
 interface IOwnProps {
     client: ApolloClient<NormalizedCacheObject>;
 }
-
-const withLogin =
-    graphql<ILoginResponse, IOwnProps, IProfileFormContainerProps>(
-        loginQuery,
-        {
-            props: ({ mutate }) => {
-                return {
-                    onLogin: () => login(mutate!),
-                };
-            },
-        },
-    );
 
 const withSetAvatar =
     graphql<ISetUserAvatarResponse, IOwnProps, IProfileFormContainerProps>(
@@ -245,7 +232,6 @@ export default compose(
     withError(Error),
     withApollo,
     withSetAvatar,
-    withLogin,
     withEditUser,
     withHeader,
 )(ProfileFormContainer);

@@ -1,4 +1,5 @@
-import { ApolloQueryResult } from "apollo-client";
+import { NormalizedCacheObject } from "apollo-cache-inmemory";
+import { ApolloClient, ApolloQueryResult } from "apollo-client";
 import { FetchMoreOptions } from "apollo-client/core/ObservableQuery";
 import { FetchMoreQueryOptions } from "apollo-client/core/watchQueryOptions";
 import Type from "models/type";
@@ -18,4 +19,8 @@ interface IConnection<TNode, TCursor> {
     };
 }
 
-export { IFetchMore, IConnection };
+interface IWithApollo {
+    client: ApolloClient<NormalizedCacheObject>;
+}
+
+export { IFetchMore, IConnection, IWithApollo };

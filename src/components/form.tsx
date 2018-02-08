@@ -18,6 +18,10 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
+interface IFormBodyProps {
+    style?: StyleProp<ViewStyle>;
+}
+
 interface IFormSectionProps {
     msgId: string;
     isExpanded?: boolean;
@@ -62,9 +66,10 @@ type IFormButtonOkProps = IButtonProps;
 
 type IFormButtonCancelProps = IButtonProps;
 
-class FormBody extends React.Component {
+class FormBody extends React.Component<IFormBodyProps> {
     public render() {
-        return <View style={styles.body}>{this.props.children}</View>;
+        const { style, children } = this.props;
+        return <View style={[styles.body, style]}>{children}</View>;
     }
 }
 

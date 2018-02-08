@@ -4,6 +4,9 @@ import { ApolloClient } from "apollo-client";
 import App, { IAppProps } from "components/app";
 import Error from "components/error";
 import Loader from "components/loader";
+import withApolloProvider from "components/with-apollo-provider";
+import withError from "components/with-error";
+import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import "intl";
 import * as React from "react";
@@ -17,9 +20,6 @@ import apolloFactory from "utils/apollo-factory";
 import Config from "utils/config";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
-import withApolloProvider from "utils/with-apollo-provider";
-import withError from "utils/with-error";
-import withLoader from "utils/with-loader";
 
 interface IGetAppDataResponse {
     getMessages: Array<{

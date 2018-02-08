@@ -1,12 +1,14 @@
 import EmptyList from "components/empty-list";
 import Loader from "components/loader";
 import ProgressBar from "components/progress-bar";
-import Trackable from "components/trackable";
+import Trackable, { ITrackableProps } from "components/trackable";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { FlatList, ListRenderItemInfo, StyleSheet, Text } from "react-native";
 import QueryStatus from "utils/query-status";
+
+type IItemProps = IArchivedTrackableListItemNode;
 
 interface IArchivedTrackableListItem {
     node: IArchivedTrackableListItemNode;
@@ -38,14 +40,11 @@ class ArchivedTrackableList extends
     React.Component<IArchivedTrackableListProps> {
     public render() {
         const { items, queryStatus, onEndReached } = this.props;
-
-        if (!items.length) {
-            return <EmptyList />;
-        }
-
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
             <FlatList
+                windowSize={4}
+                initialNumToRender={4}
                 contentContainerStyle={styles.listContent}
                 data={items}
                 keyExtractor={this.getItemKey}
@@ -60,6 +59,17 @@ class ArchivedTrackableList extends
     private onRenderItem = (
         itemInfo: ListRenderItemInfo<IArchivedTrackableListItem>,
     ) => {
+        return <Item {...itemInfo.item.node} />;
+    }
+
+    private getItemKey(item: IArchivedTrackableListItem) {
+        return item.node.id;
+    }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class Item extends React.PureComponent<IItemProps> {
+    public render() {
         const {
             id,
             progress,
@@ -74,18 +84,14 @@ class ArchivedTrackableList extends
             creationDate,
             statusChangeDate,
             proofPhotoUrlMedium,
-        } = itemInfo.item.node;
-        let progressBar;
-
-        if (progress !== maxProgress) {
-            progressBar = (
-                <ProgressBar
-                    value={progress}
-                    maxValue={maxProgress}
-                    mode={progressDisplayMode}
-                />
-            );
-        }
+        } = this.props;
+        const progressBar = progress !== maxProgress && (
+            <ProgressBar
+                value={progress}
+                maxValue={maxProgress}
+                mode={progressDisplayMode}
+            />
+        );
 
         return (
             <Trackable
@@ -102,10 +108,6 @@ class ArchivedTrackableList extends
                 {progressBar}
             </Trackable>
         );
-    }
-
-    private getItemKey(item: IArchivedTrackableListItem) {
-        return item.node.id;
     }
 }
 
