@@ -20,7 +20,6 @@ class ArchiveNav extends React.Component<IArchiveNavProps> {
     public render() {
         return (
             <NavBar
-                keepState={true}
                 renderItem={this.renderItem}
                 items={this.props.items}
                 style={styles.container}

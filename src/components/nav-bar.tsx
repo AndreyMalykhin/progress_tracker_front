@@ -13,7 +13,7 @@ type INavBarItemRenderer = (
 
 interface INavBarProps extends RouteComponentProps<{}> {
     items: INavBarItem[];
-    keepState: boolean;
+    resetHistory?: boolean;
     renderItem: INavBarItemRenderer;
     style?: StyleProp<ViewStyle>;
 }
@@ -47,9 +47,10 @@ class NavBar extends React.PureComponent<INavBarProps> {
     }
 
     private onSelect = (path: string) => {
-        const { history, location, keepState } = this.props;
-        const newLocation =
-            keepState ? { ...location, pathname: path } : { pathname: path };
+        const { history, location, resetHistory } = this.props;
+        const newLocation = resetHistory ?
+            { pathname: path, state: { resetHistory: true } } :
+            { ...location, pathname: path };
         history.replace(newLocation);
     }
 }

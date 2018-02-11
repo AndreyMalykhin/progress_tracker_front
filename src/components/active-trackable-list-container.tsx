@@ -71,13 +71,14 @@ import Loader from "components/loader";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
+import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import * as React from "react";
 import { ReactNode } from "react";
+import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -93,9 +94,8 @@ import {
 } from "react-native";
 import ImagePicker, { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
+import { IConnection } from "utils/connection";
 import DragStatus from "utils/drag-status";
-import { IConnection, IFetchMore } from "utils/interfaces";
-import loadMore from "utils/load-more";
 import myId from "utils/my-id";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
@@ -104,7 +104,8 @@ import routes from "utils/routes";
 interface IActiveTrackableListContainerProps extends
     RouteComponentProps<IRouteParams>,
     InjectedIntlProps,
-    IWithHeaderProps {
+    IWithHeaderProps,
+    IWithLoadMoreProps {
     data: QueryProps & IGetDataResponse;
     onSetTaskDone: (taskId: string, isDone: boolean) =>
         Promise<ISetTaskDoneResponse>;
@@ -1072,10 +1073,7 @@ class ActiveTrackableListContainer extends
         });
     }
 
-    private onEndReached = () => {
-        const responseField = "getActiveTrackables";
-        loadMore(this.props.data, responseField);
-    }
+    private onEndReached = () => this.props.onLoadMore();
 
     private onStartProveItem = async (id: string) => {
         let image;
@@ -1254,6 +1252,8 @@ export default compose(
     withUnaggregate,
     withBreak,
     withAggregate,
+    withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>(
+        "getActiveTrackables", (props) => props.data),
     withHeader,
     injectIntl,
 )(ActiveTrackableListContainer);

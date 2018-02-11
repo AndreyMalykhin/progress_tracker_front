@@ -6,6 +6,7 @@ import Error from "components/error";
 import Loader from "components/loader";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
+import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
@@ -14,8 +15,7 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
-import { IConnection } from "utils/interfaces";
-import loadMore from "utils/load-more";
+import { IConnection } from "utils/connection";
 import myId from "utils/my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
 
@@ -28,7 +28,8 @@ interface IOwnProps {
     trackableStatus: TrackableStatus;
 }
 
-interface IArchivedTrackableListContainerProps {
+interface IArchivedTrackableListContainerProps extends
+    IWithLoadMoreProps, IOwnProps {
     data: QueryProps & IGetDataResponse;
 }
 
@@ -99,9 +100,10 @@ const withData = graphql<
 class ArchivedTrackableListContainer extends
     React.Component<IArchivedTrackableListContainerProps> {
     public render() {
-        const { data } = this.props;
+        const { data, trackableStatus } = this.props;
         return (
             <ArchivedTrackableList
+                trackableStatus={trackableStatus}
                 items={data.getArchivedTrackables.edges}
                 queryStatus={data.networkStatus}
                 onEndReached={this.onEndReached}
@@ -109,10 +111,7 @@ class ArchivedTrackableListContainer extends
         );
     }
 
-    private onEndReached = () => {
-        const responseField = "getArchivedTrackables";
-        loadMore(this.props.data, responseField);
-    }
+    private onEndReached = () => this.props.onLoadMore();
 }
 
 export default compose(
@@ -122,4 +121,6 @@ export default compose(
     withError(Error),
     withEmptyList<IArchivedTrackableListContainerProps>(
         EmptyList, (props) => props.data.getArchivedTrackables.edges),
+    withLoadMore<IArchivedTrackableListContainerProps, IGetDataResponse>(
+        "getArchivedTrackables", (props) => props.data),
 )(ArchivedTrackableListContainer);

@@ -6,14 +6,14 @@ interface IProps {
 }
 
 interface IState {
-    isVisible: boolean;
+    isVisible?: boolean;
 }
 
 function withLoader<T>(loader: React.ComponentClass<T>, minDuration?: number) {
     return <P extends {}>(Component: React.ComponentClass<P>) => {
         return class WithLoader extends React.Component<P & IProps, IState> {
-            public state: IState;
-            private timeoutId: NodeJS.Timer;
+            public state: IState = {};
+            private timeoutId?: NodeJS.Timer;
 
             public render() {
                 return this.state.isVisible ? React.createElement(loader) :
@@ -31,7 +31,6 @@ function withLoader<T>(loader: React.ComponentClass<T>, minDuration?: number) {
                     || queryStatus === QueryStatus.LoadingMore
                     || queryStatus === QueryStatus.Polling
                     || queryStatus === QueryStatus.Reloading
-                    || queryStatus === QueryStatus.SetVariables
                 ) {
                     return;
                 }
@@ -40,7 +39,7 @@ function withLoader<T>(loader: React.ComponentClass<T>, minDuration?: number) {
             }
 
             public componentWillUnmount() {
-                clearTimeout(this.timeoutId);
+                clearTimeout(this.timeoutId!);
             }
 
             private updateVisibility(queryStatus: QueryStatus) {
@@ -55,7 +54,9 @@ function withLoader<T>(loader: React.ComponentClass<T>, minDuration?: number) {
                     } else {
                         isVisible = false;
                     }
-                } else if (queryStatus === QueryStatus.InitialLoading) {
+                } else if (queryStatus === QueryStatus.InitialLoading
+                    || queryStatus === QueryStatus.SetVariables
+                ) {
                     isVisible = true;
                 }
 

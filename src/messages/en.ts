@@ -71,7 +71,7 @@ export default {
     "reasons.spam": "Spam",
     "rejectTrackable.title": "Please select a reason",
     "reportUser.title": "Report user for",
-    "reviewsNavigation.friendTrackables": "Friends",
+    "reviewsNavigation.friendsTrackables": "Friends",
     "reviewsNavigation.globalTrackables": "Global",
     "reviewsNavigation.myTrackables": "My",
     "taskGoalForm.newTaskTitlePlaceholder": "Do something small",

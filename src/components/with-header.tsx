@@ -7,27 +7,38 @@ interface IWithHeaderProps {
         push: (state: IHeaderState) => void;
         replace: (state: IHeaderState|null) => void;
         pop: () => void;
+        isEmpty(): boolean;
     };
 }
 
 function withHeader<T extends IWithHeaderProps>(
     Component: React.ComponentClass<T>,
 ) {
-    // tslint:disable-next-line:max-classes-per-file
     return class WithHeader extends
         React.Component< T & RouteComponentProps<{}> > {
         public render() {
             return <Component header={this} {...this.props} />;
         }
 
+        public isEmpty() {
+            const locationState = this.props.location.state;
+            return !locationState || !locationState.header;
+        }
+
         public replace(state: IHeaderState|null) {
-            this.props.history.replace(
-                Object.assign({}, this.props.location, { state } ));
+            const { history, location } = this.props;
+            history.replace({
+                ...location as object,
+                state: { ...location.state, header: state },
+            });
         }
 
         public push(state: IHeaderState) {
-            this.props.history.push(
-                Object.assign({}, this.props.location, { state } ));
+            const { history, location } = this.props;
+            history.push({
+                ...location as object,
+                state: { ...location.state, header: state },
+            });
         }
 
         public pop() {

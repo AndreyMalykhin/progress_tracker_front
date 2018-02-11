@@ -1,19 +1,27 @@
-import Archive, { IArchiveNavItem } from "components/archive";
-import ArchivedTrackableListContainer from "components/archived-trackable-list-container";
+import Archive from "components/archive";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
 import myId from "utils/my-id";
 import routes from "utils/routes";
+import { INavBarItem } from "./nav-bar";
 
 interface IRouteParams {
     id: string;
+    trackableStatus: TrackableStatus;
 }
 
 type IArchiveContainerProps = RouteComponentProps<IRouteParams>;
 
+const approvedTrackablesRoute = routes.profileArchive.path.replace(
+    ":trackableStatus", TrackableStatus.Approved);
+const rejectedTrackablesRoute = routes.profileArchive.path.replace(
+    ":trackableStatus", TrackableStatus.Rejected);
+const expiredTrackablesRoute = routes.profileArchive.path.replace(
+    ":trackableStatus", TrackableStatus.Expired);
+
 class ArchiveContainer extends React.Component<IArchiveContainerProps> {
-    private navItems: IArchiveNavItem[];
+    private navItems: INavBarItem[] = [];
 
     public constructor(props: IArchiveContainerProps, context: any) {
         super(props, context);
@@ -21,7 +29,14 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
     }
 
     public render() {
-        return <Archive navItems={this.navItems} />;
+        const { id: userId, trackableStatus } = this.props.match.params;
+        return (
+            <Archive
+                userId={userId}
+                navItems={this.navItems}
+                trackableStatus={trackableStatus}
+            />
+        );
     }
 
     public componentWillReceiveProps(nextProps: IArchiveContainerProps) {
@@ -35,39 +50,24 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
     private initNavItems(userId: string) {
         this.navItems = [
             {
-                matchExact: routes.profileArchiveApprovedTrackables.exact,
-                matchPath: routes.profileArchiveApprovedTrackables.path,
-                navigateToPath: routes.profileArchiveApprovedTrackables.path
-                    .replace(":id", userId),
-                render: () => this.renderList(userId, TrackableStatus.Approved),
+                matchExact: routes.profileArchive.exact,
+                matchPath: approvedTrackablesRoute,
+                navigateToPath: approvedTrackablesRoute.replace(":id", userId),
                 titleMsgId: "archiveNavigation.approvedTrackables",
             },
             {
-                matchExact: routes.profileArchiveRejectedTrackables.exact,
-                matchPath: routes.profileArchiveRejectedTrackables.path,
-                navigateToPath: routes.profileArchiveRejectedTrackables.path
-                    .replace(":id", userId),
-                render: () => this.renderList(userId, TrackableStatus.Rejected),
+                matchExact: routes.profileArchive.exact,
+                matchPath: rejectedTrackablesRoute,
+                navigateToPath: rejectedTrackablesRoute.replace(":id", userId),
                 titleMsgId: "archiveNavigation.rejectedTrackables",
             },
             {
-                matchExact: routes.profileArchiveExpiredTrackables.exact,
-                matchPath: routes.profileArchiveExpiredTrackables.path,
-                navigateToPath: routes.profileArchiveExpiredTrackables.path
-                    .replace(":id", userId),
-                render: () => this.renderList(userId, TrackableStatus.Expired),
+                matchExact: routes.profileArchive.exact,
+                matchPath: expiredTrackablesRoute,
+                navigateToPath: expiredTrackablesRoute.replace(":id", userId),
                 titleMsgId: "archiveNavigation.expiredTrackables",
             },
         ];
-    }
-
-    private renderList(userId: string, trackableStatus: TrackableStatus) {
-        return (
-            <ArchivedTrackableListContainer
-                userId={userId}
-                trackableStatus={trackableStatus}
-            />
-        );
     }
 }
 

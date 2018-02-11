@@ -1,7 +1,18 @@
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
 import Type from "models/type";
-import { IConnection } from "utils/interfaces";
+
+interface IConnection<TNode, TCursor> {
+    __typename?: Type;
+    edges: Array<{
+        cursor: TCursor;
+        node: TNode;
+    }>;
+    pageInfo: {
+        hasNextPage: boolean;
+        endCursor?: TCursor;
+    };
+}
 
 interface ISpliceConnectionFragment {
     __typename: Type;
@@ -58,6 +69,7 @@ function sortConnection<TNode extends ISpliceConnectionFragment, TCursor>(
 }
 
 export {
+    IConnection,
     spliceConnection,
     sortConnection,
     ISpliceConnectionFragment,

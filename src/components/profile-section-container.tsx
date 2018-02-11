@@ -54,7 +54,7 @@ interface IGetDataResponse {
 }
 
 interface IRouteParams {
-    id: string;
+    id?: string;
 }
 
 type IOwnProps = RouteComponentProps<IRouteParams>;
@@ -90,7 +90,7 @@ const withData =
             options: (ownProps) => {
                 return {
                     notifyOnNetworkStatusChange: true,
-                    variables: { userId: ownProps.match.params.id },
+                    variables: { userId: ownProps.match.params.id || myId },
                 };
             },
             props: ({ ownProps, data }) => {
@@ -147,7 +147,7 @@ const trackableTypes: Array< IActionSheetOption<Type> > = [
 
 class ProfileSectionContainer
     extends React.Component<IProfileSectionContainerProps> {
-    private navItems: IProfileSectionNavItem[];
+    private navItems: IProfileSectionNavItem[] = [];
 
     public constructor(props: IProfileSectionContainerProps, context: any) {
         super(props, context);
@@ -193,8 +193,9 @@ class ProfileSectionContainer
                 iconName: "archive",
                 matchExact: routes.profileArchive.exact,
                 matchPath: routes.profileArchive.path,
-                navigateToPath: routes.profileArchiveApprovedTrackables.path
-                    .replace(":id", userId),
+                navigateToPath: routes.profileArchive.path
+                    .replace(":id", userId)
+                    .replace(":trackableStatus", TrackableStatus.Approved),
                 titleMsgId: "profile.archive",
             },
         ];
@@ -226,7 +227,6 @@ class ProfileSectionContainer
             onRun: this.onEditProfile,
         };
         header.replace({
-            hideBackCommand: true,
             leftCommand,
             rightCommands,
             subtitleIcon: "star-circle",

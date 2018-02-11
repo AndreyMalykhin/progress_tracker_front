@@ -6,6 +6,8 @@ import LeadersSection from "components/leaders-section";
 import { INavBarItem } from "components/nav-bar";
 import PendingReviewSectionContainer from "components/pending-review-section-container";
 import ProfileSectionContainer from "components/profile-section-container";
+import StackingSwitch from "components/stacking-switch";
+import Audience from "models/audience";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
@@ -23,7 +25,7 @@ const navItems: INavItem[] = [
         component: ProfileSectionContainer,
         iconName: "account",
         matchExact: routes.profile.exact,
-        matchPath: routes.profile.path,
+        matchPath: routes.profile.path.replace(":id", myId),
         navigateToPath: myActiveTrackablesRoute,
         titleMsgId: "globalNavigation.profile",
     },
@@ -32,15 +34,17 @@ const navItems: INavItem[] = [
         iconName: "trophy",
         matchExact: routes.leaders.exact,
         matchPath: routes.leaders.path,
-        navigateToPath: routes.leadersGlobal.path,
+        navigateToPath: routes.leaders.path.replace(
+            ":audience", Audience.Global),
         titleMsgId: "globalNavigation.leaders",
     },
     {
         component: PendingReviewSectionContainer,
         iconName: "approval",
-        matchExact: routes.reviews.exact,
-        matchPath: routes.reviews.path,
-        navigateToPath: routes.reviewsGlobal.path,
+        matchExact: routes.pendingReview.exact,
+        matchPath: routes.pendingReview.path,
+        navigateToPath:
+            routes.pendingReview.path.replace(":audience", Audience.Global),
         titleMsgId: "globalNavigation.pendingReview",
     },
     {
@@ -56,31 +60,43 @@ const navItems: INavItem[] = [
         iconName: "calendar",
         matchExact: routes.activities.exact,
         matchPath: routes.activities.path,
-        navigateToPath: routes.activitiesFriends.path,
+        navigateToPath: routes.activities.path.replace(
+            ":audience", Audience.Me),
         titleMsgId: "globalNavigation.activities",
     },
 ];
 
 class HomePage extends React.Component {
     public render() {
-        const routeElements = navItems.map((navItem) => {
+        const routeElements = navItems.map((navItem, i) => {
             return (
                 <Route
-                    key={navItem.matchPath}
+                    key={i}
                     exact={navItem.matchExact}
                     path={navItem.matchPath}
                     component={navItem.component}
                 />
             );
         });
+        routeElements.push(
+            <Route
+                key={routeElements.length}
+                exact={routes.profile.exact}
+                path={routes.profile.path}
+                component={ProfileSectionContainer}
+            />,
+        );
+        routeElements.push(
+            <Redirect
+                key={routeElements.length}
+                to={myActiveTrackablesRoute}
+            />,
+        );
         return (
             <View style={styles.container}>
                 <Header />
                 <View style={styles.content}>
-                    <Switch>
-                        {routeElements}
-                        <Redirect to={myActiveTrackablesRoute} />
-                    </Switch>
+                    <StackingSwitch>{routeElements}</StackingSwitch>
                 </View>
                 <GlobalNav items={navItems} />
             </View>

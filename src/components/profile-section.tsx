@@ -1,5 +1,6 @@
 import { INavBarItem } from "components/nav-bar";
 import ProfileNav from "components/profile-nav";
+import StackingSwitch from "components/stacking-switch";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Route, Switch } from "react-router";
@@ -29,7 +30,7 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
             <View style={styles.container}>
                 <ProfileNav items={this.props.navItems} />
                 <View style={styles.content}>
-                    <Switch>{routeElements}</Switch>
+                    <StackingSwitch>{routeElements}</StackingSwitch>
                 </View>
             </View>
         );

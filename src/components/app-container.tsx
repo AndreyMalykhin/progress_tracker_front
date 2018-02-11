@@ -1,3 +1,4 @@
+import "intl";
 // tslint:disable-next-line:ordered-imports
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -8,7 +9,7 @@ import withApolloProvider from "components/with-apollo-provider";
 import withError from "components/with-error";
 import withLoader from "components/with-loader";
 import gql from "graphql-tag";
-import "intl";
+import { History } from "history";
 import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
@@ -18,6 +19,7 @@ import { getDeviceLocale } from "react-native-device-info";
 import Reactotron from "reactotron-react-native";
 import apolloFactory from "utils/apollo-factory";
 import Config from "utils/config";
+import MultiStackHistory from "utils/multi-stack-history";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 
@@ -36,17 +38,12 @@ interface IGetSettingsResponse {
     };
 }
 
-interface IWithAppDataProps {
+interface IOwnProps {
     locale: string;
 }
 
-function bootstrap(client: ApolloClient<NormalizedCacheObject>) {
-    if (Config.isDevEnv) {
-        Reactotron.configure().useReactNative().connect();
-    }
-
-    console.ignoredYellowBox = ["Remote debugger is in"];
-    initLocale(apollo);
+interface IAppContainerProps extends IOwnProps {
+    messages: { [id: string]: string };
 }
 
 const getSettingsQuery = gql`
@@ -57,7 +54,26 @@ query GetSettings {
     }
 }`;
 
-function initLocale(client: ApolloClient<NormalizedCacheObject>) {
+const getAppDataQuery = gql`
+query GetAppData($locale: String!) {
+    getMessages(locale: $locale) @client {
+        id
+        key
+        text
+    }
+}`;
+
+function bootstrap() {
+    if (Config.isDevEnv) {
+        Reactotron.configure().useReactNative().connect();
+    }
+
+    console.ignoredYellowBox = ["Remote debugger is in"];
+    history = new MultiStackHistory();
+    initLocale();
+}
+
+function initLocale() {
     addLocaleData(en);
     const settingsResponse =
         apollo.readQuery<IGetSettingsResponse>({ query: getSettingsQuery })!;
@@ -80,16 +96,8 @@ function initLocale(client: ApolloClient<NormalizedCacheObject>) {
 }
 
 const apollo = apolloFactory();
-bootstrap(apollo);
-
-const getAppDataQuery = gql`
-query GetAppData($locale: String!) {
-    getMessages(locale: $locale) @client {
-        id
-        key
-        text
-    }
-}`;
+let history: History;
+bootstrap();
 
 const withSettings = graphql<IGetSettingsResponse, {}, IAppProps>(
     getSettingsQuery,
@@ -102,7 +110,7 @@ const withSettings = graphql<IGetSettingsResponse, {}, IAppProps>(
     },
 );
 
-const withAppData = graphql<IGetAppDataResponse, IWithAppDataProps, IAppProps>(
+const withAppData = graphql<IGetAppDataResponse, IOwnProps, IAppProps>(
     getAppDataQuery,
     {
         options: ({ locale }) => {
@@ -132,10 +140,17 @@ const withAppData = graphql<IGetAppDataResponse, IWithAppDataProps, IAppProps>(
     },
 );
 
+class AppContainer extends React.Component<IAppContainerProps> {
+    public render() {
+        const { locale, messages } = this.props;
+        return <App history={history} locale={locale} messages={messages} />;
+    }
+}
+
 export default compose(
     withApolloProvider(apollo),
     withSettings,
     withAppData,
     withLoader(Loader),
     withError(Error),
-)(App);
+)(AppContainer);

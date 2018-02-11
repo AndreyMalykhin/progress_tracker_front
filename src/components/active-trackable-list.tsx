@@ -165,7 +165,7 @@ interface IActiveTrackableListProps extends IExtraData {
 
 class ActiveTrackableList extends
     React.Component<IActiveTrackableListProps> {
-    private extraData: IExtraData;
+    private extraData = {} as IExtraData;
 
     public constructor(props: IActiveTrackableListProps, context: any) {
         super(props, context);

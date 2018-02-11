@@ -1,12 +1,14 @@
 import LayoutContainer from "components/layout-container";
 import Loader from "components/loader";
+import { History } from "history";
 import * as React from "react";
 import { IntlProvider } from "react-intl";
 import { Text } from "react-native";
-import { NativeRouter } from "react-router-native";
+import { Router } from "react-router";
 import QueryStatus from "utils/query-status";
 
 interface IAppProps {
+    history: History;
     locale: string;
     messages: { [id: string]: string };
 }
@@ -20,9 +22,9 @@ class App extends React.Component<IAppProps> {
                 textComponent={Text}
                 messages={messages}
             >
-                <NativeRouter>
+                <Router history={this.props.history}>
                     <LayoutContainer />
-                </NativeRouter>
+                </Router>
             </IntlProvider>
         );
     }

@@ -2,28 +2,20 @@ import myId from "utils/my-id";
 
 export default {
     activities: {
-        exact: false,
-        path: "/activities",
-    },
-    activitiesFriends: {
         exact: true,
-        path: "/activities/friends",
-    },
-    activitiesGlobal: {
-        exact: true,
-        path: "/activities/all",
+        path: "/activities/:audience",
     },
     friends: {
         exact: true,
         path: "/friends",
     },
     leaders: {
-        exact: false,
-        path: "/leaders",
-    },
-    leadersGlobal: {
         exact: true,
-        path: "/leaders/all",
+        path: "/leaders/:audience",
+    },
+    pendingReview: {
+        exact: true,
+        path: "/pending-review/:audience",
     },
     profile: {
         exact: false,
@@ -34,40 +26,12 @@ export default {
         path: "/profile/:id/in-progress",
     },
     profileArchive: {
-        exact: false,
-        path: "/profile/:id/archive",
-    },
-    profileArchiveApprovedTrackables: {
         exact: true,
-        path: "/profile/:id/archive/approved",
-    },
-    profileArchiveExpiredTrackables: {
-        exact: true,
-        path: "/profile/:id/archive/expired",
-    },
-    profileArchiveRejectedTrackables: {
-        exact: true,
-        path: "/profile/:id/archive/rejected",
+        path: "/profile/:id/archive/:trackableStatus",
     },
     profileEdit: {
         exact: true,
         path: `/profile/${myId}/edit`,
-    },
-    reviews: {
-        exact: false,
-        path: "/reviews",
-    },
-    reviewsFriends: {
-        exact: true,
-        path: "/reviews/friends",
-    },
-    reviewsGlobal: {
-        exact: true,
-        path: "/reviews/global",
-    },
-    reviewsMy: {
-        exact: true,
-        path: `/reviews/${myId}`,
     },
     trackableEdit: {
         exact: true,

@@ -19,6 +19,7 @@ import PendingReviewTrackableList, {
 } from "components/pending-review-trackable-list";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
+import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withLogin, { IWithLoginProps } from "components/with-login";
 import gql from "graphql-tag";
@@ -30,15 +31,15 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { withApollo } from "react-apollo/withApollo";
 import { InjectedIntlProps, injectIntl } from "react-intl";
+import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
+import { IConnection } from "utils/connection";
 import Difficulty from "utils/difficulty";
-import { IConnection, IWithApollo } from "utils/interfaces";
-import loadMore from "utils/load-more";
+import { IWithApollo } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
-interface IOwnProps extends
-    RouteComponentProps<{}>, IWithLoginProps, IWithApollo, InjectedIntlProps {
+interface IOwnProps extends RouteComponentProps<{}>, IWithApollo {
     audience: Audience;
 }
 
@@ -47,7 +48,8 @@ interface IGetDataResponse {
         IConnection<IPendingReviewTrackableListItemNode, number>;
 }
 
-interface IPendingReviewTrackableListContainerProps extends IOwnProps {
+interface IPendingReviewTrackableListContainerProps extends
+    IOwnProps, IWithLoginProps, InjectedIntlProps, IWithLoadMoreProps {
     data: QueryProps & IGetDataResponse;
     onCommitApproveItem: (id: string, difficulty: Difficulty) => void;
     onCommitRejectItem: (id: string, reason: RejectReason) => void;
@@ -223,14 +225,11 @@ class PendingReviewTrackableListContainer extends
     }
 
     private onPressUser = (id: string) => {
-        this.props.history.replace(
+        this.props.history.push(
             routes.profileActiveTrackables.path.replace(":id", id));
     }
 
-    private onEndReached = () => {
-        const responseField = "getPendingReviewTrackables";
-        loadMore(this.props.data, responseField);
-    }
+    private onEndReached = () => this.props.onLoadMore();
 }
 
 export default compose(
@@ -247,5 +246,7 @@ export default compose(
     withApollo,
     withApprove,
     withReject,
+    withLoadMore<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
+        "getPendingReviewTrackables", (props) => props.data),
     injectIntl,
 )(PendingReviewTrackableListContainer);

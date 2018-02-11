@@ -2,8 +2,7 @@ import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import { spliceConnection } from "utils/connection-utils";
-import { IConnection } from "utils/interfaces";
+import { IConnection, spliceConnection } from "utils/connection";
 import makeLog from "utils/make-log";
 import myId from "utils/my-id";
 

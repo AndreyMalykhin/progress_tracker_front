@@ -1,6 +1,7 @@
 import HomePage from "components/home-page";
 import IntroPageContainer from "components/intro-page-container";
 import ProfileFormPage from "components/profile-form-page";
+import StackingSwitch from "components/stacking-switch";
 import TrackableFormPageContainer from "components/trackable-form-page-container";
 import * as React from "react";
 import { StatusBar, StyleSheet, View } from "react-native";
@@ -16,7 +17,7 @@ class Layout extends React.Component<ILayoutProps> {
         return (
             <View style={styles.container}>
                 <StatusBar />
-                <Switch>
+                <StackingSwitch>
                     <Route
                         exact={routes.trackableNew.exact}
                         path={routes.trackableNew.path}
@@ -33,7 +34,7 @@ class Layout extends React.Component<ILayoutProps> {
                         component={ProfileFormPage}
                     />
                     <Route render={this.renderHomePage}/>
-                </Switch>
+                </StackingSwitch>
             </View>
         );
     }

@@ -1,34 +1,28 @@
 import ArchiveNav from "components/archive-nav";
 import { INavBarItem } from "components/nav-bar";
+import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
-
-interface IArchiveNavItem extends INavBarItem {
-    render: (props: RouteComponentProps<any>) => JSX.Element;
-}
+import ArchivedTrackableListContainer from "./archived-trackable-list-container";
 
 interface IArchiveProps {
-    navItems: IArchiveNavItem[];
+    navItems: INavBarItem[];
+    trackableStatus: TrackableStatus;
+    userId: string;
 }
 
 class Archive extends React.Component<IArchiveProps> {
     public render() {
-        const routeElements = this.props.navItems.map((route) => {
-            return (
-                <Route
-                    key={route.matchPath}
-                    exact={route.matchExact}
-                    path={route.matchPath}
-                    render={route.render}
-                />
-            );
-        });
+        const { userId, navItems, trackableStatus } = this.props;
         return (
             <View style={styles.container}>
-                <ArchiveNav items={this.props.navItems} />
+                <ArchiveNav items={navItems} />
                 <View style={styles.content}>
-                    <Switch>{routeElements}</Switch>
+                    <ArchivedTrackableListContainer
+                        userId={userId}
+                        trackableStatus={trackableStatus}
+                    />
                 </View>
             </View>
         );
@@ -44,5 +38,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export { IArchiveNavItem };
 export default Archive;

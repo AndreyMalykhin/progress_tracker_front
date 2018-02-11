@@ -1,8 +1,11 @@
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
 import Type from "models/type";
-import { sortConnection, spliceConnection } from "utils/connection-utils";
-import { IConnection } from "utils/interfaces";
+import {
+    IConnection,
+    sortConnection,
+    spliceConnection,
+} from "utils/connection";
 import myId from "utils/my-id";
 
 interface ISpliceActiveTrackablesFragment {

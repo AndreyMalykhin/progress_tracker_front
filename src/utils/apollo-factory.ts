@@ -11,7 +11,7 @@ import Config from "utils/config";
 import dataIdFromObject from "utils/data-id-from-object";
 import fragmentTypes from "utils/fragment-types";
 
-export default function() {
+function apolloFactory() {
     const fragmentMatcher = new IntrospectionFragmentMatcher(
         { introspectionQueryResultData: fragmentTypes as any });
     const cache = new InMemoryCache(
@@ -34,3 +34,5 @@ export default function() {
         link: ApolloLink.from(links),
     });
 }
+
+export default apolloFactory;

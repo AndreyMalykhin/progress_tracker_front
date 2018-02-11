@@ -4,7 +4,14 @@ import Trackable, { ITrackableProps } from "components/trackable";
 import Audience from "models/audience";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
-import { FlatList, ListRenderItemInfo, StyleSheet } from "react-native";
+import {
+    FlatList,
+    ListRenderItemInfo,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    StyleSheet,
+} from "react-native";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
 interface ISharedProps {
@@ -43,15 +50,21 @@ interface IPendingReviewTrackableListItem {
 interface IPendingReviewTrackableListProps extends ISharedProps {
     items: IPendingReviewTrackableListItem[];
     queryStatus: QueryStatus;
+    onScroll?: (evt?: NativeSyntheticEvent<NativeScrollEvent>) => void;
 }
+
+const log = makeLog("pending-review-trackable-list");
 
 class PendingReviewTrackableList extends
     React.Component<IPendingReviewTrackableListProps> {
+    private list?: FlatList<IPendingReviewTrackableListItem>;
+
     public render() {
-        const { items, queryStatus, onEndReached } = this.props;
+        const { items, queryStatus, onScroll, onEndReached } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
             <FlatList
+                ref={this.onListRef as any}
                 windowSize={4}
                 initialNumToRender={2}
                 contentContainerStyle={styles.listContent}
@@ -61,8 +74,17 @@ class PendingReviewTrackableList extends
                 ListFooterComponent={loader}
                 onEndReachedThreshold={0.5}
                 onEndReached={onEndReached}
+                onScroll={onScroll}
             />
         );
+    }
+
+    public componentDidUpdate(
+        prevProps: IPendingReviewTrackableListProps,
+    ) {
+        if (this.props.audience !== prevProps.audience) {
+            this.list!.scrollToOffset({ offset: 0, animated: false });
+        }
     }
 
     private onRenderItem = (
@@ -89,6 +111,9 @@ class PendingReviewTrackableList extends
     private getItemKey(item: IPendingReviewTrackableListItem) {
         return item.node.id;
     }
+
+    private onListRef = (ref?: FlatList<IPendingReviewTrackableListItem>) =>
+        this.list = ref
 }
 
 // tslint:disable-next-line:max-classes-per-file

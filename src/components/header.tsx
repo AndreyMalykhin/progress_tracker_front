@@ -3,7 +3,7 @@ import Image from "components/image";
 import * as React from "react";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
 
@@ -16,7 +16,9 @@ interface IHeaderCmd {
     onRun: () => void;
 }
 
-type IHeaderCmdProps = IHeaderCmd;
+interface IHeaderCmdProps extends IHeaderCmd {
+    style?: StyleProp<ViewStyle>;
+}
 
 interface IHeaderState {
     title?: ReactNode;
@@ -43,22 +45,23 @@ const cmdSize = 32;
 
 class Header extends React.Component<IHeaderProps> {
     public render() {
-        const { state } = this.props.location;
+        const locationState = this.props.location.state;
 
-        if (!state) {
+        if (!locationState || !locationState.header) {
             return <View style={styles.container} />;
         }
 
         let cmdIndex = 0;
         let backCmd;
+        const headerState = locationState.header;
 
-        if (!state.hideBackCommand && this.props.history.length > 1) {
-            backCmd = this.renderBackCmd(cmdIndex, state.onBack);
+        if (!headerState.hideBackCommand && this.props.history.length > 1) {
+            backCmd = this.renderBackCmd(cmdIndex, headerState.onBack);
             ++cmdIndex;
         }
 
         const { leftCommand, rightCommands, title, subtitleIcon, subtitleText }
-            = state as IHeaderState;
+            = headerState as IHeaderState;
         let leftCmdElement;
 
         if (leftCommand) {
@@ -85,12 +88,17 @@ class Header extends React.Component<IHeaderProps> {
     }
 
     public shouldComponentUpdate(nextProps: IHeaderProps) {
-        return this.props.location.state !== nextProps.location.state;
+        const prevLocationState = this.props.location.state;
+        const nextLocationState = nextProps.location.state;
+        return !(!prevLocationState && !nextLocationState
+            || (prevLocationState && nextLocationState
+            && prevLocationState.header === nextLocationState.header));
     }
 
     private renderBackCmd(index: number, onRun?: () => void) {
         return (
             <HeaderCmd
+                style={styles.cmdBack}
                 key={index}
                 iconName={"keyboard-backspace"}
                 msgId={"commands.back"}
@@ -99,15 +107,13 @@ class Header extends React.Component<IHeaderProps> {
         );
     }
 
-    private onBackPress = () => {
-        this.props.history.goBack();
-    }
+    private onBackPress = () => this.props.history.goBack();
 }
 
 // tslint:disable-next-line:max-classes-per-file
 class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
     public render() {
-        const { isPrimary, msgId, iconName, imgUrl, isDisabled, onRun } =
+        const { style, isPrimary, msgId, iconName, imgUrl, isDisabled, onRun } =
             this.props;
         let content;
 
@@ -139,7 +145,11 @@ class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
             );
         }
 
-        return <Button disabled={isDisabled} onPress={onRun}>{content}</Button>;
+        return (
+            <Button disabled={isDisabled} onPress={onRun} style={style}>
+                {content}
+            </Button>
+        );
     }
 }
 
@@ -171,6 +181,9 @@ class Subtitle extends React.PureComponent<ISubtitleProps> {
 }
 
 const styles = StyleSheet.create({
+    cmdBack: {
+        marginRight: 16,
+    },
     cmdImg: {
         borderRadius: cmdSize / 2,
         borderWidth: 1,

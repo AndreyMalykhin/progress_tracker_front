@@ -16,7 +16,7 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
     public render() {
         return (
             <NavBar
-                keepState={false}
+                resetHistory={true}
                 renderItem={this.renderItem}
                 style={styles.container}
                 items={this.props.items}
