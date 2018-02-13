@@ -24,6 +24,7 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { withApollo } from "react-apollo/withApollo";
 import { RouteComponentProps, withRouter } from "react-router";
+import IconName from "utils/icon-name";
 
 type ICounter = ITrackable;
 
@@ -133,7 +134,7 @@ class CounterFormContainer extends TrackableFormContainer<
 
     protected getInitialStateForAdd() {
         return {
-            iconName: "access-point",
+            iconName: IconName.Counter as string,
         } as ICounterFormContainerState;
     }
 

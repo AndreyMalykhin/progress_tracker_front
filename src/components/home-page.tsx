@@ -1,4 +1,4 @@
-import ActivitiesSection from "components/activities-section";
+import ActivitiesSectionContainer from "components/activities-section-container";
 import FriendsSection from "components/friends-section";
 import GlobalNav from "components/global-nav";
 import Header from "components/header";
@@ -11,6 +11,7 @@ import Audience from "models/audience";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
+import IconName from "utils/icon-name";
 import myId from "utils/my-id";
 import routes from "utils/routes";
 
@@ -23,7 +24,7 @@ const myActiveTrackablesRoute = routes.profileActiveTrackables.path.replace(
 const navItems: INavItem[] = [
     {
         component: ProfileSectionContainer,
-        iconName: "account",
+        iconName: IconName.Profile,
         matchExact: routes.profile.exact,
         matchPath: routes.profile.path.replace(":id", myId),
         navigateToPath: myActiveTrackablesRoute,
@@ -31,7 +32,7 @@ const navItems: INavItem[] = [
     },
     {
         component: LeadersSection,
-        iconName: "trophy",
+        iconName: IconName.Leader,
         matchExact: routes.leaders.exact,
         matchPath: routes.leaders.path,
         navigateToPath: routes.leaders.path.replace(
@@ -40,7 +41,7 @@ const navItems: INavItem[] = [
     },
     {
         component: PendingReviewSectionContainer,
-        iconName: "approval",
+        iconName: IconName.Review,
         matchExact: routes.pendingReview.exact,
         matchPath: routes.pendingReview.path,
         navigateToPath:
@@ -49,15 +50,15 @@ const navItems: INavItem[] = [
     },
     {
         component: FriendsSection,
-        iconName: "account-multiple",
+        iconName: IconName.Friends,
         matchExact: routes.friends.exact,
         matchPath: routes.friends.path,
         navigateToPath: routes.friends.path,
         titleMsgId: "globalNavigation.friends",
     },
     {
-        component: ActivitiesSection,
-        iconName: "calendar",
+        component: ActivitiesSectionContainer,
+        iconName: IconName.Activity,
         matchExact: routes.activities.exact,
         matchPath: routes.activities.path,
         navigateToPath: routes.activities.path.replace(

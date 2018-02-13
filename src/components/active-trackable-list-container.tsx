@@ -426,7 +426,7 @@ const withData =
     );
 
 const collapsedTaskCount = 2;
-const gymExerciseDayCount = 4;
+const gymExerciseVisibleDayCount = 4;
 
 class ActiveTrackableListContainer extends
     React.Component<IActiveTrackableListContainerProps, IActiveTrackableListContainerState> {
@@ -462,7 +462,6 @@ class ActiveTrackableListContainer extends
             this.resolveOnGetAggregateCommandsCacheKey);
         this.onGetGymExerciseCommands = memoize(this.onGetGymExerciseCommands,
             this.resolveOnGetGymExerciseCommandsCacheKey);
-        this.onEndReached = throttle(this.onEndReached, 1024);
     }
 
     public render() {
@@ -474,7 +473,7 @@ class ActiveTrackableListContainer extends
             itemsMeta,
             toastMsg,
         } = this.state;
-        const { onReorderItem, data } = this.props;
+        const { onReorderItem, onLoadMore, data } = this.props;
         const { getActiveTrackables, networkStatus } = data;
         return (
             <ActiveTrackableList
@@ -496,7 +495,7 @@ class ActiveTrackableListContainer extends
                 onGetNumericalGoalCommands={this.onGetNumericalGoalCommands}
                 onGetTaskGoalCommands={this.onGetTaskGoalCommands}
                 onGetGymExerciseItems={this.onGetGymExerciseItems}
-                onEndReached={this.onEndReached}
+                onEndReached={onLoadMore}
                 onToggleItemSelect={this.onToggleItemSelect}
                 onToggleItemExpand={this.onToggleItemExpand}
                 onIsTaskGoalExpandable={this.onIsTaskGoalExpandable}
@@ -700,28 +699,26 @@ class ActiveTrackableListContainer extends
     private onGetGymExerciseItems = (
         id: string, entries: IGymExerciseEntry[], isExpanded?: boolean,
     ) => {
-        const items = new Array<IGymExerciseItem>(gymExerciseDayCount);
-        const dateToItemMap: { [timestamp: number]: number } = {};
+        const items: IGymExerciseItem[] = [];
         const date = new Date();
-        let timestamp = date.setHours(0, 0, 0, 0);
-
-        for (let i = gymExerciseDayCount - 1; i >= 0 ; --i) {
-            items[i] = {
-                date: timestamp,
-                entries: [],
-            };
-            dateToItemMap[timestamp] = i;
-            timestamp = date.setDate(date.getDate() - 1);
-        }
+        let item: IGymExerciseItem;
+        let dayTimestamp = 0;
 
         for (const entry of entries) {
             date.setTime(entry.date);
-            timestamp = date.setHours(0, 0, 0, 0);
-            const itemIndex = dateToItemMap[timestamp];
+            const entryTimestamp = date.setUTCHours(0, 0, 0, 0);
 
-            if (itemIndex != null) {
-                items[itemIndex].entries.push(entry);
+            if (entryTimestamp !== dayTimestamp) {
+                if (items.length >= gymExerciseVisibleDayCount) {
+                    break;
+                }
+
+                dayTimestamp = entryTimestamp;
+                item = { date: dayTimestamp, entries: [] };
+                items.push(item);
             }
+
+            item!.entries.push(entry);
         }
 
         if (isExpanded) {
@@ -1072,8 +1069,6 @@ class ActiveTrackableListContainer extends
             }
         });
     }
-
-    private onEndReached = () => this.props.onLoadMore();
 
     private onStartProveItem = async (id: string) => {
         let image;

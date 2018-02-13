@@ -1,3 +1,4 @@
+import { INavBarItem } from "components/nav-bar";
 import PendingReviewSection from "components/pending-review-section";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import Audience from "models/audience";
@@ -6,7 +7,6 @@ import { compose } from "react-apollo";
 import { FormattedMessage } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import routes from "utils/routes";
-import { INavBarItem } from "./nav-bar";
 
 interface IRouteParams {
     audience: Audience;
@@ -68,7 +68,6 @@ class PendingReviewSectionContainer extends
 
     private updateHeader() {
         this.props.header.replace({
-            hideBackCommand: true,
             title: <FormattedMessage id="globalNavigation.pendingReview" />,
         });
     }

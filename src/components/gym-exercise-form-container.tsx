@@ -24,6 +24,7 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { withApollo } from "react-apollo/withApollo";
 import { RouteComponentProps, withRouter } from "react-router";
+import IconName from "utils/icon-name";
 
 type IGymExercise = ITrackable;
 
@@ -134,7 +135,7 @@ class GymExerciseFormContainer extends TrackableFormContainer<
 
     protected getInitialStateForAdd() {
         return {
-            iconName: "access-point",
+            iconName: IconName.GymExercise as string,
         } as IGymExerciseFormContainerState;
     }
 

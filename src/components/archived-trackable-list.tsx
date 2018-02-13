@@ -39,14 +39,11 @@ interface IArchivedTrackableListProps {
 
 class ArchivedTrackableList extends
     React.Component<IArchivedTrackableListProps> {
-    private list?: FlatList<IArchivedTrackableListItem>;
-
     public render() {
         const { items, queryStatus, onEndReached } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
             <FlatList
-                ref={this.onListRef as any}
                 windowSize={4}
                 initialNumToRender={4}
                 contentContainerStyle={styles.listContent}
@@ -60,12 +57,6 @@ class ArchivedTrackableList extends
         );
     }
 
-    public componentDidUpdate(prevProps: IArchivedTrackableListProps) {
-        if (this.props.trackableStatus !== prevProps.trackableStatus) {
-            this.list!.scrollToOffset({ offset: 0, animated: false });
-        }
-    }
-
     private onRenderItem = (
         itemInfo: ListRenderItemInfo<IArchivedTrackableListItem>,
     ) => {
@@ -75,9 +66,6 @@ class ArchivedTrackableList extends
     private getItemKey(item: IArchivedTrackableListItem) {
         return item.node.id;
     }
-
-    private onListRef = (ref?: FlatList<IArchivedTrackableListItem>) =>
-        this.list = ref
 }
 
 // tslint:disable-next-line:max-classes-per-file

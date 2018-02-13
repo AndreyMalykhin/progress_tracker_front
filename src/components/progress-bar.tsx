@@ -1,5 +1,6 @@
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
+import { FormattedNumber } from "react-intl";
 import {
     Animated,
     Easing,
@@ -40,8 +41,15 @@ class ProgressBar extends
         }
 
         const normalizedValue = value / maxValue;
-        const formattedValue = mode === ProgressDisplayMode.Percentage ?
-            `${(normalizedValue * 100).toFixed(2)} %` : value;
+        const formattedValue = mode === ProgressDisplayMode.Percentage ? (
+            <FormattedNumber
+                value={normalizedValue}
+                minimumFractionDigits={2}
+                maximumFractionDigits={2}
+                useGrouping={false}
+                style="percent"
+            />
+        ) : value;
         return (
             <View style={[styles.container, style]}>
                 <ProgressBarImpl

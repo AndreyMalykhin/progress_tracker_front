@@ -8,6 +8,7 @@ import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import Difficulty from "utils/difficulty";
+import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IAddGymExerciseResponse {
@@ -107,6 +108,10 @@ function getOptimisticResponse(gymExercise: IAddGymExerciseFragment) {
                 status: TrackableStatus.Active,
                 statusChangeDate: null,
                 title: gymExercise.title,
+                user: {
+                    __typename: Type.User,
+                    id: myId,
+                },
             },
         },
     } as IAddGymExerciseResponse;

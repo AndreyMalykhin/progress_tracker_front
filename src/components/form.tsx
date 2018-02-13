@@ -17,6 +17,7 @@ import {
     ViewStyle,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import IconName from "utils/icon-name";
 
 interface IFormBodyProps {
     style?: StyleProp<ViewStyle>;
@@ -148,7 +149,8 @@ class FormSection extends React.Component<IFormSectionProps> {
 // tslint:disable-next-line:max-classes-per-file
 class FormSectionTitle extends React.PureComponent<IFormSectionTitleProps> {
     public render() {
-        const iconName = this.props.isExpanded ? "chevron-up" : "chevron-down";
+        const iconName =
+            this.props.isExpanded ? IconName.Expanded : IconName.Collapsed;
         return (
             <TouchableWithFeedback onPress={this.onPress}>
                 <FormGroup

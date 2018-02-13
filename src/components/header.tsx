@@ -6,6 +6,7 @@ import { FormattedMessage } from "react-intl";
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
+import IconName from "utils/icon-name";
 
 interface IHeaderCmd {
     iconName?: string;
@@ -100,7 +101,7 @@ class Header extends React.Component<IHeaderProps> {
             <HeaderCmd
                 style={styles.cmdBack}
                 key={index}
-                iconName={"keyboard-backspace"}
+                iconName={IconName.Back}
                 msgId={"commands.back"}
                 onRun={onRun || this.onBackPress}
             />

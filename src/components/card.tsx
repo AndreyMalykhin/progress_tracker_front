@@ -1,3 +1,4 @@
+import Avatar from "components/avatar";
 import CommandBar, { ICommandBarProps } from "components/command-bar";
 import Image from "components/image";
 import * as React from "react";
@@ -117,11 +118,7 @@ class CardAvatar extends React.PureComponent<ICardAvatarProps> {
         const { uri, onPress } = this.props;
         return (
             <TouchableWithoutFeedback onPress={onPress}>
-                <Image
-                    resizeMode="cover"
-                    style={styles.avatar}
-                    source={{ uri }}
-                />
+                <Avatar size="small" uri={uri} style={styles.avatar} />
             </TouchableWithoutFeedback>
         );
     }
@@ -156,10 +153,7 @@ class CardCommandBar extends React.PureComponent<ICardCommandBarProps> {
 
 const styles = StyleSheet.create({
     avatar: {
-        borderRadius: 16,
-        height: 32,
         marginRight: 8,
-        width: 32,
     },
     body: {
         paddingLeft: 8,

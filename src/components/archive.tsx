@@ -1,10 +1,10 @@
-import ArchiveNav from "components/archive-nav";
+import ArchivedTrackableListContainer from "components/archived-trackable-list-container";
 import { INavBarItem } from "components/nav-bar";
+import SecondaryNav from "components/secondary-nav";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
-import ArchivedTrackableListContainer from "./archived-trackable-list-container";
 
 interface IArchiveProps {
     navItems: INavBarItem[];
@@ -17,9 +17,10 @@ class Archive extends React.Component<IArchiveProps> {
         const { userId, navItems, trackableStatus } = this.props;
         return (
             <View style={styles.container}>
-                <ArchiveNav items={navItems} />
+                <SecondaryNav items={navItems} />
                 <View style={styles.content}>
                     <ArchivedTrackableListContainer
+                        key={trackableStatus}
                         userId={userId}
                         trackableStatus={trackableStatus}
                     />

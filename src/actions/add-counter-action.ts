@@ -8,6 +8,7 @@ import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import Difficulty from "utils/difficulty";
+import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IAddCounterResponse {
@@ -94,6 +95,10 @@ function getOptimisticResponse(counter: IAddCounterFragment) {
                 status: TrackableStatus.Active,
                 statusChangeDate: null,
                 title: counter.title,
+                user: {
+                    __typename: Type.User,
+                    id: myId,
+                },
             },
         },
     } as IAddCounterResponse;

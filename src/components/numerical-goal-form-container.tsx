@@ -30,6 +30,7 @@ import { withApollo } from "react-apollo/withApollo";
 import { FormattedMessage } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import Difficulty from "utils/difficulty";
+import IconName from "utils/icon-name";
 import uuid from "utils/uuid";
 
 interface INumericalGoal extends IGoal {
@@ -188,7 +189,7 @@ class NumericalGoalFormContainer extends GoalFormContainer<
 
     protected getInitialStateForAdd() {
         return {
-            iconName: "access-point",
+            iconName: IconName.NumericalGoal as string,
         } as INumericalGoalFormContainerState;
     }
 

@@ -5,10 +5,14 @@ import {
     removeChildFragment,
 } from "actions/aggregate-helpers";
 import { spliceArchivedTrackables } from "actions/archived-trackables-helpers";
+import {
+    splicePendingReviewTrackables,
+} from "actions/pending-review-trackables-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
+import Audience from "models/audience";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
@@ -30,6 +34,7 @@ interface IProveTrackableResponse {
         trackable: {
             __typename: Type;
             id: string;
+            isReviewed: null;
             proofPhotoUrlMedium: string;
             status: TrackableStatus;
             statusChangeDate: number;
@@ -67,6 +72,7 @@ mutation ProveTrackable($id: ID!, $assetId: ID!) {
         trackable {
             id
             ... on IGoal {
+                isReviewed
                 proofPhotoUrlMedium
                 approveCount
                 rejectCount
@@ -117,8 +123,16 @@ async function proveTrackable(
     const result = await mutate({
         optimisticResponse: getOptimisticResponse(id, photo, apollo),
         update: (proxy, response) => {
-            updateActiveTrackables(response.data, proxy);
-            updateApprovedTrackables(response.data, proxy);
+            const responseData = response.data as IProveTrackableResponse;
+            updateActiveTrackables(responseData, proxy);
+            const trackableStatus =
+                responseData.proveTrackable.trackable.status;
+
+            if (trackableStatus === TrackableStatus.Approved) {
+                updateApprovedTrackables(responseData, proxy);
+            } else if (trackableStatus === TrackableStatus.PendingReview) {
+                updatePendingReviewTrackables(responseData, proxy);
+            }
         },
         variables: { id, assetId },
     });
@@ -147,6 +161,15 @@ function updateApprovedTrackables(
         idsToRemove, trackablesToAdd, TrackableStatus.Approved, apollo);
 }
 
+function updatePendingReviewTrackables(
+    response: IProveTrackableResponse, apollo: DataProxy,
+) {
+    const trackablesToAdd = [response.proveTrackable.trackable];
+    const idsToRemove: string[] = [];
+    splicePendingReviewTrackables(
+        idsToRemove, trackablesToAdd, Audience.Me, apollo);
+}
+
 function getOptimisticResponse(
     trackableId: string,
     photo: Image,
@@ -170,6 +193,7 @@ function getOptimisticResponse(
                 __typename,
                 approveCount: status === TrackableStatus.Approved ? null : 0,
                 id: trackableId,
+                isReviewed: null,
                 parent: null,
                 proofPhotoUrlMedium: photo.path,
                 rating: null,

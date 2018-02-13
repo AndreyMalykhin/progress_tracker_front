@@ -7,7 +7,7 @@ import {
     Path,
     TransitionPromptHook,
 } from "history";
-import makeLog from "./make-log";
+import makeLog from "utils/make-log";
 
 type IChange = () => void;
 

@@ -1,3 +1,4 @@
+import { throttle } from "lodash";
 import * as React from "react";
 import { QueryProps } from "react-apollo/types";
 import { IConnection } from "utils/connection";
@@ -13,6 +14,11 @@ function withLoadMore<TProps extends IWithLoadMoreProps, TResponse>(
 ) {
     return (Component: React.ComponentClass<TProps>) => {
         return class WithLoadMore extends React.Component<TProps> {
+            public constructor(props: TProps, context: any) {
+                super(props, context);
+                this.onLoadMore = throttle(this.onLoadMore, 1024);
+            }
+
             public render() {
                 return (
                     <Component onLoadMore={this.onLoadMore} {...this.props} />

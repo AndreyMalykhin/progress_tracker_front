@@ -1,6 +1,6 @@
 import { INavBarItem } from "components/nav-bar";
-import PendingReviewNav from "components/pending-review-nav";
 import PendingReviewTrackableListContainer from "components/pending-review-trackable-list-container";
+import SecondaryNav from "components/secondary-nav";
 import Audience from "models/audience";
 import * as React from "react";
 import { ReactNode } from "react";
@@ -16,9 +16,12 @@ class PendingReviewSection extends React.Component<IPendingReviewSectionProps> {
         const { audience, navItems } = this.props;
         return (
             <View style={styles.container}>
-                <PendingReviewNav items={navItems} />
+                <SecondaryNav items={navItems} />
                 <View style={styles.content}>
-                    <PendingReviewTrackableListContainer audience={audience} />
+                    <PendingReviewTrackableListContainer
+                        key={audience}
+                        audience={audience}
+                    />
                 </View>
             </View>
         );

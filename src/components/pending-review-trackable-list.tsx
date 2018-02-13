@@ -22,8 +22,21 @@ interface ISharedProps {
     onRejectItem: (id: string) => void;
 }
 
-interface IItemProps extends
-    IPendingReviewTrackableListItemNode, ISharedProps {}
+interface IItemProps extends ISharedProps {
+    id: string;
+    title: string;
+    iconName: string;
+    status: TrackableStatus;
+    approveCount: number;
+    rejectCount: number;
+    creationDate: number;
+    statusChangeDate: number;
+    proofPhotoUrlMedium: string;
+    isReviewable?: boolean;
+    userId?: string;
+    userAvatarUrl?: string;
+    userName?: string;
+}
 
 interface IPendingReviewTrackableListItemNode {
     id: string;
@@ -57,14 +70,11 @@ const log = makeLog("pending-review-trackable-list");
 
 class PendingReviewTrackableList extends
     React.Component<IPendingReviewTrackableListProps> {
-    private list?: FlatList<IPendingReviewTrackableListItem>;
-
     public render() {
         const { items, queryStatus, onScroll, onEndReached } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
             <FlatList
-                ref={this.onListRef as any}
                 windowSize={4}
                 initialNumToRender={2}
                 contentContainerStyle={styles.listContent}
@@ -79,14 +89,6 @@ class PendingReviewTrackableList extends
         );
     }
 
-    public componentDidUpdate(
-        prevProps: IPendingReviewTrackableListProps,
-    ) {
-        if (this.props.audience !== prevProps.audience) {
-            this.list!.scrollToOffset({ offset: 0, animated: false });
-        }
-    }
-
     private onRenderItem = (
         itemInfo: ListRenderItemInfo<IPendingReviewTrackableListItem>,
     ) => {
@@ -97,23 +99,26 @@ class PendingReviewTrackableList extends
             onPressUser,
             onRejectItem,
         } = this.props;
+        const { user, isReviewed, ...restProps } = itemInfo.item.node;
+        const isMy = audience === Audience.Me;
         return (
             <Item
-                {...itemInfo.item.node}
+                userId={isMy ? undefined : user.id}
+                userName={isMy ? undefined : user.name}
+                userAvatarUrl={isMy ? undefined : user.avatarUrlSmall}
+                isReviewable={!isMy && !isReviewed}
                 audience={audience}
                 onApproveItem={onApproveItem}
                 onEndReached={onEndReached}
                 onPressUser={onPressUser}
                 onRejectItem={onRejectItem}
+                {...restProps}
             />);
     }
 
     private getItemKey(item: IPendingReviewTrackableListItem) {
         return item.node.id;
     }
-
-    private onListRef = (ref?: FlatList<IPendingReviewTrackableListItem>) =>
-        this.list = ref
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -129,9 +134,11 @@ class Item extends React.PureComponent<IItemProps> {
             creationDate,
             statusChangeDate,
             proofPhotoUrlMedium,
-            user,
+            userId,
+            userName,
+            userAvatarUrl,
             audience,
-            isReviewed,
+            isReviewable,
             onPressUser,
             onApproveItem,
             onRejectItem,
@@ -139,10 +146,10 @@ class Item extends React.PureComponent<IItemProps> {
         const isMy = audience === Audience.Me;
         return (
             <Trackable
-                userId={isMy ? undefined : user.id}
-                userName={isMy ? undefined : user.name}
-                userAvatarUrl={isMy ? undefined : user.avatarUrlSmall}
-                isReviewable={!isMy && !isReviewed}
+                userId={userId}
+                userName={userName}
+                userAvatarUrl={userAvatarUrl}
+                isReviewable={isReviewable}
                 id={id}
                 title={title}
                 iconName={iconName}

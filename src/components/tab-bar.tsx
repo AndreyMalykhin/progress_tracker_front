@@ -2,22 +2,27 @@ import TouchableWithFeedback, { ITouchableWithFeedbackProps } from "components/t
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import {
+    StyleProp,
     StyleSheet,
     Text,
     TextProperties,
+    TextStyle,
     View,
     ViewProperties,
+    ViewStyle,
 } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
 
 interface ITabBarItemTitleProps extends TextProperties {
     active?: boolean;
+    activeStyle?: StyleProp<TextStyle>;
     msgId: string;
     msgValues?: { [key: string]: string };
 }
 
 interface ITabBarItemProps extends ITouchableWithFeedbackProps {
     active?: boolean;
+    activeStyle?: StyleProp<ViewStyle>;
     id: string;
     onSelect: (id: string) => void;
 }
@@ -43,10 +48,18 @@ class TabBar extends React.Component<ITabBarProps> {
 // tslint:disable-next-line:max-classes-per-file
 class TabBarItem extends React.Component<ITabBarItemProps> {
     public render() {
-        const { id, active, style, onSelect, children, ...restProps} = this.props;
+        const {
+            id,
+            active,
+            activeStyle,
+            style,
+            onSelect,
+            children,
+            ...restProps,
+        } = this.props;
         return (
             <TouchableWithFeedback
-                style={[styles.item, style]}
+                style={[styles.item, style, active && activeStyle]}
                 disabled={this.props.active}
                 onPress={this.onPress}
                 {...restProps}
@@ -62,10 +75,15 @@ class TabBarItem extends React.Component<ITabBarItemProps> {
 // tslint:disable-next-line:max-classes-per-file
 class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
     public render() {
-        const { style, active, msgId, msgValues } = this.props;
-        const baseStyle = active ? itemTitleActiveStyle : styles.itemTitle;
+        const { style, active, activeStyle, msgId, msgValues } = this.props;
+        const newStyle = [
+            styles.itemTitle,
+            style,
+            active && styles.itemTitleActive,
+            active && activeStyle,
+        ];
         return (
-            <Text style={[baseStyle, style]}>
+            <Text style={newStyle as any}>
                 <FormattedMessage id={msgId} values={msgValues} />
             </Text>
         );
@@ -98,7 +116,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flex: 1,
         justifyContent: "center",
-        paddingVertical: 8,
+        paddingBottom: 8,
+        paddingTop: 8,
     },
     itemContent: {
         alignItems: "center",
@@ -115,7 +134,6 @@ const styles = StyleSheet.create({
     },
 });
 
-const itemTitleActiveStyle = [styles.itemTitle, styles.itemTitleActive];
 const itemIconActiveStyle = [styles.itemIcon, styles.itemIconActive];
 
 export {

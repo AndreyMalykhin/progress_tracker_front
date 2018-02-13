@@ -100,18 +100,16 @@ const withData = graphql<
 class ArchivedTrackableListContainer extends
     React.Component<IArchivedTrackableListContainerProps> {
     public render() {
-        const { data, trackableStatus } = this.props;
+        const { data, trackableStatus, onLoadMore } = this.props;
         return (
             <ArchivedTrackableList
                 trackableStatus={trackableStatus}
                 items={data.getArchivedTrackables.edges}
                 queryStatus={data.networkStatus}
-                onEndReached={this.onEndReached}
+                onEndReached={onLoadMore}
             />
         );
     }
-
-    private onEndReached = () => this.props.onLoadMore();
 }
 
 export default compose(

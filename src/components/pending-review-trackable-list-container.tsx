@@ -44,7 +44,7 @@ interface IOwnProps extends RouteComponentProps<{}>, IWithApollo {
 }
 
 interface IGetDataResponse {
-    getPendingReviewTrackables:
+    getPendingReviewTrackablesByAudience:
         IConnection<IPendingReviewTrackableListItemNode, number>;
 }
 
@@ -88,10 +88,12 @@ const withReject = graphql<
 );
 
 const getDataQuery = gql`
-query GetData($audience: Audience!, $cursor: Float) {
-    getPendingReviewTrackables(
+query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
+    getPendingReviewTrackablesByAudience(
         audience: $audience, after: $cursor
-    ) @connection(key: "getPendingReviewTrackables", filter: ["audience"]) {
+    ) @connection(
+        key: "getPendingReviewTrackablesByAudience", filter: ["audience"]
+    ) {
         edges {
             cursor
             node {
@@ -99,7 +101,7 @@ query GetData($audience: Audience!, $cursor: Float) {
                 status
                 statusChangeDate
                 creationDate
-                user {
+                user @skip(if: $skipUser) {
                     id
                     name
                     avatarUrlSmall
@@ -130,13 +132,21 @@ const withData = graphql<
 >(
     getDataQuery,
     {
+        options: (ownProps) => {
+            const { audience } = ownProps;
+            return {
+                notifyOnNetworkStatusChange: true,
+                variables: { audience, skipUser: audience === Audience.Me },
+            };
+        },
         props: ({ data }) => {
             const { networkStatus: queryStatus } = data!;
 
             if (queryStatus === QueryStatus.InitialLoading
                 || queryStatus === QueryStatus.Error
             ) {
-                return { queryStatus };
+                return { queryStatus } as
+                    Partial<IPendingReviewTrackableListContainerProps>;
             }
 
             return { queryStatus, data } as
@@ -182,14 +192,14 @@ const rejectReasons: Array< IActionSheetOption<RejectReason> > = [
 class PendingReviewTrackableListContainer extends
     React.Component<IPendingReviewTrackableListContainerProps> {
     public render() {
-        const { audience, data } = this.props;
+        const { audience, data, onLoadMore } = this.props;
         return (
             <PendingReviewTrackableList
                 audience={audience}
-                items={data.getPendingReviewTrackables.edges}
+                items={data.getPendingReviewTrackablesByAudience.edges}
                 queryStatus={data.networkStatus}
                 onApproveItem={this.onStartApproveItem}
-                onEndReached={this.onEndReached}
+                onEndReached={onLoadMore}
                 onPressUser={this.onPressUser}
                 onRejectItem={this.onStartRejectItem}
             />
@@ -228,13 +238,11 @@ class PendingReviewTrackableListContainer extends
         this.props.history.push(
             routes.profileActiveTrackables.path.replace(":id", id));
     }
-
-    private onEndReached = () => this.props.onLoadMore();
 }
 
 export default compose(
     withLogin<IPendingReviewTrackableListContainerProps>(
-        "pendingReviews.friendsLoginMsg",
+        "pendingReviewList.friendsLoginMsg",
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
@@ -242,11 +250,13 @@ export default compose(
     withLoader(Loader, 512),
     withError(Error),
     withEmptyList<IPendingReviewTrackableListContainerProps>(
-        EmptyList, (props) => props.data.getPendingReviewTrackables.edges),
+        EmptyList,
+        (props) => props.data.getPendingReviewTrackablesByAudience.edges,
+    ),
     withApollo,
     withApprove,
     withReject,
     withLoadMore<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
-        "getPendingReviewTrackables", (props) => props.data),
+        "getPendingReviewTrackablesByAudience", (props) => props.data),
     injectIntl,
 )(PendingReviewTrackableListContainer);

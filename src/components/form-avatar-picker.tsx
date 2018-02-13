@@ -1,3 +1,4 @@
+import Avatar from "components/avatar";
 import Button, { ButtonTitle } from "components/button";
 import { FormGroup } from "components/form";
 import Image from "components/image";
@@ -10,12 +11,10 @@ import ImagePicker, {
 interface IFormAvatarPickerProps {
     style?: StyleProp<ViewStyle>;
     errorMsgId?: string|null;
-    uri?: string;
+    uri: string;
     disabled?: boolean;
     onChangeImg: (img?: ImageInfo) => void;
 }
-
-const imgSize = 256;
 
 class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
     public render() {
@@ -25,11 +24,7 @@ class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
                 style={[styles.container, style]}
                 errorMsgId={errorMsgId}
             >
-                <Image
-                    resizeMode="cover"
-                    style={styles.image}
-                    source={{ uri }}
-                />
+                <Avatar size="large" uri={uri!} />
                 <View style={styles.buttonsContainer}>
                     <Button onPress={this.onSelect} disabled={disabled}>
                         <ButtonTitle
@@ -84,12 +79,6 @@ const styles = StyleSheet.create({
     },
     container: {
         alignItems: "center",
-    },
-    image: {
-        borderRadius: imgSize / 2,
-        borderWidth: 1,
-        height: imgSize,
-        width: imgSize,
     },
 });
 

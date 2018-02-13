@@ -1,4 +1,32 @@
 export default {
+    "activities.counterProgressChanged":
+        "Increased counter {trackableTitle} by {delta}",
+    "activities.externalGoalReviewed":
+        `{isApprove, select,
+            true {Approved}
+            false {Rejected}
+        } {userName}'s goal {trackableTitle}{hasRatingDelta, select,
+            true {, gained {ratingDelta} rating}
+            false {}
+        }`,
+    "activities.goalAchieved": "Goal {trackableTitle} achieved",
+    "activities.goalApproved":
+        `Goal {trackableTitle} approved{hasRatingDelta, select,
+            true {, gained {ratingDelta} rating}
+            false {}
+        }`,
+    "activities.goalExpired": "Goal {trackableTitle} expired",
+    "activities.goalRejected": "Goal {trackableTitle} rejected",
+    "activities.gymExerciseEntryAdded":
+        "Added {setCount}x{repetitionCount}x{weight} to {trackableTitle}",
+    "activities.numericalGoalProgressChanged":
+        "Increased goal {trackableTitle} progress by {delta}",
+    "activities.taskGoalProgressChanged":
+        "Completed {taskTitle} of goal {trackableTitle}",
+    "activities.trackableAdded": "Created {trackableTitle}",
+    "activitiesNavigation.friends": "Friends",
+    "activitiesNavigation.my": "My",
+    "activityList.friendsLoginMsg": "Please login to see your friends data",
     "aggregate.total": "Total: {progress}",
     "approveTrackable.title": "How difficult do you think it was?",
     "archiveNavigation.approvedTrackables": "Approved",
@@ -46,6 +74,12 @@ export default {
     "globalNavigation.profile": "Profile",
     "goalForm.titleLabel": "I must",
     "goalForm.titlePlaceholder": "Do something big",
+    "gymExercise.entry": `{hasSetCount, select,
+        true {{setCount}x}
+        false {}
+    }{repetitionCount}x{weight}`,
+    "gymExercise.entryAveraged":
+        `{setCount}\nx\n{repetitionCount}\nx\n{weight}`,
     "gymExerciseEntryForm.repetitionCountPlaceholder": "Repetition count",
     "gymExerciseEntryForm.setCountPlaceholder": "Set count",
     "gymExerciseEntryForm.weightPlaceholder": "Weight",
@@ -53,13 +87,13 @@ export default {
     "gymExerciseForm.titlePlaceholder": "Deadlift",
     "intro.skip": "Skip",
     "newTrackable.title": "What would you like to add?",
-    "notifications.goalAchieved": "Goal achieved! Not it's time to prove it.",
+    "notifications.goalAchieved": "Goal achieved! Now it's time to prove it.",
     "notifications.goalApproved": "Goal approved!",
     "notifications.goalPendingReview": "Goal is pending review now.",
     "numericalEntryForm.entryPlaceholder": "1",
     "numericalGoalForm.maxProgressLabel": "Max progress",
     "numericalGoalForm.maxProgressPlaceholder": "0",
-    "pendingReviews.friendsLoginMsg": "Please login to see your friends data",
+    "pendingReviewList.friendsLoginMsg": "Please login to see your friends data",
     "profile.activeTrackables": "In Progress",
     "profile.archive": "Archive",
     "profileForm.loginMessage": "Please login to edit your profile",
@@ -76,10 +110,19 @@ export default {
     "reviewsNavigation.myTrackables": "My",
     "taskGoalForm.newTaskTitlePlaceholder": "Do something small",
     "taskGoalForm.tasksLabel": "Tasks",
-    "trackable.achievementPeriod": "Achieved in {period} day(s)",
-    "trackable.activePeriod": "Created {period} day(s) ago",
+    "trackable.achievementPeriod": `Achieved in {period, plural,
+        =1 {{period} day}
+        other {{period} days}
+    }`,
+    "trackable.activePeriod": `Created {period, plural,
+        =1 {{period} day}
+        other {{period} days}
+    }`,
     "trackable.approve": "Approve",
-    "trackable.expirationPeriod": "Expired after {period} day(s)",
+    "trackable.expirationPeriod": `Expired after {period, plural,
+        =1 {{period} day}
+        other {{period} days}
+    }`,
     "trackable.prove": "Prove",
     "trackable.reject": "Reject",
     "trackableForm.advancedSection": "Advanced",

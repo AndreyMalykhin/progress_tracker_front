@@ -30,6 +30,7 @@ import { QueryProps } from "react-apollo/types";
 import { InjectedIntlProps, injectIntl } from "react-intl";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
+import IconName from "utils/icon-name";
 import myId from "utils/my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
 import routes from "utils/routes";
@@ -181,7 +182,7 @@ class ProfileSectionContainer
         this.navItems = [
             {
                 component: ActiveTrackableListContainer,
-                iconName: "format-list-checks",
+                iconName: IconName.InProgress,
                 matchExact: routes.profileActiveTrackables.exact,
                 matchPath: routes.profileActiveTrackables.path,
                 navigateToPath: routes.profileActiveTrackables.path.replace(
@@ -190,7 +191,7 @@ class ProfileSectionContainer
             },
             {
                 component: ArchiveContainer,
-                iconName: "archive",
+                iconName: IconName.Archive,
                 matchExact: routes.profileArchive.exact,
                 matchPath: routes.profileArchive.path,
                 navigateToPath: routes.profileArchive.path
@@ -209,13 +210,13 @@ class ProfileSectionContainer
 
         if (isMe) {
             rightCommands.push({
-                iconName: "plus",
+                iconName: IconName.Add,
                 msgId: "commands.new",
                 onRun: this.onStartNewTrackable,
             });
         } else if (!user.isReported) {
             rightCommands.push({
-                iconName: "exclamation",
+                iconName: IconName.Report,
                 msgId: "commands.report",
                 onRun: this.onStartReportUser,
             });

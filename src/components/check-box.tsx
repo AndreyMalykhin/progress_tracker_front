@@ -2,6 +2,7 @@ import Button, { ButtonIcon } from "components/button";
 import * as React from "react";
 import { StyleProp, StyleSheet, Text, ViewStyle } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import IconName from "utils/icon-name";
 
 interface ICheckBoxProps {
     isChecked?: boolean;
@@ -21,8 +22,7 @@ class CheckBox extends React.PureComponent<ICheckBoxProps> {
             style,
             onPress,
         } = this.props;
-        const iconName = isChecked ? "check-circle" :
-            "checkbox-blank-circle-outline";
+        const iconName = isChecked ? IconName.Checked : IconName.Unchecked;
         const iconStyle = isChecked ? iconCheckedStyle : styles.icon;
         return (
             <Button

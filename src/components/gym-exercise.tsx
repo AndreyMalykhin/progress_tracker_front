@@ -2,7 +2,7 @@ import { ICommandBarItem } from "components/command-bar";
 import Trackable from "components/trackable";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
-import { FormattedDate } from "react-intl";
+import { FormattedDate, FormattedMessage } from "react-intl";
 import {
     LayoutRectangle,
     StyleProp,
@@ -82,8 +82,13 @@ class Table extends React.PureComponent<ITableProps> {
 
     private renderHeader() {
         const cells = this.props.items.map((item) => {
-            const cellContent = item.entries.length ?
-                <FormattedDate value={item.date} weekday="short" /> : "---";
+            const cellContent = item.entries.length ? (
+                <FormattedDate
+                    value={item.date}
+                    weekday="short"
+                    day="numeric"
+                />
+            ) : "---";
             const inHeader = true;
             return this.renderCell(cellContent, item.date, inHeader);
         });
@@ -109,19 +114,24 @@ class Table extends React.PureComponent<ITableProps> {
                     for (let i = 0; i < setCount; ++i) {
                         const inHeader = false;
                         const key = `${id}_${i}`;
-                        cells.push(this.renderCell(
-                            `${repetitionCount}x${weight}`, key, inHeader));
+                        const cell = this.renderCell(
+                            this.renderEntry(repetitionCount, weight),
+                            key,
+                            inHeader,
+                        );
+                        cells.push(cell);
                     }
                 }
             } else {
                 const { id, setCount, repetitionCount, weight } =
                     item.entries[0];
                 const inHeader = false;
-                cells.push(this.renderCell(
-                    `${setCount}x${repetitionCount.toFixed(1)}x${weight.toFixed(1)}`,
+                const cell = this.renderCell(
+                    this.renderEntry(repetitionCount, weight, setCount),
                     id,
                     inHeader,
-                ));
+                );
+                cells.push(cell);
             }
         }
 
@@ -138,6 +148,20 @@ class Table extends React.PureComponent<ITableProps> {
         const style = inHeader ? tableHeaderCellStyle : styles.tableCell;
         return <Text key={key} style={style}>{content}</Text>;
     }
+
+    private renderEntry(
+        repetitionCount: number, weight: number, setCount?: number,
+    ) {
+        const values = {
+            hasSetCount: setCount != null,
+            repetitionCount: repetitionCount.toFixed(1),
+            setCount,
+            weight: weight.toFixed(1),
+        };
+        const msgId = this.props.isExpanded ? "gymExercise.entry" :
+            "gymExercise.entryAveraged";
+        return <FormattedMessage id={msgId} values={values} />;
+    }
 }
 
 const styles = StyleSheet.create({
@@ -149,14 +173,14 @@ const styles = StyleSheet.create({
     },
     tableCell: {
         flex: 1,
-        fontSize: 8,
+        fontSize: 12,
         lineHeight: 16,
-        paddingLeft: 8,
-        paddingRight: 8,
+        paddingLeft: 4,
+        paddingRight: 4,
         textAlign: "center",
     },
     tableCellHeader: {
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: "bold",
         lineHeight: 32,
     },

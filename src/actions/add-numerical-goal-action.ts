@@ -8,6 +8,7 @@ import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import Difficulty from "utils/difficulty";
+import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IAddNumericalGoalResponse {
@@ -104,6 +105,7 @@ function getOptimisticResponse(goal: IAddNumericalGoalFragment) {
                 iconName: goal.iconName,
                 id: uuid(),
                 isPublic: goal.isPublic,
+                isReviewed: null,
                 maxProgress: goal.maxProgress,
                 order: currentDate,
                 parent: null,
@@ -113,6 +115,10 @@ function getOptimisticResponse(goal: IAddNumericalGoalFragment) {
                 status: TrackableStatus.Active,
                 statusChangeDate: null,
                 title: goal.title,
+                user: {
+                    __typename: Type.User,
+                    id: myId,
+                },
             },
         },
     } as IAddNumericalGoalResponse;
