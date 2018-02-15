@@ -1,9 +1,11 @@
+import { addActivity, addGoalAchievedActivity } from "actions/activity-helpers";
 import {
     IUpdateProgressFragment,
     updateProgress,
     updateProgressFragment,
 } from "actions/aggregate-helpers";
 import { addProgress } from "actions/goal-helpers";
+import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
@@ -11,13 +13,17 @@ import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
+import myId from "utils/my-id";
+import uuid from "utils/uuid";
 
 interface ISetTaskDoneResponse {
     setTaskDone: {
         task: {
+            __typename: Type;
             id: string;
             isDone: boolean;
             goal: {
+                __typename: Type;
                 id: string;
                 progress: number;
                 status: TrackableStatus;
@@ -32,6 +38,7 @@ interface ISetTaskDoneResponse {
 }
 
 interface IGoalFragment {
+    __typename: Type;
     id: string;
     tasks: Array<{
         id: string;
@@ -40,9 +47,11 @@ interface IGoalFragment {
 }
 
 interface ITaskFragment {
+    __typename: Type;
     id: string;
     isDone: boolean;
     goal: {
+        __typename: Type;
         id: string;
         progress: number;
         maxProgress: number;
@@ -103,6 +112,21 @@ fragment SetTaskDoneGoalFragment on TaskGoal {
     }
 }`;
 
+const progressChangedActivityFragment = gql`
+fragment SetTaskDoneActivityFragment on TaskGoalProgressChangedActivity {
+    id
+    date
+    user {
+        id
+    }
+    trackable {
+        id
+    }
+    task {
+        id
+    }
+}`;
+
 async function setTaskDone(
     id: string,
     isDone: boolean,
@@ -112,23 +136,69 @@ async function setTaskDone(
     const result = await mutate({
         optimisticResponse: getOptimisticResponse(id, isDone, apollo),
         update: (proxy, response) => {
-            const fragmentId = dataIdFromObject(
-                (response.data as ISetTaskDoneResponse).setTaskDone.task.goal)!;
-            const goal = apollo.readFragment<IGoalFragment>(
-                {id: fragmentId, fragment: goalFragment })!;
-            goal.tasks.sort((lhs, rhs) => {
-                if (lhs.isDone === rhs.isDone) {
-                    return 0;
-                }
-
-                return lhs.isDone ? 1 : -1;
-            });
-            proxy.writeFragment(
-                { data: goal, fragment: goalFragment, id: fragmentId });
+            const responseData = response.data as ISetTaskDoneResponse;
+            updateTasks(responseData, proxy);
+            updateActivities(responseData, proxy);
         },
         variables: { id, isDone },
     });
     return result.data;
+}
+
+function updateActivities(
+    response: ISetTaskDoneResponse, apollo: DataProxy,
+) {
+    const { task } = response.setTaskDone;
+
+    if (!task.isDone) {
+        return;
+    }
+
+    const trackable = task.goal;
+    const progressChangedActivity = {
+        __typename: Type.TaskGoalProgressChangedActivity,
+        date: Date.now(),
+        id: uuid(),
+        task,
+        trackable,
+        user: {
+            __typename: Type.User,
+            id: myId,
+        },
+    };
+    addActivity(
+        progressChangedActivity, progressChangedActivityFragment, apollo);
+
+    if (trackable.status === TrackableStatus.Active) {
+        return;
+    }
+
+    const goalAchievedActivity = {
+        __typename: Type.GoalAchievedActivity,
+        date: Date.now(),
+        id: uuid(),
+        trackable,
+        user: {
+            __typename: Type.User,
+            id: myId,
+        },
+    };
+    addGoalAchievedActivity(goalAchievedActivity, apollo);
+}
+
+function updateTasks(response: ISetTaskDoneResponse, apollo: DataProxy) {
+    const fragmentId = dataIdFromObject(response.setTaskDone.task.goal)!;
+    const goal = apollo.readFragment<IGoalFragment>(
+        {id: fragmentId, fragment: goalFragment })!;
+    goal.tasks.sort((lhs, rhs) => {
+        if (lhs.isDone === rhs.isDone) {
+            return 0;
+        }
+
+        return lhs.isDone ? 1 : -1;
+    });
+    apollo.writeFragment(
+        { data: goal, fragment: goalFragment, id: fragmentId });
 }
 
 function getOptimisticResponse(

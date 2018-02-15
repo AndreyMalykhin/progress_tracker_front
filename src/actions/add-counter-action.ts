@@ -1,12 +1,18 @@
 import { spliceActiveTrackables } from "actions/active-trackables-helpers";
+import {
+    addTrackableAddedActivity,
+    spliceActivities,
+} from "actions/activity-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
 import gql from "graphql-tag";
+import Audience from "models/audience";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
+import dataIdFromObject from "utils/data-id-from-object";
 import Difficulty from "utils/difficulty";
 import myId from "utils/my-id";
 import uuid from "utils/uuid";
@@ -25,6 +31,10 @@ interface IAddCounterResponse {
             statusChangeDate: null;
             creationDate: number;
             title: string;
+            user: {
+                __typename: Type;
+                id: string;
+            };
         };
     };
 }
@@ -51,6 +61,9 @@ mutation AddCounter($counter: AddCounterInput!) {
             statusChangeDate
             creationDate
             title
+            user {
+                id
+            }
         }
     }
 }`;
@@ -63,7 +76,9 @@ async function addCounter(
     await mutate({
         optimisticResponse: getOptimisticResponse(counter),
         update: (proxy, response) => {
-            updateActiveTrackables(response.data, proxy);
+            const responseData = response.data as IAddCounterResponse;
+            updateActiveTrackables(responseData, proxy);
+            updateActivities(responseData, proxy);
         },
         variables: { counter },
     });
@@ -75,6 +90,18 @@ function updateActiveTrackables(
     const idsToRemove: string[] = [];
     const trackablesToAdd = [response.addCounter.trackable];
     spliceActiveTrackables(idsToRemove, trackablesToAdd, apollo);
+}
+
+function updateActivities(response: IAddCounterResponse, apollo: DataProxy) {
+    const { trackable } = response.addCounter;
+    const activity = {
+        __typename: Type.TrackableAddedActivity,
+        date: Date.now(),
+        id: uuid(),
+        trackable,
+        user: trackable.user,
+    };
+    addTrackableAddedActivity(activity, apollo);
 }
 
 function getOptimisticResponse(counter: IAddCounterFragment) {

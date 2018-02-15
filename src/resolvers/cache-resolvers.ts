@@ -5,6 +5,10 @@ import dataIdFromObject from "utils/data-id-from-object";
 
 export default {
     Query: {
+        getActivityById(rootValue: any, args: any) {
+            return toIdValue(dataIdFromObject(
+                { id: args.id, __typename: Type.TrackableAddedActivity })!);
+        },
         getUserById(rootValue: any, args: any) {
             return toIdValue(dataIdFromObject(
                 { id: args.id, __typename: Type.User })!);

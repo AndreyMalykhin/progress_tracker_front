@@ -67,7 +67,8 @@ async function breakAggregate(
     await mutate({
         optimisticResponse: getOptimisticResponse(id, apollo),
         update: (proxy, response) => {
-            updateActiveTrackables(id, response.data, proxy);
+            updateActiveTrackables(
+                id, response.data as IBreakAggregateResponse, proxy);
         },
         variables: { id },
     });

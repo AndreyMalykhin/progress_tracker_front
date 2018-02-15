@@ -23,6 +23,12 @@ mutation LoginMutation($facebookAccessToken: String!) {
         user {
             id
             accessToken
+            avatarUrlMedium
+            avatarUrlSmall
+            isReported
+            name
+            rating
+            rewardableReviewsLeft
         }
     }
     completeIntro @client

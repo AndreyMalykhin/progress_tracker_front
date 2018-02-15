@@ -37,7 +37,7 @@ interface IGetDataResponse {
 }
 
 const getDataQuery = gql`
-query GetData($audience: Audience!, $cursor: Float) {
+query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
     getActivitiesByAudience(
         audience: $audience, after: $cursor
     ) @connection(key: "getActivitiesByAudience", filter: ["audience"]) {
@@ -45,7 +45,7 @@ query GetData($audience: Audience!, $cursor: Float) {
             node {
                 id
                 date
-                user {
+                user @skip(if: $skipUser) {
                     id
                     name
                     avatarUrlSmall
@@ -109,9 +109,10 @@ const withData = graphql<
     getDataQuery,
     {
         options: (ownProps) => {
+            const { audience } = ownProps;
             return {
                 notifyOnNetworkStatusChange: true,
-                variables: { audience: ownProps.match.params.audience },
+                variables: { audience, skipUser: audience === Audience.Me },
             };
         },
         props: ({ data }) => {
@@ -190,7 +191,7 @@ class ActivityListContainer extends
 
 export default compose(
     withLogin<IActivityListContainerProps>(
-        "activityList.friendsLoginMsg",
+        "activityList.loginToSeeFriends",
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,

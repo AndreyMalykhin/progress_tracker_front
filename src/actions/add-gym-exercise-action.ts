@@ -1,4 +1,5 @@
 import { spliceActiveTrackables } from "actions/active-trackables-helpers";
+import { addTrackableAddedActivity } from "actions/activity-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
@@ -23,6 +24,10 @@ interface IAddGymExerciseResponse {
             statusChangeDate: null;
             creationDate: number;
             title: string;
+            user: {
+                __typename: Type;
+                id: string;
+            };
             entries: Array<{
                 id: string;
                 gymExercise: {
@@ -55,6 +60,9 @@ mutation AddGymExercise($gymExercise: AddGymExerciseInput!) {
             statusChangeDate
             creationDate
             title
+            user {
+                id
+            }
             entries {
                 id
                 gymExercise {
@@ -77,10 +85,26 @@ async function addGymExercise(
     await mutate({
         optimisticResponse: getOptimisticResponse(gymExercise),
         update: (proxy, response) => {
-            updateActiveTrackables(response.data, proxy);
+            const responseData = response.data as IAddGymExerciseResponse;
+            updateActiveTrackables(responseData, proxy);
+            updateActivities(responseData, proxy);
         },
         variables: { gymExercise },
     });
+}
+
+function updateActivities(
+    response: IAddGymExerciseResponse, apollo: DataProxy,
+) {
+    const { trackable } = response.addGymExercise;
+    const activity = {
+        __typename: Type.TrackableAddedActivity,
+        date: Date.now(),
+        id: uuid(),
+        trackable,
+        user: trackable.user,
+    };
+    addTrackableAddedActivity(activity, apollo);
 }
 
 function updateActiveTrackables(

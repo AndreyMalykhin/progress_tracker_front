@@ -2,6 +2,7 @@ import Avatar from "components/avatar";
 import Button, { ButtonTitle } from "components/button";
 import { FormGroup } from "components/form";
 import Image from "components/image";
+import Loader from "components/loader";
 import * as React from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import ImagePicker, {
@@ -13,18 +14,19 @@ interface IFormAvatarPickerProps {
     errorMsgId?: string|null;
     uri: string;
     disabled?: boolean;
-    onChangeImg: (img?: ImageInfo) => void;
+    changing?: boolean;
+    onChangeImg: (img: ImageInfo|null) => void;
 }
 
 class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
     public render() {
-        const { errorMsgId, uri, disabled, style } = this.props;
-        return (
-            <FormGroup
-                style={[styles.container, style]}
-                errorMsgId={errorMsgId}
-            >
-                <Avatar size="large" uri={uri!} />
+        const { errorMsgId, uri, disabled, changing, style } = this.props;
+        let buttons;
+
+        if (changing) {
+            buttons = <Loader style={styles.loader} isNoFillParent={true} />;
+        } else {
+            buttons = (
                 <View style={styles.buttonsContainer}>
                     <Button onPress={this.onSelect} disabled={disabled}>
                         <ButtonTitle
@@ -40,6 +42,16 @@ class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
                         />
                     </Button>
                 </View>
+            );
+        }
+
+        return (
+            <FormGroup
+                style={[styles.container, style]}
+                errorMsgId={errorMsgId}
+            >
+                <Avatar size="large" uri={uri!} />
+                {buttons}
             </FormGroup>
         );
     }
@@ -68,7 +80,7 @@ class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
         this.props.onChangeImg(image);
     }
 
-    private onRemove = () => this.props.onChangeImg(undefined);
+    private onRemove = () => this.props.onChangeImg(null);
 }
 
 const styles = StyleSheet.create({
@@ -79,6 +91,9 @@ const styles = StyleSheet.create({
     },
     container: {
         alignItems: "center",
+    },
+    loader: {
+        marginTop: 8,
     },
 });
 

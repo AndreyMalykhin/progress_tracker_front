@@ -9,6 +9,7 @@ import gql from "graphql-tag";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
+import makeLog from "utils/make-log";
 
 interface IReorderTrackableResponse {
     reorderTrackable: {
@@ -21,6 +22,8 @@ interface ITrackableFragment {
     id: string;
     order: number;
 }
+
+const log = makeLog("reorder-trackable-action");
 
 const trackableFragment = gql`
 fragment ReorderTrackableFragment on ITrackable {
@@ -45,6 +48,7 @@ async function reorderTrackable(
     mutate: MutationFunc<IReorderTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
+    log("reorderTrackable(); sourceId=%o; destId=%o", sourceId, destinationId);
     await mutate({
         optimisticResponse: getOptimisticResponse(
             sourceId, destinationId, apollo),

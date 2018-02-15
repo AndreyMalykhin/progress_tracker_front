@@ -3,6 +3,7 @@ import {
     approveTrackableQuery,
     IApproveTrackableResponse,
 } from "actions/approve-trackable-action";
+import { ILoginResponse, login, loginQuery } from "actions/login-action";
 import {
     IRejectTrackableResponse,
     rejectTrackable,
@@ -17,6 +18,7 @@ import Loader from "components/loader";
 import PendingReviewTrackableList, {
     IPendingReviewTrackableListItemNode,
 } from "components/pending-review-trackable-list";
+import { IToastListItem } from "components/toast-list";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
@@ -30,11 +32,12 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { withApollo } from "react-apollo/withApollo";
-import { InjectedIntlProps, injectIntl } from "react-intl";
-import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
+import { Alert, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
 import Difficulty from "utils/difficulty";
+import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApollo } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
@@ -49,11 +52,36 @@ interface IGetDataResponse {
 }
 
 interface IPendingReviewTrackableListContainerProps extends
-    IOwnProps, IWithLoginProps, InjectedIntlProps, IWithLoadMoreProps {
+    IOwnProps,
+    IWithLoginProps,
+    InjectedIntlProps,
+    IWithLoadMoreProps {
     data: QueryProps & IGetDataResponse;
-    onCommitApproveItem: (id: string, difficulty: Difficulty) => void;
-    onCommitRejectItem: (id: string, reason: RejectReason) => void;
+    onCommitApproveItem: (id: string, difficulty: Difficulty) =>
+        Promise<IApproveTrackableResponse>;
+    onCommitRejectItem: (id: string, reason: RejectReason) =>
+        Promise<IRejectTrackableResponse>;
+    onLogin: () => void;
 }
+
+interface IPendingReviewTrackableListContainerState {
+    toasts: IToastListItem[];
+}
+
+const withLoginAction = graphql<
+    ILoginResponse,
+    IOwnProps,
+    IPendingReviewTrackableListContainerProps
+>(
+    loginQuery,
+    {
+        props: ({ mutate }) => {
+            return {
+                onLogin: () => login(mutate!),
+            } as Partial<IPendingReviewTrackableListContainerProps>;
+        },
+    },
+);
 
 const withApprove = graphql<
     IApproveTrackableResponse,
@@ -189,12 +217,18 @@ const rejectReasons: Array< IActionSheetOption<RejectReason> > = [
     },
 ];
 
-class PendingReviewTrackableListContainer extends
-    React.Component<IPendingReviewTrackableListContainerProps> {
+class PendingReviewTrackableListContainer extends React.Component<
+    IPendingReviewTrackableListContainerProps,
+    IPendingReviewTrackableListContainerState
+> {
+    public state: IPendingReviewTrackableListContainerState = { toasts: [] };
+
     public render() {
         const { audience, data, onLoadMore } = this.props;
+        const { toasts } = this.state;
         return (
             <PendingReviewTrackableList
+                toasts={toasts}
                 audience={audience}
                 items={data.getPendingReviewTrackablesByAudience.edges}
                 queryStatus={data.networkStatus}
@@ -202,16 +236,57 @@ class PendingReviewTrackableListContainer extends
                 onEndReached={onLoadMore}
                 onPressUser={this.onPressUser}
                 onRejectItem={this.onStartRejectItem}
+                onCloseToast={this.onCloseToast}
             />
         );
     }
 
+    private onCloseToast = (index: number) => {
+        this.setState((prevState) => {
+            return { toasts: removeIndex(index, prevState.toasts) };
+        });
+    }
+
+    private showToast(msg: React.ReactNode) {
+        this.setState((prevState) => {
+            return { toasts: push({ msg }, prevState.toasts) };
+        });
+    }
+
+    private ensureUserLoggedIn() {
+        const { accessToken, intl, onLogin } = this.props;
+
+        if (accessToken) {
+            return true;
+        }
+
+        const msg = undefined;
+        const { formatMessage } = intl;
+        const title =
+            formatMessage({ id: "pendingReviewList.loginToReview" });
+        Alert.alert(title, msg, [
+            {
+                style: "cancel",
+                text: formatMessage({ id: "common.cancel" }),
+            },
+            {
+                onPress: onLogin,
+                text: formatMessage({ id: "common.login" }),
+            },
+        ]);
+        return false;
+    }
+
     private onStartApproveItem = (id: string) => {
+        if (!this.ensureUserLoggedIn()) {
+            return;
+        }
+
         const { intl, onCommitApproveItem } = this.props;
         ActionSheet.open({
             onClose: (difficulty) => {
                 if (difficulty) {
-                    onCommitApproveItem(id, difficulty);
+                    this.commitApproveItem(id, difficulty);
                 }
             },
             options: difficulties,
@@ -220,18 +295,63 @@ class PendingReviewTrackableListContainer extends
         });
     }
 
+    private async commitApproveItem(id: string, difficulty: Difficulty) {
+        let response;
+
+        try {
+            response =
+                await this.props.onCommitApproveItem(id, difficulty);
+        } catch (e) {
+            // TODO
+            throw e;
+        }
+
+        this.tryShowReviewRewardToast(response.approveTrackable.bonusRating);
+    }
+
     private onStartRejectItem = (id: string) => {
+        if (!this.ensureUserLoggedIn()) {
+            return;
+        }
+
         const { intl, onCommitRejectItem } = this.props;
         ActionSheet.open({
             onClose: (rejectReason) => {
                 if (rejectReason) {
-                    onCommitRejectItem(id, rejectReason);
+                    this.commitRejectItem(id, rejectReason);
                 }
             },
             options: rejectReasons,
             titleMsgId: "rejectTrackable.title",
             translator: intl,
         });
+    }
+
+    private async commitRejectItem(id: string, reason: RejectReason) {
+        let response;
+
+        try {
+            response =
+                await this.props.onCommitRejectItem(id, reason);
+        } catch (e) {
+            // TODO
+            throw e;
+        }
+
+        this.tryShowReviewRewardToast(response.rejectTrackable.bonusRating);
+    }
+
+    private tryShowReviewRewardToast(bonusRating?: number) {
+        if (!bonusRating) {
+            return;
+        }
+
+        this.showToast(
+            <FormattedMessage
+                id="notifications.reviewReward"
+                values={{ rating: bonusRating }}
+            />,
+        );
     }
 
     private onPressUser = (id: string) => {
@@ -242,7 +362,7 @@ class PendingReviewTrackableListContainer extends
 
 export default compose(
     withLogin<IPendingReviewTrackableListContainerProps>(
-        "pendingReviewList.friendsLoginMsg",
+        "pendingReviewList.loginToSeeFriends",
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
@@ -256,6 +376,7 @@ export default compose(
     withApollo,
     withApprove,
     withReject,
+    withLoginAction,
     withLoadMore<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
         "getPendingReviewTrackablesByAudience", (props) => props.data),
     injectIntl,

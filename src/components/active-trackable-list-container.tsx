@@ -68,6 +68,8 @@ import {
 } from "components/gym-exercise-entry-popup";
 import { IHeaderState } from "components/header";
 import Loader from "components/loader";
+import Toast from "components/toast";
+import { IToastListItem } from "components/toast-list";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
@@ -77,8 +79,8 @@ import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import { ReactNode } from "react";
 import * as React from "react";
+import { ReactNode } from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -96,6 +98,7 @@ import ImagePicker, { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
 import DragStatus from "utils/drag-status";
+import { push, removeIndex } from "utils/immutable-utils";
 import myId from "utils/my-id";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
@@ -136,7 +139,7 @@ interface IActiveTrackableListContainerState {
         isOpen?: boolean;
         onClose: (entry?: IGymExerciseEntryPopupResult) => void;
     };
-    toastMsg?: ReactNode;
+    toasts: IToastListItem[];
 }
 
 interface IRouteParams {
@@ -434,6 +437,7 @@ class ActiveTrackableListContainer extends
         gymExerciseEntryPopup: { onClose: () => null },
         itemsMeta: {},
         numericalEntryPopup: { onClose: () => null },
+        toasts: [],
     };
     private itemLayouts: { [id: string]: LayoutRectangle|undefined } = {};
     private draggedItemId?: string;
@@ -471,7 +475,7 @@ class ActiveTrackableListContainer extends
             isAggregationMode,
             isReorderMode,
             itemsMeta,
-            toastMsg,
+            toasts,
         } = this.state;
         const { onReorderItem, onLoadMore, data } = this.props;
         const { getActiveTrackables, networkStatus } = data;
@@ -484,7 +488,7 @@ class ActiveTrackableListContainer extends
                 itemsMeta={itemsMeta}
                 items={data.getActiveTrackables.edges}
                 queryStatus={data.networkStatus}
-                toastMsg={toastMsg}
+                toasts={toasts}
                 onNumericalEntryPopupClose={numericalEntryPopup.onClose}
                 onGymExerciseEntryPopupClose={gymExerciseEntryPopup.onClose}
                 onProveItem={this.onStartProveItem}
@@ -702,24 +706,26 @@ class ActiveTrackableListContainer extends
         const items: IGymExerciseItem[] = [];
         const date = new Date();
         let item: IGymExerciseItem;
-        let dayTimestamp = 0;
+        let itemTimestamp = 0;
 
         for (const entry of entries) {
             date.setTime(entry.date);
             const entryTimestamp = date.setUTCHours(0, 0, 0, 0);
 
-            if (entryTimestamp !== dayTimestamp) {
+            if (entryTimestamp !== itemTimestamp) {
                 if (items.length >= gymExerciseVisibleDayCount) {
                     break;
                 }
 
-                dayTimestamp = entryTimestamp;
-                item = { date: dayTimestamp, entries: [] };
+                itemTimestamp = entryTimestamp;
+                item = { date: itemTimestamp, entries: [] };
                 items.push(item);
             }
 
             item!.entries.push(entry);
         }
+
+        items.reverse();
 
         if (isExpanded) {
             return items;
@@ -990,12 +996,12 @@ class ActiveTrackableListContainer extends
         const { formatMessage } = this.props.intl;
         Alert.alert(formatMessage({ id: "common.confirmRemoval" }), msg, [
             {
-                onPress: () => this.onCommitRemoveItem(id),
-                text: formatMessage({ id: "common.yes" }),
-            },
-            {
                 style: "cancel",
                 text: formatMessage({ id: "common.cancel" }),
+            },
+            {
+                onPress: () => this.onCommitRemoveItem(id),
+                text: formatMessage({ id: "common.yes" }),
             },
         ]);
     }
@@ -1058,10 +1064,6 @@ class ActiveTrackableListContainer extends
         this.showToast(<FormattedMessage id="notifications.goalAchieved" />);
     }
 
-    private showToast(toastMsg: ReactNode) {
-        this.setState({ toastMsg });
-    }
-
     private onStartNewGymExerciseEntry = (id: string) => {
         this.openGymExerciseEntryPopup((entry) => {
             if (entry) {
@@ -1071,7 +1073,7 @@ class ActiveTrackableListContainer extends
     }
 
     private onStartProveItem = async (id: string) => {
-        let image;
+        let image: Image;
 
         try {
             image = await ImagePicker.openPicker({
@@ -1091,18 +1093,40 @@ class ActiveTrackableListContainer extends
             return;
         }
 
-        const response = await this.props.onCommitProveItem(id, image);
-        let msgId;
+        this.setItemProving(id, true, async () => {
+            let response: IProveTrackableResponse;
 
-        if (response.proveTrackable.trackable.status ===
-                TrackableStatus.Approved
-        ) {
-            msgId = "notifications.goalApproved";
-        } else {
-            msgId = "notifications.goalPendingReview";
-        }
+            try {
+                response = await this.props.onCommitProveItem(id, image);
+            } catch (e) {
+                // TODO
+                throw e;
+            } finally {
+                this.setItemProving(id, false);
+            }
 
-        this.showToast(<FormattedMessage id={msgId} />);
+            let msgId;
+
+            if (response.proveTrackable.trackable.status ===
+                    TrackableStatus.Approved
+            ) {
+                msgId = "notifications.goalApproved";
+            } else {
+                msgId = "notifications.goalPendingReview";
+            }
+
+            this.showToast(<FormattedMessage id={msgId} />);
+        });
+    }
+
+    private setItemProving(
+        id: string, isProving: boolean, onDone?: () => void,
+    ) {
+        this.setState((prevState) => {
+            const itemsMeta = this.updateItemMeta(
+                id, { isProving }, prevState.itemsMeta);
+            return { itemsMeta };
+        }, onDone);
     }
 
     private onEditItem = (id: string) => {
@@ -1209,7 +1233,17 @@ class ActiveTrackableListContainer extends
             (item) => (item.item as IActiveTrackableListItem).node.id);
     }
 
-    private onCloseToast = () => this.setState({ toastMsg: undefined });
+    private onCloseToast = (index: number) => {
+        this.setState((prevState) => {
+            return { toasts: removeIndex(index, prevState.toasts) };
+        });
+    }
+
+    private showToast(msg: ReactNode) {
+        this.setState((prevState) => {
+            return { toasts: push({ msg }, prevState.toasts) };
+        });
+    }
 
     private onSetTaskDone = async (taskId: string, isDone: boolean) => {
         if (!this.isMy()) {

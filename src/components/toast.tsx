@@ -7,20 +7,15 @@ interface IToastProps {
 }
 
 class Toast extends React.Component<IToastProps> {
-    public static defaultProps = {
-        duration: 8000,
-    } as IToastProps;
-
-    private timeoutId: number;
+    public static defaultProps = { duration: 8000 } as IToastProps;
+    private timeoutId?: number;
 
     public render() {
         return (
-            <View pointerEvents="box-none" style={styles.overlay}>
-                <View style={styles.container}>
-                    <Text style={styles.msg}>
-                        {this.props.children}
-                    </Text>
-                </View>
+            <View style={styles.container}>
+                <Text style={styles.msg}>
+                    {this.props.children}
+                </Text>
             </View>
         );
     }
@@ -31,7 +26,7 @@ class Toast extends React.Component<IToastProps> {
     }
 
     public componentWillUnmount() {
-        clearTimeout(this.timeoutId);
+        clearTimeout(this.timeoutId!);
     }
 }
 
@@ -50,11 +45,6 @@ const styles = StyleSheet.create({
     msg: {
         color: "#fff",
         lineHeight: 32,
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        alignItems: "center",
-        justifyContent: "flex-end",
     },
 });
 

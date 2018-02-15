@@ -4,6 +4,7 @@ import { FormattedNumber } from "react-intl";
 import {
     Animated,
     Easing,
+    LayoutChangeEvent,
     StyleProp,
     StyleSheet,
     Text,
@@ -21,6 +22,7 @@ interface IProgressBarProps {
 
 interface IProgressBarState {
     isInitialRender: boolean;
+    width: number;
 }
 
 const animationConfig = {
@@ -30,7 +32,7 @@ const animationConfig = {
 
 class ProgressBar extends
     React.PureComponent<IProgressBarProps, IProgressBarState> {
-    public state: IProgressBarState = { isInitialRender: true };
+    public state: IProgressBarState = { isInitialRender: true, width: 0 };
 
     public render() {
         const { maxValue, mode, style } = this.props;
@@ -51,17 +53,19 @@ class ProgressBar extends
             />
         ) : value;
         return (
-            <View style={[styles.container, style]}>
+            <View style={[styles.container, style]} onLayout={this.onLayout}>
                 <ProgressBarImpl
+                    animated={true}
                     animationType="timing"
                     animationConfig={animationConfig}
                     progress={normalizedValue}
-                    width={null}
+                    width={this.state.width}
                     height={height}
                     color={"#0076ff"}
-                    unfilledColor={"#000"}
-                    borderRadius={8}
+                    unfilledColor={backgroundColor}
+                    borderRadius={borderRadius}
                     borderWidth={0}
+                    useNativeDriver={true}
                 />
                 <Text style={styles.value}>{formattedValue}</Text>
             </View>
@@ -71,12 +75,19 @@ class ProgressBar extends
     public componentDidMount() {
         this.setState({ isInitialRender: false });
     }
+
+    private onLayout = (evt: LayoutChangeEvent) =>
+        this.setState({ width: evt.nativeEvent.layout.width })
 }
 
 const height = 16;
+const backgroundColor = "#000";
+const borderRadius = 8;
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor,
+        borderRadius,
         marginBottom: 8,
     },
     value: {

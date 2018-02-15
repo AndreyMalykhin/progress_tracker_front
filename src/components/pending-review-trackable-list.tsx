@@ -1,5 +1,6 @@
 import EmptyList from "components/empty-list";
 import Loader from "components/loader";
+import ToastList, { IToastListItem } from "components/toast-list";
 import Trackable, { ITrackableProps } from "components/trackable";
 import Audience from "models/audience";
 import TrackableStatus from "models/trackable-status";
@@ -10,6 +11,7 @@ import {
     NativeScrollEvent,
     NativeSyntheticEvent,
     StyleSheet,
+    View,
 } from "react-native";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
@@ -61,9 +63,11 @@ interface IPendingReviewTrackableListItem {
 }
 
 interface IPendingReviewTrackableListProps extends ISharedProps {
+    toasts: IToastListItem[];
     items: IPendingReviewTrackableListItem[];
     queryStatus: QueryStatus;
     onScroll?: (evt?: NativeSyntheticEvent<NativeScrollEvent>) => void;
+    onCloseToast: (index: number) => void;
 }
 
 const log = makeLog("pending-review-trackable-list");
@@ -71,21 +75,31 @@ const log = makeLog("pending-review-trackable-list");
 class PendingReviewTrackableList extends
     React.Component<IPendingReviewTrackableListProps> {
     public render() {
-        const { items, queryStatus, onScroll, onEndReached } = this.props;
+        const {
+            items,
+            queryStatus,
+            toasts,
+            onScroll,
+            onEndReached,
+            onCloseToast,
+        } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
-            <FlatList
-                windowSize={4}
-                initialNumToRender={2}
-                contentContainerStyle={styles.listContent}
-                data={items}
-                keyExtractor={this.getItemKey}
-                renderItem={this.onRenderItem}
-                ListFooterComponent={loader}
-                onEndReachedThreshold={0.5}
-                onEndReached={onEndReached}
-                onScroll={onScroll}
-            />
+            <View style={styles.container}>
+                <FlatList
+                    windowSize={4}
+                    initialNumToRender={2}
+                    contentContainerStyle={styles.listContent}
+                    data={items}
+                    keyExtractor={this.getItemKey}
+                    renderItem={this.onRenderItem}
+                    ListFooterComponent={loader}
+                    onEndReachedThreshold={0.5}
+                    onEndReached={onEndReached}
+                    onScroll={onScroll}
+                />
+                <ToastList items={toasts} onCloseToast={onCloseToast} />
+            </View>
         );
     }
 
@@ -167,6 +181,9 @@ class Item extends React.PureComponent<IItemProps> {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     listContent: {
         paddingLeft: 8,
         paddingRight: 8,

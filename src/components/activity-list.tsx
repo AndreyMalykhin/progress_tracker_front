@@ -81,7 +81,7 @@ interface IActivity {
     __typename: Type;
     id: string;
     date: number;
-    user: {
+    user?: {
         id: string;
         name: string;
         avatarUrlSmall: string;
@@ -400,17 +400,16 @@ class ActivityList extends React.Component<IActivityListProps> {
     }
 
     private getBaseActivityProps(item: IActivity) {
-        const { user } = item;
-
         if (this.props.audience === Audience.Me) {
             return { onPressUser: this.props.onPressUser };
         }
 
+        const { user } = item;
         return {
             onPressUser: this.props.onPressUser,
-            userAvatarUrl: user.avatarUrlSmall,
-            userId: user.id,
-            userName: user.name,
+            userAvatarUrl: user!.avatarUrlSmall,
+            userId: user!.id,
+            userName: user!.name,
         };
     }
 }
@@ -751,7 +750,7 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     activityIcon: {
-        color: "#0076ff",
+        color: "#FF8A00",
         marginLeft: 8,
     },
     activityMsg: {
@@ -796,7 +795,7 @@ const styles = StyleSheet.create({
         textDecorationLine: "line-through",
     },
     trackableAddedIcon: {
-        color: "#FF8A00",
+        color: "#0076ff",
     },
     trackableTitle: {
         fontWeight: "bold",

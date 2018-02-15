@@ -16,16 +16,17 @@ import NumericalEntryPopupContainer from "components/numerical-entry-popup-conta
 import NumericalGoal from "components/numerical-goal";
 import Reorderable from "components/reorderable";
 import TaskGoal, { ITask } from "components/task-goal";
-import Toast from "components/toast";
+import ToastList, { IToastListItem } from "components/toast-list";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import * as React from "react";
 import { ReactElement, ReactNode } from "react";
+import * as React from "react";
 import {
     Alert,
     FlatList,
     FlatListProperties,
+    LayoutAnimation,
     LayoutRectangle,
     ListRenderItemInfo,
     NativeScrollEvent,
@@ -100,6 +101,7 @@ interface IActiveTrackableListItemMeta {
     isSelected?: boolean;
     isExpanded?: boolean;
     isDisabled?: boolean;
+    isProving?: boolean;
     dragStatus?: DragStatus;
 }
 
@@ -118,7 +120,7 @@ interface IActiveTrackableListProps extends IExtraData {
     items: IActiveTrackableListItem[];
     isNumericalEntryPopupOpen?: boolean;
     isGymExerciseEntryPopupOpen?: boolean;
-    toastMsg?: ReactNode;
+    toasts: IToastListItem[];
     onNumericalEntryPopupClose: (entry?: number) => void;
     onGymExerciseEntryPopupClose: (entry?: IGymExerciseEntryPopupResult) =>
         void;
@@ -159,7 +161,7 @@ interface IActiveTrackableListProps extends IExtraData {
     onVisibleItemsChange: (info: IVisibleItemsChangeInfo) => void;
     onGetVisibleItemIds: () => string[];
     onGetDraggedItemId: () => string;
-    onCloseToast: () => void;
+    onCloseToast: (index: number) => void;
     onIsItemProveable: (status: TrackableStatus) => boolean;
 }
 
@@ -180,7 +182,7 @@ class ActiveTrackableList extends
             itemsMeta,
             queryStatus,
             isReorderMode,
-            toastMsg,
+            toasts,
             onNumericalEntryPopupClose,
             onGymExerciseEntryPopupClose,
             onEndReached,
@@ -233,9 +235,17 @@ class ActiveTrackableList extends
                 </Reorderable>
                 {numericalEntryPopup}
                 {gymExerciseEntryPopup}
-                {toastMsg && <Toast onClose={onCloseToast}>{toastMsg}</Toast>}
+                <ToastList items={toasts} onCloseToast={onCloseToast} />
             </View>
         );
+    }
+
+    public componentWillUpdate(nextProps: IActiveTrackableListProps) {
+        if ((this.props.isReorderMode && this.props.items !== nextProps.items)
+            || this.props.isAggregationMode !== nextProps.isAggregationMode
+        ) {
+            LayoutAnimation.easeInEaseOut();
+        }
     }
 
     public componentWillReceiveProps(nextProps: IActiveTrackableListProps) {
@@ -402,7 +412,7 @@ class ActiveTrackableList extends
             onPressOutItem,
             onIsItemProveable,
         } = this.props;
-        const { isDisabled, isSelected, dragStatus } = itemsMeta[id];
+        const { isDisabled, isSelected, isProving, dragStatus } = itemsMeta[id];
         const isAggregated = parent != null;
         const commands =
             onGetNumericalGoalCommands(id, isAggregated, status);
@@ -423,6 +433,7 @@ class ActiveTrackableList extends
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode && !isAggregated}
                 isProveable={onIsItemProveable(status)}
+                isProving={isProving}
                 status={status}
                 commands={commands}
                 duration={Date.now() - creationDate}
@@ -464,7 +475,7 @@ class ActiveTrackableList extends
             onPressOutItem,
             onIsItemProveable,
         } = this.props;
-        const { isExpanded, isSelected, isDisabled, dragStatus } =
+        const { isExpanded, isSelected, isDisabled, isProving, dragStatus } =
             itemsMeta[id];
         const isAggregated = parent != null;
         const visibleTaskCount =
@@ -484,6 +495,7 @@ class ActiveTrackableList extends
                 visibleTaskCount={visibleTaskCount}
                 progressDisplayMode={progressDisplayMode}
                 isProveable={onIsItemProveable(status)}
+                isProving={isProving}
                 isDragged={dragStatus != null}
                 isSelected={isSelected}
                 isDisabled={isDisabled}

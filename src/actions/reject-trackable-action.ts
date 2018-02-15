@@ -1,3 +1,9 @@
+import {
+    getOptimisticResponse,
+    IReviewTrackableResponseFragment,
+    reviewTrackableResponseFragment,
+    updateActivities,
+} from "actions/review-trackable-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
@@ -7,34 +13,15 @@ import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
 
 interface IRejectTrackableResponse {
-    rejectTrackable: {
-        trackable: ITrackableFragment;
-    };
+    rejectTrackable: IReviewTrackableResponseFragment;
 }
-
-interface ITrackableFragment {
-    id: string;
-    isReviewed: boolean;
-    rejectCount: number;
-}
-
-const trackableFragment = gql`
-fragment RejectTrackableFragment on ITrackable {
-    id
-    ... on IGoal {
-        isReviewed
-        rejectCount
-    }
-}`;
 
 const rejectTrackableQuery = gql`
-${trackableFragment}
+${reviewTrackableResponseFragment}
 
 mutation RejectTrackable($id: ID!, $reason: RejectReason!) {
     rejectTrackable(id: $id, reason: $reason) {
-        trackable {
-            ...RejectTrackableFragment
-        }
+        ...ReviewTrackableResponseFragment
     }
 }`;
 
@@ -44,28 +31,20 @@ async function rejectTrackable(
     mutate: MutationFunc<IRejectTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
-        optimisticResponse: getOptimisticResponse(id, apollo),
+    const mutationName = "rejectTrackable";
+    const counterField = "rejectCount";
+    const result = await mutate({
+        optimisticResponse: getOptimisticResponse(
+            id, counterField, mutationName, apollo),
+        update: (proxy, response) => {
+            const responseData =
+                (response.data as IRejectTrackableResponse).rejectTrackable;
+            const isApprove = false;
+            updateActivities(isApprove, responseData, proxy);
+        },
         variables: { id, reason },
     });
-}
-
-function getOptimisticResponse(
-    trackableId: string, apollo: ApolloClient<NormalizedCacheObject>,
-) {
-    const fragmentId = dataIdFromObject(
-        { id: trackableId, __typename: Type.TaskGoal })!;
-    const trackable = apollo.readFragment<ITrackableFragment>(
-        { id: fragmentId, fragment: trackableFragment })!;
-    ++trackable.rejectCount;
-    trackable.isReviewed = true;
-    return {
-        __typename: Type.Mutation,
-        rejectTrackable: {
-            __typename: Type.RejectTrackableResponse,
-            trackable,
-        },
-    } as IRejectTrackableResponse;
+    return result.data;
 }
 
 export { rejectTrackable, IRejectTrackableResponse, rejectTrackableQuery };

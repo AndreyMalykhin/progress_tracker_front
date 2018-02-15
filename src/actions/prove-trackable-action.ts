@@ -18,8 +18,11 @@ import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import { Image } from "react-native-image-crop-picker";
 import dataIdFromObject from "utils/data-id-from-object";
+import makeLog from "utils/make-log";
 import myId from "utils/my-id";
 import uploadFile from "utils/upload-file";
+
+const log = makeLog("prove-trackable-action");
 
 interface IProveTrackableResponse {
     proveTrackable: {
@@ -110,6 +113,7 @@ async function proveTrackable(
     mutate: MutationFunc<IProveTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
+    log("proveTrackable(); request");
     let assetId;
 
     try {
@@ -123,6 +127,7 @@ async function proveTrackable(
     const result = await mutate({
         optimisticResponse: getOptimisticResponse(id, photo, apollo),
         update: (proxy, response) => {
+            log("proveTrackable(); response");
             const responseData = response.data as IProveTrackableResponse;
             updateActiveTrackables(responseData, proxy);
             const trackableStatus =
@@ -175,10 +180,11 @@ function getOptimisticResponse(
     photo: Image,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    const trackableByIdResponse = apollo.readQuery<IGetTrackableByIdResponse>(
-        { query: getTrackableByIdQuery, variables: { id: trackableId } })!;
-    const { parent, isPublic, __typename } =
-        trackableByIdResponse.getTrackableById;
+    const trackable = apollo.readQuery<IGetTrackableByIdResponse>({
+        query: getTrackableByIdQuery,
+        variables: { id: trackableId },
+    })!.getTrackableById;
+    const { parent, isPublic, __typename } = trackable;
     const status =
         isPublic ? TrackableStatus.PendingReview : TrackableStatus.Approved;
     const removedAggregateId =

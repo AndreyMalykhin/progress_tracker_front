@@ -24,7 +24,7 @@ function spliceConnection<TNode extends ISpliceConnectionFragment, TCursor>(
     connection: IConnection<TNode, TCursor>,
     idsToRemove: string[],
     objectsToAdd: TNode[],
-    cursorField: string,
+    cursorField: keyof TNode,
     edgeType: Type,
     comparator: (lhs: TNode, rhs: TNode) => number,
 ) {
@@ -54,7 +54,7 @@ function spliceConnection<TNode extends ISpliceConnectionFragment, TCursor>(
 
 function sortConnection<TNode extends ISpliceConnectionFragment, TCursor>(
     connection: IConnection<TNode, TCursor>,
-    cursorField: string,
+    cursorField: keyof TNode,
     comparator: (lhs: TNode, rhs: TNode) => number,
 ) {
     connection.edges.sort((lhs, rhs) => comparator(lhs.node, rhs.node));

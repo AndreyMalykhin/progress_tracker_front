@@ -32,9 +32,9 @@ class Reorderable extends React.Component<IReorderableProps> {
     private panResponder: PanResponderInstance;
     private draggedItemId?: string;
     private draggedItemLayout?: LayoutRectangle;
-    private x: number;
-    private y: number;
-    private height: number;
+    private x: number = 0;
+    private y: number = 0;
+    private height: number = 0;
     private container?: View;
     private prevDropTargetId?: string;
 
@@ -99,7 +99,7 @@ class Reorderable extends React.Component<IReorderableProps> {
     private onPanResponderMove = (
         evt: GestureResponderEvent, gestureState: PanResponderGestureState,
     ) => {
-        this.pan.setValue({ x: 0, y: gestureState.dy });
+        Animated.event([null, { dy: this.pan.y }])(evt, gestureState);
         this.tryReorder(gestureState);
     }
 

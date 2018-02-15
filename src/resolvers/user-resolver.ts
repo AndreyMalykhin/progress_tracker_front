@@ -13,6 +13,7 @@ export default {
             isReported: false,
             name: "Anonymous",
             rating: 0,
+            rewardableReviewsLeft: 4,
         },
     },
     resolvers: {},

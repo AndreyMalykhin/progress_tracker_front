@@ -87,7 +87,8 @@ async function unaggregateTrackable(
     await mutate({
         optimisticResponse: getOptimisticResponse(id, apollo),
         update: (proxy, response) => {
-            updateActiveTrackables(response.data, proxy);
+            updateActiveTrackables(
+                response.data as IUnaggregateTrackableResponse, proxy);
         },
         variables: { id },
     });

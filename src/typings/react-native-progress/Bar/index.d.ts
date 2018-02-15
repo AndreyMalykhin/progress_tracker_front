@@ -1,6 +1,6 @@
 declare module "react-native-progress/Bar" {
     import * as React from "react";
-    import { Animated } from "react-native";
+    import { Animated, LayoutChangeEvent } from "react-native";
 
     interface IProgressBarProps {
         animated?: boolean;
@@ -17,6 +17,7 @@ declare module "react-native-progress/Bar" {
         animationConfig?: Animated.TimingAnimationConfig
             | Animated.SpringAnimationConfig | Animated.DecayAnimationConfig;
         animationType?: "decay" | "timing" | "spring";
+        onLayout?: (evt: LayoutChangeEvent) => void;
     }
 
     declare class ProgressBar extends React.Component<IProgressBarProps> {}

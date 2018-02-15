@@ -15,6 +15,17 @@ function dataIdFromObject(object: IObject) {
         case Type.NumericalGoal:
         case Type.TaskGoal:
         return "Trackable:" + id;
+        case Type.CounterProgressChangedActivity:
+        case Type.ExternalGoalReviewedActivity:
+        case Type.GoalAchievedActivity:
+        case Type.GoalApprovedActivity:
+        case Type.GoalExpiredActivity:
+        case Type.GoalRejectedActivity:
+        case Type.GymExerciseEntryAddedActivity:
+        case Type.NumericalGoalProgressChangedActivity:
+        case Type.TaskGoalProgressChangedActivity:
+        case Type.TrackableAddedActivity:
+        return "Activity:" + id;
     }
 
     return id ? `${__typename}:${id}` : null;

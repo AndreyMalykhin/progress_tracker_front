@@ -102,7 +102,7 @@ class CardTitle extends React.PureComponent<ICardTitleProps> {
         const { isPrimary, text, onPress } = this.props;
         return (
             <Text
-                numberOfLines={1}
+                numberOfLines={2}
                 style={[styles.title, isPrimary && styles.titlePrimary]}
                 onPress={onPress}
             >

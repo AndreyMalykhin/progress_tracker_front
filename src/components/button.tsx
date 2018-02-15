@@ -1,4 +1,7 @@
-import TouchableWithFeedback, { ITouchableWithFeedbackProps } from "components/touchable-with-feedback";
+import Loader from "components/loader";
+import TouchableWithFeedback, {
+    ITouchableWithFeedbackProps,
+} from "components/touchable-with-feedback";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import {
@@ -12,6 +15,7 @@ import { IconProps } from "react-native-vector-icons/Icon";
 
 interface IButtonProps extends ITouchableWithFeedbackProps {
     vertical?: boolean;
+    loading?: boolean;
 }
 
 interface IButtonTitleProps {
@@ -30,17 +34,25 @@ interface IButtonIconProps extends IconProps {
 
 class Button extends React.Component<IButtonProps> {
     public render() {
-        const { children, disabled, style, vertical, ...restProps } =
+        const { children, loading, disabled, style, vertical, ...restProps } =
             this.props;
-        const contentStyle =
-            vertical ? contentVerticalStyle : styles.content;
+        let content;
+
+        if (loading) {
+            content = <Loader isNoFillParent={true} />;
+        } else {
+            const contentStyle =
+                vertical ? contentVerticalStyle : styles.content;
+            content = <View style={contentStyle}>{children}</View>;
+        }
+
         return (
             <TouchableWithFeedback
                 disabled={disabled}
                 style={[styles.container, style]}
                 {...restProps}
             >
-                <View style={contentStyle}>{children}</View>
+                {content}
             </TouchableWithFeedback>
         );
     }
@@ -82,7 +94,9 @@ class ButtonIcon extends React.PureComponent<IButtonIconProps> {
 }
 
 const styles = StyleSheet.create({
-    container: {},
+    container: {
+        minHeight: 32,
+    },
     content: {
         alignItems: "center",
         flexDirection: "row",

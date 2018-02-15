@@ -1,14 +1,19 @@
+import { addActivity, spliceActivities } from "actions/activity-helpers";
 import {
     IUpdateProgressFragment,
     updateProgress,
     updateProgressFragment,
 } from "actions/aggregate-helpers";
+import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
+import Audience from "models/audience";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
+import myId from "utils/my-id";
+import uuid from "utils/uuid";
 
 interface IAddCounterProgressResponse {
     addCounterProgress: {
@@ -56,21 +61,23 @@ mutation AddCounterProgress($id: ID!, $value: Float!) {
     }
 }`;
 
+const activityFragment = gql`
+fragment AddCounterProgressChangedActivityFragment on CounterProgressChangedActivity {
+    id
+    date
+    delta
+    trackable {
+        id
+    }
+    user {
+        id
+    }
+}`;
+
 async function addCounterProgress(
     id: string,
     value: number,
     mutate: MutationFunc<IAddCounterProgressResponse>,
-    apollo: ApolloClient<NormalizedCacheObject>,
-) {
-    await mutate({
-        optimisticResponse: getOptimisticResponse(id, value, apollo),
-        variables: { id, value },
-    });
-}
-
-function getOptimisticResponse(
-    id: string,
-    value: number,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     const fragmentId = dataIdFromObject({ __typename: Type.Counter, id })!;
@@ -79,6 +86,45 @@ function getOptimisticResponse(
         fragmentName: "AddCounterProgressCounterFragment",
         id: fragmentId,
     })!;
+    const prevProgress = counter.progress;
+    await mutate({
+        optimisticResponse: getOptimisticResponse(counter, value, apollo),
+        update: (proxy, response) => {
+            updateActivities(
+                prevProgress,
+                response.data as IAddCounterProgressResponse,
+                proxy,
+            );
+        },
+        variables: { id, value },
+    });
+}
+
+function updateActivities(
+    prevProgress: number,
+    response: IAddCounterProgressResponse,
+    apollo: DataProxy,
+) {
+    const { trackable } = response.addCounterProgress;
+    const activity = {
+        __typename: Type.CounterProgressChangedActivity,
+        date: Date.now(),
+        delta: trackable.progress - prevProgress,
+        id: uuid(),
+        trackable,
+        user: {
+            __typename: Type.User,
+            id: myId,
+        },
+    };
+    addActivity(activity, activityFragment, apollo);
+}
+
+function getOptimisticResponse(
+    counter: ICounterFragment,
+    value: number,
+    apollo: ApolloClient<NormalizedCacheObject>,
+) {
     counter.progress += value;
 
     if (counter.parent) {

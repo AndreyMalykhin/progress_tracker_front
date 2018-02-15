@@ -125,7 +125,8 @@ async function aggregateTrackables(
     await mutate({
         optimisticResponse: getOptimisticResponse(ids, apollo),
         update: (proxy, response) => {
-            updateActiveTrackables(response.data, proxy);
+            updateActiveTrackables(
+                response.data as IAggregateTrackablesResponse, proxy);
         },
         variables: { ids },
     });

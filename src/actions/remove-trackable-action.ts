@@ -66,7 +66,8 @@ async function removeTrackable(
     await mutate({
         optimisticResponse: getOptimisticResponse(id, apollo),
         update: (proxy, response) => {
-            updateActiveTrackables(id, response.data, proxy);
+            updateActiveTrackables(
+                id, response.data as IRemoveTrackableResponse, proxy);
         },
         variables: { id },
     });

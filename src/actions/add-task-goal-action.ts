@@ -1,4 +1,5 @@
 import { spliceActiveTrackables } from "actions/active-trackables-helpers";
+import { addTrackableAddedActivity } from "actions/activity-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
@@ -38,6 +39,10 @@ interface IAddTaskGoalResponse {
                 };
             }>
             title: string;
+            user: {
+                __typename: Type;
+                id: string;
+            }
         };
     };
 }
@@ -83,6 +88,9 @@ mutation AddTaskGoal($goal: AddTaskGoalInput!) {
                 }
             }
             title
+            user {
+                id
+            }
         }
     }
 }`;
@@ -95,10 +103,24 @@ async function addTaskGoal(
     await mutate({
         optimisticResponse: getOptimisticResponse(goal),
         update: (proxy, response) => {
-            updateActiveTrackables(response.data, proxy);
+            const responseData = response.data as IAddTaskGoalResponse;
+            updateActiveTrackables(responseData, proxy);
+            updateActivities(responseData, proxy);
         },
         variables: { goal },
     });
+}
+
+function updateActivities(response: IAddTaskGoalResponse, apollo: DataProxy) {
+    const { trackable } = response.addTaskGoal;
+    const activity = {
+        __typename: Type.TrackableAddedActivity,
+        date: Date.now(),
+        id: uuid(),
+        trackable,
+        user: trackable.user,
+    };
+    addTrackableAddedActivity(activity, apollo);
 }
 
 function updateActiveTrackables(

@@ -1,3 +1,11 @@
+import { addActivity } from "actions/activity-helpers";
+import {
+    getOptimisticResponse,
+    IReviewTrackableResponseFragment,
+    reviewTrackableResponseFragment,
+    updateActivities,
+} from "actions/review-trackable-helpers";
+import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
@@ -7,34 +15,15 @@ import dataIdFromObject from "utils/data-id-from-object";
 import Difficulty from "utils/difficulty";
 
 interface IApproveTrackableResponse {
-    approveTrackable: {
-        trackable: ITrackableFragment;
-    };
+    approveTrackable: IReviewTrackableResponseFragment;
 }
-
-interface ITrackableFragment {
-    id: string;
-    approveCount: number;
-    isReviewed: boolean;
-}
-
-const trackableFragment = gql`
-fragment ApproveTrackableFragment on ITrackable {
-    id
-    ... on IGoal {
-        isReviewed
-        approveCount
-    }
-}`;
 
 const approveTrackableQuery = gql`
-${trackableFragment}
+${reviewTrackableResponseFragment}
 
 mutation ApproveTrackable($id: ID!, $difficulty: Difficulty!) {
     approveTrackable(id: $id, difficulty: $difficulty) {
-        trackable {
-            ...ApproveTrackableFragment
-        }
+        ...ReviewTrackableResponseFragment
     }
 }`;
 
@@ -44,28 +33,20 @@ async function approveTrackable(
     mutate: MutationFunc<IApproveTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
-        optimisticResponse: getOptimisticResponse(id, apollo),
+    const mutationName = "approveTrackable";
+    const counterField = "approveCount";
+    const result = await mutate({
+        optimisticResponse: getOptimisticResponse(
+            id, counterField, mutationName, apollo),
+        update: (proxy, response) => {
+            const responseData =
+                (response.data as IApproveTrackableResponse).approveTrackable;
+            const isApprove = true;
+            updateActivities(isApprove, responseData, proxy);
+        },
         variables: { id, difficulty },
     });
-}
-
-function getOptimisticResponse(
-    trackableId: string, apollo: ApolloClient<NormalizedCacheObject>,
-) {
-    const fragmentId = dataIdFromObject(
-        { id: trackableId, __typename: Type.TaskGoal })!;
-    const trackable = apollo.readFragment<ITrackableFragment>(
-        { id: fragmentId, fragment: trackableFragment })!;
-    ++trackable.approveCount;
-    trackable.isReviewed = true;
-    return {
-        __typename: Type.Mutation,
-        approveTrackable: {
-            __typename: Type.ApproveTrackableResponse,
-            trackable,
-        },
-    } as IApproveTrackableResponse;
+    return result.data;
 }
 
 export { approveTrackable, IApproveTrackableResponse, approveTrackableQuery };

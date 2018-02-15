@@ -31,6 +31,7 @@ interface ITrackableProps {
     parentId?: string;
     status: TrackableStatus;
     isProveable?: boolean;
+    isProving?: boolean;
     isReviewable?: boolean;
     isBatchEditMode?: boolean;
     isSelected?: boolean;
@@ -88,6 +89,7 @@ interface IExpandButtonProps {
 
 interface IProveButtonProps {
     isDisabled?: boolean;
+    isLoading?: boolean;
     onPress?: () => void;
 }
 
@@ -256,10 +258,11 @@ class Trackable extends React.Component<ITrackableProps> {
     }
 
     private renderProveBtn() {
-        const { isDisabled, onProve } = this.props;
+        const { isDisabled, isProving, onProve } = this.props;
         return (
             <ProveButton
                 isDisabled={isDisabled}
+                isLoading={isProving}
                 onPress={onProve && this.onProve}
             />
         );
@@ -388,12 +391,13 @@ class ExpandButton extends React.PureComponent<IExpandButtonProps> {
 // tslint:disable-next-line:max-classes-per-file
 class ProveButton extends React.PureComponent<IProveButtonProps> {
     public render() {
-        const { isDisabled, onPress } = this.props;
+        const { isDisabled, isLoading, onPress } = this.props;
 
         return (
             <Button
                 style={styles.proveBtn}
                 disabled={isDisabled}
+                loading={isLoading}
                 onPress={onPress}
             >
                 <ButtonTitle disabled={isDisabled} msgId="trackable.prove" />
@@ -489,7 +493,6 @@ const styles = StyleSheet.create({
     },
     proveBtn: {
         alignSelf: "center",
-        marginBottom: 8,
     },
     rejectBtnTitle: {},
     reviewControls: {

@@ -16,7 +16,8 @@ interface IProfileFormProps {
     avatarUri: string;
     avatarError?: string|null;
     isAvatarDisabled?: boolean;
-    onChangeAvatar: (img?: Image) => void;
+    isAvatarChanging?: boolean;
+    onChangeAvatar: (img: Image|null) => void;
     onChangeName: (name: string) => void;
     onLogin: () => void;
 }
@@ -31,6 +32,7 @@ class ProfileForm extends React.Component<IProfileFormProps> {
             avatarUri,
             avatarError,
             isAvatarDisabled,
+            isAvatarChanging,
             onChangeAvatar,
             onChangeName,
             onLogin,
@@ -45,6 +47,7 @@ class ProfileForm extends React.Component<IProfileFormProps> {
                     style={styles.avatarContainer}
                     errorMsgId={avatarError}
                     disabled={isAvatarDisabled}
+                    changing={isAvatarChanging}
                     uri={avatarUri}
                     onChangeImg={onChangeAvatar}
                 />

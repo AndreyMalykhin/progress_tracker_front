@@ -26,7 +26,7 @@ export default {
     "activities.trackableAdded": "Created {trackableTitle}",
     "activitiesNavigation.friends": "Friends",
     "activitiesNavigation.my": "My",
-    "activityList.friendsLoginMsg": "Please login to see your friends data",
+    "activityList.loginToSeeFriends": "Please login to see your friends data",
     "aggregate.total": "Total: {progress}",
     "approveTrackable.title": "How difficult do you think it was?",
     "archiveNavigation.approvedTrackables": "Approved",
@@ -90,10 +90,14 @@ export default {
     "notifications.goalAchieved": "Goal achieved! Now it's time to prove it.",
     "notifications.goalApproved": "Goal approved!",
     "notifications.goalPendingReview": "Goal is pending review now.",
+    "notifications.reviewReward":
+        "You have earned {rating} rating for doing review",
     "numericalEntryForm.entryPlaceholder": "1",
     "numericalGoalForm.maxProgressLabel": "Max progress",
     "numericalGoalForm.maxProgressPlaceholder": "0",
-    "pendingReviewList.friendsLoginMsg": "Please login to see your friends data",
+    "pendingReviewList.loginToReview": "Please login to do review",
+    "pendingReviewList.loginToSeeFriends":
+        "Please login to see your friends data",
     "profile.activeTrackables": "In Progress",
     "profile.archive": "Archive",
     "profileForm.loginMessage": "Please login to edit your profile",
@@ -110,13 +114,14 @@ export default {
     "reviewsNavigation.myTrackables": "My",
     "taskGoalForm.newTaskTitlePlaceholder": "Do something small",
     "taskGoalForm.tasksLabel": "Tasks",
-    "trackable.achievementPeriod": `Achieved in {period, plural,
-        =1 {{period} day}
-        other {{period} days}
+    "trackable.achievementPeriod": `Achieved {period, plural,
+        =1 {in {period} day}
+        other {in {period} days}
     }`,
     "trackable.activePeriod": `Created {period, plural,
-        =1 {{period} day}
-        other {{period} days}
+        =0 {today}
+        =1 {{period} day ago}
+        other {{period} days ago}
     }`,
     "trackable.approve": "Approve",
     "trackable.expirationPeriod": `Expired after {period, plural,

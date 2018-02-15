@@ -70,7 +70,7 @@ function getPendingReviewTrackables(audience: Audience, apollo: DataProxy) {
             variables: { audience },
         })!;
     } catch (e) {
-        log("getPendingReviewTrackables(); error=%o", e);
+        log("getPendingReviewTrackables(); no data");
         return null;
     }
 }

@@ -35,7 +35,10 @@ interface IArchivedTrackableListContainerProps extends
 
 const getDataQuery = gql`
 query GetData(
-    $userId: ID!, $trackableStatus: TrackableStatus!, $cursor: Float
+    $userId: ID!,
+    $trackableStatus: TrackableStatus!,
+    $skipProofedGoalFields: Boolean!,
+    $cursor: Float
 ) {
     getArchivedTrackables(
         userId: $userId, status: $trackableStatus, after: $cursor
@@ -59,10 +62,10 @@ query GetData(
                     progress
                     maxProgress
                     progressDisplayMode
-                    rating
-                    approveCount
-                    rejectCount
-                    proofPhotoUrlMedium
+                    rating @skip(if: $skipProofedGoalFields)
+                    approveCount @skip(if: $skipProofedGoalFields)
+                    rejectCount @skip(if: $skipProofedGoalFields)
+                    proofPhotoUrlMedium @skip(if: $skipProofedGoalFields)
                 }
             }
         }
@@ -80,7 +83,12 @@ const withData = graphql<
             const { userId, trackableStatus } = ownProps;
             return {
                 notifyOnNetworkStatusChange: true,
-                variables: { userId, trackableStatus },
+                variables: {
+                    skipProofedGoalFields:
+                        trackableStatus === TrackableStatus.Expired,
+                    trackableStatus,
+                    userId,
+                },
             };
         },
         props: ({ data }) => {

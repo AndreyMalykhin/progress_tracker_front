@@ -29,6 +29,7 @@ const withData = graphql<IGetDataResponse, {}, IWithLoginProps>(
     getDataQuery,
     {
         options: {
+            fetchPolicy: "cache-only",
             variables: { userId: myId },
         },
         props: ({ data }) => {

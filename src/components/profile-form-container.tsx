@@ -42,12 +42,13 @@ interface IGetDataResponse {
 interface IProfileFormContainerProps extends
     IWithHeaderProps, RouteComponentProps<{}> {
     data: QueryProps & IGetDataResponse;
-    onSetAvatar: (img?: Image) => void;
+    onSetAvatar: (img: Image|null) => void;
     onEditUser: (user: IEditUserFragment) => void;
     onLogin: () => void;
 }
 
 interface IProfileFormContainerState {
+    isAvatarChanging?: boolean;
     avatarUri: string;
     avatarError?: string|null;
     name: string;
@@ -64,8 +65,8 @@ const withSetAvatar =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onSetAvatar: (img?: Image) =>
-                        setUserAvatar(img || null, mutate!, ownProps.client),
+                    onSetAvatar: (img: Image|null) =>
+                        setUserAvatar(img, mutate!, ownProps.client),
                 };
             },
         },
@@ -128,12 +129,14 @@ class ProfileFormContainer extends
 
     public render() {
         const isUserLoggedIn = this.props.data.getUserById.accessToken != null;
-        const { avatarError, avatarUri, name, nameError } = this.state;
+        const { avatarError, avatarUri, name, nameError, isAvatarChanging } =
+            this.state;
         return (
             <ProfileForm
                 avatarError={avatarError}
                 avatarUri={avatarUri}
                 isAvatarDisabled={!isUserLoggedIn}
+                isAvatarChanging={isAvatarChanging}
                 isNameDisabled={!isUserLoggedIn}
                 isUserLoggedIn={isUserLoggedIn}
                 name={name}
@@ -201,8 +204,18 @@ class ProfileFormContainer extends
         }, callback);
     }
 
-    private onChangeAvatar = (img?: Image) => {
-        this.props.onSetAvatar(img);
+    private onChangeAvatar = async (img: Image|null) => {
+        if (img) {
+            this.setState({ isAvatarChanging: true });
+        }
+
+        try {
+            await this.props.onSetAvatar(img);
+        } finally {
+            if (img) {
+                this.setState({ isAvatarChanging: false });
+            }
+        }
     }
 
     private onLogin = () => this.props.onLogin();

@@ -1,11 +1,8 @@
-import "intl";
-// tslint:disable-next-line:ordered-imports
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import App, { IAppProps } from "components/app";
 import Error from "components/error";
 import Loader from "components/loader";
-import withApolloProvider from "components/with-apollo-provider";
 import withError from "components/with-error";
 import withLoader from "components/with-loader";
 import gql from "graphql-tag";
@@ -13,17 +10,19 @@ import { History } from "history";
 import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
-import { addLocaleData } from "react-intl";
-import * as en from "react-intl/locale-data/en";
-import { getDeviceLocale } from "react-native-device-info";
-import Reactotron from "reactotron-react-native";
-import apolloFactory from "utils/apollo-factory";
-import Config from "utils/config";
-import MultiStackHistory from "utils/multi-stack-history";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 
-interface IGetAppDataResponse {
+interface IAppContainerProps extends IOwnProps {
+    messages: { [id: string]: string };
+    history: History;
+}
+
+interface IOwnProps {
+    locale: string;
+}
+
+interface IGetDataResponse {
     getMessages: Array<{
         id: string;
         key: string;
@@ -38,14 +37,6 @@ interface IGetSettingsResponse {
     };
 }
 
-interface IOwnProps {
-    locale: string;
-}
-
-interface IAppContainerProps extends IOwnProps {
-    messages: { [id: string]: string };
-}
-
 const getSettingsQuery = gql`
 query GetSettings {
     settings @client {
@@ -54,8 +45,8 @@ query GetSettings {
     }
 }`;
 
-const getAppDataQuery = gql`
-query GetAppData($locale: String!) {
+const getDataQuery = gql`
+query GetData($locale: String!) {
     getMessages(locale: $locale) @client {
         id
         key
@@ -63,43 +54,7 @@ query GetAppData($locale: String!) {
     }
 }`;
 
-function bootstrap() {
-    if (Config.isDevEnv) {
-        Reactotron.configure().useReactNative().connect();
-    }
-
-    console.ignoredYellowBox = ["Remote debugger is in"];
-    history = new MultiStackHistory();
-    initLocale();
-}
-
-function initLocale() {
-    addLocaleData(en);
-    const settingsResponse =
-        apollo.readQuery<IGetSettingsResponse>({ query: getSettingsQuery })!;
-    let { locale } = settingsResponse.settings;
-
-    if (locale) {
-        return;
-    }
-
-    locale = getDeviceLocale();
-    const isLocaleSupported = ["en"].some(
-        (supportedLocale) => locale!.startsWith(supportedLocale));
-
-    if (!isLocaleSupported) {
-        locale = "en";
-    }
-
-    settingsResponse.settings.locale = locale;
-    apollo.writeQuery({ data: settingsResponse, query: getSettingsQuery });
-}
-
-const apollo = apolloFactory();
-let history: History;
-bootstrap();
-
-const withSettings = graphql<IGetSettingsResponse, {}, IAppProps>(
+const withSettings = graphql<IGetSettingsResponse, IOwnProps, IAppProps>(
     getSettingsQuery,
     {
         props: ({ data }) => {
@@ -110,8 +65,8 @@ const withSettings = graphql<IGetSettingsResponse, {}, IAppProps>(
     },
 );
 
-const withAppData = graphql<IGetAppDataResponse, IOwnProps, IAppProps>(
-    getAppDataQuery,
+const withData = graphql<IGetDataResponse, IOwnProps, IAppProps>(
+    getDataQuery,
     {
         options: ({ locale }) => {
             return {
@@ -128,29 +83,27 @@ const withAppData = graphql<IGetAppDataResponse, IOwnProps, IAppProps>(
                 return { queryStatus };
             }
 
-            const transformedMessages: { [key: string]: string } = {};
-            return {
-                messages: data!.getMessages.reduce((accumulator, message) => {
-                    accumulator[message.key] = message.text;
-                    return accumulator;
-                }, transformedMessages),
-                queryStatus,
-            };
+            const messages: { [key: string]: string } = {};
+
+            for (const message of getMessages) {
+                messages[message.key] = message.text;
+            }
+
+            return { messages, queryStatus };
         },
     },
 );
 
 class AppContainer extends React.Component<IAppContainerProps> {
     public render() {
-        const { locale, messages } = this.props;
+        const { locale, messages, history } = this.props;
         return <App history={history} locale={locale} messages={messages} />;
     }
 }
 
 export default compose(
-    withApolloProvider(apollo),
     withSettings,
-    withAppData,
+    withData,
     withLoader(Loader),
     withError(Error),
 )(AppContainer);

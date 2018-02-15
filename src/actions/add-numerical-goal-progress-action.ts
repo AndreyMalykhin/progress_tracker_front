@@ -1,9 +1,11 @@
+import { addActivity, addGoalAchievedActivity } from "actions/activity-helpers";
 import {
     IUpdateProgressFragment,
     updateProgress,
     updateProgressFragment,
 } from "actions/aggregate-helpers";
 import { addProgress } from "actions/goal-helpers";
+import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
@@ -11,10 +13,13 @@ import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
+import myId from "utils/my-id";
+import uuid from "utils/uuid";
 
 interface IAddNumericalGoalProgressResponse {
     addNumericalGoalProgress: {
         trackable: {
+            __typename: Type;
             id: string;
             progress: number;
             status: TrackableStatus;
@@ -28,6 +33,7 @@ interface IAddNumericalGoalProgressResponse {
 }
 
 interface IGoalFragment {
+    __typename: Type;
     id: string;
     progress: number;
     maxProgress: number;
@@ -68,22 +74,23 @@ mutation AddNumericalGoalProgress($id: ID!, $value: Float!) {
     }
 }`;
 
+const progressChangedActivityFragment = gql`
+fragment AddNumericalGoalActivityFragment on NumericalGoalProgressChangedActivity {
+    id
+    date
+    delta
+    user {
+        id
+    }
+    trackable {
+        id
+    }
+}`;
+
 async function addNumericalGoalProgress(
     id: string,
     value: number,
     mutate: MutationFunc<IAddNumericalGoalProgressResponse>,
-    apollo: ApolloClient<NormalizedCacheObject>,
-) {
-    const result = await mutate({
-        optimisticResponse: getOptimisticResponse(id, value, apollo),
-        variables: { id, value },
-    });
-    return result.data;
-}
-
-function getOptimisticResponse(
-    id: string,
-    value: number,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     const fragmentId =
@@ -93,6 +100,63 @@ function getOptimisticResponse(
         fragmentName: "AddNumericalGoalProgressFragment",
         id: fragmentId,
     })!;
+    const prevProgress = goal.progress;
+    const result = await mutate({
+        optimisticResponse: getOptimisticResponse(goal, value, apollo),
+        update: (proxy, response) => {
+            updateActivities(
+                prevProgress,
+                response.data as IAddNumericalGoalProgressResponse,
+                proxy,
+            );
+        },
+        variables: { id, value },
+    });
+    return result.data;
+}
+
+function updateActivities(
+    prevProgress: number,
+    response: IAddNumericalGoalProgressResponse,
+    apollo: DataProxy,
+) {
+    const { trackable } = response.addNumericalGoalProgress;
+    const progressChangedActivity = {
+        __typename: Type.NumericalGoalProgressChangedActivity,
+        date: Date.now(),
+        delta: trackable.progress - prevProgress,
+        id: uuid(),
+        trackable,
+        user: {
+            __typename: Type.User,
+            id: myId,
+        },
+    };
+    addActivity(
+        progressChangedActivity, progressChangedActivityFragment, apollo);
+
+    if (trackable.status === TrackableStatus.Active) {
+        return;
+    }
+
+    const goalAchievedActivity = {
+        __typename: Type.GoalAchievedActivity,
+        date: Date.now(),
+        id: uuid(),
+        trackable,
+        user: {
+            __typename: Type.User,
+            id: myId,
+        },
+    };
+    addGoalAchievedActivity(goalAchievedActivity, apollo);
+}
+
+function getOptimisticResponse(
+    goal: IGoalFragment,
+    value: number,
+    apollo: ApolloClient<NormalizedCacheObject>,
+) {
     addProgress(goal, value);
     return {
         __typename: Type.Mutation,
