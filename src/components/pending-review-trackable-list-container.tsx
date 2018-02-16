@@ -3,7 +3,6 @@ import {
     approveTrackableQuery,
     IApproveTrackableResponse,
 } from "actions/approve-trackable-action";
-import { ILoginResponse, login, loginQuery } from "actions/login-action";
 import {
     IRejectTrackableResponse,
     rejectTrackable,
@@ -24,8 +23,12 @@ import withError from "components/with-error";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withLogin, { IWithLoginProps } from "components/with-login";
+import withLoginAction, {
+    IWithLoginActionProps,
+} from "components/with-login-action";
 import gql from "graphql-tag";
 import Audience from "models/audience";
+import Difficulty from "models/difficulty";
 import RejectReason from "models/reject-reason";
 import * as React from "react";
 import { compose } from "react-apollo";
@@ -36,7 +39,6 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { Alert, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
-import Difficulty from "utils/difficulty";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApollo } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
@@ -46,42 +48,27 @@ interface IOwnProps extends RouteComponentProps<{}>, IWithApollo {
     audience: Audience;
 }
 
-interface IGetDataResponse {
-    getPendingReviewTrackablesByAudience:
-        IConnection<IPendingReviewTrackableListItemNode, number>;
-}
-
 interface IPendingReviewTrackableListContainerProps extends
     IOwnProps,
     IWithLoginProps,
     InjectedIntlProps,
+    IWithLoginActionProps,
     IWithLoadMoreProps {
     data: QueryProps & IGetDataResponse;
     onCommitApproveItem: (id: string, difficulty: Difficulty) =>
         Promise<IApproveTrackableResponse>;
     onCommitRejectItem: (id: string, reason: RejectReason) =>
         Promise<IRejectTrackableResponse>;
-    onLogin: () => void;
 }
 
 interface IPendingReviewTrackableListContainerState {
     toasts: IToastListItem[];
 }
 
-const withLoginAction = graphql<
-    ILoginResponse,
-    IOwnProps,
-    IPendingReviewTrackableListContainerProps
->(
-    loginQuery,
-    {
-        props: ({ mutate }) => {
-            return {
-                onLogin: () => login(mutate!),
-            } as Partial<IPendingReviewTrackableListContainerProps>;
-        },
-    },
-);
+interface IGetDataResponse {
+    getPendingReviewTrackablesByAudience:
+        IConnection<IPendingReviewTrackableListItemNode, number>;
+}
 
 const withApprove = graphql<
     IApproveTrackableResponse,
@@ -254,9 +241,9 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private ensureUserLoggedIn() {
-        const { accessToken, intl, onLogin } = this.props;
+        const { session, intl, onLogin } = this.props;
 
-        if (accessToken) {
+        if (session.accessToken) {
             return true;
         }
 

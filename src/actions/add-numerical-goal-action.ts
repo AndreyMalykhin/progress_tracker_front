@@ -1,15 +1,15 @@
 import { spliceActiveTrackables } from "actions/active-trackables-helpers";
 import { addTrackableAddedActivity } from "actions/activity-helpers";
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
 import gql from "graphql-tag";
+import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
-import Difficulty from "utils/difficulty";
-import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IAddNumericalGoalResponse {
@@ -83,7 +83,7 @@ async function addNumericalGoal(
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     await mutate({
-        optimisticResponse: getOptimisticResponse(goal),
+        optimisticResponse: getOptimisticResponse(goal, apollo),
         update: (proxy, response) => {
             const responseData = response.data as IAddNumericalGoalResponse;
             updateActiveTrackables(responseData, proxy);
@@ -115,7 +115,10 @@ function updateActiveTrackables(
     spliceActiveTrackables(idsToRemove, trackablesToAdd, apollo);
 }
 
-function getOptimisticResponse(goal: IAddNumericalGoalFragment) {
+function getOptimisticResponse(
+    goal: IAddNumericalGoalFragment,
+    apollo: ApolloClient<NormalizedCacheObject>,
+) {
     const currentDate = Date.now();
     return {
         __typename: Type.Mutation,
@@ -141,7 +144,7 @@ function getOptimisticResponse(goal: IAddNumericalGoalFragment) {
                 title: goal.title,
                 user: {
                     __typename: Type.User,
-                    id: myId,
+                    id: getSession(apollo).userId,
                 },
             },
         },

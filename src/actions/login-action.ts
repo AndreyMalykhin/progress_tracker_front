@@ -1,19 +1,17 @@
+import { setSession } from "actions/session-helpers";
+import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
+import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import { AccessToken, LoginManager, LoginResult } from "react-native-fbsdk";
+import dataIdFromObject from "utils/data-id-from-object";
 
 interface ILoginResponse {
     login: {
         user: {
             id: string;
-            accessToken: string;
         };
-    };
-    completeIntro: {
-        settings: {
-            id: string;
-            showIntro: boolean;
-        };
+        accessToken: string;
     };
 }
 
@@ -22,7 +20,6 @@ mutation LoginMutation($facebookAccessToken: String!) {
     login(facebookAccessToken: $facebookAccessToken) {
         user {
             id
-            accessToken
             avatarUrlMedium
             avatarUrlSmall
             isReported
@@ -30,6 +27,7 @@ mutation LoginMutation($facebookAccessToken: String!) {
             rating
             rewardableReviewsLeft
         }
+        accessToken
     }
     completeIntro @client
 }`;
@@ -49,11 +47,19 @@ async function login(mutate: MutationFunc<ILoginResponse>) {
         return false;
     }
 
-    const accessToken = await AccessToken.getCurrentAccessToken();
+    const facebookAccessToken = await AccessToken.getCurrentAccessToken();
     await mutate({
-        variables: { facebookAccessToken: accessToken!.accessToken },
+        update: (proxy, response) => {
+            updateSession(response.data as ILoginResponse, proxy);
+        },
+        variables: { facebookAccessToken: facebookAccessToken!.accessToken },
     });
     return true;
+}
+
+function updateSession(response: ILoginResponse, apollo: DataProxy) {
+    const { user, accessToken } = response.login;
+    setSession(user.id, accessToken, apollo);
 }
 
 export { login, loginQuery, ILoginResponse };

@@ -1,11 +1,11 @@
 import { addActivity } from "actions/activity-helpers";
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
 import Type from "models/type";
 import dataIdFromObject from "utils/data-id-from-object";
-import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IReviewTrackableResponseFragment {
@@ -77,14 +77,14 @@ function getOptimisticResponse(
     mutationName: string,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    const fragmentId = dataIdFromObject(
+    const trackableFragmentId = dataIdFromObject(
         { id: trackableId, __typename: Type.TaskGoal })!;
     const trackable = apollo.readFragment<ITrackableFragment>(
-        { id: fragmentId, fragment: trackableFragment })!;
+        { id: trackableFragmentId, fragment: trackableFragment })!;
     trackable.isReviewed = true;
     ++(trackable[counterField] as number);
-    const userFragmentdId =
-        dataIdFromObject({ __typename: Type.User, id: myId })!;
+    const userFragmentdId = dataIdFromObject(
+        { __typename: Type.User, id: getSession(apollo).userId })!;
     const user = apollo.readFragment<IUserFragment>(
         { id: userFragmentdId, fragment: userFragment })!;
     let bonusRating = 0;

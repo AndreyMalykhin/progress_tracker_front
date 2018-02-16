@@ -1,11 +1,11 @@
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
 import gql from "graphql-tag";
+import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
-import Difficulty from "utils/difficulty";
 
 interface IEditCounterResponse {
     editCounter: {

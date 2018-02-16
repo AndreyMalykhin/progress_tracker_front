@@ -37,6 +37,7 @@ enum Type {
     ReorderTrackableResponse = "ReorderTrackableResponse",
     ReportUserResponse = "ReportUserResponse",
     ReviewTrackableResponse = "ReviewTrackableResponse",
+    Session = "Session",
     Settings = "Settings",
     SetUserAvatarResponse = "SetUserAvatarResponse",
     SetTaskDoneResponse = "SetTaskDoneResponse",

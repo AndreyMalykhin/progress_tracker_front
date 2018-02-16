@@ -1,8 +1,8 @@
 import FormTextInput from "components/form-text-input";
 import GoalForm from "components/goal-form";
+import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
-import Difficulty from "utils/difficulty";
 
 interface INumericalGoalFormProps {
     availableIconNames: string[];

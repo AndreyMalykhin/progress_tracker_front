@@ -2,7 +2,7 @@ import { ApolloCacheClient } from "apollo-link-state";
 import gql from "graphql-tag";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
-import myId from "utils/my-id";
+import defaultId from "utils/default-id";
 
 // tslint:disable-next-line:no-empty-interface
 interface ICompleteIntroResponse {}
@@ -23,7 +23,7 @@ const completeIntroResolver = {
                 const data = {
                     settings: {
                         __typename: Type.Settings,
-                        id: myId,
+                        id: defaultId,
                         showIntro: false,
                     },
                 };

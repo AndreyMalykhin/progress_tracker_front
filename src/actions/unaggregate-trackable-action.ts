@@ -11,7 +11,6 @@ import gql from "graphql-tag";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
-import myId from "utils/my-id";
 
 interface IUnaggregateTrackableResponse {
     unaggregateTrackable: {

@@ -16,7 +16,6 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
-import myId from "utils/my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
 
 interface IGetDataResponse {

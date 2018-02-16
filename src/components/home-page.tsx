@@ -11,8 +11,8 @@ import Audience from "models/audience";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
+import defaultId from "utils/default-id";
 import IconName from "utils/icon-name";
-import myId from "utils/my-id";
 import routes from "utils/routes";
 
 type INavItem = INavBarItem & {
@@ -20,13 +20,13 @@ type INavItem = INavBarItem & {
 };
 
 const myActiveTrackablesRoute = routes.profileActiveTrackables.path.replace(
-    ":id", myId);
+    ":id", defaultId);
 const navItems: INavItem[] = [
     {
         component: ProfileSectionContainer,
         iconName: IconName.Profile,
         matchExact: routes.profile.exact,
-        matchPath: routes.profile.path.replace(":id", myId),
+        matchPath: routes.profile.path.replace(":id", defaultId),
         navigateToPath: myActiveTrackablesRoute,
         titleMsgId: "globalNavigation.profile",
     },

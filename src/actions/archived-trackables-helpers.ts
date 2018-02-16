@@ -1,10 +1,10 @@
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { IConnection, spliceConnection } from "utils/connection";
 import makeLog from "utils/make-log";
-import myId from "utils/my-id";
 
 const log = makeLog("archived-trackables-helpers");
 
@@ -65,7 +65,7 @@ function getArchivedTrackables(status: TrackableStatus, apollo: DataProxy) {
     try {
         return apollo.readQuery<IGetActiveTrackablesResponse>({
             query: getArchivedTrackablesQuery,
-            variables: { userId: myId, status },
+            variables: { userId: getSession(apollo).userId, status },
         })!;
     } catch (e) {
         log("getArchivedTrackables(); no data");
@@ -81,7 +81,7 @@ function setArchivedTrackables(
     apollo.writeQuery({
         data: archivedTrackablesResponse,
         query: getArchivedTrackablesQuery,
-        variables: { userId: myId, status },
+        variables: { userId: getSession(apollo).userId, status },
     });
 }
 

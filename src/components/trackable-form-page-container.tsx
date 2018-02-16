@@ -5,7 +5,9 @@ import TrackableFormPage, {
 } from "components/trackable-form-page";
 import withError from "components/with-error";
 import withLoader from "components/with-loader";
+import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
+import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import Type from "models/type";
 import * as React from "react";
@@ -13,18 +15,19 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
-import Difficulty from "utils/difficulty";
-import myId from "utils/my-id";
 import QueryStatus from "utils/query-status";
+
+interface ITrackableFormPageContainerProps extends
+    IOwnProps, IWithSessionProps {
+    trackable: ITrackable;
+}
+
+interface IOwnProps extends RouteComponentProps<IRouteParams> {}
 
 interface IRouteParams {
     type?: Type;
     id?: string;
 }
-
-type IOwnProps = RouteComponentProps<IRouteParams> & {
-    queryStatus?: QueryStatus;
-};
 
 interface IGetTrackableResponse {
     getTrackableById: {
@@ -32,21 +35,7 @@ interface IGetTrackableResponse {
     };
 }
 
-interface IGetUserResponse {
-    getUserById: {
-        id: string;
-        accessToken?: string;
-    };
-}
-
-type ITrackableFormPageContainerProps = IOwnProps & {
-    trackable: ITrackable;
-    user: {
-        accessToken?: string;
-    }
-};
-
-const getTrackableQuery = gql`
+const getDataQuery = gql`
 query GetData($trackableId: ID!) {
     getTrackableById(id: $trackableId) {
         id
@@ -71,9 +60,9 @@ query GetData($trackableId: ID!) {
     }
 }`;
 
-const withTrackable =
+const withData =
     graphql<IGetTrackableResponse, IOwnProps, ITrackableFormPageProps>(
-        getTrackableQuery,
+        getDataQuery,
         {
             options: (ownProps) => {
                 const { id: trackableId, type: trackableType } =
@@ -98,47 +87,14 @@ const withTrackable =
         },
     );
 
-const getUserQuery = gql`
-query GetUser($id: ID!) {
-    getUserById(id: $id) {
-        id
-        accessToken
-    }
-}`;
-
-const withUser = graphql<IGetUserResponse, IOwnProps, ITrackableFormPageProps>(
-    getUserQuery,
-    {
-        options: (ownProps) => {
-            return {
-                notifyOnNetworkStatusChange: true,
-                variables: { id: myId },
-            };
-        },
-        props: ({ ownProps, data }) => {
-            const { networkStatus: queryStatus, getUserById } = data!;
-
-            if (queryStatus === QueryStatus.InitialLoading
-                || queryStatus === QueryStatus.Error
-                || ownProps.queryStatus === QueryStatus.InitialLoading
-                || ownProps.queryStatus === QueryStatus.Error
-            ) {
-                return { queryStatus };
-            }
-
-            return { user: data!.getUserById, queryStatus };
-        },
-    },
-);
-
 class TrackableFormPageContainer extends
     React.Component<ITrackableFormPageContainerProps> {
     public render() {
-        const { trackable, user, match, ...restProps } = this.props;
+        const { trackable, session, match, ...restProps } = this.props;
         const trackableType = match.params.type || trackable!.__typename;
         return (
             <TrackableFormPage
-                isUserLoggedIn={!!user.accessToken}
+                isUserLoggedIn={session.accessToken != null}
                 trackableType={trackableType}
                 trackable={trackable}
             />
@@ -148,8 +104,8 @@ class TrackableFormPageContainer extends
 
 export default compose(
     withRouter,
-    withTrackable,
-    withUser,
+    withSession,
+    withData,
     withLoader(Loader),
     withError(Error),
 )(TrackableFormPageContainer);

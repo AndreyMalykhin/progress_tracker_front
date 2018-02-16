@@ -21,6 +21,7 @@ import { IHeaderState } from "components/header";
 import NumericalGoalForm from "components/numerical-goal-form";
 import withHeader from "components/with-header";
 import { debounce, throttle } from "lodash";
+import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import Type from "models/type";
 import * as React from "react";
@@ -29,7 +30,6 @@ import graphql from "react-apollo/graphql";
 import { withApollo } from "react-apollo/withApollo";
 import { FormattedMessage } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
-import Difficulty from "utils/difficulty";
 import IconName from "utils/icon-name";
 import uuid from "utils/uuid";
 

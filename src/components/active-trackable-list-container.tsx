@@ -79,8 +79,8 @@ import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import * as React from "react";
 import { ReactNode } from "react";
+import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -97,9 +97,9 @@ import {
 import ImagePicker, { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import defaultId from "utils/default-id";
 import DragStatus from "utils/drag-status";
 import { push, removeIndex } from "utils/immutable-utils";
-import myId from "utils/my-id";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
@@ -1255,7 +1255,7 @@ class ActiveTrackableListContainer extends
     }
 
     private isMy() {
-        return this.props.match.params.id === myId;
+        return this.props.match.params.id === defaultId;
     }
 
     private onIsItemProveable = (status: TrackableStatus) => {

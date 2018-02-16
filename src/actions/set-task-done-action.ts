@@ -5,6 +5,7 @@ import {
     updateProgressFragment,
 } from "actions/aggregate-helpers";
 import { addProgress } from "actions/goal-helpers";
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -13,7 +14,6 @@ import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
-import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface ISetTaskDoneResponse {
@@ -154,6 +154,10 @@ function updateActivities(
         return;
     }
 
+    const user = {
+        __typename: Type.User,
+        id: getSession(apollo).userId,
+    };
     const trackable = task.goal;
     const progressChangedActivity = {
         __typename: Type.TaskGoalProgressChangedActivity,
@@ -161,10 +165,7 @@ function updateActivities(
         id: uuid(),
         task,
         trackable,
-        user: {
-            __typename: Type.User,
-            id: myId,
-        },
+        user,
     };
     addActivity(
         progressChangedActivity, progressChangedActivityFragment, apollo);
@@ -178,10 +179,7 @@ function updateActivities(
         date: Date.now(),
         id: uuid(),
         trackable,
-        user: {
-            __typename: Type.User,
-            id: myId,
-        },
+        user,
     };
     addGoalAchievedActivity(goalAchievedActivity, apollo);
 }

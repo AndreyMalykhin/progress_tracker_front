@@ -4,6 +4,7 @@ import {
     updateProgress,
     updateProgressFragment,
 } from "actions/aggregate-helpers";
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -12,7 +13,6 @@ import Audience from "models/audience";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
-import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IAddCounterProgressResponse {
@@ -114,7 +114,7 @@ function updateActivities(
         trackable,
         user: {
             __typename: Type.User,
-            id: myId,
+            id: getSession(apollo).userId,
         },
     };
     addActivity(activity, activityFragment, apollo);

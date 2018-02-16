@@ -17,6 +17,7 @@ import ProfileForm from "components/profile-form";
 import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoader from "components/with-loader";
+import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import { debounce } from "lodash";
 import * as React from "react";
@@ -27,20 +28,11 @@ import { withApollo } from "react-apollo/withApollo";
 import { FormattedMessage } from "react-intl";
 import { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
-import myId from "utils/my-id";
+import { IWithApollo } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 
-interface IGetDataResponse {
-    getUserById: {
-        id: string;
-        accessToken?: string;
-        name: string;
-        avatarUrlMedium: string;
-    };
-}
-
 interface IProfileFormContainerProps extends
-    IWithHeaderProps, RouteComponentProps<{}> {
+    IWithHeaderProps, RouteComponentProps<{}>, IOwnProps {
     data: QueryProps & IGetDataResponse;
     onSetAvatar: (img: Image|null) => void;
     onEditUser: (user: IEditUserFragment) => void;
@@ -55,8 +47,14 @@ interface IProfileFormContainerState {
     nameError?: string|null;
 }
 
-interface IOwnProps {
-    client: ApolloClient<NormalizedCacheObject>;
+interface IOwnProps extends IWithSessionProps, IWithApollo {}
+
+interface IGetDataResponse {
+    getUserById: {
+        id: string;
+        name: string;
+        avatarUrlMedium: string;
+    };
 }
 
 const withSetAvatar =
@@ -89,7 +87,6 @@ const getDataQuery = gql`
 query GetData($userId: ID!) {
     getUserById(id: $userId) {
         id
-        accessToken
         name
         avatarUrlMedium
     }
@@ -99,9 +96,9 @@ const withData =
     graphql<IGetDataResponse, IOwnProps, IProfileFormContainerProps>(
         getDataQuery,
         {
-            options: () => {
+            options: (ownProps) => {
                 return {
-                    variables: { userId: myId },
+                    variables: { userId: ownProps.session.userId },
                 };
             },
             props: ({ data }) => {
@@ -128,7 +125,7 @@ class ProfileFormContainer extends
     }
 
     public render() {
-        const isUserLoggedIn = this.props.data.getUserById.accessToken != null;
+        const isUserLoggedIn = this.props.session.accessToken != null;
         const { avatarError, avatarUri, name, nameError, isAvatarChanging } =
             this.state;
         return (
@@ -158,7 +155,7 @@ class ProfileFormContainer extends
         const prevUser = this.props.data.getUserById;
         const nextUser = nextProps.data.getUserById;
 
-        if (prevUser.accessToken !== nextUser.accessToken
+        if (this.props.session.accessToken !== nextProps.session.accessToken
             || prevUser.avatarUrlMedium !== nextUser.avatarUrlMedium
         ) {
             this.init(nextProps);
@@ -240,6 +237,7 @@ class ProfileFormContainer extends
 
 export default compose(
     withRouter,
+    withSession,
     withData,
     withLoader(Loader),
     withError(Error),

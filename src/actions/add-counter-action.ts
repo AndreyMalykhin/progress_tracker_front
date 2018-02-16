@@ -3,18 +3,18 @@ import {
     addTrackableAddedActivity,
     spliceActivities,
 } from "actions/activity-helpers";
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
 import gql from "graphql-tag";
 import Audience from "models/audience";
+import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
-import Difficulty from "utils/difficulty";
-import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IAddCounterResponse {
@@ -74,7 +74,7 @@ async function addCounter(
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     await mutate({
-        optimisticResponse: getOptimisticResponse(counter),
+        optimisticResponse: getOptimisticResponse(counter, apollo),
         update: (proxy, response) => {
             const responseData = response.data as IAddCounterResponse;
             updateActiveTrackables(responseData, proxy);
@@ -104,7 +104,8 @@ function updateActivities(response: IAddCounterResponse, apollo: DataProxy) {
     addTrackableAddedActivity(activity, apollo);
 }
 
-function getOptimisticResponse(counter: IAddCounterFragment) {
+function getOptimisticResponse(
+    counter: IAddCounterFragment, apollo: ApolloClient<NormalizedCacheObject>) {
     const currentDate = Date.now();
     return {
         __typename: Type.Mutation,
@@ -124,7 +125,7 @@ function getOptimisticResponse(counter: IAddCounterFragment) {
                 title: counter.title,
                 user: {
                     __typename: Type.User,
-                    id: myId,
+                    id: getSession(apollo).userId,
                 },
             },
         },

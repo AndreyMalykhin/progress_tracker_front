@@ -1,3 +1,4 @@
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
 import Type from "models/type";
@@ -6,7 +7,6 @@ import {
     sortConnection,
     spliceConnection,
 } from "utils/connection";
-import myId from "utils/my-id";
 
 interface ISpliceActiveTrackablesFragment {
     __typename: Type;
@@ -77,7 +77,7 @@ function sortActiveTrackables(apollo: DataProxy) {
 function getActiveTrackables(apollo: DataProxy) {
     return apollo.readQuery<IGetActiveTrackablesResponse>({
         query: getActiveTrackablesQuery,
-        variables: { userId: myId },
+        variables: { userId: getSession(apollo).userId },
     })!;
 }
 
@@ -87,7 +87,7 @@ function setActiveTrackables(
     apollo.writeQuery({
         data: activeTrackablesResponse,
         query: getActiveTrackablesQuery,
-        variables: { userId: myId },
+        variables: { userId: getSession(apollo).userId },
     });
 }
 

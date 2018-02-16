@@ -3,7 +3,6 @@ import { INavBarItem } from "components/nav-bar";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
-import myId from "utils/my-id";
 import routes from "utils/routes";
 
 interface IRouteParams {

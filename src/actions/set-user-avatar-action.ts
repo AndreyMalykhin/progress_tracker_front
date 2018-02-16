@@ -4,6 +4,7 @@ import {
     IEditUserFragment,
     IEditUserResponse,
 } from "actions/edit-user-action";
+import { getSession } from "actions/session-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
@@ -12,7 +13,6 @@ import { MutationFunc } from "react-apollo/types";
 import { Image } from "react-native-image-crop-picker";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultAvatar from "utils/default-avatar";
-import myId from "utils/my-id";
 import uploadFile from "utils/upload-file";
 
 interface ISetUserAvatarResponse {
@@ -71,7 +71,8 @@ async function setUserAvatar(
 function getOptimisticResponse(
     img: Image|null, apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    const fragmentId = dataIdFromObject({ __typename: Type.User, id: myId })!;
+    const fragmentId = dataIdFromObject(
+        { __typename: Type.User, id: getSession(apollo).userId })!;
     const user = apollo.readFragment<ISetUserAvatarFragment>(
         { id: fragmentId, fragment: setUserAvatarFragment })!;
     user.avatarUrlSmall = img ? img.path : defaultAvatar.urlSmall;

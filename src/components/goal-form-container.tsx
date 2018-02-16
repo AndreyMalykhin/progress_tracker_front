@@ -4,9 +4,9 @@ import TrackableFormContainer, {
     ITrackableFormContainerState,
 } from "components/trackable-form-container";
 import { debounce, throttle } from "lodash";
+import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
-import Difficulty from "utils/difficulty";
 
 interface IGoal extends ITrackable {
     difficulty: Difficulty;

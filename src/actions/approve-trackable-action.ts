@@ -9,10 +9,10 @@ import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
+import Difficulty from "models/difficulty";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
-import Difficulty from "utils/difficulty";
 
 interface IApproveTrackableResponse {
     approveTrackable: IReviewTrackableResponseFragment;

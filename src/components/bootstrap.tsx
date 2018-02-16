@@ -16,8 +16,8 @@ import Reactotron from "reactotron-react-native";
 import apolloFactory from "utils/apollo-factory";
 import Config from "utils/config";
 import dataIdFromObject from "utils/data-id-from-object";
+import defaultId from "utils/default-id";
 import MultiStackHistory from "utils/multi-stack-history";
-import myId from "utils/my-id";
 
 interface ISettingsFragment {
     id: string;
@@ -59,7 +59,7 @@ class Bootstrap extends React.Component {
     private initLocale() {
         addLocaleData(en);
         const fragmentId = dataIdFromObject(
-            { __typename: Type.Settings, id: myId })!;
+            { __typename: Type.Settings, id: defaultId })!;
         const settings = this.apollo.readFragment<ISettingsFragment>(
             { id: fragmentId, fragment: settingsFragment })!;
         let { locale } = settings;

@@ -1,5 +1,6 @@
 import { addActivity } from "actions/activity-helpers";
 import { spliceArchivedTrackables } from "actions/archived-trackables-helpers";
+import { getSession } from "actions/session-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
@@ -9,7 +10,6 @@ import { NetInfo } from "react-native";
 import { IConnection } from "utils/connection";
 import dataIdFromObject from "utils/data-id-from-object";
 import makeLog from "utils/make-log";
-import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IActiveTrackableFragment {
@@ -60,6 +60,7 @@ fragment GoalExpiredActivityFragment on GoalExpiredActivity {
     }
 }`;
 
+// TODO
 const millisecondsInHour = 1 * 60 * 1000;
 
 class DeadlineTracker {
@@ -120,7 +121,7 @@ class DeadlineTracker {
         try {
             return this.apollo.readQuery<IGetActiveTrackablesResponse>({
                 query: getActiveTrackablesQuery,
-                variables: { userId: myId },
+                variables: { userId: getSession(this.apollo).userId },
             });
         } catch (e) {
             log("getActiveTrackables(); no data");
@@ -148,7 +149,7 @@ class DeadlineTracker {
         this.apollo.writeQuery({
             data: response,
             query: getActiveTrackablesQuery,
-            variables: { userId: myId },
+            variables: { userId: getSession(this.apollo).userId },
         });
     }
 
@@ -166,7 +167,7 @@ class DeadlineTracker {
             trackable,
             user: {
                 __typename: Type.User,
-                id: myId,
+                id: getSession(this.apollo).userId,
             },
         };
         addActivity(activity, activityFragment, this.apollo);

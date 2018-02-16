@@ -1,5 +1,6 @@
 import Button, { ButtonTitle } from "components/button";
 import Image from "components/image";
+import { IWithLoginActionProps } from "components/with-login-action";
 import * as React from "react";
 import {
     Dimensions,
@@ -10,9 +11,8 @@ import {
 } from "react-native";
 import { withRouter } from "react-router";
 
-interface IIntroPageProps  {
+interface IIntroPageProps extends IWithLoginActionProps {
     onClose: () => void;
-    onLogin: () => void;
 }
 
 class IntroPage extends React.Component<IIntroPageProps> {

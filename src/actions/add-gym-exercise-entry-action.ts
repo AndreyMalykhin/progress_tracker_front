@@ -1,10 +1,10 @@
 import { addActivity } from "actions/activity-helpers";
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
-import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IGymExerciseFragment {
@@ -117,7 +117,7 @@ function updateActivities(
         trackable: entry.gymExercise,
         user: {
             __typename: Type.User,
-            id: myId,
+            id: getSession(apollo).userId,
         },
     };
     addActivity(activity, activityFragment, apollo);

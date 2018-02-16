@@ -3,11 +3,11 @@ import defaultId from "utils/default-id";
 
 export default {
     defaults: {
-        settings: {
-            __typename: Type.Settings,
+        session: {
+            __typename: Type.Session,
+            accessToken: null,
             id: defaultId,
-            locale: null,
-            showIntro: true,
+            userId: defaultId,
         },
     },
     resolvers: {},

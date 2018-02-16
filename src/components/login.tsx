@@ -1,14 +1,14 @@
 import Button, { ButtonTitle } from "components/button";
+import { IWithLoginActionProps } from "components/with-login-action";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import { StyleSheet, Text, View } from "react-native";
 
 interface ILoginProps {
     msgId?: string;
-    onLogin: () => void;
 }
 
-class Login extends React.Component<ILoginProps> {
+class Login extends React.Component<ILoginProps & IWithLoginActionProps> {
     public render() {
         const { msgId, onLogin } = this.props;
         const msg = msgId && (

@@ -16,6 +16,7 @@ import FormSwitch from "components/form-switch";
 import FormTextInput from "components/form-text-input";
 import TextInput from "components/text-input";
 import TrackableForm, { ITrackableFormProps } from "components/trackable-form";
+import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import Type from "models/type";
 import * as React from "react";
@@ -27,7 +28,6 @@ import {
     View,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import Difficulty from "utils/difficulty";
 
 interface IGoalFormProps extends ITrackableFormProps {
     difficulty: Difficulty;

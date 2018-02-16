@@ -18,6 +18,7 @@ import ProfileSection, {
 import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoader from "components/with-loader";
+import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import ReportReason from "models/report-reason";
 import TrackableStatus from "models/trackable-status";
@@ -31,7 +32,6 @@ import { InjectedIntlProps, injectIntl } from "react-intl";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
-import myId from "utils/my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
 import routes from "utils/routes";
 
@@ -58,7 +58,8 @@ interface IRouteParams {
     id?: string;
 }
 
-type IOwnProps = RouteComponentProps<IRouteParams>;
+interface IOwnProps extends
+    RouteComponentProps<IRouteParams>, IWithSessionProps {}
 
 const withReportUser =
     graphql<IReportUserResponse, IOwnProps, IProfileSectionContainerProps>(
@@ -89,9 +90,12 @@ const withData =
         getDataQuery,
         {
             options: (ownProps) => {
+                const { match, session } = ownProps;
                 return {
                     notifyOnNetworkStatusChange: true,
-                    variables: { userId: ownProps.match.params.id || myId },
+                    variables: {
+                        userId: match.params.id || session.userId,
+                    },
                 };
             },
             props: ({ ownProps, data }) => {
@@ -203,9 +207,9 @@ class ProfileSectionContainer
     }
 
     private updateHeader(props: IProfileSectionContainerProps) {
-        const { data, header } = props;
-        const { getUserById: user } = data;
-        const isMe = user.id === myId;
+        const { data, header, match } = props;
+        const user = data.getUserById;
+        const isMe = !match.params.id;
         const rightCommands: IHeaderCmd[] = [];
 
         if (isMe) {
@@ -237,9 +241,10 @@ class ProfileSectionContainer
     }
 
     private onEditProfile = () => {
-        const { data, history } = this.props;
+        const { history, match } = this.props;
+        const isMe = !match.params.id;
 
-        if (data.getUserById.id !== myId) {
+        if (!isMe) {
             return;
         }
 
@@ -286,6 +291,7 @@ class ProfileSectionContainer
 
 export default compose(
     withRouter,
+    withSession,
     withData,
     withLoader(Loader),
     withError(Error),

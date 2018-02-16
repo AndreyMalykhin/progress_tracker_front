@@ -1,10 +1,10 @@
+import { getSession } from "actions/session-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
-import myId from "utils/my-id";
 
 interface IEditUserResponse {
     editUser: {
@@ -52,7 +52,8 @@ async function editUser(
 function getOptimisticResponse(
     user: IEditUserFragment, apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    const fragmentId = dataIdFromObject({ __typename: Type.User, id: myId })!;
+    const fragmentId = dataIdFromObject(
+        { __typename: Type.User, id: getSession(apollo).userId })!;
     const storedUser = apollo.readFragment<IStoredUserFragment>(
         { id: fragmentId, fragment: editUserFragment })!;
     Object.assign(storedUser, user);

@@ -1,5 +1,6 @@
 import { spliceActiveTrackables } from "actions/active-trackables-helpers";
 import { getProgress } from "actions/aggregate-helpers";
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -8,7 +9,6 @@ import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
-import myId from "utils/my-id";
 import uuid from "utils/uuid";
 
 interface IAggregateTrackablesResponse {
@@ -24,6 +24,9 @@ interface IAggregateTrackablesResponse {
             creationDate: number;
             order: number;
             isPublic: boolean;
+            user: {
+                id: string;
+            };
             children: Array<{
                 id: string;
                 parent: {
@@ -68,6 +71,9 @@ mutation AggregateTrackables($ids: [ID!]!) {
             maxProgress
             order
             isPublic
+            user {
+                id
+            }
             children {
                 id
                 ... on IAggregatable {
@@ -173,6 +179,7 @@ function getOptimisticResponse(
     }
 
     const { current: progress, max: maxProgress } = getProgress(children);
+    const user = { __typename: Type.User, id: getSession(apollo).userId };
     let isNewTrackable = false;
 
     if (!aggregateId) {
@@ -203,6 +210,7 @@ function getOptimisticResponse(
                 progress,
                 status: TrackableStatus.Active,
                 statusChangeDate: null,
+                user,
             },
         },
     } as IAggregateTrackablesResponse;
