@@ -35,14 +35,16 @@ import IconName from "utils/icon-name";
 import QueryStatus, { isLoading } from "utils/query-status";
 import routes from "utils/routes";
 
-type IProfileSectionContainerProps =
-    RouteComponentProps<IRouteParams>
-    & InjectedIntlProps
-    & IWithHeaderProps
-    & {
+interface IProfileSectionContainerProps extends
+    IOwnProps,
+    InjectedIntlProps,
+    IWithHeaderProps {
     data: QueryProps & IGetDataResponse;
     onCommitReportUser: (id: string, reportReason: ReportReason) => void;
-};
+}
+
+interface IOwnProps extends
+    RouteComponentProps<IRouteParams>, IWithSessionProps {}
 
 interface IGetDataResponse {
     getUserById: {
@@ -52,14 +54,14 @@ interface IGetDataResponse {
         avatarUrlSmall: string;
         isReported: boolean;
     };
+    ui: {
+        isContextMode: boolean;
+    };
 }
 
 interface IRouteParams {
     id?: string;
 }
-
-interface IOwnProps extends
-    RouteComponentProps<IRouteParams>, IWithSessionProps {}
 
 const withReportUser =
     graphql<IReportUserResponse, IOwnProps, IProfileSectionContainerProps>(
@@ -82,6 +84,9 @@ query GetData($userId: ID!) {
         rating
         avatarUrlSmall
         isReported
+    }
+    ui @client {
+        isContextMode
     }
 }`;
 
@@ -161,7 +166,12 @@ class ProfileSectionContainer
     }
 
     public render() {
-        return <ProfileSection navItems={this.navItems} />;
+        return (
+            <ProfileSection
+                navItems={this.navItems}
+                isContextMode={this.props.data.ui.isContextMode}
+            />
+        );
     }
 
     public componentWillReceiveProps(nextProps: IProfileSectionContainerProps) {

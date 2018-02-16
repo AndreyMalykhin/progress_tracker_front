@@ -6,7 +6,7 @@ interface IWithLoginActionProps {
 }
 
 function withLoginAction<P>(
-    component: React.ComponentClass<P & IWithLoginActionProps>,
+    component: React.ComponentType<P & IWithLoginActionProps>,
 ) {
     return graphql<ILoginResponse, P, P & IWithLoginActionProps>(
         loginQuery,

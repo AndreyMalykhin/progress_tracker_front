@@ -26,6 +26,9 @@ import withLogin, { IWithLoginProps } from "components/with-login";
 import withLoginAction, {
     IWithLoginActionProps,
 } from "components/with-login-action";
+import withRefetchOnFirstLoad, {
+    IWithRefetchOnFirstLoadProps,
+} from "components/with-refetch-on-first-load";
 import gql from "graphql-tag";
 import Audience from "models/audience";
 import Difficulty from "models/difficulty";
@@ -40,11 +43,12 @@ import { Alert, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
 import { push, removeIndex } from "utils/immutable-utils";
-import { IWithApollo } from "utils/interfaces";
+import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
-interface IOwnProps extends RouteComponentProps<{}>, IWithApollo {
+interface IOwnProps extends
+    RouteComponentProps<{}>, IWithApolloProps, IWithRefetchOnFirstLoadProps {
     audience: Audience;
 }
 
@@ -148,8 +152,9 @@ const withData = graphql<
     getDataQuery,
     {
         options: (ownProps) => {
-            const { audience } = ownProps;
+            const { audience, fetchPolicy } = ownProps;
             return {
+                fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: { audience, skipUser: audience === Audience.Me },
             };
@@ -353,6 +358,8 @@ export default compose(
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
+    withRefetchOnFirstLoad<IPendingReviewTrackableListContainerProps>(
+        (props) => props.audience),
     withData,
     withLoader(Loader, 512),
     withError(Error),

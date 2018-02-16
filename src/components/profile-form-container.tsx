@@ -28,7 +28,7 @@ import { withApollo } from "react-apollo/withApollo";
 import { FormattedMessage } from "react-intl";
 import { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
-import { IWithApollo } from "utils/interfaces";
+import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 
 interface IProfileFormContainerProps extends
@@ -47,7 +47,7 @@ interface IProfileFormContainerState {
     nameError?: string|null;
 }
 
-interface IOwnProps extends IWithSessionProps, IWithApollo {}
+interface IOwnProps extends IWithSessionProps, IWithApolloProps {}
 
 interface IGetDataResponse {
     getUserById: {

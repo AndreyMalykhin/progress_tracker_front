@@ -12,7 +12,7 @@ interface IWithHeaderProps {
 }
 
 function withHeader<T extends IWithHeaderProps>(
-    Component: React.ComponentClass<T>,
+    Component: React.ComponentType<T>,
 ) {
     return class WithHeader extends
         React.Component< T & RouteComponentProps<{}> > {

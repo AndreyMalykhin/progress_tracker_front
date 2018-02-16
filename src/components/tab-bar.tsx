@@ -16,6 +16,7 @@ import { IconProps } from "react-native-vector-icons/Icon";
 interface ITabBarItemTitleProps extends TextProperties {
     active?: boolean;
     activeStyle?: StyleProp<TextStyle>;
+    disabled?: boolean;
     msgId: string;
     msgValues?: { [key: string]: string };
 }
@@ -31,7 +32,8 @@ type ITabBarProps = ViewProperties;
 
 interface ITabBarItemIconProps extends IconProps {
     active?: boolean;
-    component: React.ComponentClass<IconProps>;
+    disabled?: boolean;
+    component: React.ComponentType<IconProps>;
 }
 
 class TabBar extends React.Component<ITabBarProps> {
@@ -51,6 +53,7 @@ class TabBarItem extends React.Component<ITabBarItemProps> {
         const {
             id,
             active,
+            disabled,
             activeStyle,
             style,
             onSelect,
@@ -60,7 +63,7 @@ class TabBarItem extends React.Component<ITabBarItemProps> {
         return (
             <TouchableWithFeedback
                 style={[styles.item, style, active && activeStyle]}
-                disabled={this.props.active}
+                disabled={disabled || active}
                 onPress={this.onPress}
                 {...restProps}
             >
@@ -75,12 +78,14 @@ class TabBarItem extends React.Component<ITabBarItemProps> {
 // tslint:disable-next-line:max-classes-per-file
 class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
     public render() {
-        const { style, active, activeStyle, msgId, msgValues } = this.props;
+        const { style, active, activeStyle, disabled, msgId, msgValues } =
+            this.props;
         const newStyle = [
             styles.itemTitle,
             style,
             active && styles.itemTitleActive,
             active && activeStyle,
+            disabled && styles.itemTitleDisabled,
         ];
         return (
             <Text style={newStyle as any}>
@@ -93,13 +98,24 @@ class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
 // tslint:disable-next-line:max-classes-per-file
 class TabBarItemIcon extends React.PureComponent<ITabBarItemIconProps> {
     public render() {
-        const { component: Component, style, active, children, ...restProps } =
-            this.props;
-        const baseStyle = active ? itemIconActiveStyle : styles.itemIcon;
+        const {
+            component: Component,
+            style,
+            active,
+            disabled,
+            children,
+            ...restProps,
+        } = this.props;
+        const newStyle = [
+            styles.itemIcon,
+            style,
+            active && styles.itemIconActive,
+            disabled && styles.itemIconDisabled,
+        ];
         return (
             <Component
                 size={32}
-                style={[baseStyle, style]}
+                style={newStyle as any}
                 {...restProps}
             />
         );
@@ -126,15 +142,19 @@ const styles = StyleSheet.create({
     itemIconActive: {
         color: "#0076ff",
     },
+    itemIconDisabled: {
+        color: "#ccc",
+    },
     itemTitle: {
         flexDirection: "column",
     },
     itemTitleActive: {
         color: "#0076ff",
     },
+    itemTitleDisabled: {
+        color: "#ccc",
+    },
 });
-
-const itemIconActiveStyle = [styles.itemIcon, styles.itemIconActive];
 
 export {
     TabBarItem,

@@ -7,7 +7,7 @@ type IWithLoginProps = IWithSessionProps;
 function withLogin<P extends IWithLoginProps>(
     msgId: string, condition?: (props: P) => boolean,
 ) {
-    return (Component: React.ComponentClass<P>) => {
+    return (Component: React.ComponentType<P>) => {
         class WithLogin extends React.Component<P> {
             public render() {
                 const isShown = (!condition || condition(this.props))

@@ -43,6 +43,7 @@ import {
     setTaskDone,
     setTaskDoneQuery,
 } from "actions/set-task-done-action";
+import { setContextMode } from "actions/ui-helpers";
 import {
     IUnaggregateTrackableResponse,
     unaggregateTrackable,
@@ -75,12 +76,15 @@ import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
+import withRefetchOnFirstLoad, {
+    IWithRefetchOnFirstLoadProps,
+} from "components/with-refetch-on-first-load";
 import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import { ReactNode } from "react";
 import * as React from "react";
+import { ReactNode } from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -100,12 +104,13 @@ import { IConnection } from "utils/connection";
 import defaultId from "utils/default-id";
 import DragStatus from "utils/drag-status";
 import { push, removeIndex } from "utils/immutable-utils";
+import { IWithApolloProps } from "utils/interfaces";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
 interface IActiveTrackableListContainerProps extends
-    RouteComponentProps<IRouteParams>,
+    IOwnProps,
     InjectedIntlProps,
     IWithHeaderProps,
     IWithLoadMoreProps {
@@ -127,6 +132,11 @@ interface IActiveTrackableListContainerProps extends
     onLongPressItem: (id: string) => void;
 }
 
+interface IOwnProps extends
+    RouteComponentProps<IRouteParams>,
+    IWithApolloProps,
+    IWithRefetchOnFirstLoadProps {}
+
 interface IActiveTrackableListContainerState {
     itemsMeta: IActiveTrackableListItemsMeta;
     isAggregationMode?: boolean;
@@ -145,10 +155,6 @@ interface IActiveTrackableListContainerState {
 interface IRouteParams {
     id: string;
 }
-
-type IOwnProps = RouteComponentProps<IRouteParams> & {
-    client: ApolloClient<NormalizedCacheObject>;
-};
 
 interface IGetDataResponse {
     getActiveTrackables: IConnection<IActiveTrackableListItemNode, number>;
@@ -410,11 +416,12 @@ const withData =
         {
             options: (ownProps) => {
                 return {
+                    fetchPolicy: ownProps.fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                     variables: { userId: ownProps.match.params.id },
                 };
             },
-            props: ({ data }) => {
+            props: ({ data, ownProps }) => {
                 const queryStatus = data!.networkStatus;
 
                 if (queryStatus === QueryStatus.InitialLoading
@@ -431,8 +438,10 @@ const withData =
 const collapsedTaskCount = 2;
 const gymExerciseVisibleDayCount = 4;
 
-class ActiveTrackableListContainer extends
-    React.Component<IActiveTrackableListContainerProps, IActiveTrackableListContainerState> {
+class ActiveTrackableListContainer extends React.Component<
+    IActiveTrackableListContainerProps,
+    IActiveTrackableListContainerState
+> {
     public state: IActiveTrackableListContainerState = {
         gymExerciseEntryPopup: { onClose: () => null },
         itemsMeta: {},
@@ -528,6 +537,12 @@ class ActiveTrackableListContainer extends
             this.props.data.getActiveTrackables.edges
         ) {
             this.initItemsMeta(nextProps.data.getActiveTrackables.edges);
+        }
+    }
+
+    public componentWillUnmount() {
+        if (this.state.isAggregationMode) {
+            setContextMode(false, this.props.client);
         }
     }
 
@@ -968,6 +983,7 @@ class ActiveTrackableListContainer extends
                     },
                 ],
             });
+            setContextMode(true, this.props.client);
             return { isAggregationMode: true, itemsMeta };
         });
     }
@@ -976,6 +992,7 @@ class ActiveTrackableListContainer extends
         this.setState((prevState) => {
             const itemsMeta = this.unselectAndEnableItems(prevState.itemsMeta);
             this.props.header.pop();
+            setContextMode(false, this.props.client);
             return { isAggregationMode: false, itemsMeta };
         });
     }
@@ -1265,6 +1282,7 @@ class ActiveTrackableListContainer extends
 
 export default compose(
     withRouter,
+    withRefetchOnFirstLoad(),
     withData,
     withLoader(Loader, 512),
     withError(Error),

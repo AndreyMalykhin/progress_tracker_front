@@ -5,8 +5,8 @@ interface IOwnProps {
     queryStatus: QueryStatus;
 }
 
-function withError<T>(error: React.ComponentClass<T>) {
-    return <P extends {}>(Component: React.ComponentClass<P>) => {
+function withError<T>(error: React.ComponentType<T>) {
+    return <P extends {}>(Component: React.ComponentType<P>) => {
         return class WithError extends React.Component<P & IOwnProps> {
             public render() {
                 return this.props.queryStatus === QueryStatus.Error ?

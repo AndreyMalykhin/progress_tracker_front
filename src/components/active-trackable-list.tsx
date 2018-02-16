@@ -10,7 +10,6 @@ import {
     IGymExerciseEntryPopupResult,
 } from "components/gym-exercise-entry-popup";
 import GymExerciseEntryPopupContainer from "components/gym-exercise-entry-popup-container";
-import { IHeaderState } from "components/header";
 import Loader from "components/loader";
 import NumericalEntryPopupContainer from "components/numerical-entry-popup-container";
 import NumericalGoal from "components/numerical-goal";

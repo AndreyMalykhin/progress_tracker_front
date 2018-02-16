@@ -37,6 +37,7 @@ enum Type {
     ReorderTrackableResponse = "ReorderTrackableResponse",
     ReportUserResponse = "ReportUserResponse",
     ReviewTrackableResponse = "ReviewTrackableResponse",
+    Query = "Query",
     Session = "Session",
     Settings = "Settings",
     SetUserAvatarResponse = "SetUserAvatarResponse",
@@ -46,6 +47,7 @@ enum Type {
     TaskGoalProgressChangedActivity = "TaskGoalProgressChangedActivity",
     TrackableAddedActivity = "TrackableAddedActivity",
     TrackableEdge = "TrackableEdge",
+    UI = "UI",
     User = "User",
     UnaggregateTrackableResponse = "UnaggregateTrackableResponse",
 }

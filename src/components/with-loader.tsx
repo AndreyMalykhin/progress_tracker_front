@@ -9,8 +9,8 @@ interface IState {
     isVisible?: boolean;
 }
 
-function withLoader<T>(loader: React.ComponentClass<T>, minDuration?: number) {
-    return <P extends {}>(Component: React.ComponentClass<P>) => {
+function withLoader<T>(loader: React.ComponentType<T>, minDuration?: number) {
+    return <P extends {}>(Component: React.ComponentType<P>) => {
         return class WithLoader extends React.Component<P & IProps, IState> {
             public state: IState = {};
             private timeoutId?: NodeJS.Timer;
@@ -48,8 +48,15 @@ function withLoader<T>(loader: React.ComponentClass<T>, minDuration?: number) {
                 if (queryStatus === QueryStatus.Ready) {
                     if (minDuration) {
                         isVisible = true;
+
+                        if (this.timeoutId) {
+                            clearTimeout(this.timeoutId);
+                        }
+
                         this.timeoutId = setTimeout(() => {
-                            this.setState({ isVisible: false });
+                            if (this.props.queryStatus === queryStatus) {
+                                this.setState({ isVisible: false });
+                            }
                         }, minDuration);
                     } else {
                         isVisible = false;

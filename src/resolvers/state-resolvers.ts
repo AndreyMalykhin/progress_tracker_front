@@ -3,6 +3,7 @@ import { merge } from "lodash";
 import messageResolver from "resolvers/message-resolver";
 import sessionResolver from "resolvers/session-resolver";
 import settingsResolver from "resolvers/settings-resolver";
+import uiResolver from "resolvers/ui-resolver";
 import userResolver from "resolvers/user-resolver";
 
 export default merge(
@@ -11,4 +12,5 @@ export default merge(
     completeIntroResolver,
     userResolver,
     sessionResolver,
+    uiResolver,
 );

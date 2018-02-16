@@ -60,6 +60,13 @@ fragment GoalExpiredActivityFragment on GoalExpiredActivity {
     }
 }`;
 
+const trackableFragment = gql`
+fragment TrackableFragment on ITrackable {
+    id
+    status
+    statusChangeDate
+}`;
+
 // TODO
 const millisecondsInHour = 1 * 60 * 1000;
 
@@ -133,6 +140,11 @@ class DeadlineTracker {
         log("expire(); trackable=%o", trackable);
         trackable.status = TrackableStatus.Expired;
         trackable.statusChangeDate = Date.now();
+        this.apollo.writeFragment({
+            data: trackable,
+            fragment: trackableFragment,
+            id: dataIdFromObject(trackable)!,
+        });
     }
 
     private removeExpiredTrackablesFromActive(

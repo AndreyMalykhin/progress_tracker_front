@@ -8,6 +8,9 @@ import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
+import withRefetchOnFirstLoad, {
+    IWithRefetchOnFirstLoadProps,
+} from "components/with-refetch-on-first-load";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -18,18 +21,18 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
 import QueryStatus, { isLoading } from "utils/query-status";
 
+interface IArchivedTrackableListContainerProps extends
+    IWithLoadMoreProps, IOwnProps {
+    data: QueryProps & IGetDataResponse;
+}
+
 interface IGetDataResponse {
     getArchivedTrackables: IConnection<IArchivedTrackableListItemNode, number>;
 }
 
-interface IOwnProps {
+interface IOwnProps extends IWithRefetchOnFirstLoadProps {
     userId: string;
     trackableStatus: TrackableStatus;
-}
-
-interface IArchivedTrackableListContainerProps extends
-    IWithLoadMoreProps, IOwnProps {
-    data: QueryProps & IGetDataResponse;
 }
 
 const getDataQuery = gql`
@@ -81,6 +84,7 @@ const withData = graphql<
         options: (ownProps) => {
             const { userId, trackableStatus } = ownProps;
             return {
+                fetchPolicy: ownProps.fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: {
                     skipProofedGoalFields:
@@ -121,6 +125,8 @@ class ArchivedTrackableListContainer extends
 
 export default compose(
     withRouter,
+    withRefetchOnFirstLoad<IArchivedTrackableListContainerProps>(
+        (props) => `${props.userId}_${props.trackableStatus}`),
     withData,
     withLoader(Loader, 512),
     withError(Error),

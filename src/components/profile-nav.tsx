@@ -14,6 +14,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface IProfileNavProps {
     items: INavBarItem[];
+    isDisabled?: boolean;
 }
 
 class ProfileNav extends React.Component<IProfileNavProps> {
@@ -30,19 +31,26 @@ class ProfileNav extends React.Component<IProfileNavProps> {
     private renderItem: INavBarItemRenderer = (
         path, isActive, onSelect, titleMsgId, iconName,
     ) => {
+        const { isDisabled } = this.props;
         return (
             <TabBarItem
                 key={path}
                 id={path}
                 active={isActive}
+                disabled={isDisabled}
                 onSelect={onSelect}
             >
                 <TabBarItemIcon
                     active={isActive}
+                    disabled={isDisabled}
                     component={Icon}
                     name={iconName!}
                 />
-                <TabBarItemTitle active={isActive} msgId={titleMsgId!} />
+                <TabBarItemTitle
+                    disabled={isDisabled}
+                    active={isActive}
+                    msgId={titleMsgId!}
+                />
             </TabBarItem>
         );
     }

@@ -27,7 +27,7 @@ query GetData {
 }`;
 
 function withSession<P extends IWithSessionProps>(
-    component: React.ComponentClass<P>,
+    component: React.ComponentType<P>,
 ) {
     return graphql<IGetDataResponse, P, P>(
         getDataQuery,

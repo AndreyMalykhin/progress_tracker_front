@@ -12,7 +12,7 @@ function withLoadMore<TProps extends IWithLoadMoreProps, TResponse>(
     responseField: keyof TResponse,
     getData: (props: TProps) => QueryProps & TResponse,
 ) {
-    return (Component: React.ComponentClass<TProps>) => {
+    return (Component: React.ComponentType<TProps>) => {
         return class WithLoadMore extends React.Component<TProps> {
             public constructor(props: TProps, context: any) {
                 super(props, context);

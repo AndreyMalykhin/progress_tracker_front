@@ -5,16 +5,18 @@ import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Route, Switch } from "react-router";
 
-type IProfileSectionNavItem = INavBarItem & {
-    component: React.ComponentType;
-};
-
 interface IProfileSectionProps {
     navItems: IProfileSectionNavItem[];
+    isContextMode?: boolean;
+}
+
+interface IProfileSectionNavItem extends INavBarItem {
+    component: React.ComponentType;
 }
 
 class ProfileSection extends React.Component<IProfileSectionProps> {
     public render() {
+        const { navItems, isContextMode } = this.props;
         const routeElements = this.props.navItems.map((route) => {
             return (
                 <Route
@@ -25,10 +27,9 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
                 />
             );
         });
-
         return (
             <View style={styles.container}>
-                <ProfileNav items={this.props.navItems} />
+                <ProfileNav items={navItems} isDisabled={isContextMode} />
                 <View style={styles.content}>
                     <StackingSwitch>{routeElements}</StackingSwitch>
                 </View>

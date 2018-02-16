@@ -6,8 +6,8 @@ import { FetchMoreQueryOptions } from "apollo-client/core/watchQueryOptions";
 type IFetchMore = (options: FetchMoreQueryOptions & FetchMoreOptions) =>
     Promise< ApolloQueryResult<any> >;
 
-interface IWithApollo {
+interface IWithApolloProps {
     client: ApolloClient<NormalizedCacheObject>;
 }
 
-export { IFetchMore, IWithApollo };
+export { IFetchMore, IWithApolloProps };

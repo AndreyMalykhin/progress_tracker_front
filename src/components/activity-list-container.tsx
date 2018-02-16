@@ -1,4 +1,7 @@
-import ActivityList, { IActivityListItemNode, IActivityListSection } from "components/activity-list";
+import ActivityList, {
+    IActivityListItemNode,
+    IActivityListSection,
+} from "components/activity-list";
 import EmptyList from "components/empty-list";
 import Error from "components/error";
 import Loader from "components/loader";
@@ -6,6 +9,9 @@ import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withLoader from "components/with-loader";
 import withLogin, { IWithLoginProps } from "components/with-login";
+import withRefetchOnFirstLoad, {
+    IWithRefetchOnFirstLoadProps,
+} from "components/with-refetch-on-first-load";
 import gql from "graphql-tag";
 import Audience from "models/audience";
 import * as React from "react";
@@ -28,7 +34,8 @@ interface IRouteParams {
     audience: Audience;
 }
 
-interface IOwnProps extends RouteComponentProps<IRouteParams> {
+interface IOwnProps extends
+    RouteComponentProps<IRouteParams>, IWithRefetchOnFirstLoadProps {
     audience: Audience;
 }
 
@@ -109,8 +116,9 @@ const withData = graphql<
     getDataQuery,
     {
         options: (ownProps) => {
-            const { audience } = ownProps;
+            const { audience, fetchPolicy } = ownProps;
             return {
+                fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: { audience, skipUser: audience === Audience.Me },
             };
@@ -195,6 +203,8 @@ export default compose(
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
+    withRefetchOnFirstLoad<IActivityListContainerProps>(
+        (props) => props.audience),
     withData,
     withLoader(Loader, 512),
     withError(Error),
