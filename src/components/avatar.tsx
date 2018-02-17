@@ -2,20 +2,20 @@ import Image from "components/image";
 import * as React from "react";
 import { ImageStyle, StyleProp, StyleSheet } from "react-native";
 
-const sizeSmall = 32;
-const sizeLarge = 256;
-
 interface IAvatarProps {
     uri: string;
-    size: "small" | "large";
+    size: "small" | "medium" |"large";
     style?: StyleProp<ImageStyle>;
 }
+
+const sizeSmall = 32;
+const sizeMedium = 48;
+const sizeLarge = 256;
 
 class Avatar extends React.PureComponent<IAvatarProps> {
     public render() {
         const { uri, size, style } = this.props;
-        const newStyle =
-            [size === "small" ? styles.imgSmall : styles.imgLarge, style];
+        const newStyle = [sizeToStyleMap[size], style];
         return (
             <Image
                 resizeMode="cover"
@@ -33,6 +33,12 @@ const styles = StyleSheet.create({
         height: sizeLarge,
         width: sizeLarge,
     },
+    imgMedium: {
+        borderRadius: sizeMedium / 2,
+        borderWidth: 1,
+        height: sizeMedium,
+        width: sizeMedium,
+    },
     imgSmall: {
         borderRadius: sizeSmall / 2,
         borderWidth: 1,
@@ -40,5 +46,11 @@ const styles = StyleSheet.create({
         width: sizeSmall,
     },
 });
+
+const sizeToStyleMap = {
+    large: styles.imgLarge,
+    medium: styles.imgMedium,
+    small: styles.imgSmall,
+};
 
 export default Avatar;

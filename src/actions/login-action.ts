@@ -34,6 +34,7 @@ mutation LoginMutation($facebookAccessToken: String!) {
 
 async function login(mutate: MutationFunc<ILoginResponse>) {
     let result: LoginResult;
+    LoginManager.logOut();
 
     try {
         result = await LoginManager.logInWithReadPermissions(

@@ -33,9 +33,7 @@ class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
         return (
             <View style={styles.container}>
                 <Header />
-                <KeyboardAwareScrollView>
-                    {this.renderForm()}
-                </KeyboardAwareScrollView>
+                {this.renderForm()}
             </View>
         );
     }

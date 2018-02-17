@@ -76,9 +76,11 @@ import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
+import withNoUpdatesInBackground from "components/with-no-updates-in-background";
 import withRefetchOnFirstLoad, {
     IWithRefetchOnFirstLoadProps,
 } from "components/with-refetch-on-first-load";
+import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
 import TrackableStatus from "models/trackable-status";
@@ -135,6 +137,7 @@ interface IActiveTrackableListContainerProps extends
 interface IOwnProps extends
     RouteComponentProps<IRouteParams>,
     IWithApolloProps,
+    IWithSessionProps,
     IWithRefetchOnFirstLoadProps {}
 
 interface IActiveTrackableListContainerState {
@@ -415,10 +418,16 @@ const withData =
         getDataQuery,
         {
             options: (ownProps) => {
+                let userId = ownProps.match.params.id;
+
+                if (userId === defaultId) {
+                    userId = ownProps.session.userId;
+                }
+
                 return {
                     fetchPolicy: ownProps.fetchPolicy,
                     notifyOnNetworkStatusChange: true,
-                    variables: { userId: ownProps.match.params.id },
+                    variables: { userId },
                 };
             },
             props: ({ data, ownProps }) => {
@@ -1282,8 +1291,11 @@ class ActiveTrackableListContainer extends React.Component<
 
 export default compose(
     withRouter,
+    withHeader,
+    withSession,
     withRefetchOnFirstLoad(),
     withData,
+    withNoUpdatesInBackground,
     withLoader(Loader, 512),
     withError(Error),
     withEmptyList<IActiveTrackableListContainerProps>(
@@ -1301,6 +1313,5 @@ export default compose(
     withAggregate,
     withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>(
         "getActiveTrackables", (props) => props.data),
-    withHeader,
     injectIntl,
 )(ActiveTrackableListContainer);

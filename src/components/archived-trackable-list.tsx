@@ -38,7 +38,7 @@ interface IArchivedTrackableListProps {
 }
 
 class ArchivedTrackableList extends
-    React.Component<IArchivedTrackableListProps> {
+    React.PureComponent<IArchivedTrackableListProps> {
     public render() {
         const { items, queryStatus, onEndReached } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;

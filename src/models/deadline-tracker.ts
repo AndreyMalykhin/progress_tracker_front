@@ -1,3 +1,7 @@
+import {
+    ISpliceActiveTrackablesFragment,
+    spliceActiveTrackables,
+} from "actions/active-trackables-helpers";
 import { addActivity } from "actions/activity-helpers";
 import { spliceArchivedTrackables } from "actions/archived-trackables-helpers";
 import { getSession } from "actions/session-helpers";
@@ -116,7 +120,7 @@ class DeadlineTracker {
             return;
         }
 
-        this.removeExpiredTrackablesFromActive(activeTrackablesResponse);
+        this.removeTrackablesFromActive(expiredTrackables);
         this.addTrackablesToExpired(expiredTrackables);
 
         for (const expiredTrackable of expiredTrackables) {
@@ -147,22 +151,12 @@ class DeadlineTracker {
         });
     }
 
-    private removeExpiredTrackablesFromActive(
-        response: IGetActiveTrackablesResponse,
+    private removeTrackablesFromActive(
+        trackables: IExpiredTrackableFragment[],
     ) {
-        const activeTrackables = response.getActiveTrackables.edges;
-
-        for (let i = activeTrackables.length - 1; i >= 0; --i) {
-            if (activeTrackables[i].node.status === TrackableStatus.Expired) {
-                activeTrackables.splice(i, 1);
-            }
-        }
-
-        this.apollo.writeQuery({
-            data: response,
-            query: getActiveTrackablesQuery,
-            variables: { userId: getSession(this.apollo).userId },
-        });
+        const idsToRemove = trackables.map((trackable) => trackable.id);
+        const trackablesToAdd: ISpliceActiveTrackablesFragment[] = [];
+        spliceActiveTrackables(idsToRemove, trackablesToAdd, this.apollo);
     }
 
     private addTrackablesToExpired(trackables: IExpiredTrackableFragment[]) {

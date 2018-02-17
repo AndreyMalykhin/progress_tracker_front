@@ -10,6 +10,7 @@ import Card, {
 import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
 import Image from "components/image";
+import TouchableWithFeedback from "components/touchable-with-feedback";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
@@ -172,19 +173,16 @@ class Trackable extends React.Component<ITrackableProps> {
     private renderUser() {
         const { userName, userAvatarUrl } = this.props;
         const nameElement = userName && (
-            <CardTitle
-                isPrimary={true}
-                text={userName}
-                onPress={this.onPressUser}
-            />
+            <CardTitle isPrimary={true} text={userName} />
         );
-        const avatar = userAvatarUrl &&
-            <CardAvatar uri={userAvatarUrl} onPress={this.onPressUser} />;
+        const avatar = userAvatarUrl && <CardAvatar uri={userAvatarUrl} />;
         return (
-            <CardHeader isPrimary={true}>
-                {avatar}
-                {nameElement}
-            </CardHeader>
+            <TouchableWithFeedback onPress={this.onPressUser}>
+                <CardHeader isPrimary={true}>
+                    {avatar}
+                    {nameElement}
+                </CardHeader>
+            </TouchableWithFeedback>
         );
     }
 

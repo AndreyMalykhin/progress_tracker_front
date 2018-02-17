@@ -9,6 +9,7 @@ import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withLoader from "components/with-loader";
 import withLogin, { IWithLoginProps } from "components/with-login";
+import withNoUpdatesInBackground from "components/with-no-updates-in-background";
 import withRefetchOnFirstLoad, {
     IWithRefetchOnFirstLoadProps,
 } from "components/with-refetch-on-first-load";
@@ -206,6 +207,7 @@ export default compose(
     withRefetchOnFirstLoad<IActivityListContainerProps>(
         (props) => props.audience),
     withData,
+    withNoUpdatesInBackground,
     withLoader(Loader, 512),
     withError(Error),
     withEmptyList<IActivityListContainerProps>(

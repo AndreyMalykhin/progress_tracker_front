@@ -8,6 +8,9 @@ import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import { StyleSheet, Text } from "react-native";
 import { Image } from "react-native-image-crop-picker";
+import {
+    KeyboardAwareScrollView,
+} from "react-native-keyboard-aware-scroll-view";
 
 interface IProfileFormProps extends IWithLoginActionProps {
     isNameDisabled?: boolean;
@@ -42,40 +45,36 @@ class ProfileForm extends React.Component<IProfileFormProps> {
         );
 
         return (
-            <FormBody style={styles.container}>
-                <FormAvatarPicker
-                    style={styles.avatarContainer}
-                    errorMsgId={avatarError}
-                    disabled={isAvatarDisabled}
-                    changing={isAvatarChanging}
-                    uri={avatarUri}
-                    onChangeImg={onChangeAvatar}
-                />
-                <FormTextInput
-                    disabled={isNameDisabled}
-                    errorMsgId={nameError}
-                    placeholderMsgId="profileForm.namePlaceholder"
-                    value={name}
-                    onChangeText={onChangeName}
-                />
-                {loginGroup}
-            </FormBody>
+            <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+                <FormBody style={styles.container}>
+                    <FormAvatarPicker
+                        style={styles.avatarContainer}
+                        errorMsgId={avatarError}
+                        disabled={isAvatarDisabled}
+                        changing={isAvatarChanging}
+                        uri={avatarUri}
+                        onChangeImg={onChangeAvatar}
+                    />
+                    <FormTextInput
+                        disabled={isNameDisabled}
+                        errorMsgId={nameError}
+                        placeholderMsgId="profileForm.namePlaceholder"
+                        value={name}
+                        onChangeText={onChangeName}
+                    />
+                    {loginGroup}
+                </FormBody>
+            </KeyboardAwareScrollView>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    avatarContainer: {
-        borderBottomWidth: 1,
-    },
+    avatarContainer: {},
     container: {
         flex: 1,
     },
     loginGroup: {},
 });
-
-{/* <FormGroup style={styles.loginGroup}>
-                <LoginContainer msgId="profileForm.loginMessage" />
-            </FormGroup> */}
 
 export default ProfileForm;

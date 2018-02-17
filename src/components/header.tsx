@@ -14,7 +14,7 @@ interface IHeaderCmd {
     isPrimary?: boolean;
     isDisabled?: boolean;
     msgId: string;
-    onRun: () => void;
+    onRun?: () => void;
 }
 
 interface IHeaderCmdProps extends IHeaderCmd {

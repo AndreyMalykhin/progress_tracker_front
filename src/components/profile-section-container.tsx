@@ -18,6 +18,7 @@ import ProfileSection, {
 import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoader from "components/with-loader";
+import withNoUpdatesInBackground from "components/with-no-updates-in-background";
 import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import ReportReason from "models/report-reason";
@@ -31,6 +32,7 @@ import { QueryProps } from "react-apollo/types";
 import { InjectedIntlProps, injectIntl } from "react-intl";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
+import defaultId from "utils/default-id";
 import IconName from "utils/icon-name";
 import QueryStatus, { isLoading } from "utils/query-status";
 import routes from "utils/routes";
@@ -39,14 +41,15 @@ interface IProfileSectionContainerProps extends
     IOwnProps,
     InjectedIntlProps,
     IWithHeaderProps {
-    data: QueryProps & IGetDataResponse;
+    remoteData: QueryProps & IGetRemoteDataResponse;
+    localData: QueryProps & IGetLocalDataResponse;
     onCommitReportUser: (id: string, reportReason: ReportReason) => void;
 }
 
 interface IOwnProps extends
     RouteComponentProps<IRouteParams>, IWithSessionProps {}
 
-interface IGetDataResponse {
+interface IGetRemoteDataResponse {
     getUserById: {
         id: string;
         name: string;
@@ -54,6 +57,9 @@ interface IGetDataResponse {
         avatarUrlSmall: string;
         isReported: boolean;
     };
+}
+
+interface IGetLocalDataResponse {
     ui: {
         isContextMode: boolean;
     };
@@ -76,7 +82,7 @@ const withReportUser =
         },
     );
 
-const getDataQuery = gql`
+const getRemoteDataQuery = gql`
 query GetData($userId: ID!) {
     getUserById(id: $userId) {
         id
@@ -85,22 +91,44 @@ query GetData($userId: ID!) {
         avatarUrlSmall
         isReported
     }
+}`;
+
+const getLocalDataQuery = gql`
+query GetData {
     ui @client {
+        id
         isContextMode
     }
 }`;
 
-const withData =
-    graphql<IGetDataResponse, IOwnProps, IProfileSectionContainerProps>(
-        getDataQuery,
+const withLocalData = graphql<
+    IGetLocalDataResponse,
+    IOwnProps,
+    IProfileSectionContainerProps
+>(
+    getLocalDataQuery,
+    {
+        props: ({ data }) => {
+            return { localData: data };
+        },
+    },
+);
+
+const withRemoteData =
+    graphql<IGetRemoteDataResponse, IOwnProps, IProfileSectionContainerProps>(
+        getRemoteDataQuery,
         {
             options: (ownProps) => {
                 const { match, session } = ownProps;
+                let userId = match.params.id;
+
+                if (!userId || userId === defaultId) {
+                    userId = session.userId;
+                }
+
                 return {
                     notifyOnNetworkStatusChange: true,
-                    variables: {
-                        userId: match.params.id || session.userId,
-                    },
+                    variables: { userId },
                 };
             },
             props: ({ ownProps, data }) => {
@@ -112,7 +140,7 @@ const withData =
                     return { queryStatus };
                 }
 
-                return { data, queryStatus };
+                return { remoteData: data, queryStatus };
             },
         },
     );
@@ -161,7 +189,7 @@ class ProfileSectionContainer
 
     public constructor(props: IProfileSectionContainerProps, context: any) {
         super(props, context);
-        this.initNavItems(props.data.getUserById.id);
+        this.initNavItems(props.match.params.id);
         this.updateHeader(props);
     }
 
@@ -169,21 +197,20 @@ class ProfileSectionContainer
         return (
             <ProfileSection
                 navItems={this.navItems}
-                isContextMode={this.props.data.ui.isContextMode}
+                isContextMode={this.props.localData.ui.isContextMode}
             />
         );
     }
 
     public componentWillReceiveProps(nextProps: IProfileSectionContainerProps) {
-        const nextUser = nextProps.data.getUserById;
-        const prevUser = this.props.data.getUserById;
-        const nextUserId = nextUser.id;
+        const nextUser = nextProps.remoteData.getUserById;
+        const prevUser = this.props.remoteData.getUserById;
 
-        if (prevUser.id !== nextUserId) {
-            this.initNavItems(nextUserId);
+        if (this.props.match.params.id !== nextProps.match.params.id) {
+            this.initNavItems(nextProps.match.params.id);
         }
 
-        if (prevUser.id !== nextUserId
+        if (prevUser.id !== nextUser.id
             || prevUser.rating !== nextUser.rating
             || prevUser.name !== nextUser.name
             || prevUser.isReported !== nextUser.isReported
@@ -192,7 +219,7 @@ class ProfileSectionContainer
         }
     }
 
-    private initNavItems(userId: string) {
+    private initNavItems(userId?: string) {
         this.navItems = [
             {
                 component: ActiveTrackableListContainer,
@@ -200,7 +227,7 @@ class ProfileSectionContainer
                 matchExact: routes.profileActiveTrackables.exact,
                 matchPath: routes.profileActiveTrackables.path,
                 navigateToPath: routes.profileActiveTrackables.path.replace(
-                    ":id", userId),
+                    ":id", userId || defaultId),
                 titleMsgId: "profile.activeTrackables",
             },
             {
@@ -209,7 +236,7 @@ class ProfileSectionContainer
                 matchExact: routes.profileArchive.exact,
                 matchPath: routes.profileArchive.path,
                 navigateToPath: routes.profileArchive.path
-                    .replace(":id", userId)
+                    .replace(":id", userId || defaultId)
                     .replace(":trackableStatus", TrackableStatus.Approved),
                 titleMsgId: "profile.archive",
             },
@@ -217,9 +244,9 @@ class ProfileSectionContainer
     }
 
     private updateHeader(props: IProfileSectionContainerProps) {
-        const { data, header, match } = props;
-        const user = data.getUserById;
-        const isMe = !match.params.id;
+        const { remoteData, header, session } = props;
+        const user = remoteData.getUserById;
+        const isMe = user.id === session.userId;
         const rightCommands: IHeaderCmd[] = [];
 
         if (isMe) {
@@ -239,7 +266,7 @@ class ProfileSectionContainer
         const leftCommand = {
             imgUrl: user.avatarUrlSmall,
             msgId: isMe ? "commands.edit" : "commands.profile",
-            onRun: this.onEditProfile,
+            onRun: isMe ? this.onEditProfile : undefined,
         };
         header.replace({
             leftCommand,
@@ -250,16 +277,8 @@ class ProfileSectionContainer
         });
     }
 
-    private onEditProfile = () => {
-        const { history, match } = this.props;
-        const isMe = !match.params.id;
-
-        if (!isMe) {
-            return;
-        }
-
-        history.push(routes.profileEdit.path);
-    }
+    private onEditProfile = () =>
+        this.props.history.push(routes.profileEdit.path)
 
     private onStartReportUser = () => {
         ActionSheet.open({
@@ -276,7 +295,7 @@ class ProfileSectionContainer
         }
 
         this.props.onCommitReportUser(
-            this.props.data.getUserById.id, reportReason);
+            this.props.remoteData.getUserById.id, reportReason);
         // TODO toast
     }
 
@@ -301,11 +320,13 @@ class ProfileSectionContainer
 
 export default compose(
     withRouter,
+    withHeader,
     withSession,
-    withData,
+    withLocalData,
+    withRemoteData,
+    withNoUpdatesInBackground,
     withLoader(Loader),
     withError(Error),
     withReportUser,
     injectIntl,
-    withHeader,
 )(ProfileSectionContainer);

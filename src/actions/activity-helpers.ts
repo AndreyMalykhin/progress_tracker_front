@@ -170,9 +170,11 @@ function compareActivities(
 }
 
 export {
+    getActivities,
     spliceActivities,
     addTrackableAddedActivity,
     addGoalAchievedActivity,
     addActivity,
     IAddActivityFragment,
+    ISpliceActivitiesFragment,
 };

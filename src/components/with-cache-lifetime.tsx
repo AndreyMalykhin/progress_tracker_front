@@ -20,7 +20,7 @@ interface IQueryFragment {
 const log = makeLog("with-cache-lifetime");
 
 const queryFragment = gql`
-fragment WithCacheLifetimeQueryFragment on Query {
+fragment WithCacheLifetimeRequestFragment on Request {
     id
     lastRefetchDate
 }`;
@@ -31,7 +31,7 @@ function withCacheLifetime<P>(queryId: string, lifetime: number = 32000) {
             private lastRefetchDate?: Date;
             private isExpired = false;
             private fragmentId =
-                dataIdFromObject({ __typename: Type.Query, id: queryId })!;
+                dataIdFromObject({ __typename: Type.Request, id: queryId })!;
 
             public render() {
                 const fetchPolicy: FetchPolicy =
@@ -78,7 +78,7 @@ function withCacheLifetime<P>(queryId: string, lifetime: number = 32000) {
                 log("saveLastRefetchDate(); date=%o", this.lastRefetchDate);
                 this.props.client.writeFragment({
                     data: {
-                        __typename: Type.Query,
+                        __typename: Type.Request,
                         id: queryId,
                         lastRefetchDate: this.lastRefetchDate!.getTime(),
                     },

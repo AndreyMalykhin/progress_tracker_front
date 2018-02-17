@@ -1,8 +1,11 @@
 import Archive from "components/archive";
 import { INavBarItem } from "components/nav-bar";
+import withSession, { IWithSessionProps } from "components/with-session";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
+import { compose } from "react-apollo";
 import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
+import defaultId from "utils/default-id";
 import routes from "utils/routes";
 
 interface IRouteParams {
@@ -10,7 +13,8 @@ interface IRouteParams {
     trackableStatus: TrackableStatus;
 }
 
-type IArchiveContainerProps = RouteComponentProps<IRouteParams>;
+interface IArchiveContainerProps extends
+    RouteComponentProps<IRouteParams>, IWithSessionProps {}
 
 const approvedTrackablesRoute = routes.profileArchive.path.replace(
     ":trackableStatus", TrackableStatus.Approved);
@@ -28,7 +32,9 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
     }
 
     public render() {
-        const { id: userId, trackableStatus } = this.props.match.params;
+        const { match, session } = this.props;
+        const { id, trackableStatus } = match.params;
+        const userId = id === defaultId ? session.userId : id;
         return (
             <Archive
                 userId={userId}
@@ -70,4 +76,4 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
     }
 }
 
-export default withRouter(ArchiveContainer);
+export default compose(withRouter, withSession)(ArchiveContainer);

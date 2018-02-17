@@ -1,4 +1,5 @@
 import { Location } from "history";
+import * as PropTypes from "prop-types";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import {
@@ -13,6 +14,14 @@ import makeLog from "utils/make-log";
 
 const log = makeLog("stacking-switch");
 
+interface IStackingSwitchProps extends RouteComponentProps<{}> {
+    children: IChildren;
+}
+
+interface IStackEntryProps extends IStackEntry {
+    isHidden?: boolean;
+}
+
 type IChildren = Array< React.ReactElement<RouteProps> >;
 
 interface IStackEntry {
@@ -20,8 +29,8 @@ interface IStackEntry {
     location: Location;
 }
 
-interface IStackingSwitchProps extends RouteComponentProps<{}> {
-    children: IChildren;
+interface IStackingSwitchContext {
+    isInBackground: () => boolean;
 }
 
 class StackingSwitch extends React.Component<IStackingSwitchProps> {
@@ -31,12 +40,14 @@ class StackingSwitch extends React.Component<IStackingSwitchProps> {
     public render() {
         const lastEntryIndex = this.stack.length - 1;
         const stackElements = this.stack.map((entry, i) => {
-            const style =
-                i === lastEntryIndex ? styles.child : styles.childHidden;
             return (
-                <View key={i} style={style}>
-                    <Switch location={entry.location}>{entry.children}</Switch>
-                </View>
+                <StackEntry
+                    key={i}
+                    isHidden={i !== lastEntryIndex}
+                    location={entry.location}
+                >
+                    {entry.children}
+                </StackEntry>
             );
         });
         return <View style={styles.container}>{stackElements}</View>;
@@ -136,18 +147,55 @@ class StackingSwitch extends React.Component<IStackingSwitchProps> {
     }
 }
 
+// tslint:disable-next-line:max-classes-per-file
+class StackEntry extends React.Component<IStackEntryProps> {
+    public static childContextTypes = {
+        isInBackground: PropTypes.func.isRequired,
+    };
+    public static contextTypes = {
+        isInBackground: PropTypes.func,
+    };
+
+    public render() {
+        const { isHidden, children, location } = this.props;
+        const style = isHidden ? styles.stackEntryHidden : styles.stackEntry;
+        return (
+            <View style={style}>
+                <Switch location={location}>{children}</Switch>
+            </View>
+        );
+    }
+
+    public shouldComponentUpdate(nextProps: IStackEntryProps) {
+        return this.props.isHidden !== nextProps.isHidden
+            || !this.props.isHidden;
+    }
+
+    public getChildContext() {
+        return {
+            isInBackground: this.isInBackground,
+        } as IStackingSwitchContext;
+    }
+
+    private isInBackground = () => {
+        return (this.context.isInBackground && this.context.isInBackground())
+            || this.props.isHidden;
+    }
+}
+
 const styles = StyleSheet.create({
-    child: {
-        flex: 1,
-    },
-    childHidden: {
-        display: "none",
-    },
     container: {
         flex: 1,
     },
+    stackEntry: {
+        flex: 1,
+    },
+    stackEntryHidden: {
+        display: "none",
+    },
 });
 
-const childHiddenStyle = [styles.child, styles.childHidden];
+const childHiddenStyle = [styles.stackEntry, styles.stackEntryHidden];
 
+export { IStackingSwitchContext };
 export default withRouter(StackingSwitch);

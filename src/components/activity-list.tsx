@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import IconName from "utils/icon-name";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
 interface IActivityListProps {
@@ -218,8 +219,11 @@ interface IExternalGoalReviewedActivityProps extends IBaseActivityProps {
     onPressUser: (id: string) => void;
 }
 
-class ActivityList extends React.Component<IActivityListProps> {
+const log = makeLog("activity-list");
+
+class ActivityList extends React.PureComponent<IActivityListProps> {
     public render() {
+        log("render()");
         const { sections, queryStatus, onEndReached } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (

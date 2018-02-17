@@ -4,6 +4,7 @@ import StackingSwitch from "components/stacking-switch";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Route, Switch } from "react-router";
+import makeLog from "utils/make-log";
 
 interface IProfileSectionProps {
     navItems: IProfileSectionNavItem[];
@@ -14,8 +15,11 @@ interface IProfileSectionNavItem extends INavBarItem {
     component: React.ComponentType;
 }
 
+const log = makeLog("profile-section");
+
 class ProfileSection extends React.Component<IProfileSectionProps> {
     public render() {
+        log("render()");
         const { navItems, isContextMode } = this.props;
         const routeElements = this.props.navItems.map((route) => {
             return (

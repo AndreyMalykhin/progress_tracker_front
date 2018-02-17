@@ -26,6 +26,7 @@ import withLogin, { IWithLoginProps } from "components/with-login";
 import withLoginAction, {
     IWithLoginActionProps,
 } from "components/with-login-action";
+import withNoUpdatesInBackground from "components/with-no-updates-in-background";
 import withRefetchOnFirstLoad, {
     IWithRefetchOnFirstLoadProps,
 } from "components/with-refetch-on-first-load";
@@ -361,6 +362,7 @@ export default compose(
     withRefetchOnFirstLoad<IPendingReviewTrackableListContainerProps>(
         (props) => props.audience),
     withData,
+    withNoUpdatesInBackground,
     withLoader(Loader, 512),
     withError(Error),
     withEmptyList<IPendingReviewTrackableListContainerProps>(

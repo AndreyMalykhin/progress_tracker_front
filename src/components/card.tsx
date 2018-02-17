@@ -21,7 +21,6 @@ interface ICardProps extends ViewProperties {
 
 interface ICardAvatarProps {
     uri: string;
-    onPress?: () => void;
 }
 
 interface ICardHeaderProps extends ViewProperties {
@@ -115,11 +114,9 @@ class CardTitle extends React.PureComponent<ICardTitleProps> {
 // tslint:disable-next-line:max-classes-per-file
 class CardAvatar extends React.PureComponent<ICardAvatarProps> {
     public render() {
-        const { uri, onPress } = this.props;
+        const { uri } = this.props;
         return (
-            <TouchableWithoutFeedback onPress={onPress}>
-                <Avatar size="small" uri={uri} style={styles.avatar} />
-            </TouchableWithoutFeedback>
+            <Avatar size="small" uri={uri} style={styles.avatar} />
         );
     }
 }

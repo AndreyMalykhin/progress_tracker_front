@@ -1,5 +1,5 @@
 import ActivitiesSectionContainer from "components/activities-section-container";
-import FriendsSection from "components/friends-section";
+import FriendsSectionContainer from "components/friends-section-container";
 import GlobalNav from "components/global-nav";
 import Header from "components/header";
 import LeadersSection from "components/leaders-section";
@@ -32,7 +32,7 @@ const navItems: INavItem[] = [
     },
     {
         component: LeadersSection,
-        iconName: IconName.Leader,
+        iconName: IconName.Leaders,
         matchExact: routes.leaders.exact,
         matchPath: routes.leaders.path,
         navigateToPath: routes.leaders.path.replace(
@@ -49,7 +49,7 @@ const navItems: INavItem[] = [
         titleMsgId: "globalNavigation.pendingReview",
     },
     {
-        component: FriendsSection,
+        component: FriendsSectionContainer,
         iconName: IconName.Friends,
         matchExact: routes.friends.exact,
         matchPath: routes.friends.path,

@@ -73,8 +73,9 @@ interface IPendingReviewTrackableListProps extends ISharedProps {
 const log = makeLog("pending-review-trackable-list");
 
 class PendingReviewTrackableList extends
-    React.Component<IPendingReviewTrackableListProps> {
+    React.PureComponent<IPendingReviewTrackableListProps> {
     public render() {
+        log("render()");
         const {
             items,
             queryStatus,

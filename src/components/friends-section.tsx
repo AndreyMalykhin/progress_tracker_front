@@ -1,10 +1,21 @@
+import FriendListContainer from "components/friend-list-container";
 import * as React from "react";
-import { Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 class FriendsSection extends React.Component {
     public render() {
-        return <Text>FRIENDS SECTION</Text>;
+        return (
+            <View style={styles.container}>
+                <FriendListContainer />
+            </View>
+        );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+});
 
 export default FriendsSection;

@@ -19,6 +19,9 @@ import {
     TextInput as NativeTextInput,
     View,
 } from "react-native";
+import {
+    KeyboardAwareScrollView,
+} from "react-native-keyboard-aware-scroll-view";
 
 interface ITrackableFormProps {
     title: string;
@@ -67,27 +70,29 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
         }
 
         return (
-            <FormBody>
-                <FormTextInput
-                    labelMsgId={titleLabelMsgId}
-                    placeholderMsgId={titlePlaceholderMsgId}
-                    value={title}
-                    errorMsgId={titleError}
-                    onChangeText={onChangeTitle}
-                />
-                <FormIconPickerCollapsed
-                    iconName={iconName}
-                    onExpand={onOpenIconPicker}
-                />
-                <FormSwitch
-                    labelMsgId="trackableForm.isPublicLabel"
-                    hintMsgId="trackableForm.isPublicHint"
-                    disabled={isPublicDisabled}
-                    value={isPublic}
-                    onValueChange={onChangePublic}
-                />
-                {onRenderChildren && onRenderChildren()}
-            </FormBody>
+            <KeyboardAwareScrollView>
+                <FormBody>
+                    <FormTextInput
+                        labelMsgId={titleLabelMsgId}
+                        placeholderMsgId={titlePlaceholderMsgId}
+                        value={title}
+                        errorMsgId={titleError}
+                        onChangeText={onChangeTitle}
+                    />
+                    <FormIconPickerCollapsed
+                        iconName={iconName}
+                        onExpand={onOpenIconPicker}
+                    />
+                    <FormSwitch
+                        labelMsgId="trackableForm.isPublicLabel"
+                        hintMsgId="trackableForm.isPublicHint"
+                        disabled={isPublicDisabled}
+                        value={isPublic}
+                        onValueChange={onChangePublic}
+                    />
+                    {onRenderChildren && onRenderChildren()}
+                </FormBody>
+            </KeyboardAwareScrollView>
         );
     }
 }

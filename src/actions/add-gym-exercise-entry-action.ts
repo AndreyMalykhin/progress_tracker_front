@@ -133,7 +133,6 @@ function updateEntries(
     const gymExercise = apollo.readFragment<IGymExerciseFragment>(
         { id: fragmentId, fragment: gymExerciseFragment })!;
     gymExercise.entries.unshift(response.addGymExerciseEntry.entry);
-    removeOldEntries(gymExercise);
     apollo.writeFragment({
         data: gymExercise,
         fragment: gymExerciseFragment,
@@ -162,20 +161,6 @@ function getOptimisticResponse(
             },
         },
     } as IAddGymExerciseEntryResponse;
-}
-
-function removeOldEntries(gymExercise: IGymExerciseFragment) {
-    const { entries } = gymExercise;
-    const currentDate = Date.now();
-
-    for (let i = entries.length - 1; i >= 0; --i) {
-        const isMoreThanWeekAgo = currentDate > entries[i].date +
-            millisecondsInWeek;
-
-        if (isMoreThanWeekAgo) {
-            entries.splice(i, 1);
-        }
-    }
 }
 
 export {

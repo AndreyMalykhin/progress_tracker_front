@@ -1,5 +1,3 @@
-import defaultId from "utils/default-id";
-
 export default {
     activities: {
         exact: true,
@@ -31,7 +29,7 @@ export default {
     },
     profileEdit: {
         exact: true,
-        path: `/profile/${defaultId}/edit`,
+        path: `/profile/edit`,
     },
     trackableEdit: {
         exact: true,

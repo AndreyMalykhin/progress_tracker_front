@@ -37,12 +37,6 @@ class TextInput extends React.Component<ITextInputProps> {
             invalid ? styles.containerInvalid : null,
             disabled ? styles.containerDisabled : null,
         ];
-        let newEditable = editable;
-
-        if (disabled) {
-            newEditable = false;
-        }
-
         const controlStyle = [
             styles.control,
             style,
@@ -53,7 +47,7 @@ class TextInput extends React.Component<ITextInputProps> {
                 <TextInputImpl
                     ref={onRef as any}
                     style={controlStyle as any}
-                    editable={newEditable}
+                    editable={!disabled && (editable == null || editable)}
                     underlineColorAndroid="transparent"
                     {...restProps}
                 />

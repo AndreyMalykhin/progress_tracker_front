@@ -7,6 +7,7 @@ import {
     sortConnection,
     spliceConnection,
 } from "utils/connection";
+import makeLog from "utils/make-log";
 
 interface ISpliceActiveTrackablesFragment {
     __typename: Type;
@@ -17,6 +18,8 @@ interface ISpliceActiveTrackablesFragment {
 interface IGetActiveTrackablesResponse {
     getActiveTrackables: IConnection<ISpliceActiveTrackablesFragment, number>;
 }
+
+const log = makeLog("active-trackables-helpers");
 
 const getActiveTrackablesQuery = gql`
 query GetActiveTrackables($userId: ID!) {
@@ -42,6 +45,11 @@ function spliceActiveTrackables(
     apollo: DataProxy,
 ) {
     const activeTrackablesResponse = getActiveTrackables(apollo);
+
+    if (!activeTrackablesResponse) {
+        return;
+    }
+
     const cursorField = "order";
     spliceConnection(
         activeTrackablesResponse.getActiveTrackables,
@@ -68,6 +76,11 @@ function compareTrackables(
 
 function sortActiveTrackables(apollo: DataProxy) {
     const activeTrackablesResponse = getActiveTrackables(apollo);
+
+    if (!activeTrackablesResponse) {
+        return;
+    }
+
     const cursorField = "order";
     sortConnection(activeTrackablesResponse.getActiveTrackables, cursorField,
         compareTrackables);
@@ -75,10 +88,15 @@ function sortActiveTrackables(apollo: DataProxy) {
 }
 
 function getActiveTrackables(apollo: DataProxy) {
-    return apollo.readQuery<IGetActiveTrackablesResponse>({
-        query: getActiveTrackablesQuery,
-        variables: { userId: getSession(apollo).userId },
-    })!;
+    try {
+        return apollo.readQuery<IGetActiveTrackablesResponse>({
+            query: getActiveTrackablesQuery,
+            variables: { userId: getSession(apollo).userId },
+        });
+    } catch (e) {
+        log("getActiveTrackables(); no data");
+        return null;
+    }
 }
 
 function setActiveTrackables(

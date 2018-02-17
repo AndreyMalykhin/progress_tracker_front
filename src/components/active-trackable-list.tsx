@@ -37,6 +37,7 @@ import {
     ViewToken,
 } from "react-native";
 import DragStatus from "utils/drag-status";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
 interface IVisibleItemsChangeInfo {
@@ -164,8 +165,10 @@ interface IActiveTrackableListProps extends IExtraData {
     onIsItemProveable: (status: TrackableStatus) => boolean;
 }
 
+const log = makeLog("active-trackable-list");
+
 class ActiveTrackableList extends
-    React.Component<IActiveTrackableListProps> {
+    React.PureComponent<IActiveTrackableListProps> {
     private extraData = {} as IExtraData;
 
     public constructor(props: IActiveTrackableListProps, context: any) {
@@ -174,6 +177,7 @@ class ActiveTrackableList extends
     }
 
     public render() {
+        log("render()");
         const {
             isNumericalEntryPopupOpen,
             isGymExerciseEntryPopupOpen,
