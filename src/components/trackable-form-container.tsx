@@ -1,9 +1,16 @@
+import { share } from "actions/share-action";
+import { addGenericErrorToast } from "actions/toast-helpers";
+import { isApolloError } from "apollo-client/errors/ApolloError";
 import { IHeaderState } from "components/header";
+import { ITrackableFormProps } from "components/trackable-form";
 import { IWithHeaderProps } from "components/with-header";
 import { debounce, throttle } from "lodash";
+import TrackableType from "models/trackable-type";
 import * as React from "react";
-import { FormattedMessage } from "react-intl";
+import { withApollo } from "react-apollo";
+import { FormattedMessage, InjectedIntlProps } from "react-intl";
 import { RouteComponentProps } from "react-router";
+import { IWithApolloProps } from "utils/interfaces";
 
 interface ITrackable {
     id: string;
@@ -18,8 +25,11 @@ interface IEditTrackableFragment {
     iconName?: string;
 }
 
-interface ITrackableFormContainerProps<T extends ITrackable>
-    extends RouteComponentProps<{}>, IWithHeaderProps {
+interface ITrackableFormContainerProps<T extends ITrackable> extends
+    RouteComponentProps<{}>,
+    IWithHeaderProps,
+    IWithApolloProps,
+    InjectedIntlProps {
     trackable?: T;
     isUserLoggedIn: boolean;
 }
@@ -30,6 +40,7 @@ interface ITrackableFormContainerState {
     iconName: string;
     isPublic: boolean;
     isIconPickerOpen?: boolean;
+    share?: boolean;
 }
 
 abstract class TrackableFormContainer<
@@ -68,13 +79,44 @@ abstract class TrackableFormContainer<
     }
 
     protected abstract getTitleMsgId(): string;
-    protected abstract addTrackable(): Promise<void>;
+    protected abstract addTrackable(): Promise<any>;
     protected abstract doEditTrackable(
-        trackable: TEditTrackableFragment): Promise<void>;
+        trackable: TEditTrackableFragment): Promise<any>;
     protected abstract isValidForAdd(state: TState): boolean;
     protected abstract isValidForEdit(state: TState): boolean;
     protected abstract getInitialStateForAdd(): TState;
     protected abstract getInitialStateForEdit(): TState;
+    protected abstract getTrackableType(): TrackableType;
+
+    protected getFormBaseProps() {
+        const {
+            title,
+            titleError,
+            iconName,
+            isPublic,
+            isIconPickerOpen,
+            share: shareWithFriends,
+        } = this.state;
+        const { isUserLoggedIn } = this.props;
+        const isNew = this.isNew();
+        return {
+            availableIconNames: this.icons,
+            iconName,
+            isIconPickerOpen,
+            isPublic,
+            isPublicDisabled: this.isPublicDisabled(isNew, isUserLoggedIn),
+            isShareDisabled: !isUserLoggedIn,
+            isShareable: isNew,
+            onChangeIcon: this.onChangeIcon,
+            onChangePublic: this.onChangePublic,
+            onChangeShare: this.onChangeShare,
+            onChangeTitle: this.onChangeTitle,
+            onOpenIconPicker: this.onToggleIconPicker,
+            share: shareWithFriends,
+            title,
+            titleError,
+        } as ITrackableFormProps;
+    }
 
     protected goBack() {
         this.props.history.goBack();
@@ -148,6 +190,9 @@ abstract class TrackableFormContainer<
         }
     }
 
+    protected onChangeShare = (value: boolean) =>
+        this.setState({ share: value })
+
     private saveTitle = (title: string) => {
         const titleError = !title ? "errors.emptyValue" : null;
         this.setState({ titleError });
@@ -161,10 +206,14 @@ abstract class TrackableFormContainer<
 
     private init(props: TProps, onDone?: () => void) {
         let state;
+        const isNew = this.isNew();
 
-        if (this.isNew()) {
-            state = Object.assign({ isPublic: this.props.isUserLoggedIn },
-                this.getInitialStateForAdd());
+        if (isNew) {
+            const { isUserLoggedIn } = this.props;
+            state = Object.assign({
+                isPublic: isUserLoggedIn,
+                share: isUserLoggedIn,
+            }, this.getInitialStateForAdd());
         } else {
             const { iconName, isPublic, title } = this.props.trackable!;
             state = Object.assign({
@@ -200,12 +249,25 @@ abstract class TrackableFormContainer<
         if (this.isNew()) {
             try {
                 await this.addTrackable();
+
+                if (this.state.share) {
+                    await this.shareTrackable();
+                }
             } catch (e) {
+                if (!isApolloError(e)) {
+                    addGenericErrorToast(this.props.client);
+                }
+
                 return;
             }
         }
 
         this.goBack();
+    }
+
+    private shareTrackable() {
+        return share("share.newTrackable", this.props.intl,
+            { type: this.getTrackableType(), title: this.state.title! });
     }
 }
 

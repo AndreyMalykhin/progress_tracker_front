@@ -13,6 +13,7 @@ import { MutationFunc } from "react-apollo/types";
 import { Image } from "react-native-image-crop-picker";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultAvatar from "utils/default-avatar";
+import makeLog from "utils/make-log";
 import uploadFile from "utils/upload-file";
 
 interface ISetUserAvatarResponse {
@@ -26,6 +27,8 @@ interface ISetUserAvatarFragment {
     avatarUrlSmall: string;
     avatarUrlMedium: string;
 }
+
+const log = makeLog("set-user-avatar-action");
 
 const setUserAvatarFragment = gql`
 fragment SetUserAvatarFragment on User {

@@ -29,7 +29,13 @@ async function uploadFile(
             headers: { Authorization: "Bearer " + accessToken },
             method: "POST",
         });
-        return (await response.json()) as IUploadFileResponse;
+        const json = (await response.json()) as IUploadFileResponse;
+
+        if (json.status !== 200) {
+            log.error("uploadFile(); bad response=%o", response);
+        }
+
+        return json;
     } catch (e) {
         log.error("uploadFile(); error=%o", e);
         throw e;

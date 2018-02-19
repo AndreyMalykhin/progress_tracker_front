@@ -1,3 +1,4 @@
+import { IGoalFormProps } from "components/goal-form";
 import TrackableFormContainer, {
     IEditTrackableFragment,
     ITrackable,
@@ -69,6 +70,30 @@ abstract class GoalFormContainer<
             difficulty: Difficulty.Easy,
             progressDisplayMode: ProgressDisplayMode.Percentage,
         });
+    }
+
+    protected getFormBaseProps() {
+        const {
+            difficulty,
+            deadlineDate,
+            progressDisplayMode,
+            isExpanded,
+        } = this.state;
+        return {
+            ...super.getFormBaseProps(),
+            deadlineDate,
+            difficulty,
+            isExpanded,
+            minDeadlineDate: this.minDeadlineDate,
+            onChangeDeadlineDate: this.onChangeDeadlineDate,
+            onChangeDifficulty: this.onChangeDifficulty,
+            onChangeExpanded: this.onChangeExpanded,
+            onChangeProgressDisplayMode: this.onChangeProgressDisplayMode,
+            onDifficultyToNumber: this.onDifficultyToNumber,
+            onGetDifficultyTitleMsgId: this.onGetDifficultyTitleMsgId,
+            onNumberToDifficulty: this.onNumberToDifficulty,
+            progressDisplayMode,
+        } as IGoalFormProps;
     }
 
     protected onChangeExpanded = (isExpanded: boolean) => {

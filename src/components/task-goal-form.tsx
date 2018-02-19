@@ -14,7 +14,7 @@ import {
 import FormSlider from "components/form-slider";
 import FormSwitch from "components/form-switch";
 import FormTextInput from "components/form-text-input";
-import GoalForm from "components/goal-form";
+import GoalForm, { IGoalFormProps } from "components/goal-form";
 import TextInput from "components/text-input";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
@@ -60,8 +60,8 @@ interface ITaskListItemProps {
     onFocus: (id?: string) => void;
 }
 
-interface ITaskGoalFormProps {
-    title: string;
+interface ITaskGoalFormProps extends IGoalFormProps {
+    title?: string;
     titleError?: string|null;
     iconName: string;
     availableIconNames: string[];
@@ -75,11 +75,15 @@ interface ITaskGoalFormProps {
     deadlineDate?: Date;
     minDeadlineDate: Date;
     progressDisplayMode: ProgressDisplayMode;
-    isExpanded: boolean;
+    isExpanded?: boolean;
     newTaskTitle?: string;
     isAddTaskDisabled: boolean;
     isRemoveTaskDisabled: boolean;
     focusedTaskId?: string;
+    isShareable?: boolean;
+    isShareDisabled?: boolean;
+    share?: boolean;
+    onChangeShare: (share: boolean) => void;
     onOpenIconPicker: () => void;
     onChangeTitle: (value: string) => void;
     onChangePublic: (value: boolean) => void;

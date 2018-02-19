@@ -28,12 +28,13 @@ import withHeader from "components/with-header";
 import { debounce, throttle } from "lodash";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
+import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { withApollo } from "react-apollo/withApollo";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
 import { push } from "utils/immutable-utils";
@@ -44,9 +45,9 @@ interface ITaskGoal extends IGoal {
 }
 
 type ITaskGoalFormContainerProps = IGoalFormContainerProps<ITaskGoal> & {
-    onAddGoal: (goal: IAddTaskGoalFragment) => Promise<void>;
-    onEditGoal: (goal: IEditTaskGoalFragment) => Promise<void>;
-    onEditTask: (id: string, title: string) => Promise<void>;
+    onAddGoal: (goal: IAddTaskGoalFragment) => Promise<any>;
+    onEditGoal: (goal: IEditTaskGoalFragment) => Promise<any>;
+    onEditTask: (id: string, title: string) => Promise<any>;
 };
 
 interface ITaskGoalFormContainerState extends IGoalFormContainerState {
@@ -118,62 +119,33 @@ class TaskGoalFormContainer extends GoalFormContainer<
 
     public render() {
         const {
-            title,
-            titleError,
-            iconName,
-            isPublic,
-            difficulty,
             tasks,
             taskListError,
             taskErrors,
-            deadlineDate,
-            progressDisplayMode,
-            isExpanded,
             newTaskTitle,
-            isIconPickerOpen,
             focusedTaskId,
         } = this.state;
         const isNew = this.isNew();
-        const isPublicDisabled = this.isPublicDisabled(
-            isNew, this.props.isUserLoggedIn);
         return (
             <TaskGoalForm
-                title={title!}
-                titleError={titleError}
-                availableIconNames={this.icons}
-                iconName={iconName!}
-                isPublic={isPublic!}
-                isPublicDisabled={isPublicDisabled}
-                difficulty={difficulty!}
                 tasks={tasks!}
                 taskListError={taskListError}
                 taskErrors={taskErrors}
                 focusedTaskId={focusedTaskId}
-                isExpanded={isExpanded!}
-                deadlineDate={deadlineDate}
-                minDeadlineDate={this.minDeadlineDate}
-                progressDisplayMode={progressDisplayMode!}
                 newTaskTitle={newTaskTitle}
                 isAddTaskDisabled={!isNew}
                 isRemoveTaskDisabled={!isNew}
-                isIconPickerOpen={isIconPickerOpen}
-                onChangeExpanded={this.onChangeExpanded}
-                onChangeTitle={this.onChangeTitle}
-                onOpenIconPicker={this.onToggleIconPicker}
-                onChangeIcon={this.onChangeIcon}
-                onChangePublic={this.onChangePublic}
-                onChangeDifficulty={this.onChangeDifficulty}
-                onChangeDeadlineDate={this.onChangeDeadlineDate}
-                onChangeProgressDisplayMode={this.onChangeProgressDisplayMode}
                 onRemoveTask={this.onRemoveTask}
                 onChangeTaskTitle={this.onChangeTaskTitle}
                 onChangeNewTaskTitle={this.onChangeNewTaskTitle}
                 onFocusTask={this.onFocusTask}
-                onDifficultyToNumber={this.onDifficultyToNumber}
-                onNumberToDifficulty={this.onNumberToDifficulty}
-                onGetDifficultyTitleMsgId={this.onGetDifficultyTitleMsgId}
+                {...this.getFormBaseProps()}
             />
         );
+    }
+
+    protected getTrackableType() {
+        return TrackableType.TaskGoal;
     }
 
     protected getTitleMsgId() {
@@ -334,4 +306,5 @@ export default compose(
     withEditGoal,
     withEditTask,
     withHeader,
+    injectIntl,
 )(TaskGoalFormContainer);

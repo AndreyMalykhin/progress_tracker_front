@@ -24,7 +24,6 @@ import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import ReportReason from "models/report-reason";
 import TrackableStatus from "models/trackable-status";
-import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
 import { compose, withApollo } from "react-apollo";
@@ -307,7 +306,7 @@ class ProfileSectionContainer
         ActionSheet.open({
             onClose: this.onCommitNewTrackable,
             options: trackableTypes,
-            titleMsgId: "newTrackable.title",
+            titleMsgId: "addTrackable.title",
             translator: this.props.intl,
         });
     }

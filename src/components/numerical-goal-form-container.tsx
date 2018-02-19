@@ -23,12 +23,13 @@ import withHeader from "components/with-header";
 import { debounce, throttle } from "lodash";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
+import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { withApollo } from "react-apollo/withApollo";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
 import uuid from "utils/uuid";
@@ -39,8 +40,8 @@ interface INumericalGoal extends IGoal {
 
 type INumericalGoalFormContainerProps =
     IGoalFormContainerProps<INumericalGoal> & {
-    onAddGoal: (goal: IAddNumericalGoalFragment) => Promise<void>;
-    onEditGoal: (goal: IEditNumericalGoalFragment) => Promise<void>;
+    onAddGoal: (goal: IAddNumericalGoalFragment) => Promise<any>;
+    onEditGoal: (goal: IEditNumericalGoalFragment) => Promise<any>;
 };
 
 interface INumericalGoalFormContainerState extends IGoalFormContainerState {
@@ -97,53 +98,20 @@ class NumericalGoalFormContainer extends GoalFormContainer<
     }
 
     public render() {
-        const {
-            title,
-            titleError,
-            iconName,
-            isPublic,
-            difficulty,
-            deadlineDate,
-            progressDisplayMode,
-            isExpanded,
-            isIconPickerOpen,
-            maxProgress,
-            maxProgressError,
-        } = this.state;
-        const isNew = this.isNew();
-        const isPublicDisabled = this.isPublicDisabled(
-            isNew, this.props.isUserLoggedIn);
+        const { maxProgress, maxProgressError } = this.state;
         return (
             <NumericalGoalForm
                 maxProgress={maxProgress}
                 maxProgressError={maxProgressError}
-                isMaxProgressDisabled={!isNew}
-                title={title!}
-                titleError={titleError}
-                availableIconNames={this.icons}
-                iconName={iconName!}
-                isPublic={isPublic!}
-                isPublicDisabled={isPublicDisabled}
-                difficulty={difficulty!}
-                isExpanded={isExpanded!}
-                deadlineDate={deadlineDate}
-                minDeadlineDate={this.minDeadlineDate}
-                progressDisplayMode={progressDisplayMode!}
-                isIconPickerOpen={isIconPickerOpen}
-                onChangeExpanded={this.onChangeExpanded}
-                onChangeTitle={this.onChangeTitle}
-                onOpenIconPicker={this.onToggleIconPicker}
-                onChangeIcon={this.onChangeIcon}
-                onChangePublic={this.onChangePublic}
-                onChangeDifficulty={this.onChangeDifficulty}
-                onChangeDeadlineDate={this.onChangeDeadlineDate}
-                onChangeProgressDisplayMode={this.onChangeProgressDisplayMode}
+                isMaxProgressDisabled={!this.isNew()}
                 onChangeMaxProgress={this.onChangeMaxProgress}
-                onDifficultyToNumber={this.onDifficultyToNumber}
-                onNumberToDifficulty={this.onNumberToDifficulty}
-                onGetDifficultyTitleMsgId={this.onGetDifficultyTitleMsgId}
+                {...this.getFormBaseProps()}
             />
         );
+    }
+
+    protected getTrackableType() {
+        return TrackableType.NumericalGoal;
     }
 
     protected getTitleMsgId() {
@@ -224,4 +192,5 @@ export default compose(
     withAddGoal,
     withEditGoal,
     withHeader,
+    injectIntl,
 )(NumericalGoalFormContainer);

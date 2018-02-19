@@ -34,7 +34,7 @@ interface IGoalFormProps extends ITrackableFormProps {
     deadlineDate?: Date;
     minDeadlineDate: Date;
     progressDisplayMode: ProgressDisplayMode;
-    isExpanded: boolean;
+    isExpanded?: boolean;
     onChangeDifficulty: (value: Difficulty) => void;
     onChangeExpanded: (value: boolean) => void;
     onChangeDeadlineDate: (value?: Date) => void;

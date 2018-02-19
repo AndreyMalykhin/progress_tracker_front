@@ -1,4 +1,4 @@
-import { inviteFriends } from "actions/invite-friends-action";
+import { share } from "actions/share-action";
 import { addGenericErrorToast, addToast } from "actions/toast-helpers";
 import FriendsSection from "components/friends-section";
 import withHeader, { IWithHeaderProps } from "components/with-header";
@@ -46,11 +46,8 @@ class FriendsSectionContainer extends
     }
 
     private onInvite = async () => {
-        const msg = this.props.intl.formatMessage({ id: "friends.inviteMsg" });
-        const hashtag = this.props.intl.formatMessage({ id: "common.brand" });
-
         try {
-            await inviteFriends(msg, hashtag);
+            await share("share.app", this.props.intl);
         } catch (e) {
             addGenericErrorToast(this.props.client);
         }

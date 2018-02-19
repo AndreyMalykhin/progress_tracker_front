@@ -7,13 +7,13 @@ class Log {
         this.debugger = debug("progress-tracker:" + namespace);
     }
 
-    public trace(...args: any[]) {
-        this.debugger(args);
+    public trace(formatter: any, ...args: any[]) {
+        this.debugger(formatter, ...args);
     }
 
-    public error(...args: any[]) {
+    public error(formatter: any, ...args: any[]) {
         // TODO
-        this.trace(...args);
+        this.trace(formatter, ...args);
     }
 }
 

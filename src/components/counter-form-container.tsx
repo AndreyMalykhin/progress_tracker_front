@@ -19,10 +19,12 @@ import TrackableFormContainer, {
     ITrackableFormContainerState,
 } from "components/trackable-form-container";
 import withHeader from "components/with-header";
+import TrackableType from "models/trackable-type";
 import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { withApollo } from "react-apollo/withApollo";
+import { injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
 
@@ -30,8 +32,8 @@ type ICounter = ITrackable;
 
 interface ICounterFormContainerProps extends
     ITrackableFormContainerProps<ICounter> {
-    onAddCounter: (counter: IAddCounterFragment) => Promise<void>;
-    onEditCounter: (counter: IEditCounterFragment) => Promise<void>;
+    onAddCounter: (counter: IAddCounterFragment) => Promise<any>;
+    onEditCounter: (counter: IEditCounterFragment) => Promise<any>;
 }
 
 type ICounterFormContainerState = ITrackableFormContainerState;
@@ -79,30 +81,11 @@ class CounterFormContainer extends TrackableFormContainer<
     ICounterFormContainerState
 > {
     public render() {
-        const {
-            title,
-            titleError,
-            iconName,
-            isPublic,
-            isIconPickerOpen,
-        } = this.state;
-        const isPublicDisabled = this.isPublicDisabled(
-            this.isNew(), this.props.isUserLoggedIn);
-        return (
-            <CounterForm
-                title={title!}
-                titleError={titleError}
-                availableIconNames={this.icons}
-                iconName={iconName!}
-                isPublic={isPublic!}
-                isPublicDisabled={isPublicDisabled}
-                isIconPickerOpen={isIconPickerOpen}
-                onChangeTitle={this.onChangeTitle}
-                onOpenIconPicker={this.onToggleIconPicker}
-                onChangeIcon={this.onChangeIcon}
-                onChangePublic={this.onChangePublic}
-            />
-        );
+        return <CounterForm {...this.getFormBaseProps()} />;
+    }
+
+    protected getTrackableType() {
+        return TrackableType.Counter;
     }
 
     protected getTitleMsgId() {
@@ -145,4 +128,5 @@ export default compose(
     withAddCounter,
     withEditCounter,
     withHeader,
+    injectIntl,
 )(CounterFormContainer);

@@ -24,19 +24,23 @@ import {
 } from "react-native-keyboard-aware-scroll-view";
 
 interface ITrackableFormProps {
-    title: string;
+    title?: string;
     titleError?: string|null;
     iconName: string;
     availableIconNames: string[];
     isPublic: boolean;
     isPublicDisabled: boolean;
     isIconPickerOpen?: boolean;
+    isShareable?: boolean;
+    isShareDisabled?: boolean;
+    share?: boolean;
     titleLabelMsgId: string;
     titlePlaceholderMsgId: string;
     onOpenIconPicker: () => void;
     onChangeTitle: (value: string) => void;
     onChangePublic: (value: boolean) => void;
     onChangeIcon: (name: string) => void;
+    onChangeShare: (share: boolean) => void;
     onRenderChildren?: () => JSX.Element;
 }
 
@@ -49,6 +53,9 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
             iconName,
             isPublic,
             isPublicDisabled,
+            isShareable,
+            isShareDisabled,
+            share,
             availableIconNames,
             titleLabelMsgId,
             titlePlaceholderMsgId,
@@ -57,6 +64,7 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
             onChangeIcon,
             onOpenIconPicker,
             onChangePublic,
+            onChangeShare,
         } = this.props;
 
         if (isIconPickerOpen) {
@@ -69,6 +77,14 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
             );
         }
 
+        const shareSwitch = isShareable && (
+            <FormSwitch
+                labelMsgId="trackableForm.shareLabel"
+                disabled={isShareDisabled}
+                value={share}
+                onValueChange={onChangeShare}
+            />
+        );
         return (
             <KeyboardAwareScrollView>
                 <FormBody>
@@ -90,6 +106,7 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
                         value={isPublic}
                         onValueChange={onChangePublic}
                     />
+                    {shareSwitch}
                     {onRenderChildren && onRenderChildren()}
                 </FormBody>
             </KeyboardAwareScrollView>

@@ -6,7 +6,7 @@ import * as React from "react";
 
 interface INumericalGoalFormProps {
     availableIconNames: string[];
-    title: string;
+    title?: string;
     titleError?: string|null;
     iconName: string;
     isPublic: boolean;
@@ -17,9 +17,13 @@ interface INumericalGoalFormProps {
     maxProgress?: string;
     maxProgressError?: string|null;
     isMaxProgressDisabled?: boolean;
-    isExpanded: boolean;
+    isExpanded?: boolean;
     minDeadlineDate: Date;
     isIconPickerOpen?: boolean;
+    isShareable?: boolean;
+    isShareDisabled?: boolean;
+    share?: boolean;
+    onChangeShare: (share: boolean) => void;
     onChangeTitle: (value: string) => void;
     onChangeDifficulty: (value: Difficulty) => void;
     onChangePublic: (value: boolean) => void;

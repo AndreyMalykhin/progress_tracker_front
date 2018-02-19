@@ -43,6 +43,7 @@ import {
     setTaskDone,
     setTaskDoneQuery,
 } from "actions/set-task-done-action";
+import { share } from "actions/share-action";
 import { addGenericErrorToast, addToast } from "actions/toast-helpers";
 import { setContextMode } from "actions/ui-helpers";
 import {
@@ -104,6 +105,7 @@ import {
 import ImagePicker, { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
 import DragStatus from "utils/drag-status";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
@@ -166,6 +168,10 @@ interface IRouteParams {
 
 interface IGetDataResponse {
     getActiveTrackables: IConnection<IActiveTrackableListItemNode, number>;
+}
+
+interface IShareProvedGoalFragment {
+    title: string;
 }
 
 const withReorder =
@@ -313,6 +319,14 @@ const withBreak =
             },
         },
     );
+
+const shareProvedGoalFragment = gql`
+fragment ShareProvedGoalFragment on ITrackable {
+    id
+    ... on IPrimitiveTrackable {
+        title
+    }
+}`;
 
 const getDataQuery = gql`
 fragment ActiveTrackableListTrackableFragment on ITrackable {
@@ -1027,7 +1041,7 @@ class ActiveTrackableListContainer extends React.Component<
     private onStartRemoveItem = (id: string) => {
         const msg = undefined;
         const { formatMessage } = this.props.intl;
-        Alert.alert(formatMessage({ id: "common.confirmRemoval" }), msg, [
+        Alert.alert(formatMessage({ id: "common.areYouSure" }), msg, [
             {
                 style: "cancel",
                 text: formatMessage({ id: "common.cancel" }),
@@ -1124,11 +1138,15 @@ class ActiveTrackableListContainer extends React.Component<
             return;
         }
 
+        await this.commitProveItem(id, image);
+    }
+
+    private async commitProveItem(id: string, image: Image) {
         this.setItemProving(id, true, async () => {
             let response: IProveTrackableResponse;
 
             try {
-                response = await this.props.onCommitProveItem(id, image!);
+                response = await this.props.onCommitProveItem(id, image);
             } catch (e) {
                 if (!isApolloError(e)) {
                     addGenericErrorToast(this.props.client);
@@ -1139,11 +1157,11 @@ class ActiveTrackableListContainer extends React.Component<
                 this.setItemProving(id, false);
             }
 
+            await this.tryShareProvedGoal(response);
             let msgId;
+            const { status } = response.proveTrackable.trackable;
 
-            if (response.proveTrackable.trackable.status ===
-                    TrackableStatus.Approved
-            ) {
+            if (status === TrackableStatus.Approved) {
                 msgId = "notifications.goalApproved";
             } else {
                 msgId = "notifications.goalPendingReview";
@@ -1161,6 +1179,44 @@ class ActiveTrackableListContainer extends React.Component<
                 id, { isProving }, prevState.itemsMeta);
             return { itemsMeta };
         }, onDone);
+    }
+
+    private tryShareProvedGoal(response: IProveTrackableResponse) {
+        if (!this.props.session.accessToken) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            const { formatMessage } = this.props.intl;
+            const dlgMsg = undefined;
+            const dlgTitle = formatMessage({ id: "shareProvedGoal.title" });
+            Alert.alert(dlgTitle, dlgMsg, [
+                {
+                    onPress: resolve,
+                    style: "cancel",
+                    text: formatMessage({ id: "common.no" }),
+                },
+                {
+                    onPress: async () => {
+                        await this.shareProvedGoal(response);
+                        resolve();
+                    },
+                    text: formatMessage({ id: "common.yes" }),
+                },
+            ]);
+        });
+    }
+
+    private async shareProvedGoal(response: IProveTrackableResponse) {
+        const fragmentId = dataIdFromObject(response.proveTrackable.trackable)!;
+        const title = this.props.client.readFragment<IShareProvedGoalFragment>(
+            { id: fragmentId, fragment: shareProvedGoalFragment })!.title;
+
+        try {
+            await share("share.provedGoal", this.props.intl, { title });
+        } catch (e) {
+            addGenericErrorToast(this.props.client);
+        }
     }
 
     private onEditItem = (id: string) => {
