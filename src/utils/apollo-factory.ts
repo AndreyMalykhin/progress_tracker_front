@@ -1,4 +1,4 @@
-import { IntrospectionFragmentMatcher } from "apollo-cache-inmemory";
+import { IntrospectionFragmentMatcher, NormalizedCacheObject } from "apollo-cache-inmemory";
 import { InMemoryCache } from "apollo-cache-inmemory/lib/inMemoryCache";
 import { ApolloClient } from "apollo-client";
 import { ApolloLink } from "apollo-link";
@@ -18,7 +18,7 @@ function apolloFactory() {
     const fragmentMatcher = new IntrospectionFragmentMatcher(
         { introspectionQueryResultData: fragmentTypes as any });
     const cache = new InMemoryCache(
-        { cacheResolvers, dataIdFromObject, fragmentMatcher });
+        { cacheRedirects: cacheResolvers, dataIdFromObject, fragmentMatcher });
     const stateLink = withClientState({
         cache: cache as any,
         ...stateResolvers,
@@ -34,7 +34,7 @@ function apolloFactory() {
         links.unshift(apolloLogger);
     }
 
-    return new ApolloClient({
+    return new ApolloClient<NormalizedCacheObject>({
         cache,
         link: ApolloLink.from(links),
     });

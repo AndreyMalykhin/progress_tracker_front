@@ -1,4 +1,5 @@
-import { ApolloCacheClient } from "apollo-link-state";
+import { ApolloCache } from "apollo-cache";
+import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import gql from "graphql-tag";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
@@ -27,7 +28,8 @@ const completeIntroResolver = {
                         showIntro: false,
                     },
                 };
-                (cache as ApolloCacheClient).writeData({ data });
+                (cache as ApolloCache<NormalizedCacheObject>).writeData(
+                    { data });
                 return null;
             },
         },
