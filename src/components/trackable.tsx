@@ -289,14 +289,14 @@ class Trackable extends React.Component<ITrackableProps> {
     private onCardRef = (ref?: View) => this.card = ref;
 
     private calculateLayout() {
-        const { onGetLayoutRef, onLayout } = this.props;
-        const container = onGetLayoutRef ? onGetLayoutRef() : this.card;
-
-        if (!container) {
-            return;
-        }
-
         requestAnimationFrame(() => {
+            const { onGetLayoutRef, onLayout } = this.props;
+            const container = onGetLayoutRef ? onGetLayoutRef() : this.card;
+
+            if (!container) {
+                return;
+            }
+
             container.measure((x, y, width, height, pageX, pageY) => {
                 this.props.onLayout!(
                     this.props.id, { x: pageX, y: pageY, width, height });

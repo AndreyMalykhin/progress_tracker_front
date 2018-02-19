@@ -10,7 +10,7 @@ import {
 } from "actions/pending-review-trackables-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
-import { ApolloClient } from "apollo-client";
+import { ApolloClient, ApolloError } from "apollo-client";
 import gql from "graphql-tag";
 import Audience from "models/audience";
 import TrackableStatus from "models/trackable-status";
@@ -112,21 +112,17 @@ async function proveTrackable(
     mutate: MutationFunc<IProveTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    log("proveTrackable(); request");
-    let assetId;
+    const uploadResponse =
+        await uploadFile(photo.path, photo.mime, "/assets", apollo);
 
-    try {
-        const response = await uploadFile(photo.path, photo.mime, "/assets");
-        assetId = response.payload.id;
-    } catch (e) {
-        // TODO
-        throw e;
+    if (uploadResponse.status !== 200) {
+        throw new Error("File upload failed");
     }
 
+    const assetId = uploadResponse.payload.id;
     const result = await mutate({
         optimisticResponse: getOptimisticResponse(id, photo, apollo),
         update: (proxy, response) => {
-            log("proveTrackable(); response");
             const responseData = response.data as IProveTrackableResponse;
             updateActiveTrackables(responseData, proxy);
             const trackableStatus =

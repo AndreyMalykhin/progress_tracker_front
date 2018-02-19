@@ -30,7 +30,7 @@ async function editTask(
     mutate: MutationFunc<IEditTaskResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(id, title),
         variables: { task: { id, title } },
     });

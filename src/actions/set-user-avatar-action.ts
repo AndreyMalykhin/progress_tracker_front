@@ -53,16 +53,17 @@ async function setUserAvatar(
     let avatarId;
 
     if (img) {
-        try {
-            const response = await uploadFile(img.path, img.mime, "/avatars");
-            avatarId = response.payload.id;
-        } catch (e) {
-            // TODO
-            throw e;
+        const response =
+            await uploadFile(img.path, img.mime, "/avatars", apollo);
+
+        if (response.status !== 200) {
+            throw new Error("File upload failed");
         }
+
+        avatarId = response.payload.id;
     }
 
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(img, apollo),
         variables: { avatarId },
     });

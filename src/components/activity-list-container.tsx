@@ -21,6 +21,7 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 import withLoadMore from "./with-load-more";
@@ -125,16 +126,7 @@ const withData = graphql<
             };
         },
         props: ({ data }) => {
-            const queryStatus = data!.networkStatus;
-
-            if (queryStatus === QueryStatus.InitialLoading
-                || queryStatus === QueryStatus.Error
-            ) {
-                return { queryStatus } as Partial<IActivityListContainerProps>;
-            }
-
-            return { data, queryStatus } as
-                Partial<IActivityListContainerProps>;
+            return getDataOrQueryStatus(data!);
         },
     },
 );

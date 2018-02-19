@@ -10,6 +10,7 @@ import { History } from "history";
 import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
+import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 
@@ -75,12 +76,12 @@ const withData = graphql<IGetDataResponse, IOwnProps, IAppProps>(
             };
         },
         props: ({ data }) => {
-            const { networkStatus: queryStatus, getMessages } = data!;
+            const { networkStatus: queryStatus, error, getMessages } = data!;
 
-            if (queryStatus === QueryStatus.InitialLoading
-                || queryStatus === QueryStatus.Error
-            ) {
+            if (queryStatus === QueryStatus.InitialLoading) {
                 return { queryStatus };
+            } else if (queryStatus === QueryStatus.Error || error) {
+                return { queryStatus: QueryStatus.Error };
             }
 
             const messages: { [key: string]: string } = {};

@@ -40,7 +40,7 @@ interface INumericalGoal extends IGoal {
 type INumericalGoalFormContainerProps =
     IGoalFormContainerProps<INumericalGoal> & {
     onAddGoal: (goal: IAddNumericalGoalFragment) => Promise<void>;
-    onEditGoal: (goal: IEditNumericalGoalFragment) => void;
+    onEditGoal: (goal: IEditNumericalGoalFragment) => Promise<void>;
 };
 
 interface INumericalGoalFormContainerState extends IGoalFormContainerState {
@@ -61,9 +61,8 @@ const withAddGoal = graphql<
     {
         props: ({ ownProps, mutate }) => {
             return {
-                onAddGoal: (goal: IAddNumericalGoalFragment) => {
-                    addNumericalGoal(goal, mutate!, ownProps.client);
-                },
+                onAddGoal: (goal: IAddNumericalGoalFragment) =>
+                    addNumericalGoal(goal, mutate!, ownProps.client),
             };
         },
     },
@@ -78,9 +77,8 @@ const withEditGoal = graphql<
     {
         props: ({ ownProps, mutate }) => {
             return {
-                onEditGoal: (goal: IEditNumericalGoalFragment) => {
-                    editNumericalGoal(goal, mutate!, ownProps.client);
-                },
+                onEditGoal: (goal: IEditNumericalGoalFragment) =>
+                    editNumericalGoal(goal, mutate!, ownProps.client),
             };
         },
     },
@@ -88,12 +86,14 @@ const withEditGoal = graphql<
 
 class NumericalGoalFormContainer extends GoalFormContainer<
     INumericalGoal,
+    IEditNumericalGoalFragment,
     INumericalGoalFormContainerProps,
     INumericalGoalFormContainerState
 > {
     public constructor(props: INumericalGoalFormContainerProps, context: any) {
         super(props, context);
-        this.validateMaxProgress = debounce(this.validateMaxProgress, this.saveDelay);
+        this.validateMaxProgress =
+            debounce(this.validateMaxProgress, this.saveDelay);
     }
 
     public render() {
@@ -171,12 +171,8 @@ class NumericalGoalFormContainer extends GoalFormContainer<
         });
     }
 
-    protected saveTitle(title: string) {
-        this.props.onEditGoal({ id: this.props.trackable!.id, title });
-    }
-
-    protected saveIconName(iconName: string) {
-        this.props.onEditGoal({ id: this.props.trackable!.id, iconName });
+    protected doEditTrackable(trackable: IEditNumericalGoalFragment) {
+        return this.props.onEditGoal(trackable);
     }
 
     protected isValidForAdd(state: INumericalGoalFormContainerState) {
@@ -206,22 +202,6 @@ class NumericalGoalFormContainer extends GoalFormContainer<
             maxProgress: String(maxProgress),
             progressDisplayMode,
         } as INumericalGoalFormContainerState;
-    }
-
-    protected saveDifficulty(difficulty: Difficulty) {
-        this.props.onEditGoal({ difficulty, id: this.props.trackable!.id });
-    }
-
-    protected saveDeadlineDate(deadlineDate: number|null) {
-        this.props.onEditGoal(
-            { deadlineDate, id: this.props.trackable!.id });
-    }
-
-    protected saveProgressDisplayMode(
-        progressDisplayMode: ProgressDisplayMode,
-    ) {
-        this.props.onEditGoal(
-            { id: this.props.trackable!.id, progressDisplayMode });
     }
 
     private onChangeMaxProgress = (maxProgress: string) => {

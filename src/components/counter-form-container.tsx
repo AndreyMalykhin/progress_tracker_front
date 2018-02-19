@@ -31,7 +31,7 @@ type ICounter = ITrackable;
 interface ICounterFormContainerProps extends
     ITrackableFormContainerProps<ICounter> {
     onAddCounter: (counter: IAddCounterFragment) => Promise<void>;
-    onEditCounter: (counter: IEditCounterFragment) => void;
+    onEditCounter: (counter: IEditCounterFragment) => Promise<void>;
 }
 
 type ICounterFormContainerState = ITrackableFormContainerState;
@@ -49,9 +49,8 @@ const withAddCounter = graphql<
     {
         props: ({ ownProps, mutate }) => {
             return {
-                onAddCounter: (counter: IAddCounterFragment) => {
-                    addCounter(counter, mutate!, ownProps.client);
-                },
+                onAddCounter: (counter: IAddCounterFragment) =>
+                    addCounter(counter, mutate!, ownProps.client),
             };
         },
     },
@@ -66,9 +65,8 @@ const withEditCounter = graphql<
     {
         props: ({ ownProps, mutate }) => {
             return {
-                onEditCounter: (counter: IEditCounterFragment) => {
-                    editCounter(counter, mutate!, ownProps.client);
-                },
+                onEditCounter: (counter: IEditCounterFragment) =>
+                    editCounter(counter, mutate!, ownProps.client),
             };
         },
     },
@@ -76,6 +74,7 @@ const withEditCounter = graphql<
 
 class CounterFormContainer extends TrackableFormContainer<
     ICounter,
+    IEditCounterFragment,
     ICounterFormContainerProps,
     ICounterFormContainerState
 > {
@@ -110,18 +109,14 @@ class CounterFormContainer extends TrackableFormContainer<
         return "trackableTypes.counter";
     }
 
+    protected doEditTrackable(trackable: IEditCounterFragment) {
+        return this.props.onEditCounter(trackable);
+    }
+
     protected addTrackable() {
         const { title, iconName, isPublic } = this.state;
         return this.props.onAddCounter(
             { iconName, isPublic, title: title! });
-    }
-
-    protected saveTitle(title: string) {
-        this.props.onEditCounter({ id: this.props.trackable!.id, title });
-    }
-
-    protected saveIconName(iconName: string) {
-        this.props.onEditCounter({ id: this.props.trackable!.id, iconName });
     }
 
     protected isValidForAdd(state: ICounterFormContainerState) {

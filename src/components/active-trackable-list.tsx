@@ -15,7 +15,6 @@ import NumericalEntryPopupContainer from "components/numerical-entry-popup-conta
 import NumericalGoal from "components/numerical-goal";
 import Reorderable from "components/reorderable";
 import TaskGoal, { ITask } from "components/task-goal";
-import ToastList, { IToastListItem } from "components/toast-list";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
@@ -120,7 +119,6 @@ interface IActiveTrackableListProps extends IExtraData {
     items: IActiveTrackableListItem[];
     isNumericalEntryPopupOpen?: boolean;
     isGymExerciseEntryPopupOpen?: boolean;
-    toasts: IToastListItem[];
     onNumericalEntryPopupClose: (entry?: number) => void;
     onGymExerciseEntryPopupClose: (entry?: IGymExerciseEntryPopupResult) =>
         void;
@@ -161,7 +159,6 @@ interface IActiveTrackableListProps extends IExtraData {
     onVisibleItemsChange: (info: IVisibleItemsChangeInfo) => void;
     onGetVisibleItemIds: () => string[];
     onGetDraggedItemId: () => string;
-    onCloseToast: (index: number) => void;
     onIsItemProveable: (status: TrackableStatus) => boolean;
 }
 
@@ -177,7 +174,7 @@ class ActiveTrackableList extends
     }
 
     public render() {
-        log("render()");
+        log.trace("render()");
         const {
             isNumericalEntryPopupOpen,
             isGymExerciseEntryPopupOpen,
@@ -185,7 +182,6 @@ class ActiveTrackableList extends
             itemsMeta,
             queryStatus,
             isReorderMode,
-            toasts,
             onNumericalEntryPopupClose,
             onGymExerciseEntryPopupClose,
             onEndReached,
@@ -196,7 +192,6 @@ class ActiveTrackableList extends
             onVisibleItemsChange,
             onGetVisibleItemIds,
             onGetDraggedItemId,
-            onCloseToast,
         } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         const numericalEntryPopup = isNumericalEntryPopupOpen && (
@@ -238,13 +233,12 @@ class ActiveTrackableList extends
                 </Reorderable>
                 {numericalEntryPopup}
                 {gymExerciseEntryPopup}
-                <ToastList items={toasts} onCloseToast={onCloseToast} />
             </View>
         );
     }
 
     public componentWillUpdate(nextProps: IActiveTrackableListProps) {
-        if ((this.props.isReorderMode && this.props.items !== nextProps.items)
+        if (this.props.isReorderMode && this.props.items !== nextProps.items
             || this.props.isAggregationMode !== nextProps.isAggregationMode
         ) {
             LayoutAnimation.easeInEaseOut();

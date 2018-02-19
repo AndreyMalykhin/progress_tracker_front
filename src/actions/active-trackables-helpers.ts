@@ -94,7 +94,7 @@ function getActiveTrackables(apollo: DataProxy) {
             variables: { userId: getSession(apollo).userId },
         });
     } catch (e) {
-        log("getActiveTrackables(); no data");
+        log.trace("getActiveTrackables(); no data");
         return null;
     }
 }

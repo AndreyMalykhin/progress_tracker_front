@@ -47,6 +47,7 @@ enum Type {
     Task = "Task",
     TaskGoal = "TaskGoal",
     TaskGoalProgressChangedActivity = "TaskGoalProgressChangedActivity",
+    Toast = "Toast",
     TrackableAddedActivity = "TrackableAddedActivity",
     TrackableEdge = "TrackableEdge",
     UI = "UI",

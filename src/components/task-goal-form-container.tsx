@@ -36,6 +36,7 @@ import { withApollo } from "react-apollo/withApollo";
 import { FormattedMessage } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
+import { push } from "utils/immutable-utils";
 import uuid from "utils/uuid";
 
 interface ITaskGoal extends IGoal {
@@ -44,8 +45,8 @@ interface ITaskGoal extends IGoal {
 
 type ITaskGoalFormContainerProps = IGoalFormContainerProps<ITaskGoal> & {
     onAddGoal: (goal: IAddTaskGoalFragment) => Promise<void>;
-    onEditGoal: (goal: IEditTaskGoalFragment) => void;
-    onEditTask: (id: string, title: string) => void;
+    onEditGoal: (goal: IEditTaskGoalFragment) => Promise<void>;
+    onEditTask: (id: string, title: string) => Promise<void>;
 };
 
 interface ITaskGoalFormContainerState extends IGoalFormContainerState {
@@ -66,9 +67,8 @@ const withAddGoal =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onAddGoal: (goal: IAddTaskGoalFragment) => {
-                        addTaskGoal(goal, mutate!, ownProps.client);
-                    },
+                    onAddGoal: (goal: IAddTaskGoalFragment) =>
+                        addTaskGoal(goal, mutate!, ownProps.client),
                 };
             },
         },
@@ -80,9 +80,8 @@ const withEditGoal =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onEditGoal: (goal: IEditTaskGoalFragment) => {
-                        editTaskGoal(goal, mutate!, ownProps.client);
-                    },
+                    onEditGoal: (goal: IEditTaskGoalFragment) =>
+                        editTaskGoal(goal, mutate!, ownProps.client),
                 };
             },
         },
@@ -94,9 +93,8 @@ const withEditTask =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onEditTask: (id: string, title: string) => {
-                        editTask(id, title, mutate!, ownProps.client);
-                    },
+                    onEditTask: (id: string, title: string) =>
+                        editTask(id, title, mutate!, ownProps.client),
                 };
             },
         },
@@ -104,13 +102,14 @@ const withEditTask =
 
 class TaskGoalFormContainer extends GoalFormContainer<
     ITaskGoal,
+    IEditTaskGoalFragment,
     ITaskGoalFormContainerProps,
     ITaskGoalFormContainerState
 > {
     public constructor(props: ITaskGoalFormContainerProps, context: any) {
         super(props, context);
         this.saveTaskTitle = debounce(this.saveTaskTitle, this.saveDelay);
-        this.saveTask = debounce(this.saveTask, this.saveDelay);
+        this.addTask = debounce(this.addTask, this.saveDelay);
         Object.assign(this.state, {
             taskErrors: {},
             tasks: [],
@@ -181,6 +180,10 @@ class TaskGoalFormContainer extends GoalFormContainer<
         return "trackableTypes.taskGoal";
     }
 
+    protected doEditTrackable(trackable: IEditTaskGoalFragment) {
+        return this.props.onEditGoal(trackable);
+    }
+
     protected addTrackable() {
         const {
             title,
@@ -202,14 +205,6 @@ class TaskGoalFormContainer extends GoalFormContainer<
             }),
             title: title!,
         });
-    }
-
-    protected saveTitle(title: string) {
-        this.props.onEditGoal({ id: this.props.trackable!.id, title });
-    }
-
-    protected saveIconName(iconName: string) {
-        this.props.onEditGoal({ id: this.props.trackable!.id, iconName });
     }
 
     protected isValidForAdd(state: ITaskGoalFormContainerState) {
@@ -261,31 +256,15 @@ class TaskGoalFormContainer extends GoalFormContainer<
         } as ITaskGoalFormContainerState;
     }
 
-    protected saveDifficulty(difficulty: Difficulty) {
-        this.props.onEditGoal({ difficulty, id: this.props.trackable!.id });
-    }
-
-    protected saveDeadlineDate(deadlineDate: number|null) {
-        this.props.onEditGoal(
-            { deadlineDate, id: this.props.trackable!.id });
-    }
-
-    protected saveProgressDisplayMode(
-        progressDisplayMode: ProgressDisplayMode,
-    ) {
-        this.props.onEditGoal(
-            { id: this.props.trackable!.id, progressDisplayMode });
-    }
-
     private onChangeNewTaskTitle = (title: string) => {
         this.setState({ newTaskTitle: title });
 
         if (title) {
-            this.saveTask(title);
+            this.addTask(title);
         }
     }
 
-    private saveTask = (title: string) => {
+    private addTask = (title: string) => {
         this.setState((prevState) => {
             const id = uuid();
             const task = { id, title, isDone: false };
@@ -293,7 +272,7 @@ class TaskGoalFormContainer extends GoalFormContainer<
                 focusedTaskId: id,
                 newTaskTitle: undefined,
                 taskListError: null,
-                tasks: prevState.tasks.concat([task]),
+                tasks: push(task, prevState.tasks),
             };
         });
     }
@@ -307,21 +286,22 @@ class TaskGoalFormContainer extends GoalFormContainer<
 
                 return task;
             });
-            this.saveTaskTitle(id, title);
             return { tasks };
         });
+        this.saveTaskTitle(id, title);
     }
 
     private saveTaskTitle = (id: string, title: string) => {
+        let error: string|null;
+
         this.setState((prevState) => {
-            const error = !title ? "errors.emptyValue" : null;
+            error = !title ? "errors.emptyValue" : null;
             const taskErrors = { ...prevState.taskErrors, [id]: error };
-
-            if (!error && !this.isNew()) {
-                this.props.onEditTask(id, title);
-            }
-
             return { taskErrors };
+        }, () => {
+            if (!error && !this.isNew()) {
+                this.transaction(() => this.props.onEditTask(id, title));
+            }
         });
     }
 
@@ -342,9 +322,8 @@ class TaskGoalFormContainer extends GoalFormContainer<
         });
     }
 
-    private onFocusTask = (focusedTaskId?: string) => {
-        this.setState({ focusedTaskId });
-    }
+    private onFocusTask = (focusedTaskId?: string) =>
+        this.setState({ focusedTaskId })
 }
 
 export { ITaskGoal };

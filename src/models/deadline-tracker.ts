@@ -82,15 +82,12 @@ class DeadlineTracker {
     }
 
     public async start() {
-        if (!await NetInfo.isConnected.fetch()) {
-            this.tick();
-        }
-
+        this.tick();
         setInterval(this.tick, millisecondsInHour);
     }
 
     private tick = () => {
-        log("tick()");
+        log.trace("tick()");
         const activeTrackablesResponse = this.getActiveTrackables();
 
         if (!activeTrackablesResponse) {
@@ -126,6 +123,8 @@ class DeadlineTracker {
         for (const expiredTrackable of expiredTrackables) {
             this.addExpirationActivity(expiredTrackable);
         }
+
+        // TODO add toast
     }
 
     private getActiveTrackables() {
@@ -135,13 +134,13 @@ class DeadlineTracker {
                 variables: { userId: getSession(this.apollo).userId },
             });
         } catch (e) {
-            log("getActiveTrackables(); no data");
+            log.trace("getActiveTrackables(); no data");
             return null;
         }
     }
 
     private expire(trackable: IActiveTrackableFragment) {
-        log("expire(); trackable=%o", trackable);
+        log.trace("expire(); trackable=%o", trackable);
         trackable.status = TrackableStatus.Expired;
         trackable.statusChangeDate = Date.now();
         this.apollo.writeFragment({

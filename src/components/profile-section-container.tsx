@@ -3,6 +3,7 @@ import {
     reportUser,
     reportUserQuery,
 } from "actions/report-user-action";
+import { addToast } from "actions/toast-helpers";
 import ActionSheet, { IActionSheetOption } from "components/action-sheet";
 import ActiveTrackableListContainer from "components/active-trackable-list-container";
 import ArchiveContainer from "components/archive-container";
@@ -26,14 +27,16 @@ import TrackableStatus from "models/trackable-status";
 import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
-import { compose } from "react-apollo";
+import { compose, withApollo } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { InjectedIntlProps, injectIntl } from "react-intl";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
 import defaultId from "utils/default-id";
+import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import IconName from "utils/icon-name";
+import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus, { isLoading } from "utils/query-status";
 import routes from "utils/routes";
 
@@ -43,11 +46,12 @@ interface IProfileSectionContainerProps extends
     IWithHeaderProps {
     remoteData: QueryProps & IGetRemoteDataResponse;
     localData: QueryProps & IGetLocalDataResponse;
-    onCommitReportUser: (id: string, reportReason: ReportReason) => void;
+    onCommitReportUser: (id: string, reportReason: ReportReason) =>
+        Promise<any>;
 }
 
 interface IOwnProps extends
-    RouteComponentProps<IRouteParams>, IWithSessionProps {}
+    RouteComponentProps<IRouteParams>, IWithSessionProps, IWithApolloProps {}
 
 interface IGetRemoteDataResponse {
     getUserById: {
@@ -131,16 +135,9 @@ const withRemoteData =
                     variables: { userId },
                 };
             },
-            props: ({ ownProps, data }) => {
-                const queryStatus = data!.networkStatus;
-
-                if (queryStatus === QueryStatus.InitialLoading
-                    || queryStatus === QueryStatus.Error
-                ) {
-                    return { queryStatus };
-                }
-
-                return { remoteData: data, queryStatus };
+            props: ({ data }) => {
+                const dataKey = "remoteData";
+                return getDataOrQueryStatus(data!, dataKey);
             },
         },
     );
@@ -289,14 +286,21 @@ class ProfileSectionContainer
         });
     }
 
-    private onCommitReportUser = (reportReason?: ReportReason) => {
+    private onCommitReportUser = async (reportReason?: ReportReason) => {
         if (reportReason == null) {
             return;
         }
 
-        this.props.onCommitReportUser(
-            this.props.remoteData.getUserById.id, reportReason);
-        // TODO toast
+        try {
+            await this.props.onCommitReportUser(
+                this.props.remoteData.getUserById.id, reportReason);
+        } catch (e) {
+            return;
+        }
+
+        const msg = this.props.intl.formatMessage(
+            { id: "notifications.userReported" });
+        addToast({ msg }, this.props.client);
     }
 
     private onStartNewTrackable = () => {
@@ -327,6 +331,7 @@ export default compose(
     withNoUpdatesInBackground,
     withLoader(Loader),
     withError(Error),
+    withApollo,
     withReportUser,
     injectIntl,
 )(ProfileSectionContainer);

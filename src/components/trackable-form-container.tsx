@@ -12,6 +12,12 @@ interface ITrackable {
     isPublic: boolean;
 }
 
+interface IEditTrackableFragment {
+    id: string;
+    title?: string;
+    iconName?: string;
+}
+
 interface ITrackableFormContainerProps<T extends ITrackable>
     extends RouteComponentProps<{}>, IWithHeaderProps {
     trackable?: T;
@@ -28,6 +34,7 @@ interface ITrackableFormContainerState {
 
 abstract class TrackableFormContainer<
     TTrackable extends ITrackable,
+    TEditTrackableFragment extends IEditTrackableFragment,
     TProps extends ITrackableFormContainerProps<TTrackable>,
     TState extends ITrackableFormContainerState
 > extends React.Component<TProps, TState> {
@@ -43,42 +50,27 @@ abstract class TrackableFormContainer<
 
     public constructor(props: TProps, context: any) {
         super(props, context);
-        this.validateAndSaveTitle =
-            debounce(this.validateAndSaveTitle, this.saveDelay);
+        this.saveTitle = debounce(this.saveTitle, this.saveDelay);
     }
 
     public componentWillMount() {
-        let state;
-
-        if (this.isNew()) {
-            state = Object.assign({ isPublic: this.props.isUserLoggedIn },
-                this.getInitialStateForAdd());
-        } else {
-            const { iconName, isPublic, title } = this.props.trackable!;
-            state = Object.assign({
-                iconName,
-                isPublic,
-                title,
-            }, this.getInitialStateForEdit());
-        }
-
-        this.setState(state, () => {
+        this.init(this.props, () => {
             this.updateHeader(this.isValid(this.state));
         });
     }
 
-    public componentWillUpdate(nextProps: TProps, nextState: TState) {
-        const nextIsValid = this.isValid(nextState);
+    public componentDidUpdate(prevProps: TProps, prevState: TState) {
+        const isValid = this.isValid(this.state);
 
-        if (this.isValid(this.state) !== nextIsValid) {
-            this.updateHeader(nextIsValid);
+        if (isValid !== this.isValid(prevState)) {
+            this.updateHeader(isValid);
         }
     }
 
     protected abstract getTitleMsgId(): string;
     protected abstract addTrackable(): Promise<void>;
-    protected abstract saveTitle(title: string): void;
-    protected abstract saveIconName(iconName: string): void;
+    protected abstract doEditTrackable(
+        trackable: TEditTrackableFragment): Promise<void>;
     protected abstract isValidForAdd(state: TState): boolean;
     protected abstract isValidForEdit(state: TState): boolean;
     protected abstract getInitialStateForAdd(): TState;
@@ -106,7 +98,7 @@ abstract class TrackableFormContainer<
 
     protected onChangeTitle = (title: string) => {
         this.setState({ title });
-        this.validateAndSaveTitle(title);
+        this.saveTitle(title);
     }
 
     protected onChangeIcon = (iconName: string) => {
@@ -117,7 +109,7 @@ abstract class TrackableFormContainer<
             return;
         }
 
-        this.saveIconName(iconName);
+        this.editTrackable({ iconName } as TEditTrackableFragment);
     }
 
     protected onToggleIconPicker = () => {
@@ -140,7 +132,23 @@ abstract class TrackableFormContainer<
         this.setState({ isPublic });
     }
 
-    private validateAndSaveTitle = (title: string) => {
+    protected editTrackable(fragment: Partial<TEditTrackableFragment>) {
+        this.transaction(() => {
+            const data =
+                Object.assign({ id: this.props.trackable!.id }, fragment);
+            return this.doEditTrackable(data as TEditTrackableFragment);
+        });
+    }
+
+    protected async transaction(action: () => Promise<any>) {
+        try {
+            await action();
+        } catch (e) {
+            this.init(this.props);
+        }
+    }
+
+    private saveTitle = (title: string) => {
         const titleError = !title ? "errors.emptyValue" : null;
         this.setState({ titleError });
 
@@ -148,7 +156,25 @@ abstract class TrackableFormContainer<
             return;
         }
 
-        this.saveTitle(title);
+        this.editTrackable({ title } as TEditTrackableFragment);
+    }
+
+    private init(props: TProps, onDone?: () => void) {
+        let state;
+
+        if (this.isNew()) {
+            state = Object.assign({ isPublic: this.props.isUserLoggedIn },
+                this.getInitialStateForAdd());
+        } else {
+            const { iconName, isPublic, title } = this.props.trackable!;
+            state = Object.assign({
+                iconName,
+                isPublic,
+                title,
+            }, this.getInitialStateForEdit());
+        }
+
+        this.setState(state, onDone);
     }
 
     private onCloseIconPicker = () => {
@@ -175,8 +201,7 @@ abstract class TrackableFormContainer<
             try {
                 await this.addTrackable();
             } catch (e) {
-                // TODO
-                throw e;
+                return;
             }
         }
 
@@ -188,5 +213,6 @@ export {
     ITrackable,
     ITrackableFormContainerProps,
     ITrackableFormContainerState,
+    IEditTrackableFragment,
 };
 export default TrackableFormContainer;

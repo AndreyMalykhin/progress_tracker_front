@@ -223,7 +223,7 @@ const log = makeLog("activity-list");
 
 class ActivityList extends React.PureComponent<IActivityListProps> {
     public render() {
-        log("render()");
+        log.trace("render()");
         const { sections, queryStatus, onEndReached } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (

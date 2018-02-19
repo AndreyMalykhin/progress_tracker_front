@@ -87,7 +87,7 @@ async function addCounterProgress(
         id: fragmentId,
     })!;
     const prevProgress = counter.progress;
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(counter, value, apollo),
         update: (proxy, response) => {
             updateActivities(

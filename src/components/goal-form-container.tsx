@@ -1,4 +1,5 @@
 import TrackableFormContainer, {
+    IEditTrackableFragment,
     ITrackable,
     ITrackableFormContainerProps,
     ITrackableFormContainerState,
@@ -11,7 +12,13 @@ import * as React from "react";
 interface IGoal extends ITrackable {
     difficulty: Difficulty;
     progressDisplayMode: ProgressDisplayMode;
-    deadlineDate?: number;
+    deadlineDate?: number|null;
+}
+
+interface IEditGoalFragment extends IEditTrackableFragment {
+    difficulty?: Difficulty;
+    progressDisplayMode?: ProgressDisplayMode;
+    deadlineDate?: number|null;
 }
 
 type IGoalFormContainerProps<T extends IGoal> = ITrackableFormContainerProps<T>;
@@ -46,15 +53,16 @@ const difficultyToMsgId: { [difficulty: string]: string } = {
 
 abstract class GoalFormContainer<
     TGoal extends IGoal,
+    TEditGoalFragment extends IEditGoalFragment,
     TProps extends IGoalFormContainerProps<TGoal>,
     TState extends IGoalFormContainerState
-> extends TrackableFormContainer<TGoal, TProps, TState> {
+> extends TrackableFormContainer<TGoal, TEditGoalFragment, TProps, TState> {
     protected minDeadlineDate: Date;
 
     public constructor(props: TProps, context: any) {
         super(props, context);
         this.onChangeDifficulty = throttle(this.onChangeDifficulty, 256);
-        this.onSaveDifficulty = debounce(this.onSaveDifficulty, this.saveDelay);
+        this.saveDifficulty = debounce(this.saveDifficulty, this.saveDelay);
         this.minDeadlineDate = new Date();
         this.minDeadlineDate.setDate(this.minDeadlineDate.getDate() + 1);
         Object.assign(this.state, {
@@ -62,10 +70,6 @@ abstract class GoalFormContainer<
             progressDisplayMode: ProgressDisplayMode.Percentage,
         });
     }
-
-    protected abstract saveDifficulty(difficulty: Difficulty): void;
-    protected abstract saveDeadlineDate(date: number|null): void;
-    protected abstract saveProgressDisplayMode(mode: ProgressDisplayMode): void;
 
     protected onChangeExpanded = (isExpanded: boolean) => {
         this.setState({ isExpanded });
@@ -78,7 +82,7 @@ abstract class GoalFormContainer<
             return;
         }
 
-        this.onSaveDifficulty(difficulty);
+        this.saveDifficulty(difficulty);
     }
 
     protected onChangeDeadlineDate = (deadlineDate?: Date) => {
@@ -88,7 +92,10 @@ abstract class GoalFormContainer<
             return;
         }
 
-        this.saveDeadlineDate(deadlineDate ? deadlineDate.getTime() : null);
+        const trackableFragment = {
+            deadlineDate: deadlineDate ? deadlineDate.getTime() : null,
+        } as TEditGoalFragment;
+        this.editTrackable(trackableFragment);
     }
 
     protected onChangeProgressDisplayMode = (
@@ -100,7 +107,7 @@ abstract class GoalFormContainer<
             return;
         }
 
-        this.saveProgressDisplayMode(progressDisplayMode);
+        this.editTrackable({ progressDisplayMode } as TEditGoalFragment);
     }
 
     protected onDifficultyToNumber = (difficulty: Difficulty) => {
@@ -115,8 +122,8 @@ abstract class GoalFormContainer<
         return difficultyToMsgId[difficulty];
     }
 
-    private onSaveDifficulty = (difficulty: Difficulty) => {
-        this.saveDifficulty(difficulty);
+    private saveDifficulty = (difficulty: Difficulty) => {
+        this.editTrackable({ difficulty } as TEditGoalFragment );
     }
 }
 

@@ -87,7 +87,8 @@ class StackingSwitch extends React.Component<IStackingSwitchProps> {
             ) {
                 this.stack.push({ children, location });
                 this.shouldPop.push(true);
-                log("updateStack(); push; stackSize=%o", this.stack.length);
+                log.trace("updateStack(); push; stackSize=%o",
+                    this.stack.length);
             } else {
                 this.replaceTop(children, location);
                 this.shouldPop.push(false);
@@ -97,7 +98,8 @@ class StackingSwitch extends React.Component<IStackingSwitchProps> {
             case "POP":
             if (location.pathname !== "/" && this.shouldPop.pop()) {
                 this.stack.pop();
-                log("updateStack(); pop; stackSize=%o", this.stack.length);
+                log.trace("updateStack(); pop; stackSize=%o",
+                    this.stack.length);
             } else {
                 this.replaceTop(children, location);
             }
@@ -117,7 +119,7 @@ class StackingSwitch extends React.Component<IStackingSwitchProps> {
     }
 
     private replaceTop(children: IChildren, location: Location) {
-        log("replaceTop(); stackSize=%o; location=%o", this.stack.length,
+        log.trace("replaceTop(); stackSize=%o; location=%o", this.stack.length,
             location);
         const topEntry = this.stack[this.stack.length - 1];
         topEntry.children = children;

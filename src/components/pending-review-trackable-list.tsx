@@ -1,6 +1,5 @@
 import EmptyList from "components/empty-list";
 import Loader from "components/loader";
-import ToastList, { IToastListItem } from "components/toast-list";
 import Trackable, { ITrackableProps } from "components/trackable";
 import Audience from "models/audience";
 import TrackableStatus from "models/trackable-status";
@@ -63,11 +62,9 @@ interface IPendingReviewTrackableListItem {
 }
 
 interface IPendingReviewTrackableListProps extends ISharedProps {
-    toasts: IToastListItem[];
     items: IPendingReviewTrackableListItem[];
     queryStatus: QueryStatus;
     onScroll?: (evt?: NativeSyntheticEvent<NativeScrollEvent>) => void;
-    onCloseToast: (index: number) => void;
 }
 
 const log = makeLog("pending-review-trackable-list");
@@ -75,14 +72,12 @@ const log = makeLog("pending-review-trackable-list");
 class PendingReviewTrackableList extends
     React.PureComponent<IPendingReviewTrackableListProps> {
     public render() {
-        log("render()");
+        log.trace("render()");
         const {
             items,
             queryStatus,
-            toasts,
             onScroll,
             onEndReached,
-            onCloseToast,
         } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
@@ -99,7 +94,6 @@ class PendingReviewTrackableList extends
                     onEndReached={onEndReached}
                     onScroll={onScroll}
                 />
-                <ToastList items={toasts} onCloseToast={onCloseToast} />
             </View>
         );
     }

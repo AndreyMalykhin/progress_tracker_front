@@ -7,6 +7,7 @@ export default {
             __typename: Type.UI,
             id: defaultId,
             isContextMode: false,
+            toasts: [],
         },
     },
     resolvers: {},

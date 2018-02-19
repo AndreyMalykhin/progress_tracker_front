@@ -64,7 +64,7 @@ async function breakAggregate(
     mutate: MutationFunc<IBreakAggregateResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(id, apollo),
         update: (proxy, response) => {
             updateActiveTrackables(

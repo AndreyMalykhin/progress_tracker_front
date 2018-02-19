@@ -2,6 +2,7 @@ import HomePage from "components/home-page";
 import IntroPageContainer from "components/intro-page-container";
 import ProfileFormPage from "components/profile-form-page";
 import StackingSwitch from "components/stacking-switch";
+import ToastListContainer from "components/toast-list-container";
 import TrackableFormPageContainer from "components/trackable-form-page-container";
 import * as React from "react";
 import { StatusBar, StyleSheet, View } from "react-native";
@@ -35,13 +36,13 @@ class Layout extends React.Component<ILayoutProps> {
                     />
                     <Route render={this.renderHomePage}/>
                 </StackingSwitch>
+                <ToastListContainer />
             </View>
         );
     }
 
-    private renderHomePage = () => {
-        return this.props.showIntro ? <IntroPageContainer /> : <HomePage />;
-    }
+    private renderHomePage = () =>
+        this.props.showIntro ? <IntroPageContainer /> : <HomePage />
 }
 
 const styles = StyleSheet.create({

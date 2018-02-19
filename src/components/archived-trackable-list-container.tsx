@@ -19,6 +19,7 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus, { isLoading } from "utils/query-status";
 
 interface IArchivedTrackableListContainerProps extends
@@ -95,15 +96,7 @@ const withData = graphql<
             };
         },
         props: ({ data }) => {
-            const queryStatus = data!.networkStatus;
-
-            if (queryStatus === QueryStatus.InitialLoading
-                || queryStatus === QueryStatus.Error
-            ) {
-                return { queryStatus };
-            }
-
-            return { data, queryStatus };
+            return getDataOrQueryStatus(data!);
         },
     },
 );

@@ -63,7 +63,7 @@ async function removeTrackable(
     mutate: MutationFunc<IRemoveTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(id, apollo),
         update: (proxy, response) => {
             updateActiveTrackables(

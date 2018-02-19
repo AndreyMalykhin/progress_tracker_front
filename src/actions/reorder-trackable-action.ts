@@ -48,8 +48,9 @@ async function reorderTrackable(
     mutate: MutationFunc<IReorderTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    log("reorderTrackable(); sourceId=%o; destId=%o", sourceId, destinationId);
-    await mutate({
+    log.trace("reorderTrackable(); sourceId=%o; destId=%o", sourceId,
+        destinationId);
+    const result = await mutate({
         optimisticResponse: getOptimisticResponse(
             sourceId, destinationId, apollo),
         update: (proxy, response) => {
@@ -57,6 +58,7 @@ async function reorderTrackable(
         },
         variables: { sourceId, destinationId },
     });
+    return result.data;
 }
 
 function getOptimisticResponse(
@@ -65,7 +67,7 @@ function getOptimisticResponse(
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     const activeTrackables =
-        getActiveTrackables(apollo).getActiveTrackables.edges;
+        getActiveTrackables(apollo)!.getActiveTrackables.edges;
     const sourceTrackable = apollo.readFragment<ITrackableFragment>({
         fragment: trackableFragment,
         id: dataIdFromObject({ __typename: Type.Counter, id: sourceId })!,

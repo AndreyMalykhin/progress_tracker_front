@@ -43,6 +43,7 @@ import {
     setTaskDone,
     setTaskDoneQuery,
 } from "actions/set-task-done-action";
+import { addGenericErrorToast, addToast } from "actions/toast-helpers";
 import { setContextMode } from "actions/ui-helpers";
 import {
     IUnaggregateTrackableResponse,
@@ -51,6 +52,7 @@ import {
 } from "actions/unaggregate-trackable-action";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
+import { isApolloError } from "apollo-client/errors/ApolloError";
 import ActiveTrackableList, {
     IActiveTrackableListItem,
     IActiveTrackableListItemMeta,
@@ -70,7 +72,6 @@ import {
 import { IHeaderState } from "components/header";
 import Loader from "components/loader";
 import Toast from "components/toast";
-import { IToastListItem } from "components/toast-list";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
@@ -105,8 +106,10 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
 import defaultId from "utils/default-id";
 import DragStatus from "utils/drag-status";
+import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
+import openImgPicker from "utils/open-img-picker";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
@@ -119,18 +122,21 @@ interface IActiveTrackableListContainerProps extends
     data: QueryProps & IGetDataResponse;
     onSetTaskDone: (taskId: string, isDone: boolean) =>
         Promise<ISetTaskDoneResponse>;
-    onBreakItem: (id: string) => void;
-    onUnaggregateItem: (id: string) => void;
+    onBreakItem: (id: string) => Promise<any>;
+    onUnaggregateItem: (id: string) => Promise<any>;
     onCommitProveItem: (id: string, photo: Image) =>
         Promise<IProveTrackableResponse>;
-    onCommitRemoveItem: (id: string) => void;
+    onCommitRemoveItem: (id: string) => Promise<any>;
     onCommitAddNumericalGoalProgress: (id: string, amount: number) =>
         Promise<IAddNumericalGoalProgressResponse>;
-    onCommitNewGymExerciseEntry:
-        (id: string, entry: IGymExerciseEntryPopupResult) => void;
-    onCommitAggregateItems: (ids: string[]) => void;
-    onCommitAddCounterProgress: (id: string, amount: number) => void;
-    onReorderItem: (sourceId: string, destinationId: string) => void;
+    onCommitNewGymExerciseEntry: (
+        id: string,
+        entry: IGymExerciseEntryPopupResult,
+    ) => Promise<IAddGymExerciseEntryResponse>;
+    onCommitAggregateItems: (ids: string[]) => Promise<any>;
+    onCommitAddCounterProgress: (id: string, amount: number) => Promise<any>;
+    onReorderItem: (sourceId: string, destinationId: string) =>
+        Promise<any>;
     onLongPressItem: (id: string) => void;
 }
 
@@ -152,7 +158,6 @@ interface IActiveTrackableListContainerState {
         isOpen?: boolean;
         onClose: (entry?: IGymExerciseEntryPopupResult) => void;
     };
-    toasts: IToastListItem[];
 }
 
 interface IRouteParams {
@@ -172,7 +177,7 @@ const withReorder =
                     onReorderItem: (
                         sourceId: string, destinationId: string,
                     ) => {
-                        reorderTrackable(
+                        return reorderTrackable(
                             sourceId, destinationId, mutate!, ownProps.client);
                     },
                 } as Partial<IActiveTrackableListContainerProps>;
@@ -216,9 +221,8 @@ const withRemove =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onCommitRemoveItem: (id: string) => {
-                        removeTrackable(id, mutate!, ownProps.client);
-                    },
+                    onCommitRemoveItem: (id: string) =>
+                        removeTrackable(id, mutate!, ownProps.client),
                 } as Partial<IActiveTrackableListContainerProps>;
             },
         },
@@ -230,9 +234,8 @@ const withAddCounterProgress =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onCommitAddCounterProgress: (id: string, value: number) => {
-                        addCounterProgress(id, value, mutate!, ownProps.client);
-                    },
+                    onCommitAddCounterProgress: (id: string, value: number) =>
+                        addCounterProgress(id, value, mutate!, ownProps.client),
                 } as Partial<IActiveTrackableListContainerProps>;
             },
         },
@@ -264,7 +267,7 @@ const withNewGymExerciseEntry =
                     onCommitNewGymExerciseEntry: (
                         trackableId: string, entry: IGymExerciseEntry,
                     ) => {
-                        addGymExerciseEntry(trackableId, entry.setCount,
+                        return addGymExerciseEntry(trackableId, entry.setCount,
                             entry.repetitionCount, entry.weight, mutate!);
                     },
                 } as Partial<IActiveTrackableListContainerProps>;
@@ -278,9 +281,8 @@ const withAggregate =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onCommitAggregateItems: (ids: string[]) => {
-                        aggregateTrackables(ids, mutate!, ownProps.client);
-                    },
+                    onCommitAggregateItems: (ids: string[]) =>
+                        aggregateTrackables(ids, mutate!, ownProps.client),
                 } as Partial<IActiveTrackableListContainerProps>;
             },
         },
@@ -292,9 +294,8 @@ const withUnaggregate =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onUnaggregateItem: (id: string) => {
-                        unaggregateTrackable(id, mutate!, ownProps.client);
-                    },
+                    onUnaggregateItem: (id: string) =>
+                        unaggregateTrackable(id, mutate!, ownProps.client),
                 } as Partial<IActiveTrackableListContainerProps>;
             },
         },
@@ -306,9 +307,8 @@ const withBreak =
         {
             props: ({ ownProps, mutate }) => {
                 return {
-                    onBreakItem: (id: string) => {
-                        breakAggregate(id, mutate!, ownProps.client);
-                    },
+                    onBreakItem: (id: string) =>
+                        breakAggregate(id, mutate!, ownProps.client),
                 } as Partial<IActiveTrackableListContainerProps>;
             },
         },
@@ -430,16 +430,8 @@ const withData =
                     variables: { userId },
                 };
             },
-            props: ({ data, ownProps }) => {
-                const queryStatus = data!.networkStatus;
-
-                if (queryStatus === QueryStatus.InitialLoading
-                    || queryStatus === QueryStatus.Error
-                ) {
-                    return { queryStatus };
-                }
-
-                return { queryStatus, data };
+            props: ({ data }) => {
+                return getDataOrQueryStatus(data!);
             },
         },
     );
@@ -455,7 +447,6 @@ class ActiveTrackableListContainer extends React.Component<
         gymExerciseEntryPopup: { onClose: () => null },
         itemsMeta: {},
         numericalEntryPopup: { onClose: () => null },
-        toasts: [],
     };
     private itemLayouts: { [id: string]: LayoutRectangle|undefined } = {};
     private draggedItemId?: string;
@@ -493,9 +484,8 @@ class ActiveTrackableListContainer extends React.Component<
             isAggregationMode,
             isReorderMode,
             itemsMeta,
-            toasts,
         } = this.state;
-        const { onReorderItem, onLoadMore, data } = this.props;
+        const { onLoadMore, data } = this.props;
         const { getActiveTrackables, networkStatus } = data;
         return (
             <ActiveTrackableList
@@ -506,7 +496,6 @@ class ActiveTrackableListContainer extends React.Component<
                 itemsMeta={itemsMeta}
                 items={data.getActiveTrackables.edges}
                 queryStatus={data.networkStatus}
-                toasts={toasts}
                 onNumericalEntryPopupClose={numericalEntryPopup.onClose}
                 onGymExerciseEntryPopupClose={gymExerciseEntryPopup.onClose}
                 onProveItem={this.onStartProveItem}
@@ -523,7 +512,7 @@ class ActiveTrackableListContainer extends React.Component<
                 onIsTaskGoalExpandable={this.onIsTaskGoalExpandable}
                 onGetVisibleTaskCount={this.onGetVisibleTaskCount}
                 onIsGymExerciseExpandable={this.onIsGymExerciseExpandable}
-                onReorderItem={onReorderItem}
+                onReorderItem={this.onCommitReorderItem}
                 onStartReorderItem={this.onStartReorderItem}
                 onEndReorderItem={this.onEndReorderItem}
                 onGetItemLayout={this.onGetItemLayout}
@@ -533,7 +522,6 @@ class ActiveTrackableListContainer extends React.Component<
                 onVisibleItemsChange={this.onVisibleItemsChange}
                 onGetDraggedItemId={this.onGetDraggedItemId}
                 onGetVisibleItemIds={this.onGetVisibleItemIds}
-                onCloseToast={this.onCloseToast}
                 onIsItemProveable={this.onIsItemProveable}
             />
         );
@@ -654,7 +642,7 @@ class ActiveTrackableListContainer extends React.Component<
         if (isAggregated) {
             commands.push({
                 msgId: "commands.unaggregate",
-                run: () => this.props.onUnaggregateItem(id),
+                run: () => this.onUnaggregateItem(id),
             });
         } else {
             commands.push({
@@ -689,7 +677,7 @@ class ActiveTrackableListContainer extends React.Component<
         if (isAggregated) {
             commands.push({
                 msgId: "commands.unaggregate",
-                run: () => this.props.onUnaggregateItem(id),
+                run: () => this.onUnaggregateItem(id),
             });
         } else {
             commands.push({
@@ -715,7 +703,13 @@ class ActiveTrackableListContainer extends React.Component<
         return [
             {
                 msgId: "commands.break",
-                run: () => this.props.onBreakItem(id),
+                run: async () => {
+                    try {
+                        await this.props.onBreakItem(id);
+                    } catch (e) {
+                        // already reported
+                    }
+                },
             },
         ] as ICommandBarItem[];
     }
@@ -922,9 +916,14 @@ class ActiveTrackableListContainer extends React.Component<
         this.setState({
             numericalEntryPopup: {
                 isOpen: true,
-                onClose: (entry) => {
+                onClose: async (entry) => {
+                    try {
+                        await onClose(entry);
+                    } catch (e) {
+                        return;
+                    }
+
                     this.setState((prevState) => {
-                        onClose(entry);
                         return {
                             numericalEntryPopup: {
                                 ...prevState.numericalEntryPopup,
@@ -943,9 +942,14 @@ class ActiveTrackableListContainer extends React.Component<
         this.setState({
             gymExerciseEntryPopup: {
                 isOpen: true,
-                onClose: (entry) => {
+                onClose: async (entry) => {
+                    try {
+                        await onClose(entry);
+                    } catch (e) {
+                        return;
+                    }
+
                     this.setState((prevState) => {
-                        onClose(entry);
                         return {
                             gymExerciseEntryPopup: {
                                 ...prevState.gymExerciseEntryPopup,
@@ -1006,15 +1010,18 @@ class ActiveTrackableListContainer extends React.Component<
         });
     }
 
-    private onCommitAggregateItem = () => {
+    private onCommitAggregateItem = async () => {
         const selectedItemIds = this.getSelectedItemIds();
-        this.onCancelAggregateItem();
 
-        if (selectedItemIds.length < 2) {
-            return;
+        if (selectedItemIds.length > 1) {
+            try {
+                await this.props.onCommitAggregateItems(selectedItemIds);
+            } catch (e) {
+                return;
+            }
         }
 
-        this.props.onCommitAggregateItems(selectedItemIds);
+        this.onCancelAggregateItem();
     }
 
     private onStartRemoveItem = (id: string) => {
@@ -1032,9 +1039,14 @@ class ActiveTrackableListContainer extends React.Component<
         ]);
     }
 
-    private onCommitRemoveItem(id: string) {
+    private async onCommitRemoveItem(id: string) {
+        try {
+            await this.props.onCommitRemoveItem(id);
+        } catch (e) {
+            return;
+        }
+
         this.setState((prevState) => {
-            this.props.onCommitRemoveItem(id);
             const itemsMeta = { ...prevState.itemsMeta, [id]: {} };
             return { itemsMeta };
         });
@@ -1062,9 +1074,9 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onStartAddCounterProgress = (id: string) => {
-        this.openNumericalEntryPopup((entry) => {
+        this.openNumericalEntryPopup(async (entry) => {
             if (entry) {
-                this.props.onCommitAddCounterProgress(id, entry);
+                await this.props.onCommitAddCounterProgress(id, entry);
             }
         });
     }
@@ -1087,32 +1099,25 @@ class ActiveTrackableListContainer extends React.Component<
             return;
         }
 
-        this.showToast(<FormattedMessage id="notifications.goalAchieved" />);
+        this.showToast("notifications.goalAchieved");
     }
 
     private onStartNewGymExerciseEntry = (id: string) => {
-        this.openGymExerciseEntryPopup((entry) => {
+        this.openGymExerciseEntryPopup(async (entry) => {
             if (entry) {
-                this.props.onCommitNewGymExerciseEntry(id, entry);
+                return await this.props.onCommitNewGymExerciseEntry(id, entry);
             }
         });
     }
 
     private onStartProveItem = async (id: string) => {
-        let image: Image;
+        let image: Image|null;
 
         try {
-            image = await ImagePicker.openPicker({
-                includeBase64: false,
-                mediaType: "photo",
-            }) as Image;
+            image = await openImgPicker();
         } catch (e) {
-            if (e.code === "E_PICKER_CANCELLED") {
-                return;
-            }
-
-            // TODO
-            throw e;
+            addGenericErrorToast(this.props.client);
+            return;
         }
 
         if (!image) {
@@ -1123,10 +1128,13 @@ class ActiveTrackableListContainer extends React.Component<
             let response: IProveTrackableResponse;
 
             try {
-                response = await this.props.onCommitProveItem(id, image);
+                response = await this.props.onCommitProveItem(id, image!);
             } catch (e) {
-                // TODO
-                throw e;
+                if (!isApolloError(e)) {
+                    addGenericErrorToast(this.props.client);
+                }
+
+                return;
             } finally {
                 this.setItemProving(id, false);
             }
@@ -1141,7 +1149,7 @@ class ActiveTrackableListContainer extends React.Component<
                 msgId = "notifications.goalPendingReview";
             }
 
-            this.showToast(<FormattedMessage id={msgId} />);
+            this.showToast(msgId);
         });
     }
 
@@ -1238,6 +1246,14 @@ class ActiveTrackableListContainer extends React.Component<
         });
     }
 
+    private onCommitReorderItem = async (srcId: string, destId: string) => {
+        try {
+            await this.props.onReorderItem(srcId, destId);
+        } catch (e) {
+            // already reported
+        }
+    }
+
     private onItemLayout = (id: string, layout?: LayoutRectangle) => {
         this.itemLayouts[id] = layout;
     }
@@ -1259,16 +1275,9 @@ class ActiveTrackableListContainer extends React.Component<
             (item) => (item.item as IActiveTrackableListItem).node.id);
     }
 
-    private onCloseToast = (index: number) => {
-        this.setState((prevState) => {
-            return { toasts: removeIndex(index, prevState.toasts) };
-        });
-    }
-
-    private showToast(msg: ReactNode) {
-        this.setState((prevState) => {
-            return { toasts: push({ msg }, prevState.toasts) };
-        });
+    private showToast(msgId: string) {
+        const toast = { msg: this.props.intl.formatMessage({ id: msgId }) };
+        addToast(toast, this.props.client);
     }
 
     private onSetTaskDone = async (taskId: string, isDone: boolean) => {
@@ -1276,7 +1285,14 @@ class ActiveTrackableListContainer extends React.Component<
             return;
         }
 
-        const response = await this.props.onSetTaskDone(taskId, isDone);
+        let response;
+
+        try {
+            response = await this.props.onSetTaskDone(taskId, isDone);
+        } catch (e) {
+            return;
+        }
+
         this.tryShowGoalAchievedToast(response.setTaskDone.task.goal.status);
     }
 
@@ -1286,6 +1302,14 @@ class ActiveTrackableListContainer extends React.Component<
 
     private onIsItemProveable = (status: TrackableStatus) => {
         return status === TrackableStatus.PendingProof && this.isMy();
+    }
+
+    private onUnaggregateItem = async (id: string) => {
+        try {
+            await this.props.onUnaggregateItem(id);
+        } catch (e) {
+            // already reported
+        }
     }
 }
 

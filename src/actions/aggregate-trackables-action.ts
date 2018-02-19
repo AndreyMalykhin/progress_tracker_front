@@ -128,7 +128,7 @@ async function aggregateTrackables(
     mutate: MutationFunc<IAggregateTrackablesResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(ids, apollo),
         update: (proxy, response) => {
             updateActiveTrackables(

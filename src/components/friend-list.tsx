@@ -42,7 +42,7 @@ const log = makeLog("friend-list");
 
 class FriendList extends React.PureComponent<IFriendListProps> {
     public render() {
-        log("render()");
+        log.trace("render()");
         const { items, queryStatus, onEndReached } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (

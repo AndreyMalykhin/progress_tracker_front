@@ -43,7 +43,7 @@ async function editUser(
     mutate: MutationFunc<IEditUserResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(user, apollo),
         variables: { user },
     });

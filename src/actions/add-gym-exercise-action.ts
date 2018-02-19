@@ -82,7 +82,7 @@ async function addGymExercise(
     mutate: MutationFunc<IAddGymExerciseResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(gymExercise, apollo),
         update: (proxy, response) => {
             const responseData = response.data as IAddGymExerciseResponse;

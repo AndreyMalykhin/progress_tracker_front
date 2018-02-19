@@ -92,7 +92,7 @@ async function addGymExerciseEntry(
     weight: number,
     mutate: MutationFunc<IAddGymExerciseEntryResponse>,
 ) {
-    await mutate({
+    const result = await mutate({
         optimisticResponse: getOptimisticResponse(trackableId, repetitionCount,
             setCount, weight),
         update: (proxy, response) => {
@@ -102,6 +102,7 @@ async function addGymExerciseEntry(
         },
         variables: { id: trackableId, setCount, repetitionCount, weight },
     });
+    return result.data;
 }
 
 function updateActivities(

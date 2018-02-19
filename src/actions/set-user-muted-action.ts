@@ -84,7 +84,7 @@ async function setUserMuted(
     mutate: MutationFunc<ISetUserMutedResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(id, isMuted),
         update: (proxy, response) => {
             updateActivities(response.data as ISetUserMutedResponse, proxy);
@@ -109,7 +109,7 @@ function updateActivities(response: ISetUserMutedResponse, apollo: DataProxy) {
                     variables: { audience: Audience.Friends },
                 });
         } catch (e) {
-            log("updateActivities(); no friends activities");
+            log.trace("updateActivities(); no friends activities");
             return;
         }
 
@@ -138,7 +138,7 @@ function updateActivities(response: ISetUserMutedResponse, apollo: DataProxy) {
                     variables: { userId },
                 });
         } catch (e) {
-            log("updateActivities(); no muted activities");
+            log.trace("updateActivities(); no muted activities");
             return;
         }
 

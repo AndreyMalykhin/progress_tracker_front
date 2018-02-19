@@ -12,7 +12,7 @@ import {
     KeyboardAwareScrollView,
 } from "react-native-keyboard-aware-scroll-view";
 
-interface IProfileFormProps extends IWithLoginActionProps {
+interface IProfileFormProps {
     isNameDisabled?: boolean;
     name: string;
     nameError?: string|null;
@@ -38,7 +38,6 @@ class ProfileForm extends React.Component<IProfileFormProps> {
             isAvatarChanging,
             onChangeAvatar,
             onChangeName,
-            onLogin,
         } = this.props;
         const loginGroup = !isUserLoggedIn && (
             <LoginContainer msgId="profileForm.loginMessage" />

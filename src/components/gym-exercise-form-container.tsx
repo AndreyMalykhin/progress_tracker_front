@@ -31,7 +31,7 @@ type IGymExercise = ITrackable;
 interface IGymExerciseFormContainerProps extends
     ITrackableFormContainerProps<IGymExercise> {
     onAddGymExercise: (GymExercise: IAddGymExerciseFragment) => Promise<void>;
-    onEditGymExercise: (GymExercise: IEditGymExerciseFragment) => void;
+    onEditGymExercise: (GymExercise: IEditGymExerciseFragment) => Promise<void>;
 }
 
 type IGymExerciseFormContainerState = ITrackableFormContainerState;
@@ -49,9 +49,8 @@ const withAddGymExercise = graphql<
     {
         props: ({ ownProps, mutate }) => {
             return {
-                onAddGymExercise: (gymExercise: IAddGymExerciseFragment) => {
-                    addGymExercise(gymExercise, mutate!, ownProps.client);
-                },
+                onAddGymExercise: (gymExercise: IAddGymExerciseFragment) =>
+                    addGymExercise(gymExercise, mutate!, ownProps.client),
             };
         },
     },
@@ -66,9 +65,8 @@ const withEditGymExercise = graphql<
     {
         props: ({ ownProps, mutate }) => {
             return {
-                onEditGymExercise: (gymExercise: IEditGymExerciseFragment) => {
-                    editGymExercise(gymExercise, mutate!, ownProps.client);
-                },
+                onEditGymExercise: (gymExercise: IEditGymExerciseFragment) =>
+                    editGymExercise(gymExercise, mutate!, ownProps.client),
             };
         },
     },
@@ -76,6 +74,7 @@ const withEditGymExercise = graphql<
 
 class GymExerciseFormContainer extends TrackableFormContainer<
     IGymExercise,
+    IEditGymExerciseFragment,
     IGymExerciseFormContainerProps,
     IGymExerciseFormContainerState
 > {
@@ -110,19 +109,14 @@ class GymExerciseFormContainer extends TrackableFormContainer<
         return "trackableTypes.gymExercise";
     }
 
+    protected doEditTrackable(trackable: IEditGymExerciseFragment) {
+        return this.props.onEditGymExercise(trackable);
+    }
+
     protected addTrackable() {
         const { title, iconName, isPublic } = this.state;
         return this.props.onAddGymExercise(
             { iconName, isPublic, title: title! });
-    }
-
-    protected saveTitle(title: string) {
-        this.props.onEditGymExercise({ id: this.props.trackable!.id, title });
-    }
-
-    protected saveIconName(iconName: string) {
-        this.props.onEditGymExercise(
-            { id: this.props.trackable!.id, iconName });
     }
 
     protected isValidForAdd(state: IGymExerciseFormContainerState) {

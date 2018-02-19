@@ -47,7 +47,7 @@ async function editCounter(
     mutate: MutationFunc<IEditCounterResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(counter, apollo),
         variables: { counter },
     });

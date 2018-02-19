@@ -12,10 +12,10 @@ async function inviteFriends(msg: string, hashtag: string) {
         quote: msg,
     };
     const canShow = await ShareDialog.canShow(shareContent);
-    log("inviteFriends(); canShow=%o", canShow);
+    log.trace("inviteFriends(); canShow=%o", canShow);
 
     if (!canShow) {
-        return;
+        return false;
     }
 
     let result;
@@ -23,15 +23,11 @@ async function inviteFriends(msg: string, hashtag: string) {
     try {
         result = await ShareDialog.show(shareContent);
     } catch (e) {
-        // TODO
+        log.error("inviteFriends(); error=%o", e);
         throw e;
     }
 
-    log("inviteFriends(); result=%o", result);
-
-    if (result.isCancelled) {
-        return;
-    }
+    return true;
 }
 
 export { inviteFriends };

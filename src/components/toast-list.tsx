@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         alignItems: "center",
         justifyContent: "flex-end",
+        paddingBottom: 64,
     },
 });
 

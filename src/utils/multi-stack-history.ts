@@ -40,7 +40,7 @@ class MultiStackHistory implements History {
     public push(
         pathOrLocation: Path | LocationDescriptorObject, state?: LocationState,
     ) {
-        log("push(); location=%o", pathOrLocation);
+        log.trace("push(); location=%o", pathOrLocation);
         this.queueChange(() => ++this.size);
         return typeof pathOrLocation === "string" ?
             this.impl.push(pathOrLocation, state) :
@@ -52,7 +52,7 @@ class MultiStackHistory implements History {
     public replace(
         pathOrLocation: LocationDescriptorObject | Path, state?: LocationState,
     ) {
-        log("replace(); location=%o", pathOrLocation);
+        log.trace("replace(); location=%o", pathOrLocation);
         state = state || (pathOrLocation as LocationDescriptorObject).state;
 
         if (state && state.resetHistory) {
@@ -67,7 +67,7 @@ class MultiStackHistory implements History {
 
     public go(n: number) {
         if (n > 0) {
-            log("go(); not supported with n=%o", n);
+            log.trace("go(); not supported with n=%o", n);
             return;
         }
 
@@ -76,7 +76,7 @@ class MultiStackHistory implements History {
     }
 
     public goBack() {
-        log("goBack()");
+        log.trace("goBack()");
         return this.go(-1);
     }
 
@@ -101,7 +101,7 @@ class MultiStackHistory implements History {
 
         if (change) {
             change();
-            log("onChange(); size=%o", this.size);
+            log.trace("onChange(); size=%o", this.size);
         }
     }
 

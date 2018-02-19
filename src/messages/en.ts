@@ -66,7 +66,7 @@ export default {
     "errors.emptyValue": "Can't be empty",
     "errors.negativeOrNotNumber": "Should be a positive number",
     "errors.noTasks": "At least 1 task is required",
-    "errors.unexpected": "Oops! Something went wrong.",
+    "errors.unexpected": "Oops! Something went wrong",
     "errors.zeroOrNegativeOrNotInteger": "Should be a positive integer",
     "errors.zeroOrNotNumber": "Should be a non-zero number",
     "friends.inviteMsg": "Yo, check this out!",
@@ -94,8 +94,9 @@ export default {
     "notifications.goalAchieved": "Goal achieved! Now it's time to prove it.",
     "notifications.goalApproved": "Goal approved!",
     "notifications.goalPendingReview": "Goal is pending review now.",
-    "notifications.reviewReward":
+    "notifications.reviewRewarded":
         "You have earned {rating} rating for doing review",
+    "notifications.userReported": "Thank you for improving our service!",
     "numericalEntryForm.entryPlaceholder": "1",
     "numericalGoalForm.maxProgressLabel": "Max progress",
     "numericalGoalForm.maxProgressPlaceholder": "0",

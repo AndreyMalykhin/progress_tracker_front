@@ -53,7 +53,7 @@ function withCacheLifetime<P>(queryId: string, lifetime: number = 32000) {
                 this.lastRefetchDate = this.loadLastRefetchDate();
                 this.isExpired = !this.lastRefetchDate
                     || Date.now() > this.lastRefetchDate.getTime() + lifetime;
-                log("init(); isExpired=%o lastRefetchDate=%o",
+                log.trace("init(); isExpired=%o lastRefetchDate=%o",
                     this.isExpired, this.lastRefetchDate);
             }
 
@@ -75,7 +75,8 @@ function withCacheLifetime<P>(queryId: string, lifetime: number = 32000) {
             }
 
             private saveLastRefetchDate() {
-                log("saveLastRefetchDate(); date=%o", this.lastRefetchDate);
+                log.trace("saveLastRefetchDate(); date=%o",
+                    this.lastRefetchDate);
                 this.props.client.writeFragment({
                     data: {
                         __typename: Type.Request,

@@ -83,7 +83,7 @@ async function unaggregateTrackable(
     mutate: MutationFunc<IUnaggregateTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(id, apollo),
         update: (proxy, response) => {
             updateActiveTrackables(

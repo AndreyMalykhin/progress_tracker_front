@@ -15,11 +15,12 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
+import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus from "utils/query-status";
 
 interface ITrackableFormPageContainerProps extends
     IOwnProps, IWithSessionProps {
-    trackable: ITrackable;
+    data?: QueryProps & IGetDataResponse;
 }
 
 interface IOwnProps extends RouteComponentProps<IRouteParams> {}
@@ -29,10 +30,8 @@ interface IRouteParams {
     id?: string;
 }
 
-interface IGetTrackableResponse {
-    getTrackableById: {
-        __typename: Type;
-    };
+interface IGetDataResponse {
+    getTrackableById: ITrackable;
 }
 
 const getDataQuery = gql`
@@ -61,7 +60,7 @@ query GetData($trackableId: ID!) {
 }`;
 
 const withData =
-    graphql<IGetTrackableResponse, IOwnProps, ITrackableFormPageProps>(
+    graphql<IGetDataResponse, IOwnProps, ITrackableFormPageProps>(
         getDataQuery,
         {
             options: (ownProps) => {
@@ -72,16 +71,8 @@ const withData =
                     variables: { trackableId },
                 };
             },
-            props: ({ ownProps, data }) => {
-                const { networkStatus: queryStatus, getTrackableById } = data!;
-
-                if (queryStatus === QueryStatus.InitialLoading
-                    || queryStatus === QueryStatus.Error
-                ) {
-                    return { queryStatus };
-                }
-
-                return { trackable: data!.getTrackableById };
+            props: ({ data }) => {
+                return getDataOrQueryStatus(data!);
             },
             skip: (ownProps) => !ownProps.match.params.id,
         },
@@ -90,7 +81,8 @@ const withData =
 class TrackableFormPageContainer extends
     React.Component<ITrackableFormPageContainerProps> {
     public render() {
-        const { trackable, session, match, ...restProps } = this.props;
+        const { data, session, match, ...restProps } = this.props;
+        const trackable = data && data.getTrackableById;
         const trackableType = match.params.type || trackable!.__typename;
         return (
             <TrackableFormPage

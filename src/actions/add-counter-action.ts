@@ -73,7 +73,7 @@ async function addCounter(
     mutate: MutationFunc<IAddCounterResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(counter, apollo),
         update: (proxy, response) => {
             const responseData = response.data as IAddCounterResponse;

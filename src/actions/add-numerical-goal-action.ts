@@ -82,7 +82,7 @@ async function addNumericalGoal(
     mutate: MutationFunc<IAddNumericalGoalResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(goal, apollo),
         update: (proxy, response) => {
             const responseData = response.data as IAddNumericalGoalResponse;

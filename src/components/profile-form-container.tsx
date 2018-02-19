@@ -9,8 +9,10 @@ import {
     setUserAvatar,
     setUserAvatarQuery,
 } from "actions/set-user-avatar-action";
+import { addGenericErrorToast } from "actions/toast-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
+import { isApolloError } from "apollo-client/errors/ApolloError";
 import Error from "components/error";
 import Loader from "components/loader";
 import ProfileForm from "components/profile-form";
@@ -28,15 +30,15 @@ import { withApollo } from "react-apollo/withApollo";
 import { FormattedMessage } from "react-intl";
 import { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
+import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 
 interface IProfileFormContainerProps extends
     IWithHeaderProps, RouteComponentProps<{}>, IOwnProps {
     data: QueryProps & IGetDataResponse;
-    onSetAvatar: (img: Image|null) => void;
-    onEditUser: (user: IEditUserFragment) => void;
-    onLogin: () => void;
+    onSetAvatar: (img: Image|null) => Promise<any>;
+    onEditUser: (user: IEditUserFragment) => Promise<any>;
 }
 
 interface IProfileFormContainerState {
@@ -98,19 +100,12 @@ const withData =
         {
             options: (ownProps) => {
                 return {
+                    notifyOnNetworkStatusChange: true,
                     variables: { userId: ownProps.session.userId },
                 };
             },
             props: ({ data }) => {
-                const queryStatus = data!.networkStatus;
-
-                if (queryStatus === QueryStatus.InitialLoading
-                    || queryStatus === QueryStatus.Error
-                ) {
-                    return { queryStatus };
-                }
-
-                return { data, queryStatus };
+                return getDataOrQueryStatus(data!);
             },
         },
     );
@@ -140,7 +135,6 @@ class ProfileFormContainer extends
                 nameError={nameError}
                 onChangeAvatar={this.onChangeAvatar}
                 onChangeName={this.onChangeName}
-                onLogin={this.onLogin}
             />
         );
     }
@@ -162,14 +156,14 @@ class ProfileFormContainer extends
         }
     }
 
-    public componentWillUpdate(
-        nextProps: IProfileFormContainerProps,
-        nextState: IProfileFormContainerState,
+    public componentDidUpdate(
+        prevProps: IProfileFormContainerProps,
+        prevState: IProfileFormContainerState,
     ) {
-        const nextIsValid = this.isValid(nextState);
+        const isValid = this.isValid(this.state);
 
-        if (this.isValid(this.state) !== nextIsValid) {
-            this.updateHeader(nextIsValid);
+        if (isValid !== this.isValid(prevState)) {
+            this.updateHeader(isValid);
         }
     }
 
@@ -191,14 +185,15 @@ class ProfileFormContainer extends
         });
     }
 
-    private init(props: IProfileFormContainerProps, callback?: () => void) {
+    private init(props: IProfileFormContainerProps, onDone?: () => void) {
         const { avatarUrlMedium, name } = props.data.getUserById;
         this.setState({
             avatarError: undefined,
             avatarUri: avatarUrlMedium,
+            isAvatarChanging: false,
             name,
             nameError: undefined,
-        }, callback);
+        }, onDone);
     }
 
     private onChangeAvatar = async (img: Image|null) => {
@@ -206,16 +201,12 @@ class ProfileFormContainer extends
             this.setState({ isAvatarChanging: true });
         }
 
-        try {
-            await this.props.onSetAvatar(img);
-        } finally {
-            if (img) {
-                this.setState({ isAvatarChanging: false });
-            }
+        await this.transaction(() => this.props.onSetAvatar(img));
+
+        if (img) {
+            this.setState({ isAvatarChanging: false });
         }
     }
-
-    private onLogin = () => this.props.onLogin();
 
     private onChangeName = (name: string) => {
         this.setState({ name });
@@ -224,15 +215,26 @@ class ProfileFormContainer extends
 
     private saveName = (name: string) => {
         const nameError = !name ? "errors.emptyValue" : null;
+        this.setState({ nameError });
 
         if (!nameError) {
-            this.props.onEditUser({ name });
+            this.transaction(() => this.props.onEditUser({ name }));
         }
-
-        this.setState({ nameError });
     }
 
     private onDone = () => this.props.history.goBack();
+
+    private async transaction(action: () => Promise<any>) {
+        try {
+            await action();
+        } catch (e) {
+            this.init(this.props);
+
+            if (!isApolloError(e)) {
+                addGenericErrorToast(this.props.client);
+            }
+        }
+    }
 }
 
 export default compose(

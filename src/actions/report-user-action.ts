@@ -27,7 +27,7 @@ async function reportUser(
     reason: ReportReason,
     mutate: MutationFunc<IReportUserResponse>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: {
             __typename: Type.Mutation,
             reportUser: {

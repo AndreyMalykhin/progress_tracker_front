@@ -8,6 +8,7 @@ import {
     rejectTrackable,
     rejectTrackableQuery,
 } from "actions/reject-trackable-action";
+import { addGenericErrorToast, addToast } from "actions/toast-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import ActionSheet, { IActionSheetOption } from "components/action-sheet";
@@ -17,7 +18,6 @@ import Loader from "components/loader";
 import PendingReviewTrackableList, {
     IPendingReviewTrackableListItemNode,
 } from "components/pending-review-trackable-list";
-import { IToastListItem } from "components/toast-list";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
@@ -43,6 +43,7 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { Alert, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
@@ -66,9 +67,8 @@ interface IPendingReviewTrackableListContainerProps extends
         Promise<IRejectTrackableResponse>;
 }
 
-interface IPendingReviewTrackableListContainerState {
-    toasts: IToastListItem[];
-}
+// tslint:disable-next-line:no-empty-interface
+interface IPendingReviewTrackableListContainerState {}
 
 interface IGetDataResponse {
     getPendingReviewTrackablesByAudience:
@@ -161,16 +161,7 @@ const withData = graphql<
             };
         },
         props: ({ data }) => {
-            const { networkStatus: queryStatus } = data!;
-
-            if (queryStatus === QueryStatus.InitialLoading
-                || queryStatus === QueryStatus.Error
-            ) {
-                return { queryStatus } as
-                    Partial<IPendingReviewTrackableListContainerProps>;
-            }
-
-            return { queryStatus, data } as
+            return getDataOrQueryStatus(data!) as
                 Partial<IPendingReviewTrackableListContainerProps>;
         },
     },
@@ -218,10 +209,8 @@ class PendingReviewTrackableListContainer extends React.Component<
 
     public render() {
         const { audience, data, onLoadMore } = this.props;
-        const { toasts } = this.state;
         return (
             <PendingReviewTrackableList
-                toasts={toasts}
                 audience={audience}
                 items={data.getPendingReviewTrackablesByAudience.edges}
                 queryStatus={data.networkStatus}
@@ -229,21 +218,15 @@ class PendingReviewTrackableListContainer extends React.Component<
                 onEndReached={onLoadMore}
                 onPressUser={this.onPressUser}
                 onRejectItem={this.onStartRejectItem}
-                onCloseToast={this.onCloseToast}
             />
         );
     }
 
-    private onCloseToast = (index: number) => {
-        this.setState((prevState) => {
-            return { toasts: removeIndex(index, prevState.toasts) };
-        });
-    }
-
-    private showToast(msg: React.ReactNode) {
-        this.setState((prevState) => {
-            return { toasts: push({ msg }, prevState.toasts) };
-        });
+    private showToast(
+       msgId: string, msgValues: { [key: string]: string|number },
+    ) {
+        const toast = { msg: this.props.intl.formatMessage({ id: msgId }) };
+        addToast(toast, this.props.client);
     }
 
     private ensureUserLoggedIn() {
@@ -275,7 +258,7 @@ class PendingReviewTrackableListContainer extends React.Component<
             return;
         }
 
-        const { intl, onCommitApproveItem } = this.props;
+        const { intl } = this.props;
         ActionSheet.open({
             onClose: (difficulty) => {
                 if (difficulty) {
@@ -295,8 +278,7 @@ class PendingReviewTrackableListContainer extends React.Component<
             response =
                 await this.props.onCommitApproveItem(id, difficulty);
         } catch (e) {
-            // TODO
-            throw e;
+            return;
         }
 
         this.tryShowReviewRewardToast(response.approveTrackable.bonusRating);
@@ -307,7 +289,7 @@ class PendingReviewTrackableListContainer extends React.Component<
             return;
         }
 
-        const { intl, onCommitRejectItem } = this.props;
+        const { intl } = this.props;
         ActionSheet.open({
             onClose: (rejectReason) => {
                 if (rejectReason) {
@@ -327,8 +309,7 @@ class PendingReviewTrackableListContainer extends React.Component<
             response =
                 await this.props.onCommitRejectItem(id, reason);
         } catch (e) {
-            // TODO
-            throw e;
+            return;
         }
 
         this.tryShowReviewRewardToast(response.rejectTrackable.bonusRating);
@@ -339,12 +320,7 @@ class PendingReviewTrackableListContainer extends React.Component<
             return;
         }
 
-        this.showToast(
-            <FormattedMessage
-                id="notifications.reviewReward"
-                values={{ rating: bonusRating }}
-            />,
-        );
+        this.showToast("notifications.reviewRewarded", { rating: bonusRating });
     }
 
     private onPressUser = (id: string) => {

@@ -5,6 +5,7 @@ import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import { AccessToken, LoginManager, LoginResult } from "react-native-fbsdk";
 import dataIdFromObject from "utils/data-id-from-object";
+import makeLog from "utils/make-log";
 
 interface ILoginResponse {
     login: {
@@ -14,6 +15,8 @@ interface ILoginResponse {
         accessToken: string;
     };
 }
+
+const log = makeLog("login-action");
 
 const loginQuery = gql`
 mutation LoginMutation($facebookAccessToken: String!) {
@@ -29,7 +32,6 @@ mutation LoginMutation($facebookAccessToken: String!) {
         }
         accessToken
     }
-    completeIntro @client
 }`;
 
 async function login(mutate: MutationFunc<ILoginResponse>) {
@@ -40,7 +42,7 @@ async function login(mutate: MutationFunc<ILoginResponse>) {
         result = await LoginManager.logInWithReadPermissions(
             ["public_profile"]);
     } catch (e) {
-        // TODO
+        log.error("login(); error=%o", e);
         throw e;
     }
 

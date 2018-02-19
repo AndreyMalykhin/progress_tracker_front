@@ -1,13 +1,17 @@
+import { addGenericErrorToast } from "actions/toast-helpers";
 import Avatar from "components/avatar";
 import Button, { ButtonTitle } from "components/button";
 import { FormGroup } from "components/form";
 import Image from "components/image";
 import Loader from "components/loader";
 import * as React from "react";
+import { withApollo } from "react-apollo";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import ImagePicker, {
     Image as ImageInfo,
 } from "react-native-image-crop-picker";
+import { IWithApolloProps } from "utils/interfaces";
+import openImgPicker from "utils/open-img-picker";
 
 interface IFormAvatarPickerProps {
     style?: StyleProp<ViewStyle>;
@@ -18,7 +22,8 @@ interface IFormAvatarPickerProps {
     onChangeImg: (img: ImageInfo|null) => void;
 }
 
-class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
+class FormAvatarPicker extends
+    React.PureComponent<IFormAvatarPickerProps & IWithApolloProps> {
     public render() {
         const { errorMsgId, uri, disabled, changing, style } = this.props;
         let buttons;
@@ -60,17 +65,10 @@ class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
         let image;
 
         try {
-            image = await ImagePicker.openPicker({
-                includeBase64: false,
-                mediaType: "photo",
-            }) as ImageInfo;
+            image = await openImgPicker();
         } catch (e) {
-            if (e.code === "E_PICKER_CANCELLED") {
-                return;
-            }
-
-            // TODO
-            throw e;
+            addGenericErrorToast(this.props.client);
+            return;
         }
 
         if (!image) {
@@ -97,4 +95,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default FormAvatarPicker;
+export default withApollo(FormAvatarPicker);

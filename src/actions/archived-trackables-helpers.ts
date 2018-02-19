@@ -68,7 +68,7 @@ function getArchivedTrackables(status: TrackableStatus, apollo: DataProxy) {
             variables: { userId: getSession(apollo).userId, status },
         })!;
     } catch (e) {
-        log("getArchivedTrackables(); no data");
+        log.trace("getArchivedTrackables(); no data");
         return null;
     }
 }

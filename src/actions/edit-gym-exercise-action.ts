@@ -47,7 +47,7 @@ async function editGymExercise(
     mutate: MutationFunc<IEditGymExerciseResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    await mutate({
+    return await mutate({
         optimisticResponse: getOptimisticResponse(gymExercise, apollo),
         variables: { gymExercise },
     });

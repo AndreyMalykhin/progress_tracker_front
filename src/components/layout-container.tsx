@@ -17,11 +17,13 @@ query GetData {
     }
 }`;
 
-export default graphql<IGetDataResponse, {}, ILayoutProps>(
+const withData = graphql<IGetDataResponse, {}, ILayoutProps>(
     getDataQuery,
     {
         props: ({ data }) => {
             return { showIntro: data!.settings.showIntro };
         },
     },
-)(Layout);
+);
+
+export default withData(Layout);

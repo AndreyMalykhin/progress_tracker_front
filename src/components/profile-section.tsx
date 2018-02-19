@@ -19,7 +19,7 @@ const log = makeLog("profile-section");
 
 class ProfileSection extends React.Component<IProfileSectionProps> {
     public render() {
-        log("render()");
+        log.trace("render()");
         const { navItems, isContextMode } = this.props;
         const routeElements = this.props.navItems.map((route) => {
             return (
