@@ -223,9 +223,11 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private showToast(
-       msgId: string, msgValues: { [key: string]: string|number },
+       msgId: string, msgValues?: { [key: string]: string|number },
     ) {
-        const toast = { msg: this.props.intl.formatMessage({ id: msgId }) };
+        const toast = {
+            msg: this.props.intl.formatMessage({ id: msgId }, msgValues),
+        };
         addToast(toast, this.props.client);
     }
 

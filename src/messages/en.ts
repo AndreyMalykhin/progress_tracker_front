@@ -157,4 +157,4 @@ export default {
     "trackableTypes.gymExercise": "Gym Exercise",
     "trackableTypes.numericalGoal": "Numerical Goal",
     "trackableTypes.taskGoal": "Task Goal",
-};
+} as any;

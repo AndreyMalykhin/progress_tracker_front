@@ -114,7 +114,7 @@ function updateActivities(
         trackable,
         user: {
             __typename: Type.User,
-            id: getSession(apollo).userId,
+            id: getSession(apollo).userId!,
         },
     };
     addActivity(activity, activityFragment, apollo);

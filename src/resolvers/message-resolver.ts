@@ -1,5 +1,5 @@
-import en from "messages/en";
 import Type from "models/type";
+import IStateResolver from "resolvers/state-resolver";
 
 interface IMessage {
     __typename: string;
@@ -8,13 +8,13 @@ interface IMessage {
     text: string;
 }
 
-interface ITransformInput {
+interface IMessages {
     [locale: string]: {
         [key: string]: string;
     };
 }
 
-function transformMessages(input: ITransformInput) {
+function transformMessages(input: IMessages) {
     const output: { [locale: string]: IMessage[] } = {};
 
     // tslint:disable-next-line:forin
@@ -38,15 +38,18 @@ function transformMessages(input: ITransformInput) {
     return output;
 }
 
-const messages = transformMessages({ en });
-
-export default {
-    defaults: {},
-    resolvers: {
-        Query: {
-            getMessages: (rootValue: any, args: any) => {
-                return messages[args.locale];
+function makeMessageResolver(messages: IMessages) {
+    const transformedMessages = transformMessages(messages);
+    return {
+        defaults: {},
+        resolvers: {
+            Query: {
+                getMessages: (rootValue, args) => {
+                    return transformedMessages[args.locale];
+                },
             },
         },
-    },
-};
+    } as IStateResolver;
+}
+
+export { makeMessageResolver };

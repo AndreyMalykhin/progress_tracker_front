@@ -123,7 +123,7 @@ function updateActivities(
     const { trackable } = response.addNumericalGoalProgress;
     const user = {
         __typename: Type.User,
-        id: getSession(apollo).userId,
+        id: getSession(apollo).userId!,
     };
     const progressChangedActivity = {
         __typename: Type.NumericalGoalProgressChangedActivity,

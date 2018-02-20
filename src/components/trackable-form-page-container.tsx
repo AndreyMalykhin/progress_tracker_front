@@ -9,6 +9,7 @@ import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
+import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
 import { compose } from "react-apollo";
@@ -26,7 +27,7 @@ interface ITrackableFormPageContainerProps extends
 interface IOwnProps extends RouteComponentProps<IRouteParams> {}
 
 interface IRouteParams {
-    type?: Type;
+    type?: TrackableType;
     id?: string;
 }
 
@@ -83,7 +84,8 @@ class TrackableFormPageContainer extends
     public render() {
         const { data, session, match, ...restProps } = this.props;
         const trackable = data && data.getTrackableById;
-        const trackableType = match.params.type || trackable!.__typename;
+        const trackableType = match.params.type
+            || trackable!.__typename as TrackableType;
         return (
             <TrackableFormPage
                 isUserLoggedIn={session.accessToken != null}

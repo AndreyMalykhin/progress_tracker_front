@@ -1,7 +1,8 @@
 import Type from "models/type";
+import IStateResolver from "resolvers/state-resolver";
 import defaultId from "utils/default-id";
 
-export default {
+const uiResolver: IStateResolver = {
     defaults: {
         ui: {
             __typename: Type.UI,
@@ -12,3 +13,5 @@ export default {
     },
     resolvers: {},
 };
+
+export default uiResolver;

@@ -1,19 +1,19 @@
 import HomePage from "components/home-page";
-import IntroPageContainer from "components/intro-page-container";
+import LoginPageContainer from "components/login-page-container";
 import ProfileFormPage from "components/profile-form-page";
 import StackingSwitch from "components/stacking-switch";
 import ToastListContainer from "components/toast-list-container";
 import TrackableFormPageContainer from "components/trackable-form-page-container";
+import { IWithSessionProps } from "components/with-session";
 import * as React from "react";
 import { StatusBar, StyleSheet, View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
 import routes from "utils/routes";
 
-interface ILayoutProps {
-    showIntro?: boolean;
-}
+// tslint:disable-next-line:no-empty-interface
+interface ILayoutProps {}
 
-class Layout extends React.Component<ILayoutProps> {
+class Layout extends React.Component<ILayoutProps & IWithSessionProps> {
     public render() {
         return (
             <View style={styles.container}>
@@ -42,7 +42,7 @@ class Layout extends React.Component<ILayoutProps> {
     }
 
     private renderHomePage = () =>
-        this.props.showIntro ? <IntroPageContainer /> : <HomePage />
+        this.props.session.userId ? <HomePage /> : <LoginPageContainer />
 }
 
 const styles = StyleSheet.create({

@@ -9,7 +9,7 @@ import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
 interface IArchiveProps {
     navItems: INavBarItem[];
     trackableStatus: TrackableStatus;
-    userId: string;
+    userId?: string;
 }
 
 class Archive extends React.Component<IArchiveProps> {

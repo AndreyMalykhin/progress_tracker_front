@@ -5,15 +5,15 @@ import graphql from "react-apollo/graphql";
 interface IGetDataResponse {
     session: {
         id: string;
-        accessToken: string;
-        userId: string;
+        accessToken?: string;
+        userId?: string;
     };
 }
 
 interface IWithSessionProps {
     session: {
         accessToken?: string;
-        userId: string;
+        userId?: string;
     };
 }
 
@@ -26,17 +26,22 @@ query GetData {
     }
 }`;
 
-function withSession<P extends IWithSessionProps>(
-    component: React.ComponentType<P>,
+function withSession<P>(
+    component: React.ComponentType<P & IWithSessionProps>,
 ) {
-    return graphql<IGetDataResponse, P, P>(
+    const WithSession = graphql<IGetDataResponse, P, P & IWithSessionProps>(
         getDataQuery,
         {
+            options: () => {
+                return { fetchPolicy: "cache-only" };
+            },
             props: ({ data }) => {
                 return { session: data!.session };
             },
         },
-    )(component);
+    );
+
+    return WithSession(component);
 }
 
 export { IWithSessionProps };

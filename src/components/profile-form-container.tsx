@@ -107,6 +107,9 @@ const withData =
             props: ({ data }) => {
                 return getDataOrQueryStatus(data!);
             },
+            skip: (ownProps: IOwnProps) => {
+                return !ownProps.session.userId;
+            },
         },
     );
 
@@ -241,7 +244,7 @@ export default compose(
     withRouter,
     withSession,
     withData,
-    withLoader(Loader),
+    withLoader(Loader, 512),
     withError(Error),
     withApollo,
     withSetAvatar,

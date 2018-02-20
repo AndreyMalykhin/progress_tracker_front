@@ -28,7 +28,11 @@ query GetData {
 }`;
 
 const withData = graphql<IGetDataResponse, {}, IToastListContainerProps>(
-    getDataQuery);
+    getDataQuery,
+    {
+        options: { fetchPolicy : "cache-only" },
+    },
+);
 
 class ToastListContainer extends React.Component<IToastListContainerProps> {
     public render() {

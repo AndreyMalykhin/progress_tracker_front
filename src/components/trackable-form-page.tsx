@@ -11,6 +11,7 @@ import NumericalGoalFormContainer, {
 import TaskGoalFormContainer, {
     ITaskGoal,
 } from "components/task-goal-form-container";
+import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -19,12 +20,12 @@ import {
 } from "react-native-keyboard-aware-scroll-view";
 
 type ITrackable = (ITaskGoal | INumericalGoal | ICounter | IGymExercise) & {
-    __typename: Type;
+    __typename: TrackableType;
 };
 
 interface ITrackableFormPageProps {
     trackable?: ITrackable;
-    trackableType: Type;
+    trackableType: TrackableType;
     isUserLoggedIn: boolean;
 }
 
@@ -41,28 +42,28 @@ class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
     private renderForm() {
         const { trackable, trackableType, isUserLoggedIn } = this.props;
         switch (trackableType) {
-            case Type.TaskGoal:
+            case TrackableType.TaskGoal:
             return (
                 <TaskGoalFormContainer
                     isUserLoggedIn={isUserLoggedIn}
                     trackable={trackable as ITaskGoal}
                 />
             );
-            case Type.NumericalGoal:
+            case TrackableType.NumericalGoal:
             return (
                 <NumericalGoalFormContainer
                     isUserLoggedIn={isUserLoggedIn}
                     trackable={trackable as INumericalGoal}
                 />
             );
-            case Type.Counter:
+            case TrackableType.Counter:
             return (
                 <CounterFormContainer
                     isUserLoggedIn={isUserLoggedIn}
                     trackable={trackable as ICounter}
                 />
             );
-            case Type.GymExercise:
+            case TrackableType.GymExercise:
             return (
                 <GymExerciseFormContainer
                     isUserLoggedIn={isUserLoggedIn}

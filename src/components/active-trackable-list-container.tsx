@@ -435,7 +435,7 @@ const withData =
                 let userId = ownProps.match.params.id;
 
                 if (userId === defaultId) {
-                    userId = ownProps.session.userId;
+                    userId = ownProps.session.userId!;
                 }
 
                 return {
@@ -446,6 +446,9 @@ const withData =
             },
             props: ({ data }) => {
                 return getDataOrQueryStatus(data!);
+            },
+            skip: (ownProps: IOwnProps) => {
+                return !ownProps.session.userId;
             },
         },
     );

@@ -58,10 +58,9 @@ query GetData($locale: String!) {
 const withSettings = graphql<IGetSettingsResponse, IOwnProps, IAppProps>(
     getSettingsQuery,
     {
+        options: { fetchPolicy: "cache-only" },
         props: ({ data }) => {
-            return {
-                locale: data!.settings.locale,
-            };
+            return { locale: data!.settings.locale };
         },
     },
 );

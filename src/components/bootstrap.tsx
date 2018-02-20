@@ -1,16 +1,18 @@
-// tslint:disable-next-line:ordered-imports
+import "intl";
+import en from "messages/en";
+import { addLocaleData } from "react-intl";
+import * as enLocaleData from "react-intl/locale-data/en";
+
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import AppContainer from "components/app-container";
 import gql from "graphql-tag";
 import { History } from "history";
-import "intl";
+import { merge } from "lodash";
 import DeadlineTracker from "models/deadline-tracker";
 import Type from "models/type";
 import * as React from "react";
 import { ApolloProvider } from "react-apollo";
-import { addLocaleData } from "react-intl";
-import * as en from "react-intl/locale-data/en";
 import { getDeviceLocale } from "react-native-device-info";
 import Reactotron from "reactotron-react-native";
 import apolloFactory from "utils/apollo-factory";
@@ -19,16 +21,11 @@ import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
 import MultiStackHistory from "utils/multi-stack-history";
 
-interface ISettingsFragment {
-    id: string;
-    locale?: string;
-}
-
-const settingsFragment = gql`
-fragment BootstrapSettingsFragment on Settings {
-    id
-    locale
-}`;
+import { makeMessageResolver } from "resolvers/message-resolver";
+import sessionResolver from "resolvers/session-resolver";
+import { makeSettingsResolver } from "resolvers/settings-resolver";
+import uiResolver from "resolvers/ui-resolver";
+import userResolver from "resolvers/user-resolver";
 
 class Bootstrap extends React.Component {
     private apollo: ApolloClient<NormalizedCacheObject>;
@@ -43,9 +40,16 @@ class Bootstrap extends React.Component {
         }
 
         this.history = new MultiStackHistory();
-        this.apollo = apolloFactory();
+        const locale = this.initLocale();
+        const stateResolver = merge(
+            makeMessageResolver({ en }),
+            makeSettingsResolver(locale),
+            userResolver,
+            sessionResolver,
+            uiResolver,
+        );
+        this.apollo = apolloFactory(stateResolver);
         new DeadlineTracker(this.apollo).start();
-        this.initLocale();
     }
 
     public render() {
@@ -58,17 +62,7 @@ class Bootstrap extends React.Component {
 
     private initLocale() {
         addLocaleData(en);
-        const fragmentId = dataIdFromObject(
-            { __typename: Type.Settings, id: defaultId })!;
-        const settings = this.apollo.readFragment<ISettingsFragment>(
-            { id: fragmentId, fragment: settingsFragment })!;
-        let { locale } = settings;
-
-        if (locale) {
-            return;
-        }
-
-        locale = getDeviceLocale();
+        let locale = getDeviceLocale();
         const isLocaleSupported = ["en"].some(
             (supportedLocale) => locale!.startsWith(supportedLocale));
 
@@ -76,9 +70,7 @@ class Bootstrap extends React.Component {
             locale = "en";
         }
 
-        settings.locale = locale;
-        this.apollo.writeFragment(
-            { data: settings, id: fragmentId, fragment: settingsFragment });
+        return locale;
     }
 }
 

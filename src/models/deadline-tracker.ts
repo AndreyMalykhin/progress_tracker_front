@@ -88,6 +88,11 @@ class DeadlineTracker {
 
     private tick = () => {
         log.trace("tick()");
+
+        if (!getSession(this.apollo).userId) {
+            return;
+        }
+
         const activeTrackablesResponse = this.getActiveTrackables();
 
         if (!activeTrackablesResponse) {
@@ -172,7 +177,7 @@ class DeadlineTracker {
             trackable,
             user: {
                 __typename: Type.User,
-                id: getSession(this.apollo).userId,
+                id: getSession(this.apollo).userId!,
             },
         };
         addActivity(activity, activityFragment, this.apollo);

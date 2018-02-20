@@ -111,6 +111,7 @@ const withLocalData = graphql<
 >(
     getLocalDataQuery,
     {
+        options: { fetchPolicy: "cache-only" },
         props: ({ data }) => {
             return { localData: data };
         },
@@ -137,6 +138,9 @@ const withRemoteData =
             props: ({ data }) => {
                 const dataKey = "remoteData";
                 return getDataOrQueryStatus(data!, dataKey);
+            },
+            skip: (ownProps: IOwnProps) => {
+                return !ownProps.session.userId;
             },
         },
     );
@@ -210,6 +214,7 @@ class ProfileSectionContainer
             || prevUser.rating !== nextUser.rating
             || prevUser.name !== nextUser.name
             || prevUser.isReported !== nextUser.isReported
+            || this.props.session.accessToken !== nextProps.session.accessToken
         ) {
             this.updateHeader(nextProps);
         }
@@ -251,7 +256,7 @@ class ProfileSectionContainer
                 msgId: "commands.new",
                 onRun: this.onStartNewTrackable,
             });
-        } else if (!user.isReported) {
+        } else if (!user.isReported && session.accessToken) {
             rightCommands.push({
                 iconName: IconName.Report,
                 msgId: "commands.report",

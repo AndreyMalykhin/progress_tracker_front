@@ -32,15 +32,18 @@ class FriendsSectionContainer extends
     }
 
     private updateHeader(props: IFriendsSectionContainerProps) {
+        const rightCommands = [];
+
+        if (props.session.accessToken) {
+            rightCommands.push({
+                iconName: IconName.Add,
+                msgId: "commands.share",
+                onRun: this.onInvite,
+            });
+        }
+
         props.header.replace({
-            rightCommands: [
-                {
-                    iconName: IconName.Add,
-                    isDisabled: !props.session.accessToken,
-                    msgId: "commands.share",
-                    onRun: this.onInvite,
-                },
-            ],
+            rightCommands,
             title: <FormattedMessage id="globalNavigation.friends" />,
         });
     }

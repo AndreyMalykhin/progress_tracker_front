@@ -156,7 +156,7 @@ function updateActivities(
 
     const user = {
         __typename: Type.User,
-        id: getSession(apollo).userId,
+        id: getSession(apollo).userId!,
     };
     const trackable = task.goal;
     const progressChangedActivity = {

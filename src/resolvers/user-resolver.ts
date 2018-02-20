@@ -1,8 +1,9 @@
 import Type from "models/type";
+import IStateResolver from "resolvers/state-resolver";
 import defaultAvatar from "utils/default-avatar";
 import defaultId from "utils/default-id";
 
-export default {
+const userResolver: IStateResolver = {
     defaults: {
         user: {
             __typename: Type.User,
@@ -17,3 +18,5 @@ export default {
     },
     resolvers: {},
 };
+
+export default userResolver;

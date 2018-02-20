@@ -7,7 +7,7 @@ import defaultId from "utils/default-id";
 
 interface ISessionFragment {
     id: string;
-    userId: string;
+    userId?: string;
     accessToken?: string;
 }
 
@@ -26,7 +26,9 @@ function getSession(apollo: DataProxy) {
         { id: fragmentId, fragment: sessionFragment })!;
 }
 
-function setSession(userId: string, accessToken: string, apollo: DataProxy) {
+function setSession(
+    userId: string|null, accessToken: string|null, apollo: DataProxy,
+) {
     const session = {
         __typename: Type.Session,
         accessToken,

@@ -1,5 +1,7 @@
 import { setSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
+import { NormalizedCacheObject } from "apollo-cache-inmemory";
+import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
@@ -34,7 +36,10 @@ mutation LoginMutation($facebookAccessToken: String!) {
     }
 }`;
 
-async function login(mutate: MutationFunc<ILoginResponse>) {
+async function login(
+    mutate: MutationFunc<ILoginResponse>,
+    apollo: ApolloClient<NormalizedCacheObject>,
+) {
     let result: LoginResult;
     LoginManager.logOut();
 
@@ -51,18 +56,14 @@ async function login(mutate: MutationFunc<ILoginResponse>) {
     }
 
     const facebookAccessToken = await AccessToken.getCurrentAccessToken();
-    await mutate({
-        update: (proxy, response) => {
-            updateSession(response.data as ILoginResponse, proxy);
-        },
+    const response = await mutate({
         variables: { facebookAccessToken: facebookAccessToken!.accessToken },
     });
-    return true;
-}
-
-function updateSession(response: ILoginResponse, apollo: DataProxy) {
-    const { user, accessToken } = response.login;
+    await apollo.resetStore();
+    apollo.writeData({ data: response.data });
+    const { user, accessToken } = response.data.login;
     setSession(user.id, accessToken, apollo);
+    return true;
 }
 
 export { login, loginQuery, ILoginResponse };

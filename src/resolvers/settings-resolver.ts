@@ -1,14 +1,17 @@
 import Type from "models/type";
 import defaultId from "utils/default-id";
 
-export default {
-    defaults: {
-        settings: {
-            __typename: Type.Settings,
-            id: defaultId,
-            locale: null,
-            showIntro: true,
+function makeSettingsResolver(defaultLocale: string) {
+    return {
+        defaults: {
+            settings: {
+                __typename: Type.Settings,
+                id: defaultId,
+                locale: defaultLocale,
+            },
         },
-    },
-    resolvers: {},
-};
+        resolvers: {},
+    };
+}
+
+export { makeSettingsResolver };

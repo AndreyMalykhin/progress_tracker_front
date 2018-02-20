@@ -11,7 +11,7 @@ function withLogin<P extends IWithLoginProps>(
         class WithLogin extends React.Component<P> {
             public render() {
                 const isShown = (!condition || condition(this.props))
-                    && this.props.session.accessToken == null;
+                    && !this.props.session.accessToken;
                 return isShown ? <LoginContainer msgId={msgId} /> :
                     <Component {...this.props} />;
             }

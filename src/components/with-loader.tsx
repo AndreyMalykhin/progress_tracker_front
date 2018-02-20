@@ -2,7 +2,7 @@ import * as React from "react";
 import QueryStatus from "utils/query-status";
 
 interface IProps {
-    queryStatus: QueryStatus;
+    queryStatus?: QueryStatus;
 }
 
 interface IState {
@@ -42,10 +42,10 @@ function withLoader<T>(loader: React.ComponentType<T>, minDuration?: number) {
                 clearTimeout(this.timeoutId!);
             }
 
-            private updateVisibility(queryStatus: QueryStatus) {
+            private updateVisibility(queryStatus?: QueryStatus) {
                 let isVisible = false;
 
-                if (queryStatus === QueryStatus.Ready) {
+                if (queryStatus === QueryStatus.Ready || !queryStatus) {
                     if (minDuration) {
                         isVisible = true;
 

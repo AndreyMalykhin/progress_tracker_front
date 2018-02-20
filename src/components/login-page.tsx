@@ -11,11 +11,11 @@ import {
 } from "react-native";
 import { withRouter } from "react-router";
 
-interface IIntroPageProps extends IWithLoginActionProps {
-    onClose: () => void;
+interface ILoginPageProps extends IWithLoginActionProps {
+    onSkip: () => void;
 }
 
-class IntroPage extends React.Component<IIntroPageProps> {
+class LoginPage extends React.Component<ILoginPageProps> {
     public render() {
         return (
             <View style={styles.container}>
@@ -26,7 +26,7 @@ class IntroPage extends React.Component<IIntroPageProps> {
                 <Button style={styles.btn} onPress={this.props.onLogin}>
                     <ButtonTitle msgId="common.login" />
                 </Button>
-                <Button style={styles.btn} onPress={this.props.onClose}>
+                <Button style={styles.btn} onPress={this.props.onSkip}>
                     <ButtonTitle msgId="intro.skip" />
                 </Button>
             </View>
@@ -50,5 +50,5 @@ const styles = StyleSheet.create({
     },
 });
 
-export { IIntroPageProps };
-export default IntroPage;
+export { ILoginPageProps };
+export default LoginPage;

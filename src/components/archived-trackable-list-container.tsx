@@ -8,6 +8,7 @@ import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
+import withNoUpdatesInBackground from "components/with-no-updates-in-background";
 import withRefetchOnFirstLoad, {
     IWithRefetchOnFirstLoadProps,
 } from "components/with-refetch-on-first-load";
@@ -17,7 +18,6 @@ import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
-import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus, { isLoading } from "utils/query-status";
@@ -32,7 +32,7 @@ interface IGetDataResponse {
 }
 
 interface IOwnProps extends IWithRefetchOnFirstLoadProps {
-    userId: string;
+    userId?: string;
     trackableStatus: TrackableStatus;
 }
 
@@ -98,6 +98,7 @@ const withData = graphql<
         props: ({ data }) => {
             return getDataOrQueryStatus(data!);
         },
+        skip: (ownProps: IOwnProps) => !ownProps.userId,
     },
 );
 
@@ -117,10 +118,10 @@ class ArchivedTrackableListContainer extends
 }
 
 export default compose(
-    withRouter,
     withRefetchOnFirstLoad<IArchivedTrackableListContainerProps>(
         (props) => `${props.userId}_${props.trackableStatus}`),
     withData,
+    withNoUpdatesInBackground,
     withLoader(Loader, 512),
     withError(Error),
     withEmptyList<IArchivedTrackableListContainerProps>(

@@ -23,7 +23,7 @@ function withLoginAction<P>(
                 return {
                     onLogin: async () => {
                         try {
-                            return await login(mutate!);
+                            return await login(mutate!, ownProps.client);
                         } catch (e) {
                             if (!isApolloError(e)) {
                                 addGenericErrorToast(ownProps.client);
