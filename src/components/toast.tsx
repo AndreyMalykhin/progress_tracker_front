@@ -1,5 +1,6 @@
+import Text from "components/text";
 import * as React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 interface IToastProps {
     duration?: number;

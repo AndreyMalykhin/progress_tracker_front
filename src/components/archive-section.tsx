@@ -6,13 +6,13 @@ import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
 
-interface IArchiveProps {
+interface IArchiveSectionProps {
     navItems: INavBarItem[];
     trackableStatus: TrackableStatus;
     userId: string;
 }
 
-class Archive extends React.Component<IArchiveProps> {
+class ArchiveSection extends React.Component<IArchiveSectionProps> {
     public render() {
         const { userId, navItems, trackableStatus } = this.props;
         return (
@@ -39,4 +39,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Archive;
+export default ArchiveSection;

@@ -1,9 +1,9 @@
 import LayoutContainer from "components/layout-container";
 import Loader from "components/loader";
+import Text from "components/text";
 import { History } from "history";
 import * as React from "react";
 import { IntlProvider } from "react-intl";
-import { Text } from "react-native";
 import { Router } from "react-router";
 import QueryStatus from "utils/query-status";
 

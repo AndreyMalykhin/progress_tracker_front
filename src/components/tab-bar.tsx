@@ -1,10 +1,12 @@
-import TouchableWithFeedback, { ITouchableWithFeedbackProps } from "components/touchable-with-feedback";
+import Text from "components/text";
+import TouchableWithFeedback, {
+    ITouchableWithFeedbackProps,
+} from "components/touchable-with-feedback";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import {
     StyleProp,
     StyleSheet,
-    Text,
     TextProperties,
     TextStyle,
     View,

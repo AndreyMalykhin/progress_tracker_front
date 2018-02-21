@@ -6,7 +6,7 @@ import {
 import { addToast } from "actions/toast-helpers";
 import ActionSheet, { IActionSheetOption } from "components/action-sheet";
 import ActiveTrackableListContainer from "components/active-trackable-list-container";
-import ArchiveContainer from "components/archive-container";
+import ArchiveSectionContainer from "components/archive-section-container";
 import Error from "components/error";
 import {
     IHeaderCmd,
@@ -233,7 +233,7 @@ class ProfileSectionContainer
                 titleMsgId: "profile.activeTrackables",
             },
             {
-                component: ArchiveContainer,
+                component: ArchiveSectionContainer,
                 iconName: IconName.Archive,
                 matchExact: routes.profileArchive.exact,
                 matchPath: routes.profileArchive.path,
@@ -336,8 +336,8 @@ export default compose(
         (props) => String(props.match.params.id)),
     withRemoteData,
     withNoUpdatesInBackground,
-    withLoader(Loader, 0, "remoteData"),
-    withError(Error, "remoteData"),
+    withLoader(Loader, { queryProp: "remoteData" }),
+    withError(Error, { queryProp: "remoteData" }),
     withApollo,
     withReportUser,
     injectIntl,

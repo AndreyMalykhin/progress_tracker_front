@@ -1,10 +1,10 @@
 import Avatar from "components/avatar";
 import CommandBar, { ICommandBarProps } from "components/command-bar";
 import Image from "components/image";
+import Text from "components/text";
 import * as React from "react";
 import {
     StyleSheet,
-    Text,
     TouchableWithoutFeedback,
     TouchableWithoutFeedbackProperties,
     View,

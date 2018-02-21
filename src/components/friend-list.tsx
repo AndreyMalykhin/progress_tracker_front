@@ -1,13 +1,13 @@
 import Avatar from "components/avatar";
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import Loader from "components/loader";
+import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
 import * as React from "react";
 import {
     FlatList,
     ListRenderItemInfo,
     StyleSheet,
-    Text,
     View,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -92,7 +92,7 @@ class Item extends React.PureComponent<IItemProps> {
                 >
                     <View style={styles.itemUser}>
                         <Avatar
-                            style={styles.itemAvatar}
+                            style={styles.itemUserAvatar}
                             size="medium"
                             uri={avatarUrlSmall}
                         />
@@ -124,9 +124,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         paddingBottom: 32,
     },
-    itemAvatar: {
-        marginRight: 8,
-    },
     itemMuteBtn: {
         paddingLeft: 8,
     },
@@ -136,6 +133,9 @@ const styles = StyleSheet.create({
     itemUser: {
         flex: 1,
         flexDirection: "row",
+    },
+    itemUserAvatar: {
+        marginRight: 8,
     },
     itemUserName: {
         flex: 1,

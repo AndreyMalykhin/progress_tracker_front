@@ -114,6 +114,6 @@ class AppContainer extends React.Component<IAppContainerProps> {
 export default compose(
     withSettings,
     withData,
-    withLoader(Loader, 0),
+    withLoader(Loader, { showIfNoQuery: false }),
     withError(Error),
 )(AppContainer);

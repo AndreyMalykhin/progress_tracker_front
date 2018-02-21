@@ -1,8 +1,9 @@
 import Button, { ButtonTitle } from "components/button";
+import Text from "components/text";
 import { IWithLoginActionProps } from "components/with-login-action";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 interface ILoginProps {
     msgId?: string;

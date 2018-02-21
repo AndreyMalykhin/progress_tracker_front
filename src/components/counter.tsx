@@ -1,4 +1,5 @@
 import { ICommandBarItem } from "components/command-bar";
+import Text from "components/text";
 import Trackable from "components/trackable";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -6,7 +7,6 @@ import {
     LayoutRectangle,
     StyleProp,
     StyleSheet,
-    Text,
     ViewStyle,
 } from "react-native";
 

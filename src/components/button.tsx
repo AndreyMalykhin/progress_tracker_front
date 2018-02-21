@@ -1,4 +1,5 @@
 import Loader from "components/loader";
+import Text from "components/text";
 import TouchableWithFeedback, {
     ITouchableWithFeedbackProps,
 } from "components/touchable-with-feedback";
@@ -7,7 +8,6 @@ import { FormattedMessage } from "react-intl";
 import {
     StyleProp,
     StyleSheet,
-    Text,
     TextStyle,
     View,
 } from "react-native";

@@ -97,6 +97,6 @@ export default compose(
     withRouter,
     withSession,
     withData,
-    withLoader(Loader),
+    withLoader(Loader, { showIfNoQuery: false }),
     withError(Error),
 )(TrackableFormPageContainer);

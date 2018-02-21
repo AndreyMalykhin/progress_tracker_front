@@ -1,9 +1,11 @@
 import * as React from "react";
-import { Text as TextImpl } from "react-native";
+import { Text as TextImpl, TextProperties } from "react-native";
 
-class Text extends React.Component {
+type ITextProps = TextProperties;
+
+class Text extends React.Component<ITextProps> {
     public render() {
-        return <TextImpl {...this.props}/>;
+        return <TextImpl {...this.props} />;
     }
 }
 

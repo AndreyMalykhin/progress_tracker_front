@@ -3,13 +3,13 @@ import Button, {
     ButtonTitle,
     IButtonProps,
 } from "components/button";
+import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
 import * as React from "react";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import {
     StyleProp,
     StyleSheet,
-    Text,
     TextInput,
     TextInputProperties,
     TextStyle,

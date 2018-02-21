@@ -2,7 +2,7 @@ import ActivitiesSectionContainer from "components/activities-section-container"
 import FriendsSectionContainer from "components/friends-section-container";
 import GlobalNav from "components/global-nav";
 import Header from "components/header";
-import LeadersSection from "components/leaders-section";
+import LeadersSectionContainer from "components/leaders-section-container";
 import { INavBarItem } from "components/nav-bar";
 import PendingReviewSectionContainer from "components/pending-review-section-container";
 import ProfileSectionContainer from "components/profile-section-container";
@@ -15,9 +15,9 @@ import defaultId from "utils/default-id";
 import IconName from "utils/icon-name";
 import routes from "utils/routes";
 
-type INavItem = INavBarItem & {
+interface INavItem extends INavBarItem {
     component: React.ComponentType;
-};
+}
 
 const myActiveTrackablesRoute = routes.profileActiveTrackables.path.replace(
     ":id", defaultId);
@@ -31,7 +31,7 @@ const navItems: INavItem[] = [
         titleMsgId: "globalNavigation.profile",
     },
     {
-        component: LeadersSection,
+        component: LeadersSectionContainer,
         iconName: IconName.Leaders,
         matchExact: routes.leaders.exact,
         matchPath: routes.leaders.path,

@@ -1,5 +1,6 @@
 import Avatar from "components/avatar";
 import Loader from "components/loader";
+import Text from "components/text";
 import Audience from "models/audience";
 import Type from "models/type";
 import * as React from "react";
@@ -10,7 +11,6 @@ import {
     SectionListData,
     StyleProp,
     StyleSheet,
-    Text,
     TextStyle,
     TouchableWithoutFeedback,
     View,

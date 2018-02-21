@@ -14,6 +14,7 @@ import {
 import FormSlider from "components/form-slider";
 import FormSwitch from "components/form-switch";
 import FormTextInput from "components/form-text-input";
+import Text from "components/text";
 import TextInput from "components/text-input";
 import TrackableForm, { ITrackableFormProps } from "components/trackable-form";
 import Difficulty from "models/difficulty";
@@ -23,8 +24,6 @@ import * as React from "react";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import {
     StyleSheet,
-    Text,
-    TextInput as NativeTextInput,
     View,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";

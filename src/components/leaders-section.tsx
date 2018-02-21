@@ -1,10 +1,36 @@
+import LeaderListContainer from "components/leader-list-container";
+import { INavBarItem } from "components/nav-bar";
+import SecondaryNav from "components/secondary-nav";
+import Audience from "models/audience";
 import * as React from "react";
-import { Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-class LeadersSection extends React.Component {
+interface IActivitiesSectionProps {
+    navItems: INavBarItem[];
+    audience: Audience;
+}
+
+class LeadersSection extends React.Component<IActivitiesSectionProps> {
     public render() {
-        return <Text>LEADERS SECTION</Text>;
+        const { audience, navItems } = this.props;
+        return (
+            <View style={styles.container}>
+                <SecondaryNav items={navItems} />
+                <View style={styles.content}>
+                    <LeaderListContainer key={audience} audience={audience} />
+                </View>
+            </View>
+        );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    content: {
+        flex: 1,
+    },
+});
 
 export default LeadersSection;

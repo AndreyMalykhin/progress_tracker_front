@@ -2,11 +2,12 @@ import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
 import IGoalProps from "components/goal-props";
 import ProgressBar from "components/progress-bar";
+import Text from "components/text";
 import Trackable from "components/trackable";
 import { memoize } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 interface ITask {
     id: string;

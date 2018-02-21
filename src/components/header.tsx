@@ -1,9 +1,10 @@
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import Image from "components/image";
+import Text from "components/text";
 import * as React from "react";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";

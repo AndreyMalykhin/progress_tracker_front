@@ -1,4 +1,4 @@
-import Archive from "components/archive";
+import ArchiveSection from "components/archive-section";
 import { INavBarItem } from "components/nav-bar";
 import withSession, { IWithSessionProps } from "components/with-session";
 import TrackableStatus from "models/trackable-status";
@@ -13,7 +13,7 @@ interface IRouteParams {
     trackableStatus: TrackableStatus;
 }
 
-interface IArchiveContainerProps extends
+interface IArchiveSectionContainerProps extends
     RouteComponentProps<IRouteParams> {}
 
 const approvedTrackablesRoute = routes.profileArchive.path.replace(
@@ -23,10 +23,11 @@ const rejectedTrackablesRoute = routes.profileArchive.path.replace(
 const expiredTrackablesRoute = routes.profileArchive.path.replace(
     ":trackableStatus", TrackableStatus.Expired);
 
-class ArchiveContainer extends React.Component<IArchiveContainerProps> {
+class ArchiveSectionContainer extends
+    React.Component<IArchiveSectionContainerProps> {
     private navItems: INavBarItem[] = [];
 
-    public constructor(props: IArchiveContainerProps, context: any) {
+    public constructor(props: IArchiveSectionContainerProps, context: any) {
         super(props, context);
         this.initNavItems(props.match.params.id);
     }
@@ -35,7 +36,7 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
         const { match } = this.props;
         const { id, trackableStatus } = match.params;
         return (
-            <Archive
+            <ArchiveSection
                 userId={id}
                 navItems={this.navItems}
                 trackableStatus={trackableStatus}
@@ -43,7 +44,7 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
         );
     }
 
-    public componentWillReceiveProps(nextProps: IArchiveContainerProps) {
+    public componentWillReceiveProps(nextProps: IArchiveSectionContainerProps) {
         const nextUserId = nextProps.match.params.id;
 
         if (this.props.match.params.id !== nextUserId) {
@@ -75,4 +76,4 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
     }
 }
 
-export default compose(withRouter)(ArchiveContainer);
+export default compose(withRouter)(ArchiveSectionContainer);

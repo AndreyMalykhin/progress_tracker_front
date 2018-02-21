@@ -1,3 +1,4 @@
+import Text from "components/text";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
 import { FormattedNumber } from "react-intl";
@@ -7,7 +8,6 @@ import {
     LayoutChangeEvent,
     StyleProp,
     StyleSheet,
-    Text,
     View,
     ViewStyle,
 } from "react-native";

@@ -14,7 +14,7 @@ interface IWithHeaderProps {
 function withHeader<T extends IWithHeaderProps>(
     Component: React.ComponentType<T>,
 ) {
-    return class WithHeader extends
+    class WithHeader extends
         React.Component< T & RouteComponentProps<{}> > {
         public render() {
             return <Component header={this} {...this.props} />;
@@ -44,7 +44,9 @@ function withHeader<T extends IWithHeaderProps>(
         public pop() {
             this.props.history.goBack();
         }
-    };
+    }
+
+    return WithHeader;
 }
 
 export { IWithHeaderProps };

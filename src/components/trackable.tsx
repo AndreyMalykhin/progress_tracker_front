@@ -10,6 +10,7 @@ import Card, {
 import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
 import Image from "components/image";
+import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -19,7 +20,6 @@ import {
     PanResponderGestureState,
     StyleProp,
     StyleSheet,
-    Text,
     TouchableWithoutFeedback,
     View,
     ViewStyle,
