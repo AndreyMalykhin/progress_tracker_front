@@ -38,15 +38,15 @@ interface ISpliceActivitiesFragment {
 }
 
 interface IGetActivitiesResponse {
-    getActivitiesByAudience: IConnection<ISpliceActivitiesFragment, number>;
+    getActivities: IConnection<ISpliceActivitiesFragment, number>;
 }
 
 const log = makeLog("activity-helpers");
 
 const getActivitiesQuery = gql`
 query GetActivities($audience: Audience!) {
-    getActivitiesByAudience(audience: $audience) @connection(
-        key: "getActivitiesByAudience", filter: ["audience"]
+    getActivities(audience: $audience) @connection(
+        key: "getActivities", filter: ["audience"]
     ) {
         edges {
             cursor
@@ -54,6 +54,21 @@ query GetActivities($audience: Audience!) {
                 id
                 date
             }
+        }
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+    }
+}`;
+
+const initActivitiesQuery = gql`
+query GetActivities($audience: Audience!) {
+    getActivities(audience: $audience) @connection(
+        key: "getActivities", filter: ["audience"]
+    ) {
+        edges {
+            cursor
         }
         pageInfo {
             hasNextPage
@@ -125,7 +140,7 @@ function spliceActivities(
 
     const cursorField = "date";
     spliceConnection(
-        activitiesResponse.getActivitiesByAudience,
+        activitiesResponse.getActivities,
         idsToRemove,
         activitiesToAdd,
         cursorField,
@@ -169,8 +184,29 @@ function compareActivities(
     return result < 0 ? -1 : 1;
 }
 
+function initActivities(apollo: DataProxy) {
+    const data = {
+        __typename: Type.Query,
+        getActivities: {
+            __typename: Type.ActivityConnection,
+            edges: [],
+            pageInfo: {
+                __typename: Type.PageInfo,
+                endCursor: null,
+                hasNextPage: false,
+            },
+        },
+    };
+    apollo.writeQuery({
+        data,
+        query: initActivitiesQuery,
+        variables: { audience: Audience.Me },
+    });
+}
+
 export {
     getActivities,
+    initActivities,
     spliceActivities,
     addTrackableAddedActivity,
     addGoalAchievedActivity,

@@ -21,7 +21,7 @@ interface ISetUserMutedResponse {
 }
 
 interface IGetFriendsActivitiesResponse {
-    getActivitiesByAudience: {
+    getActivities: {
         edges: Array<{
             node: {
                 id: string;
@@ -63,8 +63,8 @@ query GetMutedActivities($userId: ID!) {
 
 const getFriendsActivitiesQuery = gql`
 query GetFriendsActivities($audience: Audience!) {
-    getActivitiesByAudience(audience: $audience) @connection(
-        key: "getActivitiesByAudience", filter: ["audience"]
+    getActivities(audience: $audience) @connection(
+        key: "getActivities", filter: ["audience"]
     ) {
         edges {
             node {
@@ -118,7 +118,7 @@ function updateActivities(response: ISetUserMutedResponse, apollo: DataProxy) {
         }
 
         const friendsActivities =
-            friendsActivitiesResponse.getActivitiesByAudience.edges;
+            friendsActivitiesResponse.getActivities.edges;
 
         for (const activity of friendsActivities) {
             if (activity.node.user.id === userId) {

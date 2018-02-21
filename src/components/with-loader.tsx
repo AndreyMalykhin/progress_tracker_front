@@ -1,17 +1,22 @@
 import * as React from "react";
+import { QueryProps } from "react-apollo";
 import QueryStatus from "utils/query-status";
 
-interface IProps {
-    queryStatus?: QueryStatus;
+interface IOwnProps {
+    [query: string]: QueryProps;
 }
 
 interface IState {
     isVisible?: boolean;
 }
 
-function withLoader<T>(loader: React.ComponentType<T>, minDuration?: number) {
+function withLoader<T>(
+    loader: React.ComponentType<T>,
+    minDuration = 512,
+    queryKey = "data",
+) {
     return <P extends {}>(Component: React.ComponentType<P>) => {
-        return class WithLoader extends React.Component<P & IProps, IState> {
+        class WithLoader extends React.Component<P & IOwnProps, IState> {
             public state: IState = {};
             private timeoutId?: NodeJS.Timer;
 
@@ -21,31 +26,35 @@ function withLoader<T>(loader: React.ComponentType<T>, minDuration?: number) {
             }
 
             public componentWillMount() {
-                this.updateVisibility(this.props.queryStatus);
+                this.updateVisibility(this.props[queryKey]);
             }
 
-            public componentWillReceiveProps(nextProps: Readonly<P & IProps>) {
-                const { queryStatus } = this.props;
+            public componentWillReceiveProps(nextProps: P & IOwnProps) {
+                const prevQuery: QueryProps = this.props[queryKey];
+                const nextQuery: QueryProps = nextProps[queryKey];
+                const prevNetworkStatus = prevQuery && prevQuery.networkStatus;
+                const nextNetworkStatus = nextQuery && nextQuery.networkStatus;
 
-                if (queryStatus === nextProps.queryStatus
-                    || queryStatus === QueryStatus.LoadingMore
-                    || queryStatus === QueryStatus.Polling
-                    || queryStatus === QueryStatus.Reloading
+                if (prevNetworkStatus === nextNetworkStatus
+                    || prevNetworkStatus === QueryStatus.LoadingMore
+                    || prevNetworkStatus === QueryStatus.Polling
+                    || prevNetworkStatus === QueryStatus.Reloading
                 ) {
                     return;
                 }
 
-                this.updateVisibility(nextProps.queryStatus);
+                this.updateVisibility(nextProps[queryKey]);
             }
 
             public componentWillUnmount() {
                 clearTimeout(this.timeoutId!);
             }
 
-            private updateVisibility(queryStatus?: QueryStatus) {
+            private updateVisibility(query?: QueryProps) {
                 let isVisible = false;
+                const networkStatus = query && query.networkStatus;
 
-                if (queryStatus === QueryStatus.Ready || !queryStatus) {
+                if (!networkStatus || networkStatus === QueryStatus.Ready) {
                     if (minDuration) {
                         isVisible = true;
 
@@ -54,22 +63,28 @@ function withLoader<T>(loader: React.ComponentType<T>, minDuration?: number) {
                         }
 
                         this.timeoutId = setTimeout(() => {
-                            if (this.props.queryStatus === queryStatus) {
+                            const newQuery: QueryProps = this.props[queryKey];
+                            const newNetworkStatus =
+                                newQuery && newQuery.networkStatus;
+
+                            if (newNetworkStatus === networkStatus) {
                                 this.setState({ isVisible: false });
                             }
                         }, minDuration);
                     } else {
                         isVisible = false;
                     }
-                } else if (queryStatus === QueryStatus.InitialLoading
-                    || queryStatus === QueryStatus.SetVariables
+                } else if (networkStatus === QueryStatus.InitialLoading
+                    || networkStatus === QueryStatus.SetVariables
                 ) {
                     isVisible = true;
                 }
 
                 this.setState({ isVisible });
             }
-        };
+        }
+
+        return WithLoader;
     };
 }
 

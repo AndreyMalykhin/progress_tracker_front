@@ -38,6 +38,7 @@ import {
     reorderTrackable,
     reorderTrackableQuery,
 } from "actions/reorder-trackable-action";
+import { isAnonymous } from "actions/session-helpers";
 import {
     ISetTaskDoneResponse,
     setTaskDone,
@@ -87,8 +88,8 @@ import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import * as React from "react";
 import { ReactNode } from "react";
+import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -404,7 +405,7 @@ fragment ActiveTrackableListAggregateFragment on Aggregate {
     }
 }
 
-query GetData($userId: ID!, $cursor: Float) {
+query GetData($userId: ID, $cursor: Float) {
     getActiveTrackables(
         userId: $userId,
         after: $cursor
@@ -432,24 +433,26 @@ const withData =
         getDataQuery,
         {
             options: (ownProps) => {
-                let userId = ownProps.match.params.id;
+                let userId: string|undefined = ownProps.match.params.id;
+                let { fetchPolicy } = ownProps;
 
-                if (userId === defaultId) {
-                    userId = ownProps.session.userId!;
+                if (userId === defaultId
+                    || userId === ownProps.session.userId
+                ) {
+                    userId = undefined;
+
+                    if (isAnonymous(ownProps.session)) {
+                        fetchPolicy = "cache-only";
+                    }
                 }
 
                 return {
-                    fetchPolicy: ownProps.fetchPolicy,
+                    fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                     variables: { userId },
                 };
             },
-            props: ({ data }) => {
-                return getDataOrQueryStatus(data!);
-            },
-            skip: (ownProps: IOwnProps) => {
-                return !ownProps.session.userId;
-            },
+            skip: (ownProps: IOwnProps) => !ownProps.session.userId,
         },
     );
 
@@ -1376,10 +1379,11 @@ export default compose(
     withRouter,
     withHeader,
     withSession,
-    withRefetchOnFirstLoad(),
+    withRefetchOnFirstLoad<IActiveTrackableListContainerProps>(
+        (props) => props.match.params.id),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, 512),
+    withLoader(Loader),
     withError(Error),
     withEmptyList<IActiveTrackableListContainerProps>(
         EmptyList, (props) => props.data.getActiveTrackables.edges),

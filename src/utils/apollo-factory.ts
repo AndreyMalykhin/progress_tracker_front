@@ -1,4 +1,5 @@
 import {
+    CacheResolverMap,
     IntrospectionFragmentMatcher,
     NormalizedCacheObject,
 } from "apollo-cache-inmemory";
@@ -8,7 +9,6 @@ import { HttpLink } from "apollo-link-http";
 import apolloLogger from "apollo-link-logger";
 import { withClientState } from "apollo-link-state";
 import { InjectedIntl } from "react-intl";
-import cacheResolvers from "resolvers/cache-resolvers";
 import IStateResolver from "resolvers/state-resolver";
 import AuthLink from "utils/auth-link";
 import Config from "utils/config";
@@ -20,11 +20,13 @@ import makeLog from "utils/make-log";
 
 const log = makeLog("apollo-factory");
 
-function apolloFactory(stateResolver: IStateResolver) {
+function apolloFactory(
+    stateResolver: IStateResolver, cacheResolver: CacheResolverMap,
+) {
     const fragmentMatcher = new IntrospectionFragmentMatcher(
         { introspectionQueryResultData: fragmentTypes as any });
     const cache = new InMemoryCache(
-        { cacheRedirects: cacheResolvers, dataIdFromObject, fragmentMatcher });
+        { cacheRedirects: cacheResolver, dataIdFromObject, fragmentMatcher });
     const stateLink = withClientState({
         cache: cache as any,
         ...stateResolver,

@@ -35,7 +35,7 @@ interface IGetActiveTrackablesResponse {
 const log = makeLog("deadline-tracker");
 
 const getActiveTrackablesQuery = gql`
-query GetActiveTrackables($userId: ID!) {
+query GetActiveTrackables($userId: ID) {
     getActiveTrackables(userId: $userId) @connection(
         key: "getActiveTrackables", filter: ["userId"]
     ) {
@@ -136,7 +136,6 @@ class DeadlineTracker {
         try {
             return this.apollo.readQuery<IGetActiveTrackablesResponse>({
                 query: getActiveTrackablesQuery,
-                variables: { userId: getSession(this.apollo).userId },
             });
         } catch (e) {
             log.trace("getActiveTrackables(); no data");

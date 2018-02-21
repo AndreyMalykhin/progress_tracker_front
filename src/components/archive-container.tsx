@@ -14,7 +14,7 @@ interface IRouteParams {
 }
 
 interface IArchiveContainerProps extends
-    RouteComponentProps<IRouteParams>, IWithSessionProps {}
+    RouteComponentProps<IRouteParams> {}
 
 const approvedTrackablesRoute = routes.profileArchive.path.replace(
     ":trackableStatus", TrackableStatus.Approved);
@@ -32,12 +32,11 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
     }
 
     public render() {
-        const { match, session } = this.props;
+        const { match } = this.props;
         const { id, trackableStatus } = match.params;
-        const userId = id === defaultId ? session.userId : id;
         return (
             <Archive
-                userId={userId}
+                userId={id}
                 navItems={this.navItems}
                 trackableStatus={trackableStatus}
             />
@@ -76,4 +75,4 @@ class ArchiveContainer extends React.Component<IArchiveContainerProps> {
     }
 }
 
-export default compose(withRouter, withSession)(ArchiveContainer);
+export default compose(withRouter)(ArchiveContainer);

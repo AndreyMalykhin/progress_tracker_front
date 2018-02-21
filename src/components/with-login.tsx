@@ -2,9 +2,7 @@ import LoginContainer from "components/login-container";
 import withSession, { IWithSessionProps } from "components/with-session";
 import * as React from "react";
 
-type IWithLoginProps = IWithSessionProps;
-
-function withLogin<P extends IWithLoginProps>(
+function withLogin<P extends IWithSessionProps>(
     msgId: string, condition?: (props: P) => boolean,
 ) {
     return (Component: React.ComponentType<P>) => {
@@ -17,9 +15,8 @@ function withLogin<P extends IWithLoginProps>(
             }
         }
 
-        return withSession(WithLogin);
+        return WithLogin;
     };
 }
 
-export { IWithLoginProps };
 export default withLogin;

@@ -14,13 +14,13 @@ interface ISpliceArchivedTrackablesFragment {
     statusChangeDate: number;
 }
 
-interface IGetActiveTrackablesResponse {
+interface IGetArchivedTrackablesResponse {
     getArchivedTrackables:
         IConnection<ISpliceArchivedTrackablesFragment, number>;
 }
 
 const getArchivedTrackablesQuery = gql`
-query GetArchivedTrackables($userId: ID!, $status: TrackableStatus!) {
+query GetArchivedTrackables($status: TrackableStatus!, $userId: ID) {
     getArchivedTrackables(
         userId: $userId, status: $status
     ) @connection(key: "getArchivedTrackables", filter: ["userId", "status"]) {
@@ -33,6 +33,21 @@ query GetArchivedTrackables($userId: ID!, $status: TrackableStatus!) {
         }
         pageInfo {
             endCursor
+        }
+    }
+}`;
+
+const initArchivedTrackablesQuery = gql`
+query GetArchivedTrackables($status: TrackableStatus!, $userId: ID) {
+    getArchivedTrackables(
+        userId: $userId, status: $status
+    ) @connection(key: "getArchivedTrackables", filter: ["userId", "status"]) {
+        edges {
+            cursor
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
         }
     }
 }`;
@@ -63,9 +78,8 @@ function spliceArchivedTrackables(
 
 function getArchivedTrackables(status: TrackableStatus, apollo: DataProxy) {
     try {
-        return apollo.readQuery<IGetActiveTrackablesResponse>({
+        return apollo.readQuery<IGetArchivedTrackablesResponse>({
             query: getArchivedTrackablesQuery,
-            variables: { userId: getSession(apollo).userId, status },
         })!;
     } catch (e) {
         log.trace("getArchivedTrackables(); no data");
@@ -74,14 +88,13 @@ function getArchivedTrackables(status: TrackableStatus, apollo: DataProxy) {
 }
 
 function setArchivedTrackables(
-    archivedTrackablesResponse: IGetActiveTrackablesResponse,
+    archivedTrackablesResponse: IGetArchivedTrackablesResponse,
     status: TrackableStatus,
     apollo: DataProxy,
 ) {
     apollo.writeQuery({
         data: archivedTrackablesResponse,
         query: getArchivedTrackablesQuery,
-        variables: { userId: getSession(apollo).userId, status },
     });
 }
 
@@ -98,8 +111,37 @@ function compareTrackables(
     return result < 0 ? -1 : 1;
 }
 
+function initArchivedTrackables(apollo: DataProxy) {
+    const data = {
+        __typename: Type.Query,
+        getArchivedTrackables: {
+            __typename: Type.TrackableConnection,
+            edges: [],
+            pageInfo: {
+                __typename: Type.PageInfo,
+                endCursor: null,
+                hasNextPage: false,
+            },
+        },
+    };
+    const statuses = [
+        TrackableStatus.Approved,
+        TrackableStatus.Rejected,
+        TrackableStatus.Expired,
+    ];
+
+    for (const status of statuses) {
+        apollo.writeQuery({
+            data,
+            query: initArchivedTrackablesQuery,
+            variables: { status },
+        });
+    }
+}
+
 export {
     spliceArchivedTrackables,
     getArchivedTrackables,
+    initArchivedTrackables,
     ISpliceArchivedTrackablesFragment,
 };

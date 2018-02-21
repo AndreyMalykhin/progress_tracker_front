@@ -32,9 +32,7 @@ function withSession<P>(
     const WithSession = graphql<IGetDataResponse, P, P & IWithSessionProps>(
         getDataQuery,
         {
-            options: () => {
-                return { fetchPolicy: "cache-only" };
-            },
+            options: { fetchPolicy: "cache-only" },
             props: ({ data }) => {
                 return { session: data!.session };
             },

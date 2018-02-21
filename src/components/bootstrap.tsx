@@ -21,6 +21,7 @@ import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
 import MultiStackHistory from "utils/multi-stack-history";
 
+import { makeCacheResolver } from "resolvers/cache-resolver";
 import { makeMessageResolver } from "resolvers/message-resolver";
 import sessionResolver from "resolvers/session-resolver";
 import { makeSettingsResolver } from "resolvers/settings-resolver";
@@ -48,7 +49,8 @@ class Bootstrap extends React.Component {
             sessionResolver,
             uiResolver,
         );
-        this.apollo = apolloFactory(stateResolver);
+        const cacheResolver = makeCacheResolver(() => this.apollo);
+        this.apollo = apolloFactory(stateResolver, cacheResolver);
         new DeadlineTracker(this.apollo).start();
     }
 

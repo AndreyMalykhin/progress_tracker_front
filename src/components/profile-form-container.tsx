@@ -52,7 +52,7 @@ interface IProfileFormContainerState {
 interface IOwnProps extends IWithSessionProps, IWithApolloProps {}
 
 interface IGetDataResponse {
-    getUserById: {
+    getUser: {
         id: string;
         name: string;
         avatarUrlMedium: string;
@@ -86,8 +86,8 @@ const withEditUser =
     );
 
 const getDataQuery = gql`
-query GetData($userId: ID!) {
-    getUserById(id: $userId) {
+query GetData($userId: ID) {
+    getUser(id: $userId) {
         id
         name
         avatarUrlMedium
@@ -98,18 +98,12 @@ const withData =
     graphql<IGetDataResponse, IOwnProps, IProfileFormContainerProps>(
         getDataQuery,
         {
-            options: (ownProps) => {
+            options: () => {
                 return {
                     notifyOnNetworkStatusChange: true,
-                    variables: { userId: ownProps.session.userId },
                 };
             },
-            props: ({ data }) => {
-                return getDataOrQueryStatus(data!);
-            },
-            skip: (ownProps: IOwnProps) => {
-                return !ownProps.session.userId;
-            },
+            skip: (ownProps: IOwnProps) => !ownProps.session.userId,
         },
     );
 
@@ -149,8 +143,8 @@ class ProfileFormContainer extends
     }
 
     public componentWillReceiveProps(nextProps: IProfileFormContainerProps) {
-        const prevUser = this.props.data.getUserById;
-        const nextUser = nextProps.data.getUserById;
+        const prevUser = this.props.data.getUser;
+        const nextUser = nextProps.data.getUser;
 
         if (this.props.session.accessToken !== nextProps.session.accessToken
             || prevUser.avatarUrlMedium !== nextUser.avatarUrlMedium
@@ -189,7 +183,7 @@ class ProfileFormContainer extends
     }
 
     private init(props: IProfileFormContainerProps, onDone?: () => void) {
-        const { avatarUrlMedium, name } = props.data.getUserById;
+        const { avatarUrlMedium, name } = props.data.getUser;
         this.setState({
             avatarError: undefined,
             avatarUri: avatarUrlMedium,
@@ -244,7 +238,7 @@ export default compose(
     withRouter,
     withSession,
     withData,
-    withLoader(Loader, 512),
+    withLoader(Loader),
     withError(Error),
     withApollo,
     withSetAvatar,

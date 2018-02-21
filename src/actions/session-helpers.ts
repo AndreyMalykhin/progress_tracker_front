@@ -39,4 +39,8 @@ function setSession(
         { id: fragmentId, fragment: sessionFragment, data: session });
 }
 
-export { getSession, setSession };
+function isAnonymous(session: { userId?: string }) {
+    return session.userId === defaultId;
+}
+
+export { getSession, setSession, isAnonymous };

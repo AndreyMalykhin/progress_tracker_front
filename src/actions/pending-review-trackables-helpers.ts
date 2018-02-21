@@ -12,7 +12,7 @@ interface ISplicePendingReviewTrackablesFragment {
 }
 
 interface IGetPendingReviewTrackablesResponse {
-    getPendingReviewTrackablesByAudience:
+    getPendingReviewTrackables:
         IConnection<ISplicePendingReviewTrackablesFragment, number>;
 }
 
@@ -20,8 +20,8 @@ const log = makeLog("pending-review-trackables-helpers");
 
 const getPendingReviewTrackablesQuery = gql`
 query GetPendingReviewTrackables($audience: Audience!) {
-    getPendingReviewTrackablesByAudience(audience: $audience) @connection(
-        key: "getPendingReviewTrackablesByAudience", filter: ["audience"]
+    getPendingReviewTrackables(audience: $audience) @connection(
+        key: "getPendingReviewTrackables", filter: ["audience"]
     ) {
         edges {
             cursor
@@ -29,6 +29,21 @@ query GetPendingReviewTrackables($audience: Audience!) {
                 id
                 statusChangeDate
             }
+        }
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+    }
+}`;
+
+const initPendingReviewTrackablesQuery = gql`
+query GetPendingReviewTrackables($audience: Audience!) {
+    getPendingReviewTrackables(audience: $audience) @connection(
+        key: "getPendingReviewTrackables", filter: ["audience"]
+    ) {
+        edges {
+            cursor
         }
         pageInfo {
             hasNextPage
@@ -52,7 +67,7 @@ function splicePendingReviewTrackables(
 
     const cursorField = "statusChangeDate";
     spliceConnection(
-        pendingReviewTrackablesResponse.getPendingReviewTrackablesByAudience,
+        pendingReviewTrackablesResponse.getPendingReviewTrackables,
         idsToRemove,
         trackablesToAdd,
         cursorField,
@@ -100,4 +115,24 @@ function compareTrackables(
     return result < 0 ? -1 : 1;
 }
 
-export { splicePendingReviewTrackables };
+function initPendingReviewTrackables(apollo: DataProxy) {
+    const data = {
+        __typename: Type.Query,
+        getPendingReviewTrackables: {
+            __typename: Type.TrackableConnection,
+            edges: [],
+            pageInfo: {
+                __typename: Type.PageInfo,
+                endCursor: null,
+                hasNextPage: false,
+            },
+        },
+    };
+    apollo.writeQuery({
+        data,
+        query: initPendingReviewTrackablesQuery,
+        variables: { audience: Audience.Me },
+    });
+}
+
+export { splicePendingReviewTrackables, initPendingReviewTrackables };

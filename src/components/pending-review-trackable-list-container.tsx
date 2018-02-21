@@ -8,6 +8,7 @@ import {
     rejectTrackable,
     rejectTrackableQuery,
 } from "actions/reject-trackable-action";
+import { isAnonymous } from "actions/session-helpers";
 import { addGenericErrorToast, addToast } from "actions/toast-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -22,7 +23,7 @@ import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
-import withLogin, { IWithLoginProps } from "components/with-login";
+import withLogin from "components/with-login";
 import withLoginAction, {
     IWithLoginActionProps,
 } from "components/with-login-action";
@@ -30,6 +31,7 @@ import withNoUpdatesInBackground from "components/with-no-updates-in-background"
 import withRefetchOnFirstLoad, {
     IWithRefetchOnFirstLoadProps,
 } from "components/with-refetch-on-first-load";
+import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import Audience from "models/audience";
 import Difficulty from "models/difficulty";
@@ -43,6 +45,7 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { Alert, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import defaultId from "utils/default-id";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
@@ -50,13 +53,15 @@ import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
 interface IOwnProps extends
-    RouteComponentProps<{}>, IWithApolloProps, IWithRefetchOnFirstLoadProps {
+    RouteComponentProps<{}>,
+    IWithApolloProps,
+    IWithRefetchOnFirstLoadProps,
+    IWithSessionProps {
     audience: Audience;
 }
 
 interface IPendingReviewTrackableListContainerProps extends
     IOwnProps,
-    IWithLoginProps,
     InjectedIntlProps,
     IWithLoginActionProps,
     IWithLoadMoreProps {
@@ -71,7 +76,7 @@ interface IPendingReviewTrackableListContainerProps extends
 interface IPendingReviewTrackableListContainerState {}
 
 interface IGetDataResponse {
-    getPendingReviewTrackablesByAudience:
+    getPendingReviewTrackables:
         IConnection<IPendingReviewTrackableListItemNode, number>;
 }
 
@@ -109,10 +114,10 @@ const withReject = graphql<
 
 const getDataQuery = gql`
 query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
-    getPendingReviewTrackablesByAudience(
+    getPendingReviewTrackables(
         audience: $audience, after: $cursor
     ) @connection(
-        key: "getPendingReviewTrackablesByAudience", filter: ["audience"]
+        key: "getPendingReviewTrackables", filter: ["audience"]
     ) {
         edges {
             cursor
@@ -153,17 +158,20 @@ const withData = graphql<
     getDataQuery,
     {
         options: (ownProps) => {
-            const { audience, fetchPolicy } = ownProps;
+            const { audience, session } = ownProps;
+            let { fetchPolicy } = ownProps;
+
+            if (audience === Audience.Me && isAnonymous(session)) {
+                fetchPolicy = "cache-only";
+            }
+
             return {
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: { audience, skipUser: audience === Audience.Me },
             };
         },
-        props: ({ data }) => {
-            return getDataOrQueryStatus(data!) as
-                Partial<IPendingReviewTrackableListContainerProps>;
-        },
+        skip: (ownProps: IOwnProps) => !ownProps.session.userId,
     },
 );
 
@@ -212,7 +220,7 @@ class PendingReviewTrackableListContainer extends React.Component<
         return (
             <PendingReviewTrackableList
                 audience={audience}
-                items={data.getPendingReviewTrackablesByAudience.edges}
+                items={data.getPendingReviewTrackables.edges}
                 queryStatus={data.networkStatus}
                 onApproveItem={this.onStartApproveItem}
                 onEndReached={onLoadMore}
@@ -332,6 +340,7 @@ class PendingReviewTrackableListContainer extends React.Component<
 }
 
 export default compose(
+    withSession,
     withLogin<IPendingReviewTrackableListContainerProps>(
         "pendingReviewList.loginToSeeFriends",
         (props) => props.audience === Audience.Friends,
@@ -341,17 +350,17 @@ export default compose(
         (props) => props.audience),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, 512),
+    withLoader(Loader),
     withError(Error),
     withEmptyList<IPendingReviewTrackableListContainerProps>(
         EmptyList,
-        (props) => props.data.getPendingReviewTrackablesByAudience.edges,
+        (props) => props.data.getPendingReviewTrackables.edges,
     ),
     withApollo,
     withApprove,
     withReject,
     withLoginAction,
     withLoadMore<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
-        "getPendingReviewTrackablesByAudience", (props) => props.data),
+        "getPendingReviewTrackables", (props) => props.data),
     injectIntl,
 )(PendingReviewTrackableListContainer);

@@ -3,7 +3,6 @@ import { FormBody, FormGroup } from "components/form";
 import FormAvatarPicker from "components/form-avatar-picker";
 import FormTextInput from "components/form-text-input";
 import LoginContainer from "components/login-container";
-import { IWithLoginActionProps } from "components/with-login-action";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import { StyleSheet, Text } from "react-native";

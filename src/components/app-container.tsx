@@ -8,14 +8,15 @@ import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import { History } from "history";
 import * as React from "react";
-import { compose } from "react-apollo";
+import { compose, QueryProps } from "react-apollo";
 import graphql from "react-apollo/graphql";
+import { MessageValue } from "react-intl";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 
 interface IAppContainerProps extends IOwnProps {
-    messages: { [id: string]: string };
+    data: QueryProps & IGetDataResponse;
     history: History;
 }
 
@@ -74,36 +75,45 @@ const withData = graphql<IGetDataResponse, IOwnProps, IAppProps>(
                 variables: { locale },
             };
         },
-        props: ({ data }) => {
-            const { networkStatus: queryStatus, error, getMessages } = data!;
-
-            if (queryStatus === QueryStatus.InitialLoading) {
-                return { queryStatus };
-            } else if (queryStatus === QueryStatus.Error || error) {
-                return { queryStatus: QueryStatus.Error };
-            }
-
-            const messages: { [key: string]: string } = {};
-
-            for (const message of getMessages) {
-                messages[message.key] = message.text;
-            }
-
-            return { messages, queryStatus };
-        },
     },
 );
 
 class AppContainer extends React.Component<IAppContainerProps> {
+    private messages: { [id: string]: string } = {};
+
     public render() {
-        const { locale, messages, history } = this.props;
-        return <App history={history} locale={locale} messages={messages} />;
+        const { locale, history } = this.props;
+        return (
+            <App
+                history={history}
+                locale={locale}
+                messages={this.messages}
+            />
+        );
+    }
+
+    public componentWillMount() {
+        this.initMessages(this.props);
+    }
+
+    public componentWillReceiveProps(nextProps: IAppContainerProps) {
+        if (this.props.locale !== nextProps.locale) {
+            this.initMessages(nextProps);
+        }
+    }
+
+    private initMessages(props: IAppContainerProps) {
+        this.messages = {};
+
+        for (const message of props.data.getMessages) {
+            this.messages[message.key] = message.text;
+        }
     }
 }
 
 export default compose(
     withSettings,
     withData,
-    withLoader(Loader),
+    withLoader(Loader, 0),
     withError(Error),
 )(AppContainer);

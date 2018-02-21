@@ -49,7 +49,7 @@ interface IProveTrackableResponse {
 }
 
 interface IGetTrackableByIdResponse {
-    getTrackableById: {
+    getTrackable: {
         __typename: Type;
         id: string;
         isPublic: boolean
@@ -91,11 +91,11 @@ mutation ProveTrackable($id: ID!, $assetId: ID!) {
     }
 }`;
 
-const getTrackableByIdQuery = gql`
+const getTrackableQuery = gql`
 ${removeChildFragment}
 
 query GetTrackableById($id: ID!) {
-    getTrackableById(id: $id) {
+    getTrackable(id: $id) {
         id
         isPublic
         ... on IAggregatable {
@@ -176,9 +176,9 @@ function getOptimisticResponse(
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     const trackable = apollo.readQuery<IGetTrackableByIdResponse>({
-        query: getTrackableByIdQuery,
+        query: getTrackableQuery,
         variables: { id: trackableId },
-    })!.getTrackableById;
+    })!.getTrackable;
     const { parent, isPublic, __typename } = trackable;
     const status =
         isPublic ? TrackableStatus.PendingReview : TrackableStatus.Approved;

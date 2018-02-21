@@ -5,12 +5,14 @@ import Type from "models/type";
 interface IConnection<TNode, TCursor> {
     __typename?: Type;
     edges: Array<{
+        __typename: Type;
         cursor: TCursor;
         node: TNode;
     }>;
     pageInfo: {
+        __typename: Type;
         hasNextPage: boolean;
-        endCursor?: TCursor;
+        endCursor?: TCursor|null;
     };
 }
 

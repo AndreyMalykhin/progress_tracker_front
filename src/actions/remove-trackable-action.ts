@@ -25,7 +25,7 @@ interface IRemoveTrackableResponse {
 }
 
 interface IGetTrackableByIdResponse {
-    getTrackableById: {
+    getTrackable: {
         __typename: Type;
         id: string;
         parent?: IRemoveChildFragment;
@@ -46,11 +46,11 @@ mutation RemoveTrackable($id: ID!) {
     }
 }`;
 
-const getTrackableByIdQuery = gql`
+const getTrackableQuery = gql`
 ${removeChildFragment}
 
 query GetTrackableById($id: ID!) {
-    getTrackableById(id: $id) {
+    getTrackable(id: $id) {
         id
         parent {
             ...RemoveChildAggregateFragment
@@ -90,8 +90,8 @@ function getOptimisticResponse(
     trackableId: string, apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     const trackableByIdResponse = apollo.readQuery<IGetTrackableByIdResponse>(
-        { query: getTrackableByIdQuery, variables: { id: trackableId } })!;
-    const { parent } = trackableByIdResponse.getTrackableById;
+        { query: getTrackableQuery, variables: { id: trackableId } })!;
+    const { parent } = trackableByIdResponse.getTrackable;
     const removedAggregateId =
         parent && removeChild(trackableId, parent) ? parent.id : null;
     return {

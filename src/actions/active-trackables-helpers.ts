@@ -16,13 +16,14 @@ interface ISpliceActiveTrackablesFragment {
 }
 
 interface IGetActiveTrackablesResponse {
+    __typename: Type;
     getActiveTrackables: IConnection<ISpliceActiveTrackablesFragment, number>;
 }
 
 const log = makeLog("active-trackables-helpers");
 
 const getActiveTrackablesQuery = gql`
-query GetActiveTrackables($userId: ID!) {
+query GetActiveTrackables($userId: ID) {
     getActiveTrackables(
         userId: $userId
     ) @connection(key: "getActiveTrackables", filter: ["userId"]) {
@@ -35,6 +36,21 @@ query GetActiveTrackables($userId: ID!) {
         }
         pageInfo {
             endCursor
+        }
+    }
+}`;
+
+const initActiveTrackablesQuery = gql`
+query GetActiveTrackables($userId: ID) {
+    getActiveTrackables(
+        userId: $userId
+    ) @connection(key: "getActiveTrackables", filter: ["userId"]) {
+        edges {
+            cursor
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
         }
     }
 }`;
@@ -91,7 +107,6 @@ function getActiveTrackables(apollo: DataProxy) {
     try {
         return apollo.readQuery<IGetActiveTrackablesResponse>({
             query: getActiveTrackablesQuery,
-            variables: { userId: getSession(apollo).userId },
         });
     } catch (e) {
         log.trace("getActiveTrackables(); no data");
@@ -105,7 +120,24 @@ function setActiveTrackables(
     apollo.writeQuery({
         data: activeTrackablesResponse,
         query: getActiveTrackablesQuery,
-        variables: { userId: getSession(apollo).userId },
+    });
+}
+
+function initActiveTrackables(apollo: DataProxy) {
+    apollo.writeQuery({
+        data: {
+            __typename: Type.Query,
+            getActiveTrackables: {
+                __typename: Type.TrackableConnection,
+                edges: [],
+                pageInfo: {
+                    __typename: Type.PageInfo,
+                    endCursor: null,
+                    hasNextPage: false,
+                },
+            },
+        },
+        query: initActiveTrackablesQuery,
     });
 }
 
@@ -113,5 +145,6 @@ export {
     spliceActiveTrackables,
     sortActiveTrackables,
     getActiveTrackables,
+    initActiveTrackables,
     ISpliceActiveTrackablesFragment,
 };

@@ -16,6 +16,7 @@ import withNoUpdatesInBackground from "components/with-no-updates-in-background"
 import withRefetchOnFirstLoad, {
     IWithRefetchOnFirstLoadProps,
 } from "components/with-refetch-on-first-load";
+import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import * as React from "react";
 import { compose, QueryProps } from "react-apollo";
@@ -33,7 +34,8 @@ interface IFriendListContainerProps extends
     onSetItemMuted: (id: string, isMuted: boolean) => Promise<any>;
 }
 
-interface IOwnProps extends IWithRefetchOnFirstLoadProps, IWithApolloProps {}
+interface IOwnProps extends
+    IWithRefetchOnFirstLoadProps, IWithApolloProps, IWithSessionProps {}
 
 interface IGetDataResponse {
     getFriends: IConnection<IFriendListItemNode, number>;
@@ -87,9 +89,7 @@ const withData = graphql<
                 notifyOnNetworkStatusChange: true,
             };
         },
-        props: ({ data }) => {
-            return getDataOrQueryStatus(data!);
-        },
+        skip: (ownProps: IOwnProps) => !ownProps.session.userId,
     },
 );
 
@@ -122,12 +122,13 @@ class FriendListContainer extends React.Component<IFriendListContainerProps> {
 }
 
 export default compose(
+    withSession,
     withLogin("friends.loginToSee"),
     withRouter,
     withRefetchOnFirstLoad(),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, 512),
+    withLoader(Loader),
     withError(Error),
     withEmptyList<IFriendListContainerProps>(
         EmptyList, (props) => props.data.getFriends.edges),

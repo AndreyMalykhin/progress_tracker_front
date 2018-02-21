@@ -1,3 +1,4 @@
+import { isAnonymous } from "actions/session-helpers";
 import ActivityList, {
     IActivityListItemNode,
     IActivityListSection,
@@ -7,12 +8,14 @@ import Error from "components/error";
 import Loader from "components/loader";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
+import withLoadMore from "components/with-load-more";
 import withLoader from "components/with-loader";
-import withLogin, { IWithLoginProps } from "components/with-login";
+import withLogin from "components/with-login";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
 import withRefetchOnFirstLoad, {
     IWithRefetchOnFirstLoadProps,
 } from "components/with-refetch-on-first-load";
+import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import Audience from "models/audience";
 import * as React from "react";
@@ -21,12 +24,12 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import defaultId from "utils/default-id";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
-import withLoadMore from "./with-load-more";
 
-interface IActivityListContainerProps extends IOwnProps, IWithLoginProps {
+interface IActivityListContainerProps extends IOwnProps {
     audience: Audience;
     data: QueryProps & IGetDataResponse;
     onLoadMore: () => void;
@@ -37,19 +40,21 @@ interface IRouteParams {
 }
 
 interface IOwnProps extends
-    RouteComponentProps<IRouteParams>, IWithRefetchOnFirstLoadProps {
+    RouteComponentProps<IRouteParams>,
+    IWithRefetchOnFirstLoadProps,
+    IWithSessionProps {
     audience: Audience;
 }
 
 interface IGetDataResponse {
-    getActivitiesByAudience: IConnection<IActivityListItemNode, number>;
+    getActivities: IConnection<IActivityListItemNode, number>;
 }
 
 const getDataQuery = gql`
 query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
-    getActivitiesByAudience(
+    getActivities(
         audience: $audience, after: $cursor
-    ) @connection(key: "getActivitiesByAudience", filter: ["audience"]) {
+    ) @connection(key: "getActivities", filter: ["audience"]) {
         edges {
             node {
                 id
@@ -118,16 +123,20 @@ const withData = graphql<
     getDataQuery,
     {
         options: (ownProps) => {
-            const { audience, fetchPolicy } = ownProps;
+            const { audience, session } = ownProps;
+            let { fetchPolicy } = ownProps;
+
+            if (isAnonymous(session) && audience === Audience.Me) {
+                fetchPolicy = "cache-only";
+            }
+
             return {
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: { audience, skipUser: audience === Audience.Me },
             };
         },
-        props: ({ data }) => {
-            return getDataOrQueryStatus(data!);
-        },
+        skip: (ownProps: IOwnProps) => !ownProps.session.userId,
     },
 );
 
@@ -153,8 +162,8 @@ class ActivityListContainer extends
     }
 
     public componentWillReceiveProps(nextProps: IActivityListContainerProps) {
-        if (this.props.data.getActivitiesByAudience.edges !==
-                nextProps.data.getActivitiesByAudience.edges
+        if (this.props.data.getActivities.edges !==
+                nextProps.data.getActivities.edges
         ) {
             this.initSections(nextProps);
         }
@@ -166,7 +175,7 @@ class ActivityListContainer extends
         let sectionTimestamp = 0;
         let section: IActivityListSection;
 
-        for (const activity of props.data.getActivitiesByAudience.edges) {
+        for (const activity of props.data.getActivities.edges) {
             date.setTime(activity.node.date);
             const activityTimestamp = date.setUTCHours(0, 0, 0, 0);
 
@@ -191,6 +200,7 @@ class ActivityListContainer extends
 }
 
 export default compose(
+    withSession,
     withLogin<IActivityListContainerProps>(
         "activityList.loginToSeeFriends",
         (props) => props.audience === Audience.Friends,
@@ -200,10 +210,10 @@ export default compose(
         (props) => props.audience),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, 512),
+    withLoader(Loader),
     withError(Error),
     withEmptyList<IActivityListContainerProps>(
-        EmptyList, (props) => props.data.getActivitiesByAudience.edges),
+        EmptyList, (props) => props.data.getActivities.edges),
     withLoadMore<IActivityListContainerProps, IGetDataResponse>(
-        "getActivitiesByAudience", (props) => props.data),
+        "getActivities", (props) => props.data),
 )(ActivityListContainer);

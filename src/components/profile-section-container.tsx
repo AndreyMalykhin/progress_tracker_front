@@ -20,6 +20,7 @@ import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoader from "components/with-loader";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
+import withRefetchOnFirstLoad, { IWithRefetchOnFirstLoadProps } from "components/with-refetch-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import ReportReason from "models/report-reason";
@@ -50,10 +51,13 @@ interface IProfileSectionContainerProps extends
 }
 
 interface IOwnProps extends
-    RouteComponentProps<IRouteParams>, IWithSessionProps, IWithApolloProps {}
+    RouteComponentProps<IRouteParams>,
+    IWithSessionProps,
+    IWithApolloProps,
+    IWithRefetchOnFirstLoadProps {}
 
 interface IGetRemoteDataResponse {
-    getUserById: {
+    getUser: {
         id: string;
         name: string;
         rating: number;
@@ -86,8 +90,8 @@ const withReportUser =
     );
 
 const getRemoteDataQuery = gql`
-query GetData($userId: ID!) {
-    getUserById(id: $userId) {
+query GetData($userId: ID) {
+    getUser(id: $userId) {
         id
         name
         rating
@@ -126,8 +130,8 @@ const withRemoteData =
                 const { match, session } = ownProps;
                 let userId = match.params.id;
 
-                if (!userId || userId === defaultId) {
-                    userId = session.userId;
+                if (userId === defaultId || userId === session.userId) {
+                    userId = undefined;
                 }
 
                 return {
@@ -136,12 +140,9 @@ const withRemoteData =
                 };
             },
             props: ({ data }) => {
-                const dataKey = "remoteData";
-                return getDataOrQueryStatus(data!, dataKey);
+                return { remoteData: data};
             },
-            skip: (ownProps: IOwnProps) => {
-                return !ownProps.session.userId;
-            },
+            skip: (ownProps: IOwnProps) => !ownProps.session.userId,
         },
     );
 
@@ -203,8 +204,8 @@ class ProfileSectionContainer
     }
 
     public componentWillReceiveProps(nextProps: IProfileSectionContainerProps) {
-        const nextUser = nextProps.remoteData.getUserById;
-        const prevUser = this.props.remoteData.getUserById;
+        const nextUser = nextProps.remoteData.getUser;
+        const prevUser = this.props.remoteData.getUser;
 
         if (this.props.match.params.id !== nextProps.match.params.id) {
             this.initNavItems(nextProps.match.params.id);
@@ -246,7 +247,7 @@ class ProfileSectionContainer
 
     private updateHeader(props: IProfileSectionContainerProps) {
         const { remoteData, header, session } = props;
-        const user = remoteData.getUserById;
+        const user = remoteData.getUser;
         const isMe = user.id === session.userId;
         const rightCommands: IHeaderCmd[] = [];
 
@@ -297,7 +298,7 @@ class ProfileSectionContainer
 
         try {
             await this.props.onCommitReportUser(
-                this.props.remoteData.getUserById.id, reportReason);
+                this.props.remoteData.getUser.id, reportReason);
         } catch (e) {
             return;
         }
@@ -331,10 +332,12 @@ export default compose(
     withHeader,
     withSession,
     withLocalData,
+    withRefetchOnFirstLoad<IProfileSectionContainerProps>(
+        (props) => String(props.match.params.id)),
     withRemoteData,
     withNoUpdatesInBackground,
-    withLoader(Loader),
-    withError(Error),
+    withLoader(Loader, 0, "remoteData"),
+    withError(Error, "remoteData"),
     withApollo,
     withReportUser,
     injectIntl,

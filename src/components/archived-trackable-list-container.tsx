@@ -1,3 +1,4 @@
+import { isAnonymous } from "actions/session-helpers";
 import ArchivedTrackableList, {
     IArchivedTrackableListItemNode,
 } from "components/archived-trackable-list";
@@ -12,6 +13,7 @@ import withNoUpdatesInBackground from "components/with-no-updates-in-background"
 import withRefetchOnFirstLoad, {
     IWithRefetchOnFirstLoadProps,
 } from "components/with-refetch-on-first-load";
+import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -19,6 +21,7 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { IConnection } from "utils/connection";
+import defaultId from "utils/default-id";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus, { isLoading } from "utils/query-status";
 
@@ -31,16 +34,16 @@ interface IGetDataResponse {
     getArchivedTrackables: IConnection<IArchivedTrackableListItemNode, number>;
 }
 
-interface IOwnProps extends IWithRefetchOnFirstLoadProps {
-    userId?: string;
+interface IOwnProps extends IWithRefetchOnFirstLoadProps, IWithSessionProps {
+    userId: string;
     trackableStatus: TrackableStatus;
 }
 
 const getDataQuery = gql`
 query GetData(
-    $userId: ID!,
     $trackableStatus: TrackableStatus!,
     $skipProofedGoalFields: Boolean!,
+    $userId: ID,
     $cursor: Float
 ) {
     getArchivedTrackables(
@@ -83,9 +86,20 @@ const withData = graphql<
     getDataQuery,
     {
         options: (ownProps) => {
-            const { userId, trackableStatus } = ownProps;
+            const { trackableStatus, session } = ownProps;
+            let userId: string|undefined = ownProps.userId;
+            let { fetchPolicy } = ownProps;
+
+            if (userId === defaultId || userId === session.userId) {
+                userId = undefined;
+
+                if (isAnonymous(session)) {
+                    fetchPolicy = "cache-only";
+                }
+            }
+
             return {
-                fetchPolicy: ownProps.fetchPolicy,
+                fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: {
                     skipProofedGoalFields:
@@ -95,10 +109,7 @@ const withData = graphql<
                 },
             };
         },
-        props: ({ data }) => {
-            return getDataOrQueryStatus(data!);
-        },
-        skip: (ownProps: IOwnProps) => !ownProps.userId,
+        skip: (ownProps: IOwnProps) => !ownProps.session.userId,
     },
 );
 
@@ -118,11 +129,12 @@ class ArchivedTrackableListContainer extends
 }
 
 export default compose(
+    withSession,
     withRefetchOnFirstLoad<IArchivedTrackableListContainerProps>(
         (props) => `${props.userId}_${props.trackableStatus}`),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, 512),
+    withLoader(Loader),
     withError(Error),
     withEmptyList<IArchivedTrackableListContainerProps>(
         EmptyList, (props) => props.data.getArchivedTrackables.edges),

@@ -32,12 +32,12 @@ interface IRouteParams {
 }
 
 interface IGetDataResponse {
-    getTrackableById: ITrackable;
+    getTrackable: ITrackable;
 }
 
 const getDataQuery = gql`
 query GetData($trackableId: ID!) {
-    getTrackableById(id: $trackableId) {
+    getTrackable(id: $trackableId) {
         id
         isPublic
         ... on IPrimitiveTrackable {
@@ -72,9 +72,6 @@ const withData =
                     variables: { trackableId },
                 };
             },
-            props: ({ data }) => {
-                return getDataOrQueryStatus(data!);
-            },
             skip: (ownProps) => !ownProps.match.params.id,
         },
     );
@@ -83,7 +80,7 @@ class TrackableFormPageContainer extends
     React.Component<ITrackableFormPageContainerProps> {
     public render() {
         const { data, session, match, ...restProps } = this.props;
-        const trackable = data && data.getTrackableById;
+        const trackable = data && data.getTrackable;
         const trackableType = match.params.type
             || trackable!.__typename as TrackableType;
         return (

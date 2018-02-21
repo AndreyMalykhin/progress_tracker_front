@@ -53,7 +53,7 @@ interface ITrackable {
 }
 
 interface IGetTrackablesByIdsResponse {
-    getTrackablesByIds: Array<ITrackable & {
+    getTrackables: Array<ITrackable & {
         children?: ITrackable[];
     }>;
 }
@@ -86,9 +86,9 @@ mutation AggregateTrackables($ids: [ID!]!) {
     }
 }`;
 
-const getTrackablesByIdsQuery = gql`
-query GetTrackablesByIds($ids: [ID!]!) {
-    getTrackablesByIds(ids: $ids) {
+const getTrackablesQuery = gql`
+query getTrackables($ids: [ID!]!) {
+    getTrackables(ids: $ids) {
         id
         isPublic
         ... on Counter {
@@ -161,9 +161,9 @@ function getOptimisticResponse(
     let creationDate;
     let children: ITrackable[] = [];
     const targetTrackables = apollo.readQuery<IGetTrackablesByIdsResponse>({
-        query: getTrackablesByIdsQuery,
+        query: getTrackablesQuery,
         variables: { ids: targetIds },
-    })!.getTrackablesByIds;
+    })!.getTrackables;
 
     for (const targetTrackable of targetTrackables) {
         if (targetTrackable.__typename === Type.Aggregate) {

@@ -1,4 +1,5 @@
 enum Type {
+    ActivityConnection = "ActivityConnection",
     ActivityEdge = "ActivityEdge",
     AddCounterResponse = "AddCounterResponse",
     AddCounterProgressResponse = "AddCounterProgressResponse",
@@ -32,6 +33,7 @@ enum Type {
         "NumericalGoalProgressChangedActivity",
     Message = "Message",
     Mutation = "Mutation",
+    PageInfo = "PageInfo",
     ProveTrackableResponse = "ProveTrackableResponse",
     RemoveTrackableResponse = "RemoveTrackableResponse",
     ReorderTrackableResponse = "ReorderTrackableResponse",
@@ -49,6 +51,7 @@ enum Type {
     TaskGoalProgressChangedActivity = "TaskGoalProgressChangedActivity",
     Toast = "Toast",
     TrackableAddedActivity = "TrackableAddedActivity",
+    TrackableConnection = "TrackableConnection",
     TrackableEdge = "TrackableEdge",
     UI = "UI",
     User = "User",
