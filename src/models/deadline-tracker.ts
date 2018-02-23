@@ -1,9 +1,8 @@
 import {
-    ISpliceActiveTrackablesFragment,
-    spliceActiveTrackables,
+    removeActiveTrackables,
 } from "actions/active-trackables-helpers";
-import { addActivity } from "actions/activity-helpers";
-import { spliceArchivedTrackables } from "actions/archived-trackables-helpers";
+import { prependActivity } from "actions/activity-helpers";
+import { prependArchivedTrackables } from "actions/archived-trackables-helpers";
 import { getSession } from "actions/session-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -158,14 +157,12 @@ class DeadlineTracker {
         trackables: IExpiredTrackableFragment[],
     ) {
         const idsToRemove = trackables.map((trackable) => trackable.id);
-        const trackablesToAdd: ISpliceActiveTrackablesFragment[] = [];
-        spliceActiveTrackables(idsToRemove, trackablesToAdd, this.apollo);
+        removeActiveTrackables(idsToRemove, this.apollo);
     }
 
     private addTrackablesToExpired(trackables: IExpiredTrackableFragment[]) {
-        const idsToRemove: string[] = [];
-        spliceArchivedTrackables(
-            idsToRemove, trackables, TrackableStatus.Expired, this.apollo);
+        prependArchivedTrackables(
+            trackables, TrackableStatus.Expired, this.apollo);
     }
 
     private addExpirationActivity(trackable: IExpiredTrackableFragment) {
@@ -179,7 +176,7 @@ class DeadlineTracker {
                 id: getSession(this.apollo).userId!,
             },
         };
-        addActivity(activity, activityFragment, this.apollo);
+        prependActivity(activity, activityFragment, this.apollo);
     }
 }
 

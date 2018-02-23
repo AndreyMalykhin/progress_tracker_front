@@ -351,7 +351,7 @@ fragment ActiveTrackableListCounterFragment on Counter {
 fragment ActiveTrackableListGymExerciseFragment on GymExercise {
     iconName
     title
-    entries {
+    recentEntries {
         id
         date
         setCount
@@ -407,8 +407,7 @@ fragment ActiveTrackableListAggregateFragment on Aggregate {
 
 query GetData($userId: ID, $cursor: Float) {
     getActiveTrackables(
-        userId: $userId,
-        after: $cursor
+        userId: $userId, after: $cursor
     ) @connection(key: "getActiveTrackables", filter: ["userId"]) {
         edges {
             cursor
@@ -1385,8 +1384,6 @@ export default compose(
     withNoUpdatesInBackground,
     withLoader(Loader),
     withError(Error),
-    withEmptyList<IActiveTrackableListContainerProps>(
-        EmptyList, (props) => props.data.getActiveTrackables.edges),
     withApollo,
     withReorder,
     withSetTaskDone,

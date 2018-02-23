@@ -67,7 +67,7 @@ interface ICounter extends IPrimitiveNode {
 }
 
 interface IGymExercise extends IPrimitiveNode {
-    entries: IGymExerciseEntry[];
+    recentEntries: IGymExerciseEntry[];
 }
 
 interface IAggregate extends IBaseNode {
@@ -129,7 +129,7 @@ interface IActiveTrackableListProps extends IExtraData {
         ICommandBarItem[]|undefined;
     onGetGymExerciseItems: (
         id: string,
-        entries: IGymExerciseEntry[],
+        recentEntries: IGymExerciseEntry[],
         isExpanded: boolean,
     ) => IGymExerciseItem[];
     onGetGymExerciseCommands: (id: string) => ICommandBarItem[]|undefined;
@@ -193,6 +193,10 @@ class ActiveTrackableList extends
             onGetVisibleItemIds,
             onGetDraggedItemId,
         } = this.props;
+        if (!items.length) {
+            return <EmptyList />;
+        }
+
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         const numericalEntryPopup = isNumericalEntryPopupOpen && (
             <NumericalEntryPopupContainer
@@ -341,7 +345,7 @@ class ActiveTrackableList extends
     }
 
     private renderGymExercise(item: IGymExercise, index: number) {
-        const { id, iconName, title, entries, status, creationDate } = item;
+        const { id, iconName, title, recentEntries, status, creationDate } = item;
         const {
             isAggregationMode,
             isReorderMode,
@@ -357,7 +361,7 @@ class ActiveTrackableList extends
         } = this.props;
         const { isExpanded, isDisabled, isSelected, dragStatus } =
             itemsMeta[id];
-        const items =  onGetGymExerciseItems(id, entries, isExpanded!);
+        const items =  onGetGymExerciseItems(id, recentEntries, isExpanded!);
         return (
             <GymExercise
                 key={id}

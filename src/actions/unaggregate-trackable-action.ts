@@ -97,14 +97,14 @@ function updateActiveTrackables(
     response: IUnaggregateTrackableResponse, apollo: DataProxy,
 ) {
     const { trackable, removedAggregateId } = response.unaggregateTrackable;
-    const trackablesToAdd = [trackable];
+    const trackablesToPrepend = [trackable];
     const idsToRemove = [];
 
     if (removedAggregateId) {
         idsToRemove.push(removedAggregateId);
     }
 
-    spliceActiveTrackables(idsToRemove, trackablesToAdd, apollo);
+    spliceActiveTrackables(idsToRemove, trackablesToPrepend, [], apollo);
 }
 
 function getOptimisticResponse(

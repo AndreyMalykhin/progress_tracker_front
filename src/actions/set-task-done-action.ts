@@ -1,7 +1,6 @@
-import { addActivity, addGoalAchievedActivity } from "actions/activity-helpers";
+import { prependActivity, prependGoalAchievedActivity } from "actions/activity-helpers";
 import {
-    IUpdateProgressFragment,
-    updateProgress,
+    IUpdateProgressAggregateFragment,
     updateProgressFragment,
 } from "actions/aggregate-helpers";
 import { addProgress } from "actions/goal-helpers";
@@ -57,7 +56,7 @@ interface ITaskFragment {
         maxProgress: number;
         status: TrackableStatus;
         statusChangeDate: number;
-        parent?: IUpdateProgressFragment;
+        parent?: IUpdateProgressAggregateFragment;
     };
 }
 
@@ -167,7 +166,7 @@ function updateActivities(
         trackable,
         user,
     };
-    addActivity(
+    prependActivity(
         progressChangedActivity, progressChangedActivityFragment, apollo);
 
     if (trackable.status === TrackableStatus.Active) {
@@ -181,7 +180,7 @@ function updateActivities(
         trackable,
         user,
     };
-    addGoalAchievedActivity(goalAchievedActivity, apollo);
+    prependGoalAchievedActivity(goalAchievedActivity, apollo);
 }
 
 function updateTasks(response: ISetTaskDoneResponse, apollo: DataProxy) {

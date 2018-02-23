@@ -77,8 +77,8 @@ async function breakAggregate(
 function updateActiveTrackables(
     aggregateId: string, response: IBreakAggregateResponse, apollo: DataProxy) {
     const idsToRemove = [aggregateId];
-    const trackablesToAdd = response.breakAggregate.trackables;
-    spliceActiveTrackables(idsToRemove, trackablesToAdd, apollo);
+    const trackablesToPrepend = response.breakAggregate.trackables;
+    spliceActiveTrackables(idsToRemove, trackablesToPrepend, [], apollo);
 }
 
 function getOptimisticResponse(

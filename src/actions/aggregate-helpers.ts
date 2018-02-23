@@ -1,10 +1,9 @@
-import { spliceActiveTrackables } from "actions/active-trackables-helpers";
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
 import Type from "models/type";
 import dataIdFromObject from "utils/data-id-from-object";
 
-interface IUpdateProgressFragment {
+interface IUpdateProgressAggregateFragment {
     id: string;
     progress: number;
     maxProgress?: number;
@@ -16,7 +15,12 @@ interface IUpdateProgressFragment {
     }>;
 }
 
-type IRemoveChildFragment = IUpdateProgressFragment;
+interface IUpdateProgressChildFragment {
+    id: string;
+    progress: number;
+}
+
+type IRemoveChildFragment = IUpdateProgressAggregateFragment;
 
 interface IGetProgressFragment {
     __typename: Type;
@@ -87,7 +91,18 @@ function removeChild(id: string, parent: IRemoveChildFragment) {
     return true;
 }
 
-function updateProgress(aggregate: IUpdateProgressFragment) {
+function updateProgress(
+    aggregate: IUpdateProgressAggregateFragment,
+    childToUpdate: IUpdateProgressChildFragment,
+) {
+    if (childToUpdate) {
+        for (const child of aggregate.children) {
+            if (child.id === childToUpdate.id) {
+                child.progress = childToUpdate.progress;
+            }
+        }
+    }
+
     const { current, max } = getProgress(aggregate.children);
     aggregate.progress = current;
     aggregate.maxProgress = max;
@@ -99,16 +114,16 @@ function getProgress(aggregateChildren: IGetProgressFragment[]) {
 
     if (aggregateChildren[0].__typename === Type.Counter) {
         for (const child of aggregateChildren) {
-            current += child.progress!;
+            current += child.progress;
         }
     } else {
         const childrenCount = aggregateChildren.length;
         max = 1;
 
         for (const child of aggregateChildren) {
-            const childProgress =
-                child.progress! / child.maxProgress!;
-            current += childProgress / childrenCount;
+            const childNormalizedProgress =
+                child.progress / child.maxProgress!;
+            current += childNormalizedProgress / childrenCount;
         }
     }
 
@@ -118,7 +133,7 @@ function getProgress(aggregateChildren: IGetProgressFragment[]) {
 export {
     updateProgress,
     updateProgressFragment,
-    IUpdateProgressFragment,
+    IUpdateProgressAggregateFragment,
     getProgress,
     removeChild,
     removeChildFragment,

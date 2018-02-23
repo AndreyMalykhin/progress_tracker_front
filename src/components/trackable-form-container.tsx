@@ -43,6 +43,14 @@ interface ITrackableFormContainerState {
     share?: boolean;
 }
 
+const icons = [
+    "access-point", "access-point-network", "account", "account-alert",
+    "account-box", "account-box-outline", "account-card-details",
+    "account-check", "account-circle", "account-convert", "account-edit",
+    "account-key", "account-location", "account-minus", "account-multiple",
+    "account-multiple-minus",
+];
+
 abstract class TrackableFormContainer<
     TTrackable extends ITrackable,
     TEditTrackableFragment extends IEditTrackableFragment,
@@ -51,13 +59,6 @@ abstract class TrackableFormContainer<
 > extends React.Component<TProps, TState> {
     public state = {} as TState;
     protected saveDelay = 512;
-    protected icons = [
-        "access-point", "access-point-network", "account", "account-alert",
-        "account-box", "account-box-outline", "account-card-details",
-        "account-check", "account-circle", "account-convert", "account-edit",
-        "account-key", "account-location", "account-minus", "account-multiple",
-        "account-multiple-minus",
-    ];
 
     public constructor(props: TProps, context: any) {
         super(props, context);
@@ -100,7 +101,7 @@ abstract class TrackableFormContainer<
         const { isUserLoggedIn } = this.props;
         const isNew = this.isNew();
         return {
-            availableIconNames: this.icons,
+            availableIconNames: icons,
             iconName,
             isIconPickerOpen,
             isPublic,

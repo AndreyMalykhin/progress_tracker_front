@@ -165,7 +165,9 @@ class Reorderable extends React.Component<IReorderableProps> {
 }
 
 const styles = StyleSheet.create({
-    container: {},
+    container: {
+        flex: 1,
+    },
     placeholder: {
         backgroundColor: "#000",
         position: "absolute",

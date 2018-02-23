@@ -1,4 +1,4 @@
-import { spliceActiveTrackables } from "actions/active-trackables-helpers";
+import { removeActiveTrackables } from "actions/active-trackables-helpers";
 import {
     IRemoveChildFragment,
     removeChild,
@@ -83,7 +83,7 @@ function updateActiveTrackables(
         idsToRemove.push(removedAggregateId);
     }
 
-    spliceActiveTrackables(idsToRemove, [], apollo);
+    removeActiveTrackables(idsToRemove, apollo);
 }
 
 function getOptimisticResponse(

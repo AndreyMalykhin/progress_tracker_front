@@ -1,7 +1,6 @@
 import {
     getActiveTrackables,
     sortActiveTrackables,
-    spliceActiveTrackables,
 } from "actions/active-trackables-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";

@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     tableCell: {
-        flex: 1,
         fontSize: 12,
         lineHeight: 16,
         paddingLeft: 4,
@@ -180,6 +179,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     tableCellHeader: {
+        flex: 1,
         fontSize: 14,
         fontWeight: "bold",
         lineHeight: 32,

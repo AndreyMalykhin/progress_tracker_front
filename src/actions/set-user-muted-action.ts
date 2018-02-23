@@ -97,7 +97,7 @@ function updateActivities(response: ISetUserMutedResponse, apollo: DataProxy) {
     const userId = response.setUserMuted.user.id;
     const mutedActivities = [];
     let activityIdsToRemove: string[] = [];
-    let activitiesToAdd: ISpliceActivitiesFragment[] = [];
+    let activitiesToAppend: ISpliceActivitiesFragment[] = [];
 
     if (response.setUserMuted.user.isMuted) {
         let friendsActivitiesResponse;
@@ -146,11 +146,18 @@ function updateActivities(response: ISetUserMutedResponse, apollo: DataProxy) {
             return;
         }
 
-        activitiesToAdd = mutedActivitiesResponse.getMutedActivities;
+        activitiesToAppend = mutedActivitiesResponse.getMutedActivities;
     }
 
+    const sort = true;
     spliceActivities(
-        activityIdsToRemove, activitiesToAdd, Audience.Friends, apollo);
+        activityIdsToRemove,
+        [],
+        activitiesToAppend,
+        Audience.Friends,
+        sort,
+        apollo,
+    );
     apollo.writeQuery({
         data: {
             __typename: Type.Query,

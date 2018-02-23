@@ -55,9 +55,20 @@ query GetActiveTrackables($userId: ID) {
     }
 }`;
 
+function prependActiveTrackables(
+    trackables: ISpliceActiveTrackablesFragment[], apollo: DataProxy,
+) {
+    spliceActiveTrackables([], trackables, [], apollo);
+}
+
+function removeActiveTrackables(ids: string[], apollo: DataProxy) {
+    spliceActiveTrackables(ids, [], [], apollo);
+}
+
 function spliceActiveTrackables(
     idsToRemove: string[],
-    trackablesToAdd: ISpliceActiveTrackablesFragment[],
+    trackablesToPrepend: ISpliceActiveTrackablesFragment[],
+    trackablesToAppend: ISpliceActiveTrackablesFragment[],
     apollo: DataProxy,
 ) {
     const activeTrackablesResponse = getActiveTrackables(apollo);
@@ -70,10 +81,10 @@ function spliceActiveTrackables(
     spliceConnection(
         activeTrackablesResponse.getActiveTrackables,
         idsToRemove,
-        trackablesToAdd,
+        trackablesToPrepend,
+        trackablesToAppend,
         cursorField,
         Type.TrackableEdge,
-        compareTrackables,
     );
     setActiveTrackables(activeTrackablesResponse, apollo);
 }
@@ -141,10 +152,60 @@ function initActiveTrackables(apollo: DataProxy) {
     });
 }
 
+/* function getActiveTrackablesPage(
+    apollo: DataProxy, first = 8, after?: number,
+) {
+    const allTrackables = apollo.readQuery<IGetAllActiveTrackablesResponse>(
+        { query: getAllActiveTrackablesQuery })!.getAllActiveTrackables;
+    const connection: IConnection<ISpliceActiveTrackablesFragment, number> = {
+        __typename: Type.TrackableConnection,
+        edges: [],
+        pageInfo: {
+            __typename: Type.PageInfo,
+            endCursor: null,
+            hasNextPage: false,
+        },
+    };
+    const allEdges = [];
+
+    for (const trackable of allTrackables) {
+        allEdges.push({
+            __typename: Type.TrackableEdge,
+            cursor: trackable.order,
+            node: trackable,
+        });
+    }
+
+    const cursorField = "order";
+    sortConnection(connection, cursorField, compareTrackables);
+    let startIndex = 0;
+
+    if (after != null) {
+        const allEdgeCount = allEdges.length;
+
+        for (let i = 0; i < allEdgeCount; ++i) {
+            if (allEdges[i].cursor === after) {
+                startIndex = i + 1;
+                break;
+            }
+        }
+    }
+
+    const endIndex = startIndex + first;
+    const pageEdges = allEdges.slice(startIndex, endIndex);
+    connection.pageInfo.hasNextPage = endIndex < allEdges.length,
+    connection.pageInfo.endCursor = pageEdges.length ?
+        pageEdges[pageEdges.length - 1].cursor : null;
+    connection.edges = pageEdges;
+    return connection;
+} */
+
 export {
     spliceActiveTrackables,
+    removeActiveTrackables,
     sortActiveTrackables,
     getActiveTrackables,
     initActiveTrackables,
+    prependActiveTrackables,
     ISpliceActiveTrackablesFragment,
 };

@@ -1,4 +1,4 @@
-import { addActivity } from "actions/activity-helpers";
+import { prependActivity } from "actions/activity-helpers";
 import {
     getOptimisticResponse,
     IReviewTrackableResponseFragment,

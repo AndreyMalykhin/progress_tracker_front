@@ -1,5 +1,5 @@
-import { spliceActiveTrackables } from "actions/active-trackables-helpers";
-import { addTrackableAddedActivity } from "actions/activity-helpers";
+import { prependActiveTrackables } from "actions/active-trackables-helpers";
+import { prependTrackableAddedActivity } from "actions/activity-helpers";
 import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
@@ -104,15 +104,13 @@ function updateActivities(
         trackable,
         user: trackable.user,
     };
-    addTrackableAddedActivity(activity, apollo);
+    prependTrackableAddedActivity(activity, apollo);
 }
 
 function updateActiveTrackables(
     response: IAddNumericalGoalResponse, apollo: DataProxy,
 ) {
-    const idsToRemove: string[] = [];
-    const trackablesToAdd = [response.addNumericalGoal.trackable];
-    spliceActiveTrackables(idsToRemove, trackablesToAdd, apollo);
+    prependActiveTrackables([response.addNumericalGoal.trackable], apollo);
 }
 
 function getOptimisticResponse(

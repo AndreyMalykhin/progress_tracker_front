@@ -52,9 +52,18 @@ query GetArchivedTrackables($status: TrackableStatus!, $userId: ID) {
     }
 }`;
 
+function prependArchivedTrackables(
+    trackables: ISpliceArchivedTrackablesFragment[],
+    status: TrackableStatus,
+    apollo: DataProxy,
+) {
+    spliceArchivedTrackables([], trackables, [], status, apollo);
+}
+
 function spliceArchivedTrackables(
     idsToRemove: string[],
-    trackablesToAdd: ISpliceArchivedTrackablesFragment[],
+    trackablesToPrepend: ISpliceArchivedTrackablesFragment[],
+    trackablesToAppend: ISpliceArchivedTrackablesFragment[],
     status: TrackableStatus,
     apollo: DataProxy,
 ) {
@@ -68,10 +77,10 @@ function spliceArchivedTrackables(
     spliceConnection(
         archivedTrackablesResponse.getArchivedTrackables,
         idsToRemove,
-        trackablesToAdd,
+        trackablesToPrepend,
+        trackablesToAppend,
         cursorField,
         Type.TrackableEdge,
-        compareTrackables,
     );
     setArchivedTrackables(archivedTrackablesResponse, status, apollo);
 }
@@ -80,6 +89,7 @@ function getArchivedTrackables(status: TrackableStatus, apollo: DataProxy) {
     try {
         return apollo.readQuery<IGetArchivedTrackablesResponse>({
             query: getArchivedTrackablesQuery,
+            variables: { status },
         })!;
     } catch (e) {
         log.trace("getArchivedTrackables(); no data");
@@ -95,6 +105,7 @@ function setArchivedTrackables(
     apollo.writeQuery({
         data: archivedTrackablesResponse,
         query: getArchivedTrackablesQuery,
+        variables: { status },
     });
 }
 
@@ -141,6 +152,7 @@ function initArchivedTrackables(apollo: DataProxy) {
 
 export {
     spliceArchivedTrackables,
+    prependArchivedTrackables,
     getArchivedTrackables,
     initArchivedTrackables,
     ISpliceArchivedTrackablesFragment,

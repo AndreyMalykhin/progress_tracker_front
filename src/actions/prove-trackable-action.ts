@@ -1,13 +1,14 @@
-import { spliceActiveTrackables } from "actions/active-trackables-helpers";
+import { removeActiveTrackables } from "actions/active-trackables-helpers";
 import {
     IRemoveChildFragment,
     removeChild,
     removeChildFragment,
 } from "actions/aggregate-helpers";
-import { spliceArchivedTrackables } from "actions/archived-trackables-helpers";
+import { prependArchivedTrackables } from "actions/archived-trackables-helpers";
 import {
-    splicePendingReviewTrackables,
+    prependPendingReviewTrackables,
 } from "actions/pending-review-trackables-helpers";
+import { getSession, isAnonymous } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient, ApolloError } from "apollo-client";
@@ -112,14 +113,19 @@ async function proveTrackable(
     mutate: MutationFunc<IProveTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    const uploadResponse =
-        await uploadFile(photo.path, photo.mime, "/assets", apollo);
+    let assetId;
 
-    if (uploadResponse.status !== 200) {
-        throw new Error("File upload failed");
+    if (!isAnonymous(getSession(apollo))) {
+        const uploadResponse =
+            await uploadFile(photo.path, photo.mime, "/assets", apollo);
+
+        if (uploadResponse.status !== 200) {
+            throw new Error("File upload failed");
+        }
+
+        assetId = uploadResponse.payload.id;
     }
 
-    const assetId = uploadResponse.payload.id;
     const result = await mutate({
         optimisticResponse: getOptimisticResponse(id, photo, apollo),
         update: (proxy, response) => {
@@ -149,25 +155,21 @@ function updateActiveTrackables(
         idsToRemove.push(removedAggregateId);
     }
 
-    spliceActiveTrackables(idsToRemove, [], apollo);
+    removeActiveTrackables(idsToRemove, apollo);
 }
 
 function updateApprovedTrackables(
     response: IProveTrackableResponse, apollo: DataProxy,
 ) {
-    const trackablesToAdd = [response.proveTrackable.trackable];
-    const idsToRemove: string[] = [];
-    spliceArchivedTrackables(
-        idsToRemove, trackablesToAdd, TrackableStatus.Approved, apollo);
+    prependArchivedTrackables(
+        [response.proveTrackable.trackable], TrackableStatus.Approved, apollo);
 }
 
 function updatePendingReviewTrackables(
     response: IProveTrackableResponse, apollo: DataProxy,
 ) {
-    const trackablesToAdd = [response.proveTrackable.trackable];
-    const idsToRemove: string[] = [];
-    splicePendingReviewTrackables(
-        idsToRemove, trackablesToAdd, Audience.Me, apollo);
+    prependPendingReviewTrackables(
+        [response.proveTrackable.trackable], Audience.Me, apollo);
 }
 
 function getOptimisticResponse(

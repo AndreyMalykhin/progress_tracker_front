@@ -1,4 +1,4 @@
-import { addActivity } from "actions/activity-helpers";
+import { prependActivity } from "actions/activity-helpers";
 import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
@@ -120,7 +120,7 @@ function updateActivities(
         trackable,
         user,
     };
-    addActivity(activity, activityFragment, apollo);
+    prependActivity(activity, activityFragment, apollo);
 }
 
 export {

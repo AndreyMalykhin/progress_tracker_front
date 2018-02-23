@@ -1,4 +1,4 @@
-import { addActivity } from "actions/activity-helpers";
+import { prependActivity } from "actions/activity-helpers";
 import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
@@ -9,7 +9,7 @@ import uuid from "utils/uuid";
 
 interface IGymExerciseFragment {
     id: string;
-    entries: Array<{
+    recentEntries: Array<{
         id: string;
         date: number;
     }>;
@@ -59,7 +59,7 @@ mutation AddGymExerciseEntry(
 const gymExerciseFragment = gql`
 fragment GymExerciseFragment on GymExercise {
     id
-    entries {
+    recentEntries {
         id
         date
     }
@@ -97,7 +97,8 @@ async function addGymExerciseEntry(
             setCount, weight),
         update: (proxy, response) => {
             const responseData = response.data as IAddGymExerciseEntryResponse;
-            updateEntries(trackableId, responseData, proxy);
+            updateRecentEntries(trackableId, responseData, proxy);
+            updateAllEntries(responseData, proxy);
             updateActivities(responseData, proxy);
         },
         variables: { id: trackableId, setCount, repetitionCount, weight },
@@ -121,10 +122,10 @@ function updateActivities(
             id: getSession(apollo).userId!,
         },
     };
-    addActivity(activity, activityFragment, apollo);
+    prependActivity(activity, activityFragment, apollo);
 }
 
-function updateEntries(
+function updateRecentEntries(
     trackableId: string,
     response: IAddGymExerciseEntryResponse,
     apollo: DataProxy,
@@ -133,12 +134,33 @@ function updateEntries(
         { __typename: Type.GymExercise, id: trackableId })!;
     const gymExercise = apollo.readFragment<IGymExerciseFragment>(
         { id: fragmentId, fragment: gymExerciseFragment })!;
-    gymExercise.entries.unshift(response.addGymExerciseEntry.entry);
+    gymExercise.recentEntries.unshift(response.addGymExerciseEntry.entry);
+    removeOldEntries(gymExercise);
     apollo.writeFragment({
         data: gymExercise,
         fragment: gymExerciseFragment,
         id: fragmentId,
     });
+}
+
+function updateAllEntries(
+    response: IAddGymExerciseEntryResponse, apollo: DataProxy,
+) {
+    // TODO
+}
+
+function removeOldEntries(gymExercise: IGymExerciseFragment) {
+    const { recentEntries } = gymExercise;
+    const currentDate = Date.now();
+
+    for (let i = recentEntries.length - 1; i >= 0; --i) {
+        const isMoreThanWeekAgo = currentDate > recentEntries[i].date +
+            millisecondsInWeek;
+
+        if (isMoreThanWeekAgo) {
+            recentEntries.splice(i, 1);
+        }
+    }
 }
 
 function getOptimisticResponse(

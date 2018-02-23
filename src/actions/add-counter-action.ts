@@ -1,7 +1,6 @@
-import { spliceActiveTrackables } from "actions/active-trackables-helpers";
+import { prependActiveTrackables } from "actions/active-trackables-helpers";
 import {
-    addTrackableAddedActivity,
-    spliceActivities,
+    prependTrackableAddedActivity,
 } from "actions/activity-helpers";
 import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
@@ -87,9 +86,7 @@ async function addCounter(
 function updateActiveTrackables(
     response: IAddCounterResponse, apollo: DataProxy,
 ) {
-    const idsToRemove: string[] = [];
-    const trackablesToAdd = [response.addCounter.trackable];
-    spliceActiveTrackables(idsToRemove, trackablesToAdd, apollo);
+    prependActiveTrackables([response.addCounter.trackable], apollo);
 }
 
 function updateActivities(response: IAddCounterResponse, apollo: DataProxy) {
@@ -101,7 +98,7 @@ function updateActivities(response: IAddCounterResponse, apollo: DataProxy) {
         trackable,
         user: trackable.user,
     };
-    addTrackableAddedActivity(activity, apollo);
+    prependTrackableAddedActivity(activity, apollo);
 }
 
 function getOptimisticResponse(

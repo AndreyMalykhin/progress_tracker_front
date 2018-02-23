@@ -1,6 +1,6 @@
-import { addActivity, spliceActivities } from "actions/activity-helpers";
+import { prependActivity } from "actions/activity-helpers";
 import {
-    IUpdateProgressFragment,
+    IUpdateProgressAggregateFragment,
     updateProgress,
     updateProgressFragment,
 } from "actions/aggregate-helpers";
@@ -31,7 +31,7 @@ interface IAddCounterProgressResponse {
 interface ICounterFragment {
     id: string;
     progress: number;
-    parent?: IUpdateProgressFragment;
+    parent?: IUpdateProgressAggregateFragment;
 }
 
 const counterFragment = gql`
@@ -117,7 +117,7 @@ function updateActivities(
             id: getSession(apollo).userId!,
         },
     };
-    addActivity(activity, activityFragment, apollo);
+    prependActivity(activity, activityFragment, apollo);
 }
 
 function getOptimisticResponse(
@@ -128,7 +128,7 @@ function getOptimisticResponse(
     counter.progress += value;
 
     if (counter.parent) {
-        updateProgress(counter.parent);
+        updateProgress(counter.parent, counter);
     }
 
     return {

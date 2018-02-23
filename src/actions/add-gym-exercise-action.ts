@@ -1,5 +1,5 @@
-import { spliceActiveTrackables } from "actions/active-trackables-helpers";
-import { addTrackableAddedActivity } from "actions/activity-helpers";
+import { prependActiveTrackables } from "actions/active-trackables-helpers";
+import { prependTrackableAddedActivity } from "actions/activity-helpers";
 import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
@@ -28,7 +28,7 @@ interface IAddGymExerciseResponse {
                 __typename: Type;
                 id: string;
             };
-            entries: Array<{
+            recentEntries: Array<{
                 id: string;
                 gymExercise: {
                     id: string;
@@ -63,7 +63,7 @@ mutation AddGymExercise($gymExercise: AddGymExerciseInput!) {
             user {
                 id
             }
-            entries {
+            recentEntries {
                 id
                 gymExercise {
                     id
@@ -104,15 +104,13 @@ function updateActivities(
         trackable,
         user: trackable.user,
     };
-    addTrackableAddedActivity(activity, apollo);
+    prependTrackableAddedActivity(activity, apollo);
 }
 
 function updateActiveTrackables(
     response: IAddGymExerciseResponse, apollo: DataProxy,
 ) {
-    const idsToRemove: string[] = [];
-    const trackablesToAdd = [response.addGymExercise.trackable];
-    spliceActiveTrackables(idsToRemove, trackablesToAdd, apollo);
+    prependActiveTrackables([response.addGymExercise.trackable], apollo);
 }
 
 function getOptimisticResponse(
@@ -127,11 +125,11 @@ function getOptimisticResponse(
             trackable: {
                 __typename: Type.GymExercise,
                 creationDate: currentDate,
-                entries: [],
                 iconName: gymExercise.iconName,
                 id: uuid(),
                 isPublic: gymExercise.isPublic,
                 order: currentDate,
+                recentEntries: [],
                 status: TrackableStatus.Active,
                 statusChangeDate: null,
                 title: gymExercise.title,

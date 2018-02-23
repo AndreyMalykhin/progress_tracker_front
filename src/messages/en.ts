@@ -9,7 +9,7 @@ export default {
             true {, gained {ratingDelta} rating}
             false {}
         }`,
-    "activities.goalAchieved": "Goal {trackableTitle} achieved",
+    "activities.goalAchieved": "Achieved goal {trackableTitle}",
     "activities.goalApproved":
         `Goal {trackableTitle} approved{hasRatingDelta, select,
             true {, gained {ratingDelta} rating}
@@ -17,13 +17,17 @@ export default {
         }`,
     "activities.goalExpired": "Goal {trackableTitle} expired",
     "activities.goalRejected": "Goal {trackableTitle} rejected",
-    "activities.gymExerciseEntryAdded":
-        "Added {setCount}x{repetitionCount}x{weight} to {trackableTitle}",
+    "activities.gymExerciseEntryAdded": "Added " +
+        "{setCount}x{repetitionCount}x{weight} to exercise {trackableTitle}",
     "activities.numericalGoalProgressChanged":
         "Increased goal {trackableTitle} progress by {delta}",
     "activities.taskGoalProgressChanged":
         "Completed {taskTitle} of goal {trackableTitle}",
-    "activities.trackableAdded": "Created {trackableTitle}",
+    "activities.trackableAdded": `Created {trackableType, select,
+        Counter {counter}
+        GymExercise {gym exercise}
+        other {goal}
+    } {trackableTitle}`,
     "activitiesNavigation.friends": "Friends",
     "activitiesNavigation.my": "My",
     "activityList.loginToSeeFriends": "Please login to see your friends data",

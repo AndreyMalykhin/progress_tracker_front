@@ -10,6 +10,7 @@ import apolloLogger from "apollo-link-logger";
 import { withClientState } from "apollo-link-state";
 import { InjectedIntl } from "react-intl";
 import IStateResolver from "resolvers/state-resolver";
+import AnonymousLink from "utils/anonymous-link";
 import AuthLink from "utils/auth-link";
 import Config from "utils/config";
 import dataIdFromObject from "utils/data-id-from-object";
@@ -34,6 +35,7 @@ function apolloFactory(
     cache.writeDefaults = () => stateLink.writeDefaults();
     const links = [
         ErrorLink,
+        AnonymousLink,
         stateLink,
         AuthLink,
         new HttpLink({ uri: Config.serverUrl + "/graphql" }),

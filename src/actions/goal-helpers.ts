@@ -1,15 +1,16 @@
 import {
-    IUpdateProgressFragment,
+    IUpdateProgressAggregateFragment,
     updateProgress,
 } from "actions/aggregate-helpers";
 import TrackableStatus from "models/trackable-status";
 
 interface ISetProgressFragment {
+    id: string;
     progress: number;
     maxProgress: number;
     status: TrackableStatus;
     statusChangeDate?: number;
-    parent?: IUpdateProgressFragment;
+    parent?: IUpdateProgressAggregateFragment;
 }
 
 type IAddProgressFragment = ISetProgressFragment;
@@ -28,7 +29,7 @@ function setProgress(goal: ISetProgressFragment, value: number) {
     }
 
     if (goal.parent) {
-        updateProgress(goal.parent);
+        updateProgress(goal.parent, goal);
     }
 }
 

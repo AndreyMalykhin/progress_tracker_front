@@ -52,9 +52,18 @@ query GetPendingReviewTrackables($audience: Audience!) {
     }
 }`;
 
+function prependPendingReviewTrackables(
+    trackables: ISplicePendingReviewTrackablesFragment[],
+    audience: Audience,
+    apollo: DataProxy,
+) {
+    splicePendingReviewTrackables([], trackables, [], audience, apollo);
+}
+
 function splicePendingReviewTrackables(
     idsToRemove: string[],
-    trackablesToAdd: ISplicePendingReviewTrackablesFragment[],
+    trackablesToPrepend: ISplicePendingReviewTrackablesFragment[],
+    trackablesToAppend: ISplicePendingReviewTrackablesFragment[],
     audience: Audience,
     apollo: DataProxy,
 ) {
@@ -69,10 +78,10 @@ function splicePendingReviewTrackables(
     spliceConnection(
         pendingReviewTrackablesResponse.getPendingReviewTrackables,
         idsToRemove,
-        trackablesToAdd,
+        trackablesToPrepend,
+        trackablesToAppend,
         cursorField,
         Type.TrackableEdge,
-        compareTrackables,
     );
     setPendingReviewTrackables(
         pendingReviewTrackablesResponse, audience, apollo);
@@ -135,4 +144,8 @@ function initPendingReviewTrackables(apollo: DataProxy) {
     });
 }
 
-export { splicePendingReviewTrackables, initPendingReviewTrackables };
+export {
+    prependPendingReviewTrackables,
+    splicePendingReviewTrackables,
+    initPendingReviewTrackables,
+};

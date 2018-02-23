@@ -101,19 +101,19 @@ fragment GoalAchievedActivityFragment on GoalAchievedActivity {
     }
 }`;
 
-function addTrackableAddedActivity(
+function prependTrackableAddedActivity(
     activity: IAddTrackableAddedActivityFragment, apollo: DataProxy,
 ) {
-    addActivity(activity, trackableAddedActivityFragment, apollo);
+    prependActivity(activity, trackableAddedActivityFragment, apollo);
 }
 
-function addGoalAchievedActivity(
+function prependGoalAchievedActivity(
     activity: IGoalAchievedActivityFragment, apollo: DataProxy,
 ) {
-    addActivity(activity, goalAchievedActivityFragment, apollo);
+    prependActivity(activity, goalAchievedActivityFragment, apollo);
 }
 
-function addActivity<T extends IAddActivityFragment>(
+function prependActivity<T extends IAddActivityFragment>(
     activity: T, fragment: DocumentNode, apollo: DataProxy,
 ) {
     apollo.writeFragment({
@@ -121,15 +121,17 @@ function addActivity<T extends IAddActivityFragment>(
         fragment,
         id: dataIdFromObject(activity)!,
     });
-    const idsToRemove: string[] = [];
-    const activitiesToAdd = [activity];
-    spliceActivities(idsToRemove, activitiesToAdd, Audience.Me, apollo);
+    const activitiesToPrepend = [activity];
+    const sort = false;
+    spliceActivities([], activitiesToPrepend, [], Audience.Me, sort, apollo);
 }
 
 function spliceActivities(
     idsToRemove: string[],
-    activitiesToAdd: ISpliceActivitiesFragment[],
+    activitiesToPrepend: ISpliceActivitiesFragment[],
+    activitiesToAppend: ISpliceActivitiesFragment[],
     audience: Audience,
+    sort: boolean,
     apollo: DataProxy,
 ) {
     const activitiesResponse = getActivities(audience, apollo);
@@ -142,9 +144,11 @@ function spliceActivities(
     spliceConnection(
         activitiesResponse.getActivities,
         idsToRemove,
-        activitiesToAdd,
+        activitiesToPrepend,
+        activitiesToAppend,
         cursorField,
         Type.ActivityEdge,
+        sort,
         compareActivities,
     );
     setActivities(activitiesResponse, audience, apollo);
@@ -208,9 +212,9 @@ export {
     getActivities,
     initActivities,
     spliceActivities,
-    addTrackableAddedActivity,
-    addGoalAchievedActivity,
-    addActivity,
+    prependTrackableAddedActivity,
+    prependGoalAchievedActivity,
+    prependActivity,
     IAddActivityFragment,
     ISpliceActivitiesFragment,
 };

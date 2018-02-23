@@ -2,6 +2,7 @@ import Avatar from "components/avatar";
 import Loader from "components/loader";
 import Text from "components/text";
 import Audience from "models/audience";
+import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
 import { FormattedDate, FormattedMessage, MessageValue } from "react-intl";
@@ -91,10 +92,12 @@ interface IActivity {
 
 interface ITrackableAddedActivityProps extends IBaseActivityProps {
     trackableTitle: string;
+    trackableType: TrackableType;
 }
 
 interface ITrackableAddedActivity extends IActivity {
     trackable: {
+        __typename: TrackableType;
         title: string;
     };
 }
@@ -372,6 +375,7 @@ class ActivityList extends React.PureComponent<IActivityListProps> {
         return (
             <TrackableAddedActivity
                 trackableTitle={trackable.title}
+                trackableType={trackable.__typename}
                 {...this.getBaseActivityProps(item)}
             />
         );
@@ -616,9 +620,10 @@ class GymExerciseEntryAddedActivity extends
 class TrackableAddedActivity extends
     React.PureComponent<ITrackableAddedActivityProps> {
     public render() {
-        const { trackableTitle, ...restProps } = this.props;
+        const { trackableTitle, trackableType, ...restProps } = this.props;
         const msgValues = {
             trackableTitle: <TrackableTitle text={trackableTitle} />,
+            trackableType,
         };
         return (
             <Activity
