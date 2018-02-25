@@ -2,13 +2,13 @@ import { FetchPolicy } from "apollo-client/core/watchQueryOptions";
 import * as React from "react";
 import uuid from "utils/uuid";
 
-interface IWithRefetchOnFirstLoadProps {
+interface IWithRefreshOnFirstLoadProps {
     fetchPolicy: FetchPolicy;
 }
 
-function withRefetchOnFirstLoad<P>(getFilter?: (props: P) => string) {
+function withRefreshOnFirstLoad<P>(getFilter?: (props: P) => string) {
     return (
-        Component: React.ComponentType<P & IWithRefetchOnFirstLoadProps>,
+        Component: React.ComponentType<P & IWithRefreshOnFirstLoadProps>,
     ) => {
         const isNotFirstLoad: { [key: string]: boolean } = {};
         let filter = uuid();
@@ -35,5 +35,5 @@ function withRefetchOnFirstLoad<P>(getFilter?: (props: P) => string) {
     };
 }
 
-export { IWithRefetchOnFirstLoadProps };
-export default withRefetchOnFirstLoad;
+export { IWithRefreshOnFirstLoadProps };
+export default withRefreshOnFirstLoad;

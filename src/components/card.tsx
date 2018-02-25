@@ -166,8 +166,10 @@ const styles = StyleSheet.create({
         overflow: "hidden",
     },
     header: {
+        alignItems: "center",
         flexDirection: "row",
-        paddingBottom: 4,
+        minHeight: 32,
+        paddingBottom: 8,
         paddingLeft: 8,
         paddingRight: 8,
         paddingTop: 8,
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
     },
     title: {
         flex: 1,
-        lineHeight: 32,
+        paddingBottom: 2,
     },
     titlePrimary: {
         fontWeight: "bold",

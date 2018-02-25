@@ -80,16 +80,18 @@ import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
-import withRefetchOnFirstLoad, {
-    IWithRefetchOnFirstLoadProps,
-} from "components/with-refetch-on-first-load";
+import withRefresh, { IWithRefreshProps } from "components/with-refresh";
+import withRefreshOnFirstLoad, {
+    IWithRefreshOnFirstLoadProps,
+} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
+import { recentDayCount } from "models/gym-exercise";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import { ReactNode } from "react";
 import * as React from "react";
+import { ReactNode } from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -121,6 +123,7 @@ interface IActiveTrackableListContainerProps extends
     IOwnProps,
     InjectedIntlProps,
     IWithHeaderProps,
+    IWithRefreshProps,
     IWithLoadMoreProps {
     data: QueryProps & IGetDataResponse;
     onSetTaskDone: (taskId: string, isDone: boolean) =>
@@ -147,7 +150,7 @@ interface IOwnProps extends
     RouteComponentProps<IRouteParams>,
     IWithApolloProps,
     IWithSessionProps,
-    IWithRefetchOnFirstLoadProps {}
+    IWithRefreshOnFirstLoadProps {}
 
 interface IActiveTrackableListContainerState {
     itemsMeta: IActiveTrackableListItemsMeta;
@@ -456,7 +459,6 @@ const withData =
     );
 
 const collapsedTaskCount = 2;
-const gymExerciseVisibleDayCount = 4;
 
 class ActiveTrackableListContainer extends React.Component<
     IActiveTrackableListContainerProps,
@@ -504,10 +506,11 @@ class ActiveTrackableListContainer extends React.Component<
             isReorderMode,
             itemsMeta,
         } = this.state;
-        const { onLoadMore, data } = this.props;
+        const { onLoadMore, onRefresh, data, isRefreshing } = this.props;
         const { getActiveTrackables, networkStatus } = data;
         return (
             <ActiveTrackableList
+                isRefreshing={isRefreshing}
                 isNumericalEntryPopupOpen={numericalEntryPopup.isOpen}
                 isGymExerciseEntryPopupOpen={gymExerciseEntryPopup.isOpen}
                 isAggregationMode={isAggregationMode}
@@ -542,6 +545,7 @@ class ActiveTrackableListContainer extends React.Component<
                 onGetDraggedItemId={this.onGetDraggedItemId}
                 onGetVisibleItemIds={this.onGetVisibleItemIds}
                 onIsItemProveable={this.onIsItemProveable}
+                onRefresh={onRefresh}
             />
         );
     }
@@ -750,7 +754,7 @@ class ActiveTrackableListContainer extends React.Component<
             const entryTimestamp = date.setUTCHours(0, 0, 0, 0);
 
             if (entryTimestamp !== itemTimestamp) {
-                if (items.length >= gymExerciseVisibleDayCount) {
+                if (items.length >= recentDayCount) {
                     break;
                 }
 
@@ -1378,11 +1382,11 @@ export default compose(
     withRouter,
     withHeader,
     withSession,
-    withRefetchOnFirstLoad<IActiveTrackableListContainerProps>(
+    withRefreshOnFirstLoad<IActiveTrackableListContainerProps>(
         (props) => props.match.params.id),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader),
+    withLoader(Loader, { minDuration: 512 }),
     withError(Error),
     withApollo,
     withReorder,
@@ -1398,4 +1402,10 @@ export default compose(
     withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>(
         "getActiveTrackables", (props) => props.data),
     injectIntl,
+    withRefresh<IActiveTrackableListContainerProps>((props) => {
+        const { session, match } = props;
+        return !isAnonymous(session)
+            || (match.params.id !== defaultId
+                && match.params.id !== session.userId);
+    }),
 )(ActiveTrackableListContainer);

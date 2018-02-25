@@ -20,7 +20,7 @@ import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoader from "components/with-loader";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
-import withRefetchOnFirstLoad, { IWithRefetchOnFirstLoadProps } from "components/with-refetch-on-first-load";
+import withRefreshOnFirstLoad, { IWithRefreshOnFirstLoadProps } from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import ReportReason from "models/report-reason";
@@ -54,7 +54,7 @@ interface IOwnProps extends
     RouteComponentProps<IRouteParams>,
     IWithSessionProps,
     IWithApolloProps,
-    IWithRefetchOnFirstLoadProps {}
+    IWithRefreshOnFirstLoadProps {}
 
 interface IGetRemoteDataResponse {
     getUser: {
@@ -332,7 +332,7 @@ export default compose(
     withHeader,
     withSession,
     withLocalData,
-    withRefetchOnFirstLoad<IProfileSectionContainerProps>(
+    withRefreshOnFirstLoad<IProfileSectionContainerProps>(
         (props) => String(props.match.params.id)),
     withRemoteData,
     withNoUpdatesInBackground,

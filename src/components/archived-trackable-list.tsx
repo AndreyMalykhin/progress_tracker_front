@@ -2,6 +2,7 @@ import EmptyList from "components/empty-list";
 import Loader from "components/loader";
 import ProgressBar from "components/progress-bar";
 import Trackable, { ITrackableProps } from "components/trackable";
+import { IWithRefreshProps } from "components/with-refresh";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -30,7 +31,7 @@ interface IArchivedTrackableListItemNode {
     proofPhotoUrlMedium?: string;
 }
 
-interface IArchivedTrackableListProps {
+interface IArchivedTrackableListProps extends IWithRefreshProps {
     items: IArchivedTrackableListItem[];
     queryStatus: QueryStatus;
     trackableStatus: TrackableStatus;
@@ -40,12 +41,14 @@ interface IArchivedTrackableListProps {
 class ArchivedTrackableList extends
     React.PureComponent<IArchivedTrackableListProps> {
     public render() {
-        const { items, queryStatus, onEndReached } = this.props;
+        const { items, queryStatus, isRefreshing, onEndReached, onRefresh } =
+            this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
             <FlatList
                 windowSize={4}
                 initialNumToRender={4}
+                refreshing={isRefreshing}
                 contentContainerStyle={styles.listContent}
                 data={items}
                 keyExtractor={this.getItemKey}
@@ -53,6 +56,7 @@ class ArchivedTrackableList extends
                 ListFooterComponent={loader}
                 onEndReachedThreshold={0.5}
                 onEndReached={onEndReached}
+                onRefresh={onRefresh}
             />
         );
     }

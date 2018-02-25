@@ -1,6 +1,7 @@
 import EmptyList from "components/empty-list";
 import Loader from "components/loader";
 import Trackable, { ITrackableProps } from "components/trackable";
+import { IWithRefreshProps } from "components/with-refresh";
 import Audience from "models/audience";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -61,7 +62,8 @@ interface IPendingReviewTrackableListItem {
     node: IPendingReviewTrackableListItemNode;
 }
 
-interface IPendingReviewTrackableListProps extends ISharedProps {
+interface IPendingReviewTrackableListProps extends
+    ISharedProps, IWithRefreshProps {
     items: IPendingReviewTrackableListItem[];
     queryStatus: QueryStatus;
     onScroll?: (evt?: NativeSyntheticEvent<NativeScrollEvent>) => void;
@@ -76,8 +78,10 @@ class PendingReviewTrackableList extends
         const {
             items,
             queryStatus,
+            isRefreshing,
             onScroll,
             onEndReached,
+            onRefresh,
         } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
@@ -85,6 +89,7 @@ class PendingReviewTrackableList extends
                 <FlatList
                     windowSize={4}
                     initialNumToRender={2}
+                    refreshing={isRefreshing}
                     contentContainerStyle={styles.listContent}
                     data={items}
                     keyExtractor={this.getItemKey}
@@ -93,6 +98,7 @@ class PendingReviewTrackableList extends
                     onEndReachedThreshold={0.5}
                     onEndReached={onEndReached}
                     onScroll={onScroll}
+                    onRefresh={onRefresh}
                 />
             </View>
         );

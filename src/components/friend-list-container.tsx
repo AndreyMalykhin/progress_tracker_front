@@ -13,9 +13,10 @@ import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withLogin from "components/with-login";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
-import withRefetchOnFirstLoad, {
-    IWithRefetchOnFirstLoadProps,
-} from "components/with-refetch-on-first-load";
+import withRefresh, { IWithRefreshProps } from "components/with-refresh";
+import withRefreshOnFirstLoad, {
+    IWithRefreshOnFirstLoadProps,
+} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import * as React from "react";
@@ -29,13 +30,13 @@ import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
 interface IFriendListContainerProps extends
-    IWithLoadMoreProps, RouteComponentProps<{}> {
+    IWithLoadMoreProps, IWithRefreshProps, RouteComponentProps<{}> {
     data: QueryProps & IGetDataResponse;
     onSetItemMuted: (id: string, isMuted: boolean) => Promise<any>;
 }
 
 interface IOwnProps extends
-    IWithRefetchOnFirstLoadProps, IWithApolloProps, IWithSessionProps {}
+    IWithRefreshOnFirstLoadProps, IWithApolloProps, IWithSessionProps {}
 
 interface IGetDataResponse {
     getFriends: IConnection<IFriendListItemNode, number>;
@@ -95,14 +96,16 @@ const withData = graphql<
 
 class FriendListContainer extends React.Component<IFriendListContainerProps> {
     public render() {
-        const { data, onLoadMore } = this.props;
+        const { data, isRefreshing, onLoadMore, onRefresh } = this.props;
         return (
             <FriendList
+                isRefreshing={isRefreshing}
                 items={data.getFriends.edges}
                 queryStatus={data.networkStatus}
                 onEndReached={onLoadMore}
                 onSetItemMuted={this.onSetItemMuted}
                 onPressItem={this.onPressItem}
+                onRefresh={onRefresh}
             />
         );
     }
@@ -125,11 +128,12 @@ export default compose(
     withSession,
     withLogin("friends.loginToSee"),
     withRouter,
-    withRefetchOnFirstLoad(),
+    withRefreshOnFirstLoad(),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader),
+    withLoader(Loader, { minDuration: 512 }),
     withError(Error),
+    withRefresh(),
     withEmptyList<IFriendListContainerProps>(
         EmptyList, (props) => props.data.getFriends.edges),
     withLoadMore<IFriendListContainerProps, IGetDataResponse>(

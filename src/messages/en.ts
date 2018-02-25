@@ -59,6 +59,7 @@ export default {
     "common.no": "No",
     "common.noData": "No data",
     "common.ok": "OK",
+    "common.refresh": "Refresh",
     "common.remove": "Remove",
     "common.select": "Select",
     "common.yes": "Yes",
@@ -87,8 +88,7 @@ export default {
         true {{setCount}x}
         false {}
     }{repetitionCount}x{weight}`,
-    "gymExercise.entryAveraged":
-        `{setCount}\nx\n{repetitionCount}\nx\n{weight}`,
+    "gymExercise.entryAveraged": `{setCount}x{repetitionCount}x{weight}`,
     "gymExerciseEntryForm.repetitionCountPlaceholder": "Repetition count",
     "gymExerciseEntryForm.setCountPlaceholder": "Set count",
     "gymExerciseEntryForm.weightPlaceholder": "Weight",

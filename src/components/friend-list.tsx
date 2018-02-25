@@ -3,6 +3,7 @@ import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import Loader from "components/loader";
 import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
+import { IWithRefreshProps } from "components/with-refresh";
 import * as React from "react";
 import {
     FlatList,
@@ -14,7 +15,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
-interface IFriendListProps {
+interface IFriendListProps extends IWithRefreshProps {
     items: IFriendListItem[];
     queryStatus: QueryStatus;
     onEndReached: () => void;
@@ -43,12 +44,14 @@ const log = makeLog("friend-list");
 class FriendList extends React.PureComponent<IFriendListProps> {
     public render() {
         log.trace("render()");
-        const { items, queryStatus, onEndReached } = this.props;
+        const { items, queryStatus, isRefreshing, onEndReached, onRefresh } =
+            this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
             <FlatList
                 windowSize={10}
                 initialNumToRender={8}
+                refreshing={isRefreshing}
                 data={items}
                 keyExtractor={this.getItemKey}
                 renderItem={this.onRenderItem}
@@ -56,6 +59,7 @@ class FriendList extends React.PureComponent<IFriendListProps> {
                 ListFooterComponent={loader}
                 onEndReachedThreshold={0.5}
                 onEndReached={onEndReached}
+                onRefresh={onRefresh}
             />
         );
     }

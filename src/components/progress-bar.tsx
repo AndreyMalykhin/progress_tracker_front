@@ -26,7 +26,7 @@ interface IProgressBarState {
 }
 
 const animationConfig = {
-    duration: 2000,
+    duration: 1000,
     easing: Easing.out(Easing.sin),
 } as Animated.TimingAnimationConfig;
 
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
         backgroundColor,
         borderRadius,
         marginBottom: 8,
+        marginTop: 8,
     },
     value: {
         backgroundColor: "transparent",

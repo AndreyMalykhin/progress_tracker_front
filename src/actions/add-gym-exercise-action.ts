@@ -1,6 +1,7 @@
 import { prependActiveTrackables } from "actions/active-trackables-helpers";
 import { prependTrackableAddedActivity } from "actions/activity-helpers";
-import { getSession } from "actions/session-helpers";
+import { initGymExerciseEntries } from "actions/gym-exercise-entry-helpers";
+import { getSession, isAnonymous } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
@@ -88,9 +89,18 @@ async function addGymExercise(
             const responseData = response.data as IAddGymExerciseResponse;
             updateActiveTrackables(responseData, proxy);
             updateActivities(responseData, proxy);
+            updateEntries(responseData, proxy);
         },
         variables: { gymExercise },
     });
+}
+
+function updateEntries(
+    response: IAddGymExerciseResponse, apollo: DataProxy,
+) {
+    if (isAnonymous(getSession(apollo))) {
+        initGymExerciseEntries(response.addGymExercise.trackable.id, apollo);
+    }
 }
 
 function updateActivities(

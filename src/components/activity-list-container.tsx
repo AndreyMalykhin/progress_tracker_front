@@ -8,13 +8,14 @@ import Error from "components/error";
 import Loader from "components/loader";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
-import withLoadMore from "components/with-load-more";
+import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withLogin from "components/with-login";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
-import withRefetchOnFirstLoad, {
-    IWithRefetchOnFirstLoadProps,
-} from "components/with-refetch-on-first-load";
+import withRefresh, { IWithRefreshProps } from "components/with-refresh";
+import withRefreshOnFirstLoad, {
+    IWithRefreshOnFirstLoadProps,
+} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import Audience from "models/audience";
@@ -29,10 +30,10 @@ import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
-interface IActivityListContainerProps extends IOwnProps {
+interface IActivityListContainerProps extends
+    IOwnProps, IWithRefreshProps, IWithLoadMoreProps {
     audience: Audience;
     data: QueryProps & IGetDataResponse;
-    onLoadMore: () => void;
 }
 
 interface IRouteParams {
@@ -41,7 +42,7 @@ interface IRouteParams {
 
 interface IOwnProps extends
     RouteComponentProps<IRouteParams>,
-    IWithRefetchOnFirstLoadProps,
+    IWithRefreshOnFirstLoadProps,
     IWithSessionProps {
     audience: Audience;
 }
@@ -145,14 +146,17 @@ class ActivityListContainer extends
     private sections: IActivityListSection[] = [];
 
     public render() {
-        const { audience, data, onLoadMore } = this.props;
+        const { audience, data, isRefreshing, onLoadMore, onRefresh } =
+            this.props;
         return (
             <ActivityList
+                isRefreshing={isRefreshing}
                 sections={this.sections}
                 audience={audience}
                 queryStatus={data.networkStatus}
                 onPressUser={this.onPressUser}
                 onEndReached={onLoadMore}
+                onRefresh={onRefresh}
             />
         );
     }
@@ -206,12 +210,14 @@ export default compose(
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
-    withRefetchOnFirstLoad<IActivityListContainerProps>(
+    withRefreshOnFirstLoad<IActivityListContainerProps>(
         (props) => props.audience),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader),
+    withLoader(Loader, { minDuration: 512 }),
     withError(Error),
+    withRefresh<IActivityListContainerProps>((props) =>
+        !isAnonymous(props.session) || props.audience !== Audience.Me),
     withEmptyList<IActivityListContainerProps>(
         EmptyList, (props) => props.data.getActivities.edges),
     withLoadMore<IActivityListContainerProps, IGetDataResponse>(

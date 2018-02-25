@@ -10,9 +10,10 @@ import withError from "components/with-error";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
-import withRefetchOnFirstLoad, {
-    IWithRefetchOnFirstLoadProps,
-} from "components/with-refetch-on-first-load";
+import withRefresh, { IWithRefreshProps } from "components/with-refresh";
+import withRefreshOnFirstLoad, {
+    IWithRefreshOnFirstLoadProps,
+} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
@@ -26,7 +27,7 @@ import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus, { isLoading } from "utils/query-status";
 
 interface IArchivedTrackableListContainerProps extends
-    IWithLoadMoreProps, IOwnProps {
+    IWithLoadMoreProps, IWithRefreshProps, IOwnProps {
     data: QueryProps & IGetDataResponse;
 }
 
@@ -34,7 +35,7 @@ interface IGetDataResponse {
     getArchivedTrackables: IConnection<IArchivedTrackableListItemNode, number>;
 }
 
-interface IOwnProps extends IWithRefetchOnFirstLoadProps, IWithSessionProps {
+interface IOwnProps extends IWithRefreshOnFirstLoadProps, IWithSessionProps {
     userId: string;
     trackableStatus: TrackableStatus;
 }
@@ -116,13 +117,16 @@ const withData = graphql<
 class ArchivedTrackableListContainer extends
     React.Component<IArchivedTrackableListContainerProps> {
     public render() {
-        const { data, trackableStatus, onLoadMore } = this.props;
+        const { data, trackableStatus, isRefreshing, onLoadMore, onRefresh } =
+            this.props;
         return (
             <ArchivedTrackableList
+                isRefreshing={isRefreshing}
                 trackableStatus={trackableStatus}
                 items={data.getArchivedTrackables.edges}
                 queryStatus={data.networkStatus}
                 onEndReached={onLoadMore}
+                onRefresh={onRefresh}
             />
         );
     }
@@ -130,12 +134,17 @@ class ArchivedTrackableListContainer extends
 
 export default compose(
     withSession,
-    withRefetchOnFirstLoad<IArchivedTrackableListContainerProps>(
+    withRefreshOnFirstLoad<IArchivedTrackableListContainerProps>(
         (props) => `${props.userId}_${props.trackableStatus}`),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader),
+    withLoader(Loader, { minDuration: 512 }),
     withError(Error),
+    withRefresh<IArchivedTrackableListContainerProps>((props) => {
+        const { session, userId } = props;
+        return !isAnonymous(session)
+            || (userId !== defaultId && userId !== session.userId);
+    }),
     withEmptyList<IArchivedTrackableListContainerProps>(
         EmptyList, (props) => props.data.getArchivedTrackables.edges),
     withLoadMore<IArchivedTrackableListContainerProps, IGetDataResponse>(

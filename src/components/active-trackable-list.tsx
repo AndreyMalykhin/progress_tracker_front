@@ -15,6 +15,7 @@ import NumericalEntryPopupContainer from "components/numerical-entry-popup-conta
 import NumericalGoal from "components/numerical-goal";
 import Reorderable from "components/reorderable";
 import TaskGoal, { ITask } from "components/task-goal";
+import { IWithRefreshProps } from "components/with-refresh";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
@@ -115,7 +116,7 @@ interface IExtraData {
     itemsMeta: IActiveTrackableListItemsMeta;
 }
 
-interface IActiveTrackableListProps extends IExtraData {
+interface IActiveTrackableListProps extends IExtraData, IWithRefreshProps {
     items: IActiveTrackableListItem[];
     isNumericalEntryPopupOpen?: boolean;
     isGymExerciseEntryPopupOpen?: boolean;
@@ -182,6 +183,7 @@ class ActiveTrackableList extends
             itemsMeta,
             queryStatus,
             isReorderMode,
+            isRefreshing,
             onNumericalEntryPopupClose,
             onGymExerciseEntryPopupClose,
             onEndReached,
@@ -192,9 +194,12 @@ class ActiveTrackableList extends
             onVisibleItemsChange,
             onGetVisibleItemIds,
             onGetDraggedItemId,
+            onRefresh,
         } = this.props;
         if (!items.length) {
-            return <EmptyList />;
+            return (
+                <EmptyList isRefreshing={isRefreshing} onRefresh={onRefresh} />
+            );
         }
 
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
@@ -223,6 +228,7 @@ class ActiveTrackableList extends
                     <FlatList
                         windowSize={4}
                         initialNumToRender={4}
+                        refreshing={isRefreshing}
                         scrollEnabled={!isReorderMode}
                         keyExtractor={this.getItemKey}
                         data={items}
@@ -233,6 +239,7 @@ class ActiveTrackableList extends
                         onEndReached={onEndReached}
                         onEndReachedThreshold={0.5}
                         onViewableItemsChanged={onVisibleItemsChange}
+                        onRefresh={onRefresh}
                     />
                 </Reorderable>
                 {numericalEntryPopup}
@@ -551,6 +558,7 @@ class ActiveTrackableList extends
                 isAfterAggregate={isAfterAggregate}
                 isBeforeAggregate={isBeforeAggregate}
                 isLast={index === items.length - 1}
+                isFirst={!index}
                 commands={onGetAggregateCommands(id)}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}

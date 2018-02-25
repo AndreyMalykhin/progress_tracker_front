@@ -28,6 +28,8 @@ enum Type {
     GymExercise = "GymExercise",
     GymExerciseEntry = "GymExerciseEntry",
     GymExerciseEntryAddedActivity = "GymExerciseEntryAddedActivity",
+    GymExerciseEntryConnection = "GymExerciseEntryConnection",
+    GymExerciseEntryEdge = "GymExerciseEntryEdge",
     NumericalGoal = "NumericalGoal",
     NumericalGoalProgressChangedActivity =
         "NumericalGoalProgressChangedActivity",

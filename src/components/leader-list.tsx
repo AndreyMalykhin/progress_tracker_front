@@ -2,6 +2,7 @@ import Avatar from "components/avatar";
 import Loader from "components/loader";
 import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
+import { IWithRefreshProps } from "components/with-refresh";
 import * as React from "react";
 import {
     FlatList,
@@ -11,7 +12,7 @@ import {
 } from "react-native";
 import QueryStatus from "utils/query-status";
 
-interface ILeaderListProps {
+interface ILeaderListProps extends IWithRefreshProps {
     items: ILeaderListItem[];
     queryStatus: QueryStatus;
     onEndReached: () => void;
@@ -36,12 +37,14 @@ interface ILeaderListItemNode {
 
 class LeaderList extends React.Component<ILeaderListProps> {
     public render() {
-        const { items, queryStatus, onEndReached } = this.props;
+        const { items, queryStatus, isRefreshing, onEndReached, onRefresh } =
+            this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
             <FlatList
                 windowSize={10}
                 initialNumToRender={8}
+                refreshing={isRefreshing}
                 data={items}
                 keyExtractor={this.getItemKey}
                 renderItem={this.onRenderItem}
@@ -49,6 +52,7 @@ class LeaderList extends React.Component<ILeaderListProps> {
                 ListFooterComponent={loader}
                 onEndReachedThreshold={0.5}
                 onEndReached={onEndReached}
+                onRefresh={onRefresh}
             />
         );
     }

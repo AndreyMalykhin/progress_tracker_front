@@ -8,7 +8,14 @@ interface IWithLoadMoreProps {
     onLoadMore: () => void;
 }
 
-function withLoadMore<TProps extends IWithLoadMoreProps, TResponse>(
+interface IResponse {
+    [key: string]: any;
+}
+
+function withLoadMore<
+    TProps extends IWithLoadMoreProps,
+    TResponse extends IResponse
+>(
     responseField: keyof TResponse,
     getData: (props: TProps) => QueryProps & TResponse,
 ) {
@@ -37,34 +44,40 @@ function withLoadMore<TProps extends IWithLoadMoreProps, TResponse>(
                     return;
                 }
 
-                fetchMore({
-                    updateQuery: (previousResult, { fetchMoreResult }) => {
-                        const { edges, pageInfo } =
-                            fetchMoreResult![responseField] as
-                            IConnection<any, any>;
+                try {
+                    fetchMore({
+                        updateQuery: this.updateQuery,
+                        variables: { cursor: response.pageInfo.endCursor },
+                    });
+                } catch (e) {
+                    // already reported
+                }
+            }
 
-                        if (!edges.length) {
-                            return {
-                                ...previousResult,
-                                [responseField]: {
-                                    ...previousResult[responseField] as object,
-                                    pageInfo,
-                                },
-                            };
-                        }
+            private updateQuery(previousResult: IResponse, options: any) {
+                const fetchMoreResult: IResponse = options.fetchMoreResult;
+                const { edges, pageInfo } =
+                    fetchMoreResult![responseField] as IConnection<any, any>;
 
-                        const previousEdges = (previousResult[responseField] as
-                                IConnection<any, any>).edges;
-                        return {
-                            ...fetchMoreResult,
-                            [responseField]: {
-                                ...fetchMoreResult![responseField] as object,
-                                edges: previousEdges.concat(edges),
-                            },
-                        };
+                if (!edges.length) {
+                    return {
+                        ...previousResult,
+                        [responseField]: {
+                            ...previousResult[responseField] as object,
+                            pageInfo,
+                        },
+                    };
+                }
+
+                const previousEdges = (previousResult[responseField] as
+                    IConnection<any, any>).edges;
+                return {
+                    ...fetchMoreResult,
+                    [responseField]: {
+                        ...fetchMoreResult![responseField] as object,
+                        edges: previousEdges.concat(edges),
                     },
-                    variables: { cursor: response.pageInfo.endCursor },
-                });
+                };
             }
         };
     };

@@ -28,9 +28,10 @@ import withLoginAction, {
     IWithLoginActionProps,
 } from "components/with-login-action";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
-import withRefetchOnFirstLoad, {
-    IWithRefetchOnFirstLoadProps,
-} from "components/with-refetch-on-first-load";
+import withRefresh, { IWithRefreshProps } from "components/with-refresh";
+import withRefreshOnFirstLoad, {
+    IWithRefreshOnFirstLoadProps,
+} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import Audience from "models/audience";
@@ -55,7 +56,7 @@ import routes from "utils/routes";
 interface IOwnProps extends
     RouteComponentProps<{}>,
     IWithApolloProps,
-    IWithRefetchOnFirstLoadProps,
+    IWithRefreshOnFirstLoadProps,
     IWithSessionProps {
     audience: Audience;
 }
@@ -64,6 +65,7 @@ interface IPendingReviewTrackableListContainerProps extends
     IOwnProps,
     InjectedIntlProps,
     IWithLoginActionProps,
+    IWithRefreshProps,
     IWithLoadMoreProps {
     data: QueryProps & IGetDataResponse;
     onCommitApproveItem: (id: string, difficulty: Difficulty) =>
@@ -216,16 +218,19 @@ class PendingReviewTrackableListContainer extends React.Component<
     public state: IPendingReviewTrackableListContainerState = { toasts: [] };
 
     public render() {
-        const { audience, data, onLoadMore } = this.props;
+        const { audience, data, isRefreshing, onLoadMore, onRefresh } =
+            this.props;
         return (
             <PendingReviewTrackableList
                 audience={audience}
                 items={data.getPendingReviewTrackables.edges}
                 queryStatus={data.networkStatus}
+                isRefreshing={isRefreshing}
                 onApproveItem={this.onStartApproveItem}
                 onEndReached={onLoadMore}
                 onPressUser={this.onPressUser}
                 onRejectItem={this.onStartRejectItem}
+                onRefresh={onRefresh}
             />
         );
     }
@@ -346,12 +351,14 @@ export default compose(
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
-    withRefetchOnFirstLoad<IPendingReviewTrackableListContainerProps>(
+    withRefreshOnFirstLoad<IPendingReviewTrackableListContainerProps>(
         (props) => props.audience),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader),
+    withLoader(Loader, { minDuration: 512 }),
     withError(Error),
+    withRefresh<IPendingReviewTrackableListContainerProps>((props) =>
+        !isAnonymous(props.session) || props.audience !== Audience.Me),
     withEmptyList<IPendingReviewTrackableListContainerProps>(
         EmptyList,
         (props) => props.data.getPendingReviewTrackables.edges,

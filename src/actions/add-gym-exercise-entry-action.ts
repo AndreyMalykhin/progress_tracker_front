@@ -1,7 +1,9 @@
 import { prependActivity } from "actions/activity-helpers";
+import { prependGymExerciseEntries } from "actions/gym-exercise-entry-helpers";
 import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
+import { recentDayCount } from "models/gym-exercise";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
@@ -18,12 +20,14 @@ interface IGymExerciseFragment {
 interface IAddGymExerciseEntryResponse {
     addGymExerciseEntry: {
         entry: {
+            __typename: Type;
             id: string;
             date: number;
             repetitionCount: number;
             setCount: number;
             weight: number;
             gymExercise: {
+                __typename: Type;
                 id: string;
             };
         };
@@ -83,7 +87,7 @@ fragment AddGymExerciseEntryActivityFragment on GymExerciseEntryAddedActivity {
     }
 }`;
 
-const millisecondsInWeek = 604800 * 1000;
+const millisecondsInDay = 86400 * 1000;
 
 async function addGymExerciseEntry(
     trackableId: string,
@@ -146,7 +150,8 @@ function updateRecentEntries(
 function updateAllEntries(
     response: IAddGymExerciseEntryResponse, apollo: DataProxy,
 ) {
-    // TODO
+    const { entry } = response.addGymExerciseEntry;
+    prependGymExerciseEntries([entry], entry.gymExercise.id, apollo);
 }
 
 function removeOldEntries(gymExercise: IGymExerciseFragment) {
@@ -154,10 +159,10 @@ function removeOldEntries(gymExercise: IGymExerciseFragment) {
     const currentDate = Date.now();
 
     for (let i = recentEntries.length - 1; i >= 0; --i) {
-        const isMoreThanWeekAgo = currentDate > recentEntries[i].date +
-            millisecondsInWeek;
+        const isOld = currentDate > recentEntries[i].date +
+            millisecondsInDay * recentDayCount;
 
-        if (isMoreThanWeekAgo) {
+        if (isOld) {
             recentEntries.splice(i, 1);
         }
     }

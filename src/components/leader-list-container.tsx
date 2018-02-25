@@ -8,9 +8,10 @@ import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withLogin from "components/with-login";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
-import withRefetchOnFirstLoad, {
-    IWithRefetchOnFirstLoadProps,
-} from "components/with-refetch-on-first-load";
+import withRefresh, { IWithRefreshProps } from "components/with-refresh";
+import withRefreshOnFirstLoad, {
+    IWithRefreshOnFirstLoadProps,
+} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
 import gql from "graphql-tag";
 import Audience from "models/audience";
@@ -22,13 +23,13 @@ import { IConnection } from "utils/connection";
 import routes from "utils/routes";
 
 interface ILeaderListContainerProps extends
-    IOwnProps, IWithLoadMoreProps, RouteComponentProps<{}> {
+    IOwnProps, IWithLoadMoreProps, IWithRefreshProps, RouteComponentProps<{}> {
     data: QueryProps & IGetDataResponse;
     audience: Audience;
 }
 
 interface IOwnProps extends
-    IWithRefetchOnFirstLoadProps, IWithSessionProps {}
+    IWithRefreshOnFirstLoadProps, IWithSessionProps {}
 
 interface IGetDataResponse {
     getLeaders: IConnection<ILeaderListItemNode, number>;
@@ -74,13 +75,15 @@ const withData = graphql<
 
 class LeaderListContainer extends React.Component<ILeaderListContainerProps> {
     public render() {
-        const { data, onLoadMore } = this.props;
+        const { data, isRefreshing, onLoadMore, onRefresh } = this.props;
         return (
             <LeaderList
+                isRefreshing={isRefreshing}
                 items={data.getLeaders.edges}
                 queryStatus={data.networkStatus}
                 onEndReached={onLoadMore}
                 onPressItem={this.onPressItem}
+                onRefresh={onRefresh}
             />
         );
     }
@@ -96,12 +99,13 @@ export default compose(
     withLogin<ILeaderListContainerProps>("leaderList.loginToSeeFriends",
         (props) => props.audience === Audience.Friends),
     withRouter,
-    withRefetchOnFirstLoad<ILeaderListContainerProps>(
+    withRefreshOnFirstLoad<ILeaderListContainerProps>(
         (props) => props.audience),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader),
+    withLoader(Loader, { minDuration: 512 }),
     withError(Error),
+    withRefresh(),
     withEmptyList<ILeaderListContainerProps>(
         EmptyList, (props) => props.data.getLeaders.edges),
     withLoadMore<ILeaderListContainerProps, IGetDataResponse>(

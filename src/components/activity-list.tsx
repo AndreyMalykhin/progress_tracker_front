@@ -1,6 +1,7 @@
 import Avatar from "components/avatar";
 import Loader from "components/loader";
 import Text from "components/text";
+import { IWithRefreshProps } from "components/with-refresh";
 import Audience from "models/audience";
 import TrackableType from "models/trackable-type";
 import Type from "models/type";
@@ -21,7 +22,7 @@ import IconName from "utils/icon-name";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
-interface IActivityListProps {
+interface IActivityListProps extends IWithRefreshProps {
     audience: Audience;
     sections: IActivityListSection[];
     queryStatus: QueryStatus;
@@ -69,6 +70,7 @@ interface IBaseActivityProps {
     userId?: string;
     userAvatarUrl?: string;
     userName?: string;
+    isFirst?: boolean;
     onPressUser: (id: string) => void;
 }
 
@@ -227,12 +229,14 @@ const log = makeLog("activity-list");
 class ActivityList extends React.PureComponent<IActivityListProps> {
     public render() {
         log.trace("render()");
-        const { sections, queryStatus, onEndReached } = this.props;
+        const { sections, queryStatus, isRefreshing, onEndReached, onRefresh } =
+            this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
             <SectionList
                 windowSize={12}
                 initialNumToRender={10}
+                refreshing={isRefreshing}
                 keyExtractor={this.getItemKey}
                 renderItem={this.onRenderItem}
                 renderSectionHeader={this.onRenderSectionHeader}
@@ -241,6 +245,7 @@ class ActivityList extends React.PureComponent<IActivityListProps> {
                 ListFooterComponent={loader}
                 onEndReachedThreshold={0.5}
                 onEndReached={onEndReached}
+                onRefresh={onRefresh}
             />
         );
     }
@@ -260,36 +265,43 @@ class ActivityList extends React.PureComponent<IActivityListProps> {
 
         switch (item.__typename) {
             case Type.TrackableAddedActivity:
-            return this.renderTrackableAdded(item as ITrackableAddedActivity);
+            return this.renderTrackableAdded(
+                item as ITrackableAddedActivity, itemInfo.index);
             case Type.CounterProgressChangedActivity:
             return this.renderCounterProgressChanged(
-                item as ICounterProgressChangedActivity);
+                item as ICounterProgressChangedActivity, itemInfo.index);
             case Type.TaskGoalProgressChangedActivity:
             return this.renderTaskGoalProgressChanged(
-                item as ITaskGoalProgressChangedActivity);
+                item as ITaskGoalProgressChangedActivity, itemInfo.index);
             case Type.GymExerciseEntryAddedActivity:
             return this.renderGymExerciseEntryAdded(
-                item as IGymExerciseEntryAddedActivity);
+                item as IGymExerciseEntryAddedActivity, itemInfo.index);
             case Type.NumericalGoalProgressChangedActivity:
             return this.renderNumericalGoalProgressChanged(
-                item as INumericalGoalProgressChangedActivity);
+                item as INumericalGoalProgressChangedActivity, itemInfo.index);
             case Type.GoalApprovedActivity:
-            return this.renderGoalApproved(item as IGoalApprovedActivity);
+            return this.renderGoalApproved(
+                item as IGoalApprovedActivity, itemInfo.index);
             case Type.GoalRejectedActivity:
-            return this.renderGoalRejected(item as IGoalRejectedActivity);
+            return this.renderGoalRejected(
+                item as IGoalRejectedActivity, itemInfo.index);
             case Type.GoalAchievedActivity:
-            return this.renderGoalAchieved(item as IGoalAchievedActivity);
+            return this.renderGoalAchieved(
+                item as IGoalAchievedActivity, itemInfo.index);
             case Type.GoalExpiredActivity:
-            return this.renderGoalExpired(item as IGoalExpiredActivity);
+            return this.renderGoalExpired(
+                item as IGoalExpiredActivity, itemInfo.index);
             case Type.ExternalGoalReviewedActivity:
             return this.renderExternalGoalReviewed(
-                item as IExternalGoalReviewedActivity);
+                item as IExternalGoalReviewedActivity, itemInfo.index);
             default:
             throw new Error("Unexpected type: " + item.__typename);
         }
     }
 
-    private renderExternalGoalReviewed(item: IExternalGoalReviewedActivity) {
+    private renderExternalGoalReviewed(
+        item: IExternalGoalReviewedActivity, index: number,
+    ) {
         const { trackable, isApprove, ratingDelta } = item;
         return (
             <ExternalGoalReviewedActivity
@@ -298,66 +310,68 @@ class ActivityList extends React.PureComponent<IActivityListProps> {
                 isApprove={isApprove}
                 trackableTitle={trackable.title}
                 ratingDelta={ratingDelta}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
-    private renderGoalExpired(item: IGoalExpiredActivity) {
+    private renderGoalExpired(item: IGoalExpiredActivity, index: number) {
         const { trackable } = item;
         return (
             <GoalExpiredActivity
                 trackableTitle={trackable.title}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
-    private renderGoalAchieved(item: IGoalAchievedActivity) {
+    private renderGoalAchieved(item: IGoalAchievedActivity, index: number) {
         const { trackable } = item;
         return (
             <GoalAchievedActivity
                 trackableTitle={trackable.title}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
-    private renderGoalRejected(item: IGoalRejectedActivity) {
+    private renderGoalRejected(item: IGoalRejectedActivity, index: number) {
         const { trackable } = item;
         return (
             <GoalRejectedActivity
                 trackableTitle={trackable.title}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
-    private renderGoalApproved(item: IGoalApprovedActivity) {
+    private renderGoalApproved(item: IGoalApprovedActivity, index: number) {
         const { trackable, ratingDelta } = item;
         return (
             <GoalApprovedActivity
                 trackableTitle={trackable.title}
                 ratingDelta={ratingDelta}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
     private renderNumericalGoalProgressChanged(
-        item: INumericalGoalProgressChangedActivity,
+        item: INumericalGoalProgressChangedActivity, index: number,
     ) {
         const { trackable, delta } = item;
         return (
             <NumericalGoalProgressChangedActivity
                 trackableTitle={trackable.title}
                 progressDelta={delta}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
-    private renderGymExerciseEntryAdded(item: IGymExerciseEntryAddedActivity) {
+    private renderGymExerciseEntryAdded(
+        item: IGymExerciseEntryAddedActivity, index: number,
+    ) {
         const { trackable, entry } = item;
         return (
             <GymExerciseEntryAddedActivity
@@ -365,55 +379,58 @@ class ActivityList extends React.PureComponent<IActivityListProps> {
                 setCount={entry.setCount}
                 repetitionCount={entry.repetitionCount}
                 weight={entry.weight}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
-    private renderTrackableAdded(item: ITrackableAddedActivity) {
+    private renderTrackableAdded(item: ITrackableAddedActivity, index: number) {
         const { trackable } = item;
         return (
             <TrackableAddedActivity
                 trackableTitle={trackable.title}
                 trackableType={trackable.__typename}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
     private renderCounterProgressChanged(
-        item: ICounterProgressChangedActivity,
+        item: ICounterProgressChangedActivity, index: number,
     ) {
         const { trackable, delta } = item;
         return (
             <CounterProgressChangedActivity
                 trackableTitle={trackable.title}
                 progressDelta={delta}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
     private renderTaskGoalProgressChanged(
-        item: ITaskGoalProgressChangedActivity,
+        item: ITaskGoalProgressChangedActivity, index: number,
     ) {
         const { trackable, task } = item;
         return (
             <TaskGoalProgressChangedActivity
                 trackableTitle={trackable.title}
                 taskTitle={task.title}
-                {...this.getBaseActivityProps(item)}
+                {...this.getBaseActivityProps(item, index)}
             />
         );
     }
 
-    private getBaseActivityProps(item: IActivity) {
+    private getBaseActivityProps(
+        item: IActivity, index: number,
+    ): IBaseActivityProps {
         if (this.props.audience === Audience.Me) {
-            return { onPressUser: this.props.onPressUser };
+            return { isFirst: !index, onPressUser: this.props.onPressUser };
         }
 
         const { user } = item;
         return {
+            isFirst: !index,
             onPressUser: this.props.onPressUser,
             userAvatarUrl: user!.avatarUrlSmall,
             userId: user!.id,
@@ -479,9 +496,9 @@ class ExternalGoalReviewedActivity extends
             ...restProps,
         } = this.props;
         const msgValues = {
-            hasRatingDelta: ratingDelta != null,
+            hasRatingDelta: !!ratingDelta,
             isApprove,
-            ratingDelta: ratingDelta != null && <Number value={ratingDelta} />,
+            ratingDelta: ratingDelta && <Number value={ratingDelta} />,
             trackableTitle: <TrackableTitle text={trackableTitle} />,
             userName: (
                 <UserName
@@ -572,8 +589,8 @@ class GoalApprovedActivity extends
     public render() {
         const { trackableTitle, ratingDelta, ...restProps } = this.props;
         const msgValues = {
-            hasRatingDelta: ratingDelta != null,
-            ratingDelta: ratingDelta != null && <Number value={ratingDelta} />,
+            hasRatingDelta: !!ratingDelta,
+            ratingDelta: ratingDelta && <Number value={ratingDelta} />,
             trackableTitle: <TrackableTitle text={trackableTitle} />,
         };
         return (
@@ -700,8 +717,8 @@ class TaskGoalProgressChangedActivity extends
 // tslint:disable-next-line:max-classes-per-file
 class Activity extends React.Component<IActivityProps> {
     public render() {
-        const { userAvatarUrl, iconName, msgId, msgValues, iconStyle } =
-            this.props;
+        const { userAvatarUrl, iconName, msgId, msgValues, iconStyle, isFirst }
+            = this.props;
         const userAvatar = userAvatarUrl && (
             <TouchableWithoutFeedback onPress={this.onPressUser}>
                 <View style={styles.activityAvatar}>
@@ -710,7 +727,7 @@ class Activity extends React.Component<IActivityProps> {
             </TouchableWithoutFeedback>
         );
         return (
-            <View style={styles.activity}>
+            <View style={[styles.activity, isFirst && styles.activityFirst]}>
                 {userAvatar}
                 <FormattedMessage id={msgId} values={msgValues}>
                     {this.renderMsg}
@@ -758,6 +775,8 @@ const styles = StyleSheet.create({
     activityAvatar: {
         marginRight: 8,
     },
+    activityFirst: {
+    },
     activityIcon: {
         color: "#FF8A00",
         marginLeft: 8,
@@ -765,7 +784,8 @@ const styles = StyleSheet.create({
     activityMsg: {
         flex: 1,
         flexWrap: "wrap",
-        lineHeight: 32,
+        paddingBottom: 8,
+        paddingTop: 8,
     },
     externalGoalReviewedIconApproved: {
         color: "#43D459",

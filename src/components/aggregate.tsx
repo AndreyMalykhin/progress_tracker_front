@@ -30,6 +30,7 @@ type IAggregateProps = InjectedIntlProps & {
     isAfterAggregate?: boolean;
     isBeforeAggregate?: boolean;
     isLast?: boolean;
+    isFirst?: boolean;
     progress: number;
     maxProgress?: number;
     onSelectChange?: (id: string, isSelected: boolean) => void;
@@ -50,6 +51,7 @@ class Aggregate extends React.Component<IAggregateProps> {
             isDragged,
             isAfterAggregate,
             isBeforeAggregate,
+            isFirst,
             isLast,
             ...restProps,
         } = this.props;
@@ -74,6 +76,7 @@ class Aggregate extends React.Component<IAggregateProps> {
             isDragged ? styles.containerDragged : null,
             isAfterAggregate ? styles.containerAfterAggregate : null,
             isBeforeAggregate ? styles.containerBeforeAggregate : null,
+            isFirst ? styles.containerFirst : null,
             isLast ? styles.containerLast : null,
         ];
         const title = intl.formatMessage(
@@ -115,6 +118,9 @@ const styles = StyleSheet.create({
     },
     containerDragged: {
         opacity: 0,
+    },
+    containerFirst: {
+        marginTop: 0,
     },
     containerLast: {
         marginBottom: 0,
