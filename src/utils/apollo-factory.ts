@@ -11,6 +11,7 @@ import apolloLogger from "apollo-link-logger";
 import { withClientState } from "apollo-link-state";
 import { InjectedIntl } from "react-intl";
 import { AsyncStorage } from "react-native";
+import FSStorage from "redux-persist-fs-storage";
 import IStateResolver from "resolvers/state-resolver";
 import AnonymousLink from "utils/anonymous-link";
 import AuthLink from "utils/auth-link";
@@ -38,7 +39,7 @@ async function apolloFactory(
         cache,
         debug: Config.isDevEnv,
         maxSize: false,
-        storage: AsyncStorage as any,
+        storage: FSStorage(),
         trigger: "background",
     });
 
