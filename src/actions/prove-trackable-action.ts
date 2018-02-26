@@ -113,19 +113,14 @@ async function proveTrackable(
     mutate: MutationFunc<IProveTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    let assetId;
+    const uploadResponse =
+        await uploadFile(photo.path, photo.mime, "/assets", apollo);
 
-    if (!isAnonymous(getSession(apollo))) {
-        const uploadResponse =
-            await uploadFile(photo.path, photo.mime, "/assets", apollo);
-
-        if (uploadResponse.status !== 200) {
-            throw new Error("File upload failed");
-        }
-
-        assetId = uploadResponse.payload.id;
+    if (uploadResponse.status !== 200) {
+        throw new Error("File upload failed");
     }
 
+    const assetId = uploadResponse.payload.id;
     const result = await mutate({
         optimisticResponse: getOptimisticResponse(id, photo, apollo),
         update: (proxy, response) => {

@@ -28,15 +28,34 @@ import { makeSettingsResolver } from "resolvers/settings-resolver";
 import uiResolver from "resolvers/ui-resolver";
 import userResolver from "resolvers/user-resolver";
 
-class Bootstrap extends React.Component {
-    private apollo: ApolloClient<NormalizedCacheObject>;
-    private history: History;
+interface IBootstrapState {
+    isDone?: boolean;
+}
+
+class Bootstrap extends React.Component<{}, IBootstrapState> {
+    public state: IBootstrapState = {};
+    private apollo?: ApolloClient<NormalizedCacheObject>;
+    private history?: History;
 
     public constructor(props: {}, context: any) {
         super(props, context);
-        console.ignoredYellowBox = ["Remote debugger is in"];
+    }
 
+    public render() {
+        if (!this.state.isDone) {
+            return null;
+        }
+
+        return (
+            <ApolloProvider client={this.apollo!}>
+                <AppContainer history={this.history!} />
+            </ApolloProvider>
+        );
+    }
+
+    public async componentWillMount() {
         if (Config.isDevEnv) {
+            console.ignoredYellowBox = ["Remote debugger is in"];
             Reactotron.configure().useReactNative().connect();
         }
 
@@ -49,17 +68,16 @@ class Bootstrap extends React.Component {
             sessionResolver,
             uiResolver,
         );
-        const cacheResolver = makeCacheResolver(() => this.apollo);
-        this.apollo = apolloFactory(stateResolver, cacheResolver);
-        new DeadlineTracker(this.apollo).start();
-    }
+        const cacheResolver = makeCacheResolver(() => this.apollo!);
 
-    public render() {
-        return (
-            <ApolloProvider client={this.apollo}>
-                <AppContainer history={this.history} />
-            </ApolloProvider>
-        );
+        try {
+            this.apollo = await apolloFactory(stateResolver, cacheResolver);
+        } catch (e) {
+            return;
+        }
+
+        this.setState({ isDone: true });
+        new DeadlineTracker(this.apollo).start();
     }
 
     private initLocale() {

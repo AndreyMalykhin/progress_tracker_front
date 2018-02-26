@@ -20,6 +20,9 @@ import PendingReviewTrackableList, {
     IPendingReviewTrackableListItemNode,
 } from "components/pending-review-trackable-list";
 import withEmptyList from "components/with-empty-list";
+import withEnsureUserLoggedIn, {
+    IWithEnsureUserLoggedInProps,
+} from "components/with-ensure-user-logged-in";
 import withError from "components/with-error";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
@@ -64,6 +67,7 @@ interface IOwnProps extends
 interface IPendingReviewTrackableListContainerProps extends
     IOwnProps,
     InjectedIntlProps,
+    IWithEnsureUserLoggedInProps,
     IWithLoginActionProps,
     IWithRefreshProps,
     IWithLoadMoreProps {
@@ -244,32 +248,8 @@ class PendingReviewTrackableListContainer extends React.Component<
         addToast(toast, this.props.client);
     }
 
-    private ensureUserLoggedIn() {
-        const { session, intl, onLogin } = this.props;
-
-        if (session.accessToken) {
-            return true;
-        }
-
-        const msg = undefined;
-        const { formatMessage } = intl;
-        const title =
-            formatMessage({ id: "pendingReviewList.loginToReview" });
-        Alert.alert(title, msg, [
-            {
-                style: "cancel",
-                text: formatMessage({ id: "common.cancel" }),
-            },
-            {
-                onPress: onLogin,
-                text: formatMessage({ id: "common.login" }),
-            },
-        ]);
-        return false;
-    }
-
     private onStartApproveItem = (id: string) => {
-        if (!this.ensureUserLoggedIn()) {
+        if (!this.props.onEnsureUserLoggedIn()) {
             return;
         }
 
@@ -300,7 +280,7 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private onStartRejectItem = (id: string) => {
-        if (!this.ensureUserLoggedIn()) {
+        if (!this.props.onEnsureUserLoggedIn()) {
             return;
         }
 
@@ -370,4 +350,5 @@ export default compose(
     withLoadMore<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
         "getPendingReviewTrackables", (props) => props.data),
     injectIntl,
+    withEnsureUserLoggedIn,
 )(PendingReviewTrackableListContainer);

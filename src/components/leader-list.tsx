@@ -42,7 +42,7 @@ class LeaderList extends React.Component<ILeaderListProps> {
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
             <FlatList
-                windowSize={10}
+                windowSize={12}
                 initialNumToRender={8}
                 refreshing={isRefreshing}
                 data={items}

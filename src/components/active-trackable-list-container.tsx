@@ -75,6 +75,9 @@ import { IHeaderState } from "components/header";
 import Loader from "components/loader";
 import Toast from "components/toast";
 import withEmptyList from "components/with-empty-list";
+import withEnsureUserLoggedIn, {
+    IWithEnsureUserLoggedInProps,
+} from "components/with-ensure-user-logged-in";
 import withError from "components/with-error";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
@@ -90,8 +93,8 @@ import { debounce, memoize, throttle } from "lodash";
 import { recentDayCount } from "models/gym-exercise";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import * as React from "react";
 import { ReactNode } from "react";
+import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -124,6 +127,7 @@ interface IActiveTrackableListContainerProps extends
     InjectedIntlProps,
     IWithHeaderProps,
     IWithRefreshProps,
+    IWithEnsureUserLoggedInProps,
     IWithLoadMoreProps {
     data: QueryProps & IGetDataResponse;
     onSetTaskDone: (taskId: string, isDone: boolean) =>
@@ -1134,6 +1138,10 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onStartProveItem = async (id: string) => {
+        if (!this.props.onEnsureUserLoggedIn()) {
+            return;
+        }
+
         let image: Image|null;
 
         try {
@@ -1408,4 +1416,5 @@ export default compose(
             || (match.params.id !== defaultId
                 && match.params.id !== session.userId);
     }),
+    withEnsureUserLoggedIn,
 )(ActiveTrackableListContainer);

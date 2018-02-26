@@ -86,6 +86,7 @@
   "dependencies": {
     "@yfuks/react-native-action-sheet": "^0.0.4",
     "apollo-cache-inmemory": "^1.1.4",
+    "apollo-cache-persist": "^0.1.1",
     "apollo-client": "^2.0.4",
     "apollo-link": "^1.0.7",
     "apollo-link-context": "^1.0.5",

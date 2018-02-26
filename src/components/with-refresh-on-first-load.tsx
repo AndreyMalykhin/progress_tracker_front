@@ -1,10 +1,13 @@
 import { FetchPolicy } from "apollo-client/core/watchQueryOptions";
 import * as React from "react";
+import makeLog from "utils/make-log";
 import uuid from "utils/uuid";
 
 interface IWithRefreshOnFirstLoadProps {
     fetchPolicy: FetchPolicy;
 }
+
+const log = makeLog("with-refresh-on-first-load");
 
 function withRefreshOnFirstLoad<P>(getFilter?: (props: P) => string) {
     return (
@@ -15,8 +18,13 @@ function withRefreshOnFirstLoad<P>(getFilter?: (props: P) => string) {
 
         class WithRefetchOnFirstLoad extends React.Component<P> {
             public render() {
-                const fetchPolicy = isNotFirstLoad[filter] ? "cache-first" :
-                    "cache-and-network";
+                let fetchPolicy: FetchPolicy = "cache-first";
+
+                if (!isNotFirstLoad[filter]) {
+                    fetchPolicy = "cache-and-network";
+                    log.trace("render(); fetchPolicy=%o", fetchPolicy);
+                }
+
                 return <Component fetchPolicy={fetchPolicy} {...this.props} />;
             }
 

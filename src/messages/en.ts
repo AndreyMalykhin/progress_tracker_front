@@ -55,6 +55,7 @@ export default {
     "common.less": "Less",
     "common.loading": "Loading...",
     "common.login": "Login",
+    "common.loginToDo": "Please login to do this",
     "common.more": "More",
     "common.no": "No",
     "common.noData": "No data",
@@ -107,7 +108,6 @@ export default {
     "numericalEntryForm.entryPlaceholder": "1",
     "numericalGoalForm.maxProgressLabel": "Max progress",
     "numericalGoalForm.maxProgressPlaceholder": "0",
-    "pendingReviewList.loginToReview": "Please login to do review",
     "pendingReviewList.loginToSeeFriends":
         "Please login to see your friends data",
     "profile.activeTrackables": "In Progress",
