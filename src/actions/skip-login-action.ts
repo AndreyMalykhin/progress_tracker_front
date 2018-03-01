@@ -15,17 +15,9 @@ const log = makeLog("skip-login-action");
 
 function skipLogin(apollo: ApolloClient<NormalizedCacheObject>) {
     log.trace("skipLogin()");
-    initData(apollo);
     const userId = defaultId;
     const accessToken = null;
     setSession(userId, accessToken, apollo);
-}
-
-function initData(apollo: ApolloClient<NormalizedCacheObject>) {
-    initActiveTrackables(apollo);
-    initArchivedTrackables(apollo);
-    initPendingReviewTrackables(apollo);
-    initActivities(apollo);
 }
 
 export { skipLogin };

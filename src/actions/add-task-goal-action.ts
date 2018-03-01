@@ -100,14 +100,17 @@ async function addTaskGoal(
     mutate: MutationFunc<IAddTaskGoalResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
+    const optimisticResponse = getOptimisticResponse(goal, apollo);
     return await mutate({
-        optimisticResponse: getOptimisticResponse(goal, apollo),
+        optimisticResponse,
         update: (proxy, response) => {
             const responseData = response.data as IAddTaskGoalResponse;
             updateActiveTrackables(responseData, proxy);
             updateActivities(responseData, proxy);
         },
-        variables: { goal },
+        variables: {
+            goal: { ...goal, id: optimisticResponse.addTaskGoal.trackable.id },
+        },
     });
 }
 

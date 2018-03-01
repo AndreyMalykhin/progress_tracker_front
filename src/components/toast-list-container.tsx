@@ -19,9 +19,7 @@ interface IGetDataResponse {
 const getDataQuery = gql`
 query GetData {
     ui @client {
-        id
         toasts {
-            id
             msg
         }
     }

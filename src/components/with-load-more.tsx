@@ -1,3 +1,4 @@
+import { IWithNetworkStatusProps } from "components/with-network-status";
 import { throttle } from "lodash";
 import * as React from "react";
 import { QueryProps } from "react-apollo/types";
@@ -13,7 +14,7 @@ interface IResponse {
 }
 
 function withLoadMore<
-    TProps extends IWithLoadMoreProps,
+    TProps extends IWithLoadMoreProps & IWithNetworkStatusProps,
     TResponse extends IResponse
 >(
     responseField: keyof TResponse,
@@ -40,6 +41,7 @@ function withLoadMore<
 
                 if (!response.pageInfo.hasNextPage
                     || isLoading(networkStatus)
+                    || !this.props.isOnline
                 ) {
                     return;
                 }

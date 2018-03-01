@@ -114,6 +114,7 @@ interface IExtraData {
     isAggregationMode?: boolean;
     isReorderMode?: boolean;
     itemsMeta: IActiveTrackableListItemsMeta;
+    isOnline?: boolean;
 }
 
 interface IActiveTrackableListProps extends IExtraData, IWithRefreshProps {
@@ -262,12 +263,14 @@ class ActiveTrackableList extends
             itemsMeta,
             isAggregationMode,
             isReorderMode,
+            isOnline,
         } = this.props;
 
         if (nextProps.queryStatus !== queryStatus
             || nextProps.itemsMeta !== itemsMeta
             || nextProps.isAggregationMode !== isAggregationMode
             || nextProps.isReorderMode !== isReorderMode
+            || nextProps.isOnline !== isOnline
         ) {
             this.initExtraData(nextProps);
         }
@@ -279,9 +282,11 @@ class ActiveTrackableList extends
             itemsMeta,
             isAggregationMode,
             isReorderMode,
+            isOnline,
         } = props;
         this.extraData = {
             isAggregationMode,
+            isOnline,
             isReorderMode,
             itemsMeta,
             queryStatus,
@@ -412,6 +417,7 @@ class ActiveTrackableList extends
             isAggregationMode,
             isReorderMode,
             itemsMeta,
+            isOnline,
             onGetNumericalGoalCommands,
             onToggleItemSelect,
             onLongPressItem,
@@ -441,6 +447,7 @@ class ActiveTrackableList extends
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode && !isAggregated}
                 isProveable={onIsItemProveable(status)}
+                isProveDisabled={!isOnline}
                 isProving={isProving}
                 status={status}
                 commands={commands}
@@ -471,6 +478,7 @@ class ActiveTrackableList extends
             isAggregationMode,
             isReorderMode,
             itemsMeta,
+            isOnline,
             onSetTaskDone,
             onGetTaskGoalCommands,
             onToggleItemSelect,
@@ -503,6 +511,7 @@ class ActiveTrackableList extends
                 visibleTaskCount={visibleTaskCount}
                 progressDisplayMode={progressDisplayMode}
                 isProveable={onIsItemProveable(status)}
+                isProveDisabled={!isOnline}
                 isProving={isProving}
                 isDragged={dragStatus != null}
                 isSelected={isSelected}

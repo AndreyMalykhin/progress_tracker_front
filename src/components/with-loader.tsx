@@ -1,52 +1,52 @@
 import { IWithSessionProps } from "components/with-session";
 import * as React from "react";
 import { QueryProps } from "react-apollo";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
-
-interface IOwnProps {
-    [prop: string]: QueryProps;
-}
 
 interface IState {
     isVisible?: boolean;
 }
 
-interface IOptions {
-    minDuration: number;
-    queryProp: string;
-    showIfNoQuery: boolean;
+interface IOptions<TProps, TData> {
+    dataField: keyof TData;
+    minDuration?: number;
+    showIfNoQuery?: boolean;
+    getQuery: (props: TProps) => (QueryProps & TData) | undefined;
 }
 
-const defaultOptions: IOptions = {
+const log = makeLog("with-loader");
+
+const defaultOptions: Partial< IOptions<any, any> > = {
     minDuration: 0,
-    queryProp: "data",
     showIfNoQuery: true,
 };
 
-function withLoader<P extends {}, T>(
-    loader: React.ComponentType<T>, options?: Partial<IOptions>,
+function withLoader<TProps extends {}, TData extends {}>(
+    loader: React.ComponentType, options: IOptions<TProps, TData>,
 ) {
-    return (Component: React.ComponentType<P>) => {
-        const { minDuration, queryProp, showIfNoQuery } = {
+    return (Component: React.ComponentType<TProps>) => {
+        const { minDuration, getQuery, showIfNoQuery, dataField } = {
             ...defaultOptions, ...options,
         };
 
-        class WithLoader extends React.Component<P & IOwnProps, IState> {
+        class WithLoader extends React.Component<TProps, IState> {
             public state: IState = {};
             private timeoutId?: NodeJS.Timer;
 
             public render() {
+                log.trace("render(); isVisible=%o", this.state.isVisible);
                 return this.state.isVisible ? React.createElement(loader) :
                     <Component {...this.props} />;
             }
 
             public componentWillMount() {
-                this.updateVisibility(this.props[queryProp]);
+                this.updateVisibility(getQuery(this.props));
             }
 
-            public componentWillReceiveProps(nextProps: P & IOwnProps) {
-                const prevQuery: QueryProps = this.props[queryProp];
-                const nextQuery: QueryProps = nextProps[queryProp];
+            public componentWillReceiveProps(nextProps: TProps) {
+                const prevQuery = getQuery(this.props);
+                const nextQuery = getQuery(nextProps);
                 const prevNetworkStatus = prevQuery && prevQuery.networkStatus;
                 const nextNetworkStatus = nextQuery && nextQuery.networkStatus;
 
@@ -58,18 +58,19 @@ function withLoader<P extends {}, T>(
                     return;
                 }
 
-                this.updateVisibility(nextProps[queryProp]);
+                this.updateVisibility(nextQuery);
             }
 
             public componentWillUnmount() {
                 clearTimeout(this.timeoutId!);
             }
 
-            private updateVisibility(query?: QueryProps) {
+            private updateVisibility(query?: QueryProps & TData) {
                 let isVisible = false;
                 const networkStatus = query && query.networkStatus;
+                const data = query && query[dataField];
 
-                if (networkStatus === QueryStatus.Ready) {
+                if (networkStatus === QueryStatus.Ready || data) {
                     if (minDuration) {
                         isVisible = true;
 
@@ -78,11 +79,14 @@ function withLoader<P extends {}, T>(
                         }
 
                         this.timeoutId = setTimeout(() => {
-                            const newQuery: QueryProps = this.props[queryProp];
+                            const newQuery = getQuery(this.props);
                             const newNetworkStatus =
                                 newQuery && newQuery.networkStatus;
+                            const newData = newQuery && newQuery[dataField];
 
-                            if (newNetworkStatus === networkStatus) {
+                            if (newNetworkStatus === QueryStatus.Ready
+                                || newData
+                            ) {
                                 this.setState({ isVisible: false });
                             }
                         }, minDuration);

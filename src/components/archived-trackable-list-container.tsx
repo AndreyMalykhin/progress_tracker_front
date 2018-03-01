@@ -1,20 +1,27 @@
-import { isAnonymous } from "actions/session-helpers";
 import ArchivedTrackableList, {
     IArchivedTrackableListItemNode,
 } from "components/archived-trackable-list";
 import EmptyList from "components/empty-list";
 import Error from "components/error";
 import Loader from "components/loader";
+import Offline from "components/offline";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
+import withFetchPolicy, {
+    IWithFetchPolicyProps,
+} from "components/with-fetch-policy";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
+import withNetworkStatus, {
+    IWithNetworkStatusProps,
+} from "components/with-network-status";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
+import withOffline from "components/with-offline";
 import withRefresh, { IWithRefreshProps } from "components/with-refresh";
-import withRefreshOnFirstLoad, {
-    IWithRefreshOnFirstLoadProps,
-} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
+import withSyncStatus, {
+    IWithSyncStatusProps,
+} from "components/with-sync-status";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -24,10 +31,11 @@ import { QueryProps } from "react-apollo/types";
 import { IConnection } from "utils/connection";
 import defaultId from "utils/default-id";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
+import isMyId from "utils/is-my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
 
 interface IArchivedTrackableListContainerProps extends
-    IWithLoadMoreProps, IWithRefreshProps, IOwnProps {
+    IWithLoadMoreProps, IWithRefreshProps, IOwnProps, IWithSyncStatusProps {
     data: QueryProps & IGetDataResponse;
 }
 
@@ -35,7 +43,8 @@ interface IGetDataResponse {
     getArchivedTrackables: IConnection<IArchivedTrackableListItemNode, number>;
 }
 
-interface IOwnProps extends IWithRefreshOnFirstLoadProps, IWithSessionProps {
+interface IOwnProps extends
+    IWithFetchPolicyProps, IWithSessionProps, IWithNetworkStatusProps {
     userId: string;
     trackableStatus: TrackableStatus;
 }
@@ -87,16 +96,11 @@ const withData = graphql<
     getDataQuery,
     {
         options: (ownProps) => {
-            const { trackableStatus, session } = ownProps;
+            const { fetchPolicy, trackableStatus, session } = ownProps;
             let userId: string|undefined = ownProps.userId;
-            let { fetchPolicy } = ownProps;
 
             if (userId === defaultId || userId === session.userId) {
                 userId = undefined;
-
-                if (isAnonymous(session)) {
-                    fetchPolicy = "cache-only";
-                }
             }
 
             return {
@@ -134,16 +138,27 @@ class ArchivedTrackableListContainer extends
 
 export default compose(
     withSession,
-    withRefreshOnFirstLoad<IArchivedTrackableListContainerProps>(
-        (props) => `${props.userId}_${props.trackableStatus}`),
+    withNetworkStatus,
+    withSyncStatus,
+    withFetchPolicy<IArchivedTrackableListContainerProps>({
+        getNamespace: (props) => `${props.userId}_${props.trackableStatus}`,
+        isMyData: (props) => isMyId(props.userId, props.session),
+        isReadonlyData: (props) => false,
+    }),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, { minDuration: 512 }),
-    withError(Error),
-    withRefresh<IArchivedTrackableListContainerProps>((props) => {
-        const { session, userId } = props;
-        return !isAnonymous(session)
-            || (userId !== defaultId && userId !== session.userId);
+    withLoader<IArchivedTrackableListContainerProps, IGetDataResponse>(Loader, {
+        dataField: "getArchivedTrackables",
+        getQuery: (props) => props.data,
+    }),
+    withError<IArchivedTrackableListContainerProps>(
+        Error, (props) => props.data),
+    withOffline<IArchivedTrackableListContainerProps, IGetDataResponse>(
+        Offline, "getArchivedTrackables", (props) => props.data),
+    withRefresh<IArchivedTrackableListContainerProps>({
+        getQuery: (props) => props.data,
+        isMyData: (props) => isMyId(props.userId, props.session),
+        isReadonlyData: (props) => false,
     }),
     withEmptyList<IArchivedTrackableListContainerProps>(
         EmptyList, (props) => props.data.getArchivedTrackables.edges),

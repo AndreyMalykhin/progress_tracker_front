@@ -4,7 +4,6 @@ import graphql from "react-apollo/graphql";
 
 interface IGetDataResponse {
     session: {
-        id: string;
         accessToken?: string;
         userId?: string;
     };
@@ -20,7 +19,6 @@ interface IWithSessionProps {
 const getDataQuery = gql`
 query GetData {
     session @client {
-        id
         accessToken
         userId
     }

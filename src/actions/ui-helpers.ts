@@ -6,20 +6,16 @@ import defaultId from "utils/default-id";
 
 const setContextModeFragment = gql`
 fragment SetContextModeUIFragment on UI {
-    id
     isContextMode
 }`;
 
+const fragmentId = dataIdFromObject({ __typename: Type.UI, id: defaultId })!;
+
 function setContextMode(isOn: boolean, apollo: DataProxy) {
-    const ui = {
-        __typename: Type.UI,
-        id: defaultId,
-        isContextMode: isOn,
-    };
     apollo.writeFragment({
-        data: ui,
+        data: { __typename: Type.UI, isContextMode: isOn },
         fragment: setContextModeFragment,
-        id: dataIdFromObject(ui)!,
+        id: fragmentId,
     });
 }
 

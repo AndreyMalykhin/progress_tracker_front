@@ -9,6 +9,7 @@ interface IGoalProps {
     parentId?: string;
     status: TrackableStatus;
     isProveable?: boolean;
+    isProveDisabled?: boolean;
     isProving?: boolean;
     isBatchEditMode?: boolean;
     isSelected?: boolean;

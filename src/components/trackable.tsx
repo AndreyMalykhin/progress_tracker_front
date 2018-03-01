@@ -32,6 +32,7 @@ interface ITrackableProps {
     parentId?: string;
     status: TrackableStatus;
     isProveable?: boolean;
+    isProveDisabled?: boolean;
     isProving?: boolean;
     isReviewable?: boolean;
     isBatchEditMode?: boolean;
@@ -256,10 +257,10 @@ class Trackable extends React.Component<ITrackableProps> {
     }
 
     private renderProveBtn() {
-        const { isDisabled, isProving, onProve } = this.props;
+        const { isDisabled, isProving, isProveDisabled, onProve } = this.props;
         return (
             <ProveButton
-                isDisabled={isDisabled}
+                isDisabled={isDisabled || isProveDisabled}
                 isLoading={isProving}
                 onPress={onProve && this.onProve}
             />

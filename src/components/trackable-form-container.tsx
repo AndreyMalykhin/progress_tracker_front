@@ -32,6 +32,7 @@ interface ITrackableFormContainerProps<T extends ITrackable> extends
     InjectedIntlProps {
     trackable?: T;
     isUserLoggedIn: boolean;
+    isOnline?: boolean;
 }
 
 interface ITrackableFormContainerState {
@@ -98,7 +99,7 @@ abstract class TrackableFormContainer<
             isIconPickerOpen,
             share: shareWithFriends,
         } = this.state;
-        const { isUserLoggedIn } = this.props;
+        const { isUserLoggedIn, isOnline } = this.props;
         const isNew = this.isNew();
         return {
             availableIconNames: icons,
@@ -106,7 +107,7 @@ abstract class TrackableFormContainer<
             isIconPickerOpen,
             isPublic,
             isPublicDisabled: this.isPublicDisabled(isNew, isUserLoggedIn),
-            isShareDisabled: !isUserLoggedIn,
+            isShareDisabled: !isUserLoggedIn || !isOnline,
             isShareable: isNew,
             onChangeIcon: this.onChangeIcon,
             onChangePublic: this.onChangePublic,
@@ -210,10 +211,10 @@ abstract class TrackableFormContainer<
         const isNew = this.isNew();
 
         if (isNew) {
-            const { isUserLoggedIn } = this.props;
+            const { isUserLoggedIn, isOnline } = this.props;
             state = Object.assign({
                 isPublic: isUserLoggedIn,
-                share: isUserLoggedIn,
+                share: isUserLoggedIn && isOnline,
             }, this.getInitialStateForAdd());
         } else {
             const { iconName, isPublic, title } = this.props.trackable!;

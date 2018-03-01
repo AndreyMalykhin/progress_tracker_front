@@ -12,6 +12,7 @@ import { compose, QueryProps } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { MessageValue } from "react-intl";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
+import makeLog from "utils/make-log";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 
@@ -34,15 +35,15 @@ interface IGetDataResponse {
 
 interface IGetSettingsResponse {
     settings: {
-        id: string;
-        locale?: string;
+        locale: string;
     };
 }
+
+const log = makeLog("app-container");
 
 const getSettingsQuery = gql`
 query GetSettings {
     settings @client {
-        id
         locale
     }
 }`;
@@ -93,6 +94,7 @@ class AppContainer extends React.Component<IAppContainerProps> {
     }
 
     public componentWillMount() {
+        log.trace("componentWillMount()");
         this.initMessages(this.props);
     }
 
@@ -114,6 +116,9 @@ class AppContainer extends React.Component<IAppContainerProps> {
 export default compose(
     withSettings,
     withData,
-    withLoader(Loader, { showIfNoQuery: false }),
-    withError(Error),
+    withLoader<IAppContainerProps, IGetDataResponse>(Loader, {
+        dataField: "getMessages",
+        getQuery: (props) => props.data,
+        showIfNoQuery: false,
+    }),
 )(AppContainer);

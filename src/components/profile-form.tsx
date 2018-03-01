@@ -22,6 +22,7 @@ interface IProfileFormProps {
     isAvatarChanging?: boolean;
     onChangeAvatar: (img: Image|null) => void;
     onChangeName: (name: string) => void;
+    onLogout: () => void;
 }
 
 class ProfileForm extends React.Component<IProfileFormProps> {
@@ -37,10 +38,23 @@ class ProfileForm extends React.Component<IProfileFormProps> {
             isAvatarChanging,
             onChangeAvatar,
             onChangeName,
+            onLogout,
         } = this.props;
-        const loginGroup = !isUserLoggedIn && (
-            <LoginContainer msgId="profileForm.loginMessage" />
-        );
+        let authGroup;
+
+        if (isUserLoggedIn) {
+            authGroup = (
+                <FormGroup>
+                    <Button style={styles.logoutBtn} onPress={onLogout}>
+                        <ButtonTitle dangerous={true} msgId="common.logout" />
+                    </Button>
+                </FormGroup>
+            );
+        } else {
+            authGroup = (
+                <LoginContainer msgId="profileForm.loginMessage" />
+            );
+        }
 
         return (
             <KeyboardAwareScrollView contentContainerStyle={styles.container}>
@@ -60,7 +74,7 @@ class ProfileForm extends React.Component<IProfileFormProps> {
                         value={name}
                         onChangeText={onChangeName}
                     />
-                    {loginGroup}
+                    {authGroup}
                 </FormBody>
             </KeyboardAwareScrollView>
         );
@@ -72,7 +86,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    loginGroup: {},
+    logoutBtn: {
+        alignSelf: "center",
+    },
 });
 
 export default ProfileForm;

@@ -13,15 +13,25 @@ import {
     IHeaderState,
 } from "components/header";
 import Loader from "components/loader";
+import Offline from "components/offline";
 import ProfileSection, {
     IProfileSectionNavItem, IProfileSectionProps,
 } from "components/profile-section";
 import withError from "components/with-error";
+import withFetchPolicy, {
+    IWithFetchPolicyProps,
+} from "components/with-fetch-policy";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoader from "components/with-loader";
+import withNetworkStatus, {
+    IWithNetworkStatusProps,
+} from "components/with-network-status";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
-import withRefreshOnFirstLoad, { IWithRefreshOnFirstLoadProps } from "components/with-refresh-on-first-load";
+import withOffline from "components/with-offline";
 import withSession, { IWithSessionProps } from "components/with-session";
+import withSyncStatus, {
+    IWithSyncStatusProps,
+} from "components/with-sync-status";
 import gql from "graphql-tag";
 import ReportReason from "models/report-reason";
 import TrackableStatus from "models/trackable-status";
@@ -37,12 +47,15 @@ import defaultId from "utils/default-id";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import IconName from "utils/icon-name";
 import { IWithApolloProps } from "utils/interfaces";
+import isMyId from "utils/is-my-id";
+import makeLog from "utils/make-log";
 import QueryStatus, { isLoading } from "utils/query-status";
 import routes from "utils/routes";
 
 interface IProfileSectionContainerProps extends
     IOwnProps,
     InjectedIntlProps,
+    IWithSyncStatusProps,
     IWithHeaderProps {
     remoteData: QueryProps & IGetRemoteDataResponse;
     localData: QueryProps & IGetLocalDataResponse;
@@ -54,7 +67,8 @@ interface IOwnProps extends
     RouteComponentProps<IRouteParams>,
     IWithSessionProps,
     IWithApolloProps,
-    IWithRefreshOnFirstLoadProps {}
+    IWithNetworkStatusProps,
+    IWithFetchPolicyProps {}
 
 interface IGetRemoteDataResponse {
     getUser: {
@@ -75,6 +89,8 @@ interface IGetLocalDataResponse {
 interface IRouteParams {
     id?: string;
 }
+
+const log = makeLog("profile-section-container");
 
 const withReportUser =
     graphql<IReportUserResponse, IOwnProps, IProfileSectionContainerProps>(
@@ -103,7 +119,6 @@ query GetData($userId: ID) {
 const getLocalDataQuery = gql`
 query GetData {
     ui @client {
-        id
         isContextMode
     }
 }`;
@@ -127,14 +142,18 @@ const withRemoteData =
         getRemoteDataQuery,
         {
             options: (ownProps) => {
-                const { match, session } = ownProps;
+                const { fetchPolicy, match, session } = ownProps;
                 let userId = match.params.id;
 
-                if (userId === defaultId || userId === session.userId) {
+                if (!userId
+                    || userId === defaultId
+                    || userId === session.userId
+                ) {
                     userId = undefined;
                 }
 
                 return {
+                    fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                     variables: { userId },
                 };
@@ -203,12 +222,20 @@ class ProfileSectionContainer
         );
     }
 
+    public componentWillMount() {
+        log.trace("componentWillMount()");
+    }
+
     public componentWillReceiveProps(nextProps: IProfileSectionContainerProps) {
+        if (this.props.match.params.id !== nextProps.match.params.id) {
+            this.initNavItems(nextProps.match.params.id);
+        }
+
         const nextUser = nextProps.remoteData.getUser;
         const prevUser = this.props.remoteData.getUser;
 
-        if (this.props.match.params.id !== nextProps.match.params.id) {
-            this.initNavItems(nextProps.match.params.id);
+        if (prevUser === nextUser) {
+            return;
         }
 
         if (prevUser.id !== nextUser.id
@@ -219,6 +246,10 @@ class ProfileSectionContainer
         ) {
             this.updateHeader(nextProps);
         }
+    }
+
+    public componentWillUnmount() {
+        log.trace("componentWillUnmount()");
     }
 
     private initNavItems(userId?: string) {
@@ -246,9 +277,12 @@ class ProfileSectionContainer
     }
 
     private updateHeader(props: IProfileSectionContainerProps) {
-        const { remoteData, header, session } = props;
+        const { remoteData, header, session, match } = props;
         const user = remoteData.getUser;
-        const isMe = user.id === session.userId;
+        const isMe = !match.params.id
+            || match.params.id === defaultId
+            || match.params.id === session.userId
+            || (user && user.id === session.userId);
         const rightCommands: IHeaderCmd[] = [];
 
         if (isMe) {
@@ -257,15 +291,16 @@ class ProfileSectionContainer
                 msgId: "commands.new",
                 onRun: this.onStartNewTrackable,
             });
-        } else if (!user.isReported && session.accessToken) {
+        } else if (user && !user.isReported) {
             rightCommands.push({
                 iconName: IconName.Report,
+                isDisabled: !session.accessToken,
                 msgId: "commands.report",
                 onRun: this.onStartReportUser,
             });
         }
 
-        const leftCommand = {
+        const leftCommand = user && {
             imgUrl: user.avatarUrlSmall,
             msgId: isMe ? "commands.edit" : "commands.profile",
             onRun: isMe ? this.onEditProfile : undefined,
@@ -273,9 +308,9 @@ class ProfileSectionContainer
         header.replace({
             leftCommand,
             rightCommands,
-            subtitleIcon: "star-circle",
-            subtitleText: user.rating,
-            title: user.name,
+            subtitleIcon: user && "star-circle",
+            subtitleText: user && user.rating,
+            title: user && user.name,
         });
     }
 
@@ -332,12 +367,21 @@ export default compose(
     withHeader,
     withSession,
     withLocalData,
-    withRefreshOnFirstLoad<IProfileSectionContainerProps>(
-        (props) => String(props.match.params.id)),
+    withNetworkStatus,
+    withSyncStatus,
+    withFetchPolicy<IProfileSectionContainerProps>({
+        getNamespace: (props) => props.match.params.id,
+        isMyData: (props) => isMyId(props.match.params.id, props.session),
+        isReadonlyData: () => false,
+    }),
     withRemoteData,
     withNoUpdatesInBackground,
-    withLoader(Loader, { queryProp: "remoteData" }),
-    withError(Error, { queryProp: "remoteData" }),
+    withLoader<IProfileSectionContainerProps, IGetRemoteDataResponse>(Loader, {
+        dataField: "getUser",
+        getQuery: (props) => props.remoteData,
+    }),
+    withError<IProfileSectionContainerProps>(
+        Error, (props) => props.remoteData),
     withApollo,
     withReportUser,
     injectIntl,

@@ -128,13 +128,17 @@ async function aggregateTrackables(
     mutate: MutationFunc<IAggregateTrackablesResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
+    const optimisticResponse = getOptimisticResponse(ids, apollo);
     return await mutate({
-        optimisticResponse: getOptimisticResponse(ids, apollo),
+        optimisticResponse,
         update: (proxy, response) => {
             updateActiveTrackables(
                 response.data as IAggregateTrackablesResponse, proxy);
         },
-        variables: { ids },
+        variables: {
+            ids,
+            newTrackableId: optimisticResponse.aggregateTrackables.trackable.id,
+        },
     });
 }
 

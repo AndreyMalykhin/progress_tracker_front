@@ -73,21 +73,29 @@ import {
 } from "components/gym-exercise-entry-popup";
 import { IHeaderState } from "components/header";
 import Loader from "components/loader";
+import Offline from "components/offline";
 import Toast from "components/toast";
 import withEmptyList from "components/with-empty-list";
 import withEnsureUserLoggedIn, {
     IWithEnsureUserLoggedInProps,
 } from "components/with-ensure-user-logged-in";
 import withError from "components/with-error";
+import withFetchPolicy, {
+    IWithFetchPolicyProps,
+} from "components/with-fetch-policy";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
+import withNetworkStatus, {
+    IWithNetworkStatusProps,
+} from "components/with-network-status";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
+import withOffline from "components/with-offline";
 import withRefresh, { IWithRefreshProps } from "components/with-refresh";
-import withRefreshOnFirstLoad, {
-    IWithRefreshOnFirstLoadProps,
-} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
+import withSyncStatus, {
+    IWithSyncStatusProps,
+} from "components/with-sync-status";
 import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
 import { recentDayCount } from "models/gym-exercise";
@@ -117,6 +125,8 @@ import DragStatus from "utils/drag-status";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
+import isMyId from "utils/is-my-id";
+import makeLog from "utils/make-log";
 import openImgPicker from "utils/open-img-picker";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
@@ -128,6 +138,7 @@ interface IActiveTrackableListContainerProps extends
     IWithHeaderProps,
     IWithRefreshProps,
     IWithEnsureUserLoggedInProps,
+    IWithSyncStatusProps,
     IWithLoadMoreProps {
     data: QueryProps & IGetDataResponse;
     onSetTaskDone: (taskId: string, isDone: boolean) =>
@@ -152,9 +163,10 @@ interface IActiveTrackableListContainerProps extends
 
 interface IOwnProps extends
     RouteComponentProps<IRouteParams>,
+    IWithNetworkStatusProps,
     IWithApolloProps,
     IWithSessionProps,
-    IWithRefreshOnFirstLoadProps {}
+    IWithFetchPolicyProps {}
 
 interface IActiveTrackableListContainerState {
     itemsMeta: IActiveTrackableListItemsMeta;
@@ -181,6 +193,8 @@ interface IGetDataResponse {
 interface IShareProvedGoalFragment {
     title: string;
 }
+
+const log = makeLog("active-trackable-list-container");
 
 const withReorder =
     graphql<IReorderTrackableResponse, IOwnProps, IActiveTrackableListContainerProps>(
@@ -440,16 +454,10 @@ const withData =
         {
             options: (ownProps) => {
                 let userId: string|undefined = ownProps.match.params.id;
-                let { fetchPolicy } = ownProps;
+                const { fetchPolicy, session } = ownProps;
 
-                if (userId === defaultId
-                    || userId === ownProps.session.userId
-                ) {
+                if (userId === defaultId || userId === session.userId) {
                     userId = undefined;
-
-                    if (isAnonymous(ownProps.session)) {
-                        fetchPolicy = "cache-only";
-                    }
                 }
 
                 return {
@@ -510,10 +518,12 @@ class ActiveTrackableListContainer extends React.Component<
             isReorderMode,
             itemsMeta,
         } = this.state;
-        const { onLoadMore, onRefresh, data, isRefreshing } = this.props;
+        const { onLoadMore, onRefresh, data, isRefreshing, isOnline } =
+            this.props;
         const { getActiveTrackables, networkStatus } = data;
         return (
             <ActiveTrackableList
+                isOnline={isOnline}
                 isRefreshing={isRefreshing}
                 isNumericalEntryPopupOpen={numericalEntryPopup.isOpen}
                 isGymExerciseEntryPopupOpen={gymExerciseEntryPopup.isOpen}
@@ -552,6 +562,10 @@ class ActiveTrackableListContainer extends React.Component<
                 onRefresh={onRefresh}
             />
         );
+    }
+
+    public componentWillMount() {
+        log.trace("componentWillMount()");
     }
 
     public componentWillReceiveProps(
@@ -1199,7 +1213,7 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private tryShareProvedGoal(response: IProveTrackableResponse) {
-        if (!this.props.session.accessToken) {
+        if (isAnonymous(this.props.session)) {
             return Promise.resolve();
         }
 
@@ -1390,12 +1404,22 @@ export default compose(
     withRouter,
     withHeader,
     withSession,
-    withRefreshOnFirstLoad<IActiveTrackableListContainerProps>(
-        (props) => props.match.params.id),
+    withNetworkStatus,
+    withSyncStatus,
+    withFetchPolicy<IActiveTrackableListContainerProps>({
+        getNamespace: (props) => props.match.params.id,
+        isMyData: (props) => isMyId(props.match.params.id, props.session),
+        isReadonlyData: (props) => false,
+    }),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, { minDuration: 512 }),
-    withError(Error),
+    withLoader<IActiveTrackableListContainerProps, IGetDataResponse>(Loader, {
+        dataField: "getActiveTrackables",
+        getQuery: (props) => props.data,
+    }),
+    withError<IActiveTrackableListContainerProps>(Error, (props) => props.data),
+    withOffline<IActiveTrackableListContainerProps, IGetDataResponse>(
+        Offline, "getActiveTrackables", (props) => props.data),
     withApollo,
     withReorder,
     withSetTaskDone,
@@ -1410,11 +1434,10 @@ export default compose(
     withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>(
         "getActiveTrackables", (props) => props.data),
     injectIntl,
-    withRefresh<IActiveTrackableListContainerProps>((props) => {
-        const { session, match } = props;
-        return !isAnonymous(session)
-            || (match.params.id !== defaultId
-                && match.params.id !== session.userId);
+    withRefresh<IActiveTrackableListContainerProps>({
+        getQuery: (props) => props.data,
+        isMyData: (props) => isMyId(props.match.params.id, props.session),
+        isReadonlyData: (props) => false,
     }),
     withEnsureUserLoggedIn,
 )(ActiveTrackableListContainer);

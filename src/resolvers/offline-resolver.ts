@@ -2,22 +2,23 @@ import Type from "models/type";
 import IStateResolver from "resolvers/state-resolver";
 import defaultId from "utils/default-id";
 
-const uiResolver: IStateResolver = {
+const offlineResolver: IStateResolver = {
     defaults: {
-        ui: {
-            __typename: Type.UI,
+        offline: {
+            __typename: Type.Offline,
+            hasOperations: false,
             id: defaultId,
-            toasts: [],
+            operations: [],
         },
     },
     nonPersistentDefaults: {
-        ui: {
-            __typename: Type.UI,
+        offline: {
+            __typename: Type.Offline,
             id: defaultId,
-            isContextMode: false,
+            isOnline: null,
         },
     },
     resolvers: {},
 };
 
-export default uiResolver;
+export default offlineResolver;

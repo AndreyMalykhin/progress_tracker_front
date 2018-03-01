@@ -15,14 +15,17 @@ import * as React from "react";
 import { ApolloProvider } from "react-apollo";
 import { getDeviceLocale } from "react-native-device-info";
 import Reactotron from "reactotron-react-native";
-import apolloFactory from "utils/apollo-factory";
 import Config from "utils/config";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
+import makeApollo from "utils/make-apollo";
+import makeCache from "utils/make-cache";
 import MultiStackHistory from "utils/multi-stack-history";
+import { makeNetworkTracker } from "utils/network-tracker";
 
 import { makeCacheResolver } from "resolvers/cache-resolver";
 import { makeMessageResolver } from "resolvers/message-resolver";
+import offlineResolver from "resolvers/offline-resolver";
 import sessionResolver from "resolvers/session-resolver";
 import { makeSettingsResolver } from "resolvers/settings-resolver";
 import uiResolver from "resolvers/ui-resolver";
@@ -67,17 +70,21 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
             userResolver,
             sessionResolver,
             uiResolver,
+            offlineResolver,
         );
         const cacheResolver = makeCacheResolver(() => this.apollo!);
+        let cache;
 
         try {
-            this.apollo = await apolloFactory(stateResolver, cacheResolver);
+            cache = await makeCache(stateResolver, cacheResolver);
         } catch (e) {
             return;
         }
 
-        this.setState({ isDone: true });
+        this.apollo = makeApollo(cache, stateResolver);
+        const networkTracker = await makeNetworkTracker(this.apollo);
         new DeadlineTracker(this.apollo).start();
+        this.setState({ isDone: true });
     }
 
     private initLocale() {

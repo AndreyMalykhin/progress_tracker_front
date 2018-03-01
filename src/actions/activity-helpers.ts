@@ -38,6 +38,7 @@ interface ISpliceActivitiesFragment {
 }
 
 interface IGetActivitiesResponse {
+    __typename: Type;
     getActivities: IConnection<ISpliceActivitiesFragment, number>;
 }
 
@@ -189,7 +190,7 @@ function compareActivities(
 }
 
 function initActivities(apollo: DataProxy) {
-    const data = {
+    const data: IGetActivitiesResponse = {
         __typename: Type.Query,
         getActivities: {
             __typename: Type.ActivityConnection,

@@ -56,9 +56,11 @@ export default {
     "common.loading": "Loading...",
     "common.login": "Login",
     "common.loginToDo": "Please login to do this",
+    "common.logout": "Logout",
     "common.more": "More",
     "common.no": "No",
-    "common.noData": "No data",
+    "common.noData": "Nothing to show",
+    "common.offline": "You are offline",
     "common.ok": "OK",
     "common.refresh": "Refresh",
     "common.remove": "Remove",
@@ -99,6 +101,9 @@ export default {
     "leaderList.loginToSeeFriends": "Please login to see your friends data",
     "leadersNavigation.friends": "Friends",
     "leadersNavigation.global": "Global",
+    "logout.synchronizationInProgressTitle": "You have data that is not " +
+        "synchronized with a server yet, if you logout then this data will be" +
+        " lost!",
     "notifications.goalAchieved": "Goal achieved! Now it's time to prove it.",
     "notifications.goalApproved": "Goal approved!",
     "notifications.goalPendingReview": "Goal is pending review now.",

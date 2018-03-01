@@ -4,25 +4,21 @@ import {
 } from "apollo-cache-inmemory/lib/inMemoryCache";
 
 interface IConfig extends ApolloReducerConfig {
-    defaults?: object;
+    onWriteDefaults?: (cache: InMemoryCache) => void;
 }
 
 class InMemoryCache extends InMemoryCacheImpl {
-    private defaults?: object;
+    private onWriteDefaults?: (cache: InMemoryCache) => void;
 
     public constructor(config?: IConfig) {
         super(config);
-        this.defaults = config && config.defaults;
+        this.onWriteDefaults = config && config.onWriteDefaults;
     }
 
-    public writeDefaults() {
-        this.writeData({ data: this.defaults });
-    }
-
-    public reset() {
+    public async reset() {
         this.data.clear();
-        this.defaults ? this.writeDefaults() : this.broadcastWatches();
-        return Promise.resolve();
+        return this.onWriteDefaults ? await this.onWriteDefaults(this) :
+            this.broadcastWatches();
     }
 }
 

@@ -13,11 +13,14 @@ import { StyleSheet, View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
 import defaultId from "utils/default-id";
 import IconName from "utils/icon-name";
+import makeLog from "utils/make-log";
 import routes from "utils/routes";
 
 interface INavItem extends INavBarItem {
     component: React.ComponentType;
 }
+
+const log = makeLog("home-page");
 
 const myActiveTrackablesRoute = routes.profileActiveTrackables.path.replace(
     ":id", defaultId);
@@ -102,6 +105,10 @@ class HomePage extends React.Component {
                 <GlobalNav items={navItems} />
             </View>
         );
+    }
+
+    public componentWillMount() {
+        log.trace("componentWillMount()");
     }
 }
 

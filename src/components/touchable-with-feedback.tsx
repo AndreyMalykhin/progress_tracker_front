@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+    GestureResponderEvent,
     Platform,
     TouchableNativeFeedback,
     TouchableOpacity,
@@ -15,7 +16,8 @@ interface ITouchableWithFeedbackProps extends
 class TouchableWithFeedback extends
     React.Component<ITouchableWithFeedbackProps> {
     public render() {
-        const { isAnimationDisabled, children, ...restProps } = this.props;
+        const { isAnimationDisabled, children, onPress, ...restProps } =
+            this.props;
         let Component;
 
         if (isAnimationDisabled) {
@@ -26,7 +28,19 @@ class TouchableWithFeedback extends
             Component = TouchableOpacity;
         }
 
-        return <Component {...restProps}>{children}</Component>;
+        return (
+            <Component onPress={onPress && this.onPress} {...restProps}>
+                {children}
+            </Component>
+        );
+    }
+
+    private onPress = (e: GestureResponderEvent) => {
+        requestAnimationFrame(() => {
+            if (this.props.onPress) {
+                this.props.onPress(e);
+            }
+        });
     }
 }
 

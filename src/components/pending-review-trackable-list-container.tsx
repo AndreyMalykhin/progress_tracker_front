@@ -8,7 +8,6 @@ import {
     rejectTrackable,
     rejectTrackableQuery,
 } from "actions/reject-trackable-action";
-import { isAnonymous } from "actions/session-helpers";
 import { addGenericErrorToast, addToast } from "actions/toast-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -16,6 +15,7 @@ import ActionSheet, { IActionSheetOption } from "components/action-sheet";
 import EmptyList from "components/empty-list";
 import Error from "components/error";
 import Loader from "components/loader";
+import Offline from "components/offline";
 import PendingReviewTrackableList, {
     IPendingReviewTrackableListItemNode,
 } from "components/pending-review-trackable-list";
@@ -24,18 +24,25 @@ import withEnsureUserLoggedIn, {
     IWithEnsureUserLoggedInProps,
 } from "components/with-ensure-user-logged-in";
 import withError from "components/with-error";
+import withFetchPolicy, {
+    IWithFetchPolicyProps,
+} from "components/with-fetch-policy";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withLogin from "components/with-login";
 import withLoginAction, {
     IWithLoginActionProps,
 } from "components/with-login-action";
+import withNetworkStatus, {
+    IWithNetworkStatusProps,
+} from "components/with-network-status";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
+import withOffline from "components/with-offline";
 import withRefresh, { IWithRefreshProps } from "components/with-refresh";
-import withRefreshOnFirstLoad, {
-    IWithRefreshOnFirstLoadProps,
-} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
+import withSyncStatus, {
+    IWithSyncStatusProps,
+} from "components/with-sync-status";
 import gql from "graphql-tag";
 import Audience from "models/audience";
 import Difficulty from "models/difficulty";
@@ -56,14 +63,6 @@ import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
-interface IOwnProps extends
-    RouteComponentProps<{}>,
-    IWithApolloProps,
-    IWithRefreshOnFirstLoadProps,
-    IWithSessionProps {
-    audience: Audience;
-}
-
 interface IPendingReviewTrackableListContainerProps extends
     IOwnProps,
     InjectedIntlProps,
@@ -76,6 +75,16 @@ interface IPendingReviewTrackableListContainerProps extends
         Promise<IApproveTrackableResponse>;
     onCommitRejectItem: (id: string, reason: RejectReason) =>
         Promise<IRejectTrackableResponse>;
+}
+
+interface IOwnProps extends
+    RouteComponentProps<{}>,
+    IWithApolloProps,
+    IWithFetchPolicyProps,
+    IWithSessionProps,
+    IWithNetworkStatusProps,
+    IWithSyncStatusProps {
+    audience: Audience;
 }
 
 // tslint:disable-next-line:no-empty-interface
@@ -164,13 +173,7 @@ const withData = graphql<
     getDataQuery,
     {
         options: (ownProps) => {
-            const { audience, session } = ownProps;
-            let { fetchPolicy } = ownProps;
-
-            if (audience === Audience.Me && isAnonymous(session)) {
-                fetchPolicy = "cache-only";
-            }
-
+            const { audience, fetchPolicy } = ownProps;
             return {
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
@@ -331,14 +334,31 @@ export default compose(
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
-    withRefreshOnFirstLoad<IPendingReviewTrackableListContainerProps>(
-        (props) => props.audience),
+    withNetworkStatus,
+    withSyncStatus,
+    withFetchPolicy<IPendingReviewTrackableListContainerProps>({
+        getNamespace: (props) => props.audience,
+        isMyData: (props) => props.audience === Audience.Me,
+        isReadonlyData: () => false,
+    }),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, { minDuration: 512 }),
-    withError(Error),
-    withRefresh<IPendingReviewTrackableListContainerProps>((props) =>
-        !isAnonymous(props.session) || props.audience !== Audience.Me),
+    withLoader<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
+        Loader,
+        {
+            dataField: "getPendingReviewTrackables",
+            getQuery: (props) => props.data,
+        },
+    ),
+    withError<IPendingReviewTrackableListContainerProps>(
+        Error, (props) => props.data),
+    withOffline<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
+        Offline, "getPendingReviewTrackables", (props) => props.data),
+    withRefresh<IPendingReviewTrackableListContainerProps>({
+        getQuery: (props) => props.data,
+        isMyData: (props) => props.audience === Audience.Me,
+        isReadonlyData: () => false,
+    }),
     withEmptyList<IPendingReviewTrackableListContainerProps>(
         EmptyList,
         (props) => props.data.getPendingReviewTrackables.edges,

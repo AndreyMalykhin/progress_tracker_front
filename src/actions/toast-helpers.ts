@@ -11,13 +11,11 @@ interface IAddToastFragment {
 
 interface IToastFragment {
     __typename: Type;
-    id: number;
     msg: string;
 }
 
 interface IUIFragment {
     __typename: Type;
-    id: string;
     toasts: IToastFragment[];
 }
 
@@ -33,21 +31,17 @@ const log = makeLog("toast-helpers");
 
 const msgFragment = gql`
 fragment AddGenericErrorToastMessageFragment on Message {
-    id
     text
 }`;
 
 const settingsFragment = gql`
 fragment AddGenericErrorToastSettingsFragment on Settings {
-    id
     locale
 }`;
 
 const uiFragment = gql`
 fragment AddToastUIFragment on UI {
-    id
     toasts {
-        id
         msg
     }
 }`;
@@ -57,7 +51,7 @@ const fragmentId = dataIdFromObject({ __typename: Type.UI, id: defaultId })!;
 function addToast(toast: IAddToastFragment, apollo: DataProxy) {
     log.trace("addToast(); toast=%o", toast);
     const ui = getToasts(apollo);
-    ui.toasts.push({ __typename: Type.Toast, id: ui.toasts.length, ...toast });
+    ui.toasts.push({ __typename: Type.Toast, ...toast });
     setToasts(ui, apollo);
 }
 

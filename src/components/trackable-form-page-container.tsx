@@ -5,7 +5,11 @@ import TrackableFormPage, {
 } from "components/trackable-form-page";
 import withError from "components/with-error";
 import withLoader from "components/with-loader";
+import withNetworkStatus, {
+    IWithNetworkStatusProps,
+} from "components/with-network-status";
 import withSession, { IWithSessionProps } from "components/with-session";
+import withSyncStatus from "components/with-sync-status";
 import gql from "graphql-tag";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
@@ -20,7 +24,7 @@ import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus from "utils/query-status";
 
 interface ITrackableFormPageContainerProps extends
-    IOwnProps, IWithSessionProps {
+    IOwnProps, IWithSessionProps, IWithNetworkStatusProps {
     data?: QueryProps & IGetDataResponse;
 }
 
@@ -61,14 +65,14 @@ query GetData($trackableId: ID!) {
 }`;
 
 const withData =
-    graphql<IGetDataResponse, IOwnProps, ITrackableFormPageProps>(
+    graphql<IGetDataResponse, IOwnProps, ITrackableFormPageContainerProps>(
         getDataQuery,
         {
             options: (ownProps) => {
                 const { id: trackableId, type: trackableType } =
                     ownProps.match.params;
                 return {
-                    notifyOnNetworkStatusChange: true,
+                    fetchPolicy: "cache-only",
                     variables: { trackableId },
                 };
             },
@@ -79,7 +83,7 @@ const withData =
 class TrackableFormPageContainer extends
     React.Component<ITrackableFormPageContainerProps> {
     public render() {
-        const { data, session, match, ...restProps } = this.props;
+        const { data, session, match, isOnline, ...restProps } = this.props;
         const trackable = data && data.getTrackable;
         const trackableType = match.params.type
             || trackable!.__typename as TrackableType;
@@ -96,7 +100,12 @@ class TrackableFormPageContainer extends
 export default compose(
     withRouter,
     withSession,
+    withNetworkStatus,
     withData,
-    withLoader(Loader, { showIfNoQuery: false }),
-    withError(Error),
+    withLoader<ITrackableFormPageContainerProps, IGetDataResponse>(Loader, {
+        dataField: "getTrackable",
+        getQuery: (props) => props.data,
+        showIfNoQuery: false,
+    }),
+    withError<ITrackableFormPageContainerProps>(Error, (props) => props.data),
 )(TrackableFormPageContainer);

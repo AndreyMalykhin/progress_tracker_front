@@ -8,7 +8,7 @@ import { prependArchivedTrackables } from "actions/archived-trackables-helpers";
 import {
     prependPendingReviewTrackables,
 } from "actions/pending-review-trackables-helpers";
-import { getSession, isAnonymous } from "actions/session-helpers";
+import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient, ApolloError } from "apollo-client";

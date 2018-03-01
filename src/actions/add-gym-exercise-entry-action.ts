@@ -96,16 +96,25 @@ async function addGymExerciseEntry(
     weight: number,
     mutate: MutationFunc<IAddGymExerciseEntryResponse>,
 ) {
+    const optimisticResponse = getOptimisticResponse(
+        trackableId, repetitionCount, setCount, weight);
     const result = await mutate({
-        optimisticResponse: getOptimisticResponse(trackableId, repetitionCount,
-            setCount, weight),
+        optimisticResponse,
         update: (proxy, response) => {
             const responseData = response.data as IAddGymExerciseEntryResponse;
             updateRecentEntries(trackableId, responseData, proxy);
             updateAllEntries(responseData, proxy);
             updateActivities(responseData, proxy);
         },
-        variables: { id: trackableId, setCount, repetitionCount, weight },
+        variables: {
+            entry: {
+                gymExerciseId: trackableId,
+                id: optimisticResponse.addGymExerciseEntry.entry.id,
+                repetitionCount,
+                setCount,
+                weight,
+            },
+        },
     });
     return result.data;
 }

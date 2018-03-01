@@ -1,10 +1,10 @@
 import * as React from "react";
 
-function withEmptyList<T>(
-    emptyList: React.ComponentType, getList: (props: T) => any[],
+function withEmptyList<P>(
+    emptyList: React.ComponentType, getList: (props: P) => any[],
 ) {
-    return (component: React.ComponentType<T>) => {
-        class WithEmptyList extends React.Component<T> {
+    return (component: React.ComponentType<P>) => {
+        class WithEmptyList extends React.Component<P> {
             public render() {
                 const Component =
                     getList(this.props).length ? component : emptyList;

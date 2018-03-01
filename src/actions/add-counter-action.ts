@@ -72,14 +72,20 @@ async function addCounter(
     mutate: MutationFunc<IAddCounterResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
+    const optimisticResponse = getOptimisticResponse(counter, apollo);
     return await mutate({
-        optimisticResponse: getOptimisticResponse(counter, apollo),
+        optimisticResponse,
         update: (proxy, response) => {
             const responseData = response.data as IAddCounterResponse;
             updateActiveTrackables(responseData, proxy);
             updateActivities(responseData, proxy);
         },
-        variables: { counter },
+        variables: {
+            counter: {
+                ...counter,
+                id: optimisticResponse.addCounter.trackable.id,
+            },
+        },
     });
 }
 

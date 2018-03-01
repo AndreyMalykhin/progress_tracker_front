@@ -1,4 +1,3 @@
-import { isAnonymous } from "actions/session-helpers";
 import ActivityList, {
     IActivityListItemNode,
     IActivityListSection,
@@ -6,17 +5,25 @@ import ActivityList, {
 import EmptyList from "components/empty-list";
 import Error from "components/error";
 import Loader from "components/loader";
+import Offline from "components/offline";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
+import withFetchPolicy, {
+    IWithFetchPolicyProps,
+} from "components/with-fetch-policy";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withLogin from "components/with-login";
+import withNetworkStatus, {
+    IWithNetworkStatusProps,
+} from "components/with-network-status";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
+import withOffline from "components/with-offline";
 import withRefresh, { IWithRefreshProps } from "components/with-refresh";
-import withRefreshOnFirstLoad, {
-    IWithRefreshOnFirstLoadProps,
-} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
+import withSyncStatus, {
+    IWithSyncStatusProps,
+} from "components/with-sync-status";
 import gql from "graphql-tag";
 import Audience from "models/audience";
 import * as React from "react";
@@ -31,7 +38,7 @@ import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
 interface IActivityListContainerProps extends
-    IOwnProps, IWithRefreshProps, IWithLoadMoreProps {
+    IOwnProps, IWithRefreshProps, IWithLoadMoreProps, IWithSyncStatusProps {
     audience: Audience;
     data: QueryProps & IGetDataResponse;
 }
@@ -42,7 +49,8 @@ interface IRouteParams {
 
 interface IOwnProps extends
     RouteComponentProps<IRouteParams>,
-    IWithRefreshOnFirstLoadProps,
+    IWithFetchPolicyProps,
+    IWithNetworkStatusProps,
     IWithSessionProps {
     audience: Audience;
 }
@@ -124,13 +132,7 @@ const withData = graphql<
     getDataQuery,
     {
         options: (ownProps) => {
-            const { audience, session } = ownProps;
-            let { fetchPolicy } = ownProps;
-
-            if (isAnonymous(session) && audience === Audience.Me) {
-                fetchPolicy = "cache-only";
-            }
-
+            const { audience, session, fetchPolicy } = ownProps;
             return {
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
@@ -210,14 +212,27 @@ export default compose(
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
-    withRefreshOnFirstLoad<IActivityListContainerProps>(
-        (props) => props.audience),
+    withNetworkStatus,
+    withSyncStatus,
+    withFetchPolicy<IActivityListContainerProps>({
+        getNamespace: (props) => props.audience,
+        isMyData: (props) => props.audience === Audience.Me,
+        isReadonlyData: (props) => false,
+    }),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, { minDuration: 512 }),
-    withError(Error),
-    withRefresh<IActivityListContainerProps>((props) =>
-        !isAnonymous(props.session) || props.audience !== Audience.Me),
+    withLoader<IActivityListContainerProps, IGetDataResponse>(Loader, {
+        dataField: "getActivities",
+        getQuery: (props) => props.data,
+    }),
+    withError<IActivityListContainerProps>(Error, (props) => props.data),
+    withOffline<IActivityListContainerProps, IGetDataResponse>(
+        Offline, "getActivities", (props) => props.data),
+    withRefresh<IActivityListContainerProps>({
+        getQuery: (props) => props.data,
+        isMyData: (props) => props.audience === Audience.Me,
+        isReadonlyData: (props) => false,
+    }),
     withEmptyList<IActivityListContainerProps>(
         EmptyList, (props) => props.data.getActivities.edges),
     withLoadMore<IActivityListContainerProps, IGetDataResponse>(

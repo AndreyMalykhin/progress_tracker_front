@@ -7,17 +7,23 @@ import EmptyList from "components/empty-list";
 import Error from "components/error";
 import FriendList, { IFriendListItemNode } from "components/friend-list";
 import Loader from "components/loader";
+import Offline from "components/offline";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
+import withFetchPolicy, {
+    IWithFetchPolicyProps,
+} from "components/with-fetch-policy";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
 import withLogin from "components/with-login";
+import withNetworkStatus, {
+    IWithNetworkStatusProps,
+} from "components/with-network-status";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
+import withOffline from "components/with-offline";
 import withRefresh, { IWithRefreshProps } from "components/with-refresh";
-import withRefreshOnFirstLoad, {
-    IWithRefreshOnFirstLoadProps,
-} from "components/with-refresh-on-first-load";
 import withSession, { IWithSessionProps } from "components/with-session";
+import withSyncStatus from "components/with-sync-status";
 import gql from "graphql-tag";
 import * as React from "react";
 import { compose, QueryProps } from "react-apollo";
@@ -30,13 +36,16 @@ import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
 interface IFriendListContainerProps extends
-    IWithLoadMoreProps, IWithRefreshProps, RouteComponentProps<{}> {
+    IOwnProps, IWithLoadMoreProps, IWithRefreshProps, RouteComponentProps<{}> {
     data: QueryProps & IGetDataResponse;
     onSetItemMuted: (id: string, isMuted: boolean) => Promise<any>;
 }
 
 interface IOwnProps extends
-    IWithRefreshOnFirstLoadProps, IWithApolloProps, IWithSessionProps {}
+    IWithFetchPolicyProps,
+    IWithApolloProps,
+    IWithSessionProps,
+    IWithNetworkStatusProps {}
 
 interface IGetDataResponse {
     getFriends: IConnection<IFriendListItemNode, number>;
@@ -128,12 +137,26 @@ export default compose(
     withSession,
     withLogin("friends.loginToSee"),
     withRouter,
-    withRefreshOnFirstLoad(),
+    withNetworkStatus,
+    withSyncStatus,
+    withFetchPolicy({
+        isMyData: () => true,
+        isReadonlyData: () => false,
+    }),
     withData,
     withNoUpdatesInBackground,
-    withLoader(Loader, { minDuration: 512 }),
-    withError(Error),
-    withRefresh(),
+    withLoader<IFriendListContainerProps, IGetDataResponse>(Loader, {
+        dataField: "getFriends",
+        getQuery: (props) => props.data,
+    }),
+    withError<IFriendListContainerProps>(Error, (props) => props.data),
+    withOffline<IFriendListContainerProps, IGetDataResponse>(
+        Offline, "getFriends", (props) => props.data),
+    withRefresh<IFriendListContainerProps>({
+        getQuery: (props) => props.data,
+        isMyData: () => true,
+        isReadonlyData: () => false,
+    }),
     withEmptyList<IFriendListContainerProps>(
         EmptyList, (props) => props.data.getFriends.edges),
     withLoadMore<IFriendListContainerProps, IGetDataResponse>(

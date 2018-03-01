@@ -4,16 +4,17 @@ import gql from "graphql-tag";
 import Type from "models/type";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
+import makeLog from "utils/make-log";
 
 interface ISessionFragment {
-    id: string;
     userId?: string;
     accessToken?: string;
 }
 
+const log = makeLog("session-helpers");
+
 const sessionFragment = gql`
 fragment SessionFragment on Session {
-    id
     userId
     accessToken
 }`;
@@ -29,10 +30,10 @@ function getSession(apollo: DataProxy) {
 function setSession(
     userId: string|null, accessToken: string|null, apollo: DataProxy,
 ) {
+    log.trace("setSession(); userId=%o", userId);
     const session = {
         __typename: Type.Session,
         accessToken,
-        id: defaultId,
         userId,
     };
     apollo.writeFragment(

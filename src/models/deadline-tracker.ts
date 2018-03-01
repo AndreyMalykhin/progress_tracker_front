@@ -9,7 +9,8 @@ import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
-import { NetInfo } from "react-native";
+import { InteractionManager } from "react-native";
+import Config from "utils/config";
 import { IConnection } from "utils/connection";
 import dataIdFromObject from "utils/data-id-from-object";
 import makeLog from "utils/make-log";
@@ -70,9 +71,6 @@ fragment TrackableFragment on ITrackable {
     statusChangeDate
 }`;
 
-// TODO
-const millisecondsInHour = 1 * 60 * 1000;
-
 class DeadlineTracker {
     private apollo: ApolloClient<NormalizedCacheObject>;
 
@@ -82,10 +80,12 @@ class DeadlineTracker {
 
     public async start() {
         this.tick();
-        setInterval(this.tick, millisecondsInHour);
+        setInterval(() => {
+            InteractionManager.runAfterInteractions(() => this.tick());
+        }, Config.deadlineWatchPeriod);
     }
 
-    private tick = () => {
+    private tick() {
         log.trace("tick()");
 
         if (!getSession(this.apollo).userId) {

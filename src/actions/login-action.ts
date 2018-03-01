@@ -15,6 +15,7 @@ interface ILoginResponse {
             id: string;
         };
         accessToken: string;
+        isNewUser: boolean;
     };
 }
 
@@ -33,6 +34,7 @@ mutation LoginMutation($facebookAccessToken: String!) {
             rewardableReviewsLeft
         }
         accessToken
+        isNewUser
     }
 }`;
 
@@ -47,7 +49,7 @@ async function login(
         result = await LoginManager.logInWithReadPermissions(
             ["public_profile"]);
     } catch (e) {
-        log.error("login(); error=%o", e);
+        log.error("login(); facebook error=%o", e);
         throw e;
     }
 
@@ -59,9 +61,18 @@ async function login(
     const response = await mutate({
         variables: { facebookAccessToken: facebookAccessToken!.accessToken },
     });
-    await apollo.resetStore();
+    const { user, accessToken, isNewUser } = response.data.login;
+
+    if (!isNewUser) {
+        try {
+            await apollo.resetStore();
+        } catch (e) {
+            log.error("login(); reset store error=%o", e);
+            throw e;
+        }
+    }
+
     apollo.writeData({ data: response.data });
-    const { user, accessToken } = response.data.login;
     setSession(user.id, accessToken, apollo);
     return true;
 }

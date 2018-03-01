@@ -1,2 +1,7 @@
 import { v4 } from "uuid";
-export default v4;
+
+function uuid() {
+    return "temp-" + v4();
+}
+
+export default uuid;

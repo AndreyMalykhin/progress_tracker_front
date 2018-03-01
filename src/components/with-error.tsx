@@ -3,27 +3,14 @@ import * as React from "react";
 import { QueryProps } from "react-apollo";
 import QueryStatus from "utils/query-status";
 
-interface IOwnProps {
-    [query: string]: QueryProps;
-}
-
-interface IOptions {
-    queryProp: string;
-}
-
-const defaultOptions: IOptions = {
-    queryProp: "data",
-};
-
-function withError<P extends {}, T>(
-    error: React.ComponentType<T>, options?: Partial<IOptions>,
+function withError<TProps extends {}>(
+    error: React.ComponentType,
+    getQuery: (props: TProps) => QueryProps | undefined,
 ) {
-    return (Component: React.ComponentType<P>) => {
-        const { queryProp } = { ...defaultOptions, ...options };
-
-        return class WithError extends React.Component<P & IOwnProps> {
+    return (Component: React.ComponentType<TProps>) => {
+        return class WithError extends React.Component<TProps> {
             public render() {
-                const query: QueryProps = this.props[queryProp];
+                const query = getQuery(this.props);
 
                 if (query && (query.networkStatus === QueryStatus.Error
                     || query.error)

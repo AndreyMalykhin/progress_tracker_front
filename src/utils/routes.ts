@@ -7,6 +7,10 @@ export default {
         exact: true,
         path: "/friends",
     },
+    index: {
+        exact: true,
+        path: "/",
+    },
     leaders: {
         exact: true,
         path: "/leaders/:audience",

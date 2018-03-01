@@ -4,6 +4,7 @@ import {
     IEditUserFragment,
     IEditUserResponse,
 } from "actions/edit-user-action";
+import { logout } from "actions/logout-action";
 import {
     ISetUserAvatarResponse,
     setUserAvatar,
@@ -15,11 +16,22 @@ import { ApolloClient } from "apollo-client";
 import { isApolloError } from "apollo-client/errors/ApolloError";
 import Error from "components/error";
 import Loader from "components/loader";
+import Offline from "components/offline";
 import ProfileForm from "components/profile-form";
 import withError from "components/with-error";
+import withFetchPolicy, {
+    IWithFetchPolicyProps,
+} from "components/with-fetch-policy";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoader from "components/with-loader";
+import withNetworkStatus, {
+    IWithNetworkStatusProps,
+} from "components/with-network-status";
+import withOffline from "components/with-offline";
 import withSession, { IWithSessionProps } from "components/with-session";
+import withSyncStatus, {
+    IWithSyncStatusProps,
+} from "components/with-sync-status";
 import gql from "graphql-tag";
 import { debounce } from "lodash";
 import * as React from "react";
@@ -27,15 +39,21 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { withApollo } from "react-apollo/withApollo";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
+import { Alert } from "react-native";
 import { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
+import routes from "utils/routes";
 
 interface IProfileFormContainerProps extends
-    IWithHeaderProps, RouteComponentProps<{}>, IOwnProps {
+    IWithHeaderProps,
+    RouteComponentProps<{}>,
+    IOwnProps,
+    InjectedIntlProps,
+    IWithSyncStatusProps {
     data: QueryProps & IGetDataResponse;
     onSetAvatar: (img: Image|null) => Promise<any>;
     onEditUser: (user: IEditUserFragment) => Promise<any>;
@@ -49,7 +67,11 @@ interface IProfileFormContainerState {
     nameError?: string|null;
 }
 
-interface IOwnProps extends IWithSessionProps, IWithApolloProps {}
+interface IOwnProps extends
+    IWithSessionProps,
+    IWithApolloProps,
+    IWithFetchPolicyProps,
+    IWithNetworkStatusProps {}
 
 interface IGetDataResponse {
     getUser: {
@@ -98,8 +120,9 @@ const withData =
     graphql<IGetDataResponse, IOwnProps, IProfileFormContainerProps>(
         getDataQuery,
         {
-            options: () => {
+            options: (ownProps) => {
                 return {
+                    fetchPolicy: ownProps.fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                 };
             },
@@ -117,14 +140,15 @@ class ProfileFormContainer extends
     }
 
     public render() {
-        const isUserLoggedIn = this.props.session.accessToken != null;
+        const { isOnline, session } = this.props;
+        const isUserLoggedIn = session.accessToken != null;
         const { avatarError, avatarUri, name, nameError, isAvatarChanging } =
             this.state;
         return (
             <ProfileForm
                 avatarError={avatarError}
                 avatarUri={avatarUri}
-                isAvatarDisabled={!isUserLoggedIn}
+                isAvatarDisabled={!isUserLoggedIn || !isOnline}
                 isAvatarChanging={isAvatarChanging}
                 isNameDisabled={!isUserLoggedIn}
                 isUserLoggedIn={isUserLoggedIn}
@@ -132,6 +156,7 @@ class ProfileFormContainer extends
                 nameError={nameError}
                 onChangeAvatar={this.onChangeAvatar}
                 onChangeName={this.onChangeName}
+                onLogout={this.onLogout}
             />
         );
     }
@@ -232,16 +257,65 @@ class ProfileFormContainer extends
             }
         }
     }
+
+    private onLogout = async () => {
+        if (this.props.isSyncing && !await this.confirmLogout()) {
+            return;
+        }
+
+        try {
+            await logout(this.props.client);
+        } catch (e) {
+            return;
+        }
+
+        this.props.history.replace({
+            pathname: routes.index.path,
+            state: { resetHistory: true },
+        });
+    }
+
+    private confirmLogout() {
+        return new Promise((resolve) => {
+            const msg = undefined;
+            const { formatMessage } = this.props.intl;
+            const title =
+                formatMessage({ id: "logout.synchronizationInProgressTitle" });
+            Alert.alert(title, msg, [
+                {
+                    onPress: () => resolve(false),
+                    style: "cancel",
+                    text: formatMessage({ id: "common.cancel" }),
+                },
+                {
+                    onPress: () => resolve(true),
+                    text: formatMessage({ id: "common.logout" }),
+                },
+            ]);
+        });
+    }
 }
 
 export default compose(
     withRouter,
     withSession,
+    withNetworkStatus,
+    withSyncStatus,
+    withFetchPolicy({
+        isMyData: () => true,
+        isReadonlyData: () => false,
+    }),
     withData,
-    withLoader(Loader),
-    withError(Error),
+    withLoader<IProfileFormContainerProps, IGetDataResponse>(Loader, {
+        dataField: "getUser",
+        getQuery: (props) => props.data,
+    }),
+    withError<IProfileFormContainerProps>(Error, (props) => props.data),
+    withOffline<IProfileFormContainerProps, IGetDataResponse>(
+        Offline, "getUser", (props) => props.data),
     withApollo,
     withSetAvatar,
     withEditUser,
     withHeader,
+    injectIntl,
 )(ProfileFormContainer);

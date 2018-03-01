@@ -1,6 +1,7 @@
 import Avatar from "components/avatar";
 import Loader from "components/loader";
 import Text from "components/text";
+import TouchableWithFeedback from "components/touchable-with-feedback";
 import { IWithRefreshProps } from "components/with-refresh";
 import Audience from "models/audience";
 import TrackableType from "models/trackable-type";
@@ -720,14 +721,20 @@ class Activity extends React.Component<IActivityProps> {
         const { userAvatarUrl, iconName, msgId, msgValues, iconStyle, isFirst }
             = this.props;
         const userAvatar = userAvatarUrl && (
-            <TouchableWithoutFeedback onPress={this.onPressUser}>
-                <View style={styles.activityAvatar}>
-                    <Avatar uri={userAvatarUrl} size="small" />
-                </View>
-            </TouchableWithoutFeedback>
+            <TouchableWithFeedback
+                style={styles.activityAvatar}
+                onPress={this.onPressUser}
+            >
+                <Avatar uri={userAvatarUrl} size="medium" />
+            </TouchableWithFeedback>
         );
+        const containerStyle = [
+            styles.activity,
+            !userAvatar && styles.activityUserless,
+            isFirst && styles.activityFirst,
+        ];
         return (
-            <View style={[styles.activity, isFirst && styles.activityFirst]}>
+            <View style={containerStyle as any}>
                 {userAvatar}
                 <FormattedMessage id={msgId} values={msgValues}>
                     {this.renderMsg}
@@ -746,7 +753,7 @@ class Activity extends React.Component<IActivityProps> {
         const userNameElement = userName && (
             <UserName
                 id={userId!}
-                name={`${userName} `}
+                name={`${userName}\n`}
                 onPress={onPressUser}
             />
         );
@@ -754,10 +761,12 @@ class Activity extends React.Component<IActivityProps> {
             return React.isValidElement(part) ? React.cloneElement(
                 part as React.ReactElement<any>, { key: i }) : part;
         });
+        const style =
+            [styles.activityMsg, !userName && styles.activityMsgUserless];
         return (
-            <Text style={styles.activityMsg}>
+            <Text style={style as any}>
                 {userNameElement}
-                {msg}{" "}
+                {msg}
             </Text>
         );
     }
@@ -769,8 +778,8 @@ const styles = StyleSheet.create({
     activity: {
         alignItems: "flex-start",
         flexDirection: "row",
-        paddingBottom: 8,
-        paddingTop: 8,
+        paddingBottom: 16,
+        paddingTop: 16,
     },
     activityAvatar: {
         marginRight: 8,
@@ -784,6 +793,12 @@ const styles = StyleSheet.create({
     activityMsg: {
         flex: 1,
         flexWrap: "wrap",
+    },
+    activityMsgUserless: {
+        paddingBottom: 8,
+        paddingTop: 8,
+    },
+    activityUserless: {
         paddingBottom: 8,
         paddingTop: 8,
     },
