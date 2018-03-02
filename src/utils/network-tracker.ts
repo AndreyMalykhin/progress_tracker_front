@@ -3,9 +3,9 @@ import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
 import Type from "models/type";
 import { InteractionManager, NetInfo, Platform } from "react-native";
-import Config from "utils/config";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
+import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
 
 interface IGetOfflineStatusResponse {
@@ -33,16 +33,28 @@ const offlineFragmentId =
 
 class NetworkTracker {
     private apollo: ApolloClient<NormalizedCacheObject>;
-    private isOnline: boolean;
+    private isOnline?: boolean;
     private isPinging = false;
+    private envConfig: IEnvConfig;
 
     public constructor(
-        isOnline: boolean, apollo: ApolloClient<NormalizedCacheObject>,
+        apollo: ApolloClient<NormalizedCacheObject>, envConfig: IEnvConfig,
     ) {
-        this.isOnline = isOnline;
         this.apollo = apollo;
+        this.envConfig = envConfig;
+    }
+
+    public async start() {
+        this.isOnline = false;
+
+        try {
+            this.isOnline = await isConnected();
+        } catch (e) {
+            log.trace("start(); error=%o", e);
+        }
+
         this.ensureCorrectStatusInStore();
-        setInterval(this.ping, Config.pingPeriod);
+        setInterval(this.ping, this.envConfig.pingPeriod);
         /* NetInfo.isConnected.addEventListener(
             "connectionChange", this.onConnectionChange); */
     }
@@ -122,16 +134,4 @@ async function ping() {
     }
 }
 
-async function makeNetworkTracker(apollo: ApolloClient<NormalizedCacheObject>) {
-    let isOnline = false;
-
-    try {
-        isOnline = await isConnected();
-    } catch (e) {
-        log.trace("makeNetworkTracker(); error=%o", e);
-    }
-
-    return new NetworkTracker(isOnline, apollo);
-}
-
-export { makeNetworkTracker };
+export default NetworkTracker;

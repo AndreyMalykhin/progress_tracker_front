@@ -17,6 +17,9 @@ import Offline from "components/offline";
 import ProfileSection, {
     IProfileSectionNavItem, IProfileSectionProps,
 } from "components/profile-section";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import withError from "components/with-error";
 import withFetchPolicy, {
     IWithFetchPolicyProps,
@@ -56,6 +59,7 @@ interface IProfileSectionContainerProps extends
     IOwnProps,
     InjectedIntlProps,
     IWithSyncStatusProps,
+    IWithDIContainerProps,
     IWithHeaderProps {
     remoteData: QueryProps & IGetRemoteDataResponse;
     localData: QueryProps & IGetLocalDataResponse;
@@ -364,6 +368,7 @@ class ProfileSectionContainer
 
 export default compose(
     withRouter,
+    withDIContainer,
     withHeader,
     withSession,
     withLocalData,

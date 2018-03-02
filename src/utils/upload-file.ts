@@ -1,7 +1,7 @@
 import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
-import Config from "utils/config";
-import makeLog from "./make-log";
+import { IEnvConfig } from "utils/env-config";
+import makeLog from "utils/make-log";
 
 interface IUploadFileResponse {
     payload: {
@@ -13,7 +13,11 @@ interface IUploadFileResponse {
 const log = makeLog("upload-file");
 
 async function uploadFile(
-    filePath: string, mimeType: string, endpointUrl: string, apollo: DataProxy,
+    filePath: string,
+    mimeType: string,
+    endpointUrl: string,
+    apollo: DataProxy,
+    envConfig: IEnvConfig,
 ) {
     const body = new FormData();
     body.append("file", {
@@ -24,7 +28,7 @@ async function uploadFile(
     const accessToken = getSession(apollo).accessToken;
 
     try {
-        const response = await fetch(Config.serverUrl + endpointUrl, {
+        const response = await fetch(envConfig.serverUrl + endpointUrl, {
             body,
             headers: { Authorization: "Bearer " + accessToken },
             method: "POST",

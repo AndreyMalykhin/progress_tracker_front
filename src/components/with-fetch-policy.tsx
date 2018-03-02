@@ -1,10 +1,10 @@
 import { isAnonymous } from "actions/session-helpers";
 import { FetchPolicy } from "apollo-client/core/watchQueryOptions";
+import { IWithDIContainerProps } from "components/with-di-container";
 import { IWithNetworkStatusProps } from "components/with-network-status";
 import { IWithSessionProps } from "components/with-session";
 import { IWithSyncStatusProps } from "components/with-sync-status";
 import * as React from "react";
-import Config from "utils/config";
 import defaultId from "utils/default-id";
 import makeLog from "utils/make-log";
 import uuid from "utils/uuid";
@@ -14,7 +14,10 @@ interface IWithFetchPolicyProps {
 }
 
 interface IOwnProps extends
-    IWithSyncStatusProps, IWithSessionProps, IWithNetworkStatusProps {}
+    IWithSyncStatusProps,
+    IWithSessionProps,
+    IWithNetworkStatusProps,
+    IWithDIContainerProps {}
 
 interface IOptions<P> {
     isMyData: (props: P) => boolean;
@@ -25,17 +28,12 @@ interface IOptions<P> {
 
 const log = makeLog("with-fetch-policy");
 
-const defaultOptions: Partial< IOptions<any> > = {
-    cacheLifetime: Config.cacheRefreshPeriod,
-};
-
 function withFetchPolicy<P extends IOwnProps>(options: IOptions<P>) {
     return (
         Component: React.ComponentType<P & IWithFetchPolicyProps>,
     ) => {
-        const { cacheLifetime, getNamespace, isMyData, isReadonlyData } = {
-            ...defaultOptions, ...options,
-        } as IOptions<P>;
+        const { cacheLifetime, getNamespace, isMyData, isReadonlyData } =
+            options;
         const lastRefreshDate: { [namespace: string]: number } = {};
 
         class WithFetchPolicy extends React.Component<P> {
@@ -107,8 +105,10 @@ function withFetchPolicy<P extends IOwnProps>(options: IOptions<P>) {
             }
 
             private isExpired() {
+                const newCacheLifetime = cacheLifetime
+                    || this.props.diContainer.envConfig.cacheRefreshPeriod;
                 const date = lastRefreshDate[this.namespace];
-                return !date || (date + cacheLifetime!) <= Date.now();
+                return !date || (date + newCacheLifetime) <= Date.now();
             }
         }
 

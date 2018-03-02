@@ -3,6 +3,9 @@ import Error from "components/error";
 import LeaderList, { ILeaderListItemNode } from "components/leader-list";
 import Loader from "components/loader";
 import Offline from "components/offline";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withFetchPolicy, {
@@ -34,6 +37,7 @@ interface ILeaderListContainerProps extends
     IOwnProps,
     IWithLoadMoreProps,
     IWithRefreshProps,
+    IWithDIContainerProps,
     RouteComponentProps<{}>,
     IWithSyncStatusProps {
     data: QueryProps & IGetDataResponse;
@@ -107,6 +111,7 @@ class LeaderListContainer extends React.Component<ILeaderListContainerProps> {
 }
 
 export default compose(
+    withDIContainer,
     withSession,
     withLogin<ILeaderListContainerProps>("leaderList.loginToSeeFriends",
         (props) => props.audience === Audience.Friends),

@@ -8,6 +8,7 @@ import Error from "components/error";
 import FriendList, { IFriendListItemNode } from "components/friend-list";
 import Loader from "components/loader";
 import Offline from "components/offline";
+import withDIContainer from "components/with-di-container";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withFetchPolicy, {
@@ -134,6 +135,7 @@ class FriendListContainer extends React.Component<IFriendListContainerProps> {
 }
 
 export default compose(
+    withDIContainer,
     withSession,
     withLogin("friends.loginToSee"),
     withRouter,

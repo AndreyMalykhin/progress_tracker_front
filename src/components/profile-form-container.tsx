@@ -18,6 +18,9 @@ import Error from "components/error";
 import Loader from "components/loader";
 import Offline from "components/offline";
 import ProfileForm from "components/profile-form";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import withError from "components/with-error";
 import withFetchPolicy, {
     IWithFetchPolicyProps,
@@ -71,6 +74,7 @@ interface IOwnProps extends
     IWithSessionProps,
     IWithApolloProps,
     IWithFetchPolicyProps,
+    IWithDIContainerProps,
     IWithNetworkStatusProps {}
 
 interface IGetDataResponse {
@@ -88,7 +92,12 @@ const withSetAvatar =
             props: ({ ownProps, mutate }) => {
                 return {
                     onSetAvatar: (img: Image|null) =>
-                        setUserAvatar(img, mutate!, ownProps.client),
+                        setUserAvatar(
+                            img,
+                            mutate!,
+                            ownProps.client,
+                            ownProps.diContainer.envConfig,
+                        ),
                 };
             },
         },
@@ -298,6 +307,7 @@ class ProfileFormContainer extends
 
 export default compose(
     withRouter,
+    withDIContainer,
     withSession,
     withNetworkStatus,
     withSyncStatus,

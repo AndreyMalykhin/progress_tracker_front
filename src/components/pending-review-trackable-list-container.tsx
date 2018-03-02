@@ -19,6 +19,9 @@ import Offline from "components/offline";
 import PendingReviewTrackableList, {
     IPendingReviewTrackableListItemNode,
 } from "components/pending-review-trackable-list";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import withEmptyList from "components/with-empty-list";
 import withEnsureUserLoggedIn, {
     IWithEnsureUserLoggedInProps,
@@ -69,6 +72,7 @@ interface IPendingReviewTrackableListContainerProps extends
     IWithEnsureUserLoggedInProps,
     IWithLoginActionProps,
     IWithRefreshProps,
+    IWithDIContainerProps,
     IWithLoadMoreProps {
     data: QueryProps & IGetDataResponse;
     onCommitApproveItem: (id: string, difficulty: Difficulty) =>
@@ -328,6 +332,7 @@ class PendingReviewTrackableListContainer extends React.Component<
 }
 
 export default compose(
+    withDIContainer,
     withSession,
     withLogin<IPendingReviewTrackableListContainerProps>(
         "pendingReviewList.loginToSeeFriends",

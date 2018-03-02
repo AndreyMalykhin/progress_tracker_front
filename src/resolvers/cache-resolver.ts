@@ -5,7 +5,7 @@ import { toIdValue } from "apollo-utilities";
 import Type from "models/type";
 import dataIdFromObject from "utils/data-id-from-object";
 
-function makeCacheResolver(getCache: () => DataProxy) {
+function makeCacheResolver(getCache: () => DataProxy): CacheResolverMap {
     return {
         Query: {
             getActivity(rootValue, args) {
@@ -28,7 +28,7 @@ function makeCacheResolver(getCache: () => DataProxy) {
                 });
             },
         },
-    } as CacheResolverMap;
+    };
 }
 
 export { makeCacheResolver };

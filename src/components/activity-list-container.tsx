@@ -6,6 +6,9 @@ import EmptyList from "components/empty-list";
 import Error from "components/error";
 import Loader from "components/loader";
 import Offline from "components/offline";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withFetchPolicy, {
@@ -38,7 +41,11 @@ import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
 interface IActivityListContainerProps extends
-    IOwnProps, IWithRefreshProps, IWithLoadMoreProps, IWithSyncStatusProps {
+    IOwnProps,
+    IWithRefreshProps,
+    IWithLoadMoreProps,
+    IWithDIContainerProps,
+    IWithSyncStatusProps {
     audience: Audience;
     data: QueryProps & IGetDataResponse;
 }
@@ -206,6 +213,7 @@ class ActivityListContainer extends
 }
 
 export default compose(
+    withDIContainer,
     withSession,
     withLogin<IActivityListContainerProps>(
         "activityList.loginToSeeFriends",

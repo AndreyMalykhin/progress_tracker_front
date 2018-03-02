@@ -6,9 +6,9 @@ import { ApolloLink, NextLink, Observable, Operation } from "apollo-link";
 import gql from "graphql-tag";
 import Type from "models/type";
 import { InteractionManager } from "react-native";
-import Config from "utils/config";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
+import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
 
 interface IContext {
@@ -82,6 +82,12 @@ class OfflineLink extends ApolloLink {
     private isDraining = false;
     private apollo?: ApolloClient<NormalizedCacheObject>;
     private session: ISessionFragment = {};
+    private envConfig: IEnvConfig;
+
+    public constructor(envConfig: IEnvConfig) {
+        super();
+        this.envConfig = envConfig;
+    }
 
     public request(operation: Operation, forward?: NextLink) {
         const { optimisticResponse, cache, isOfflineOperation } =
@@ -217,7 +223,7 @@ class OfflineLink extends ApolloLink {
                 && status >= 400
                 && status !== 401
                 && status < 500
-                && startDate + Config.syncRetryTimeout <= Date.now()
+                && startDate + this.envConfig.syncRetryTimeout <= Date.now()
             ) {
                 log.error("runOperation(); retry timeout");
                 return true;

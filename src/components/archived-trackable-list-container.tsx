@@ -5,6 +5,9 @@ import EmptyList from "components/empty-list";
 import Error from "components/error";
 import Loader from "components/loader";
 import Offline from "components/offline";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
 import withFetchPolicy, {
@@ -35,7 +38,11 @@ import isMyId from "utils/is-my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
 
 interface IArchivedTrackableListContainerProps extends
-    IWithLoadMoreProps, IWithRefreshProps, IOwnProps, IWithSyncStatusProps {
+    IWithLoadMoreProps,
+    IWithRefreshProps,
+    IOwnProps,
+    IWithDIContainerProps,
+    IWithSyncStatusProps {
     data: QueryProps & IGetDataResponse;
 }
 
@@ -137,6 +144,7 @@ class ArchivedTrackableListContainer extends
 }
 
 export default compose(
+    withDIContainer,
     withSession,
     withNetworkStatus,
     withSyncStatus,

@@ -5,7 +5,9 @@ import * as enLocaleData from "react-intl/locale-data/en";
 
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
+import * as Bottle from "bottlejs";
 import AppContainer from "components/app-container";
+import DIContainerProvider from "components/di-container-provider";
 import gql from "graphql-tag";
 import { History } from "history";
 import { merge } from "lodash";
@@ -15,21 +17,17 @@ import * as React from "react";
 import { ApolloProvider } from "react-apollo";
 import { getDeviceLocale } from "react-native-device-info";
 import Reactotron from "reactotron-react-native";
-import Config from "utils/config";
+import IStateResolver from "resolvers/state-resolver";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
+import DIContainer, { makeDIContainer } from "utils/di-container";
+import getDefaultLocale from "utils/get-default-locale";
+import InMemoryCache from "utils/in-memory-cache";
+import loadCache from "utils/load-cache";
 import makeApollo from "utils/make-apollo";
 import makeCache from "utils/make-cache";
 import MultiStackHistory from "utils/multi-stack-history";
-import { makeNetworkTracker } from "utils/network-tracker";
-
-import { makeCacheResolver } from "resolvers/cache-resolver";
-import { makeMessageResolver } from "resolvers/message-resolver";
-import offlineResolver from "resolvers/offline-resolver";
-import sessionResolver from "resolvers/session-resolver";
-import { makeSettingsResolver } from "resolvers/settings-resolver";
-import uiResolver from "resolvers/ui-resolver";
-import userResolver from "resolvers/user-resolver";
+import NetworkTracker from "utils/network-tracker";
 
 interface IBootstrapState {
     isDone?: boolean;
@@ -37,8 +35,8 @@ interface IBootstrapState {
 
 class Bootstrap extends React.Component<{}, IBootstrapState> {
     public state: IBootstrapState = {};
+    private diContainer?: DIContainer;
     private apollo?: ApolloClient<NormalizedCacheObject>;
-    private history?: History;
 
     public constructor(props: {}, context: any) {
         super(props, context);
@@ -50,54 +48,38 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
         }
 
         return (
-            <ApolloProvider client={this.apollo!}>
-                <AppContainer history={this.history!} />
-            </ApolloProvider>
+            <DIContainerProvider container={this.diContainer!}>
+                <ApolloProvider client={this.diContainer!.apollo}>
+                    <AppContainer
+                        history={this.diContainer!.history}
+                    />
+                </ApolloProvider>
+            </DIContainerProvider>
         );
     }
 
     public async componentWillMount() {
-        if (Config.isDevEnv) {
+        this.diContainer = makeDIContainer();
+
+        if (this.diContainer.envConfig.isDevEnv) {
             console.ignoredYellowBox = ["Remote debugger is in"];
             Reactotron.configure().useReactNative().connect();
         }
 
-        this.history = new MultiStackHistory();
-        const locale = this.initLocale();
-        const stateResolver = merge(
-            makeMessageResolver({ en }),
-            makeSettingsResolver(locale),
-            userResolver,
-            sessionResolver,
-            uiResolver,
-            offlineResolver,
-        );
-        const cacheResolver = makeCacheResolver(() => this.apollo!);
-        let cache;
+        addLocaleData(en);
+        const cache = this.diContainer.cache;
+        const stateResolver = this.diContainer.stateResolver;
+        const envConfig = this.diContainer.envConfig;
 
         try {
-            cache = await makeCache(stateResolver, cacheResolver);
+            await loadCache(cache, stateResolver, envConfig);
         } catch (e) {
             return;
         }
 
-        this.apollo = makeApollo(cache, stateResolver);
-        const networkTracker = await makeNetworkTracker(this.apollo);
-        new DeadlineTracker(this.apollo).start();
+        await this.diContainer.networkTracker.start();
+        this.diContainer.deadlineTracker.start();
         this.setState({ isDone: true });
-    }
-
-    private initLocale() {
-        addLocaleData(en);
-        let locale = getDeviceLocale();
-        const isLocaleSupported = ["en"].some(
-            (supportedLocale) => locale!.startsWith(supportedLocale));
-
-        if (!isLocaleSupported) {
-            locale = "en";
-        }
-
-        return locale;
     }
 }
 

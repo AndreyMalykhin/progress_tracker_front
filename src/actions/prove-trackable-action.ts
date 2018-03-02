@@ -19,6 +19,7 @@ import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import { Image } from "react-native-image-crop-picker";
 import dataIdFromObject from "utils/data-id-from-object";
+import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
 import uploadFile from "utils/upload-file";
 
@@ -112,9 +113,10 @@ async function proveTrackable(
     photo: Image,
     mutate: MutationFunc<IProveTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
+    envConfig: IEnvConfig,
 ) {
     const uploadResponse =
-        await uploadFile(photo.path, photo.mime, "/assets", apollo);
+        await uploadFile(photo.path, photo.mime, "/assets", apollo, envConfig);
 
     if (uploadResponse.status !== 200) {
         throw new Error("File upload failed");

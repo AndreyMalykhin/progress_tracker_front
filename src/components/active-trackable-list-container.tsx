@@ -75,6 +75,9 @@ import { IHeaderState } from "components/header";
 import Loader from "components/loader";
 import Offline from "components/offline";
 import Toast from "components/toast";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import withEmptyList from "components/with-empty-list";
 import withEnsureUserLoggedIn, {
     IWithEnsureUserLoggedInProps,
@@ -166,6 +169,7 @@ interface IOwnProps extends
     IWithNetworkStatusProps,
     IWithApolloProps,
     IWithSessionProps,
+    IWithDIContainerProps,
     IWithFetchPolicyProps {}
 
 interface IActiveTrackableListContainerState {
@@ -235,8 +239,9 @@ const withProve =
             props: ({ ownProps, mutate }) => {
                 return {
                     onCommitProveItem: (id: string, photo: Image) => {
+                        const { client, diContainer } = ownProps;
                         return proveTrackable(
-                            id, photo, mutate!, ownProps.client);
+                            id, photo, mutate!, client, diContainer.envConfig);
                     },
                 } as Partial<IActiveTrackableListContainerProps>;
             },
@@ -1402,6 +1407,7 @@ class ActiveTrackableListContainer extends React.Component<
 
 export default compose(
     withRouter,
+    withDIContainer,
     withHeader,
     withSession,
     withNetworkStatus,

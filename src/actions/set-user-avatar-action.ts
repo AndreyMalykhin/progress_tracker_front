@@ -13,6 +13,7 @@ import { MutationFunc } from "react-apollo/types";
 import { Image } from "react-native-image-crop-picker";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultAvatar from "utils/default-avatar";
+import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
 import uploadFile from "utils/upload-file";
 
@@ -52,12 +53,13 @@ async function setUserAvatar(
     img: Image|null,
     mutate: MutationFunc<ISetUserAvatarResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
+    envConfig: IEnvConfig,
 ) {
     let avatarId;
 
     if (img) {
         const response =
-            await uploadFile(img.path, img.mime, "/avatars", apollo);
+            await uploadFile(img.path, img.mime, "/avatars", apollo, envConfig);
 
         if (response.status !== 200) {
             throw new Error("File upload failed");

@@ -46,7 +46,7 @@ class ProfileForm extends React.Component<IProfileFormProps> {
             authGroup = (
                 <FormGroup>
                     <Button style={styles.logoutBtn} onPress={onLogout}>
-                        <ButtonTitle dangerous={true} msgId="common.logout" />
+                        <ButtonTitle msgId="common.logout" />
                     </Button>
                 </FormGroup>
             );

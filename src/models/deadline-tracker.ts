@@ -10,9 +10,9 @@ import gql from "graphql-tag";
 import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import { InteractionManager } from "react-native";
-import Config from "utils/config";
 import { IConnection } from "utils/connection";
 import dataIdFromObject from "utils/data-id-from-object";
+import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
 import uuid from "utils/uuid";
 
@@ -73,16 +73,20 @@ fragment TrackableFragment on ITrackable {
 
 class DeadlineTracker {
     private apollo: ApolloClient<NormalizedCacheObject>;
+    private envConfig: IEnvConfig;
 
-    public constructor(apollo: ApolloClient<NormalizedCacheObject>) {
+    public constructor(
+        apollo: ApolloClient<NormalizedCacheObject>, envConfig: IEnvConfig,
+    ) {
         this.apollo = apollo;
+        this.envConfig = envConfig;
     }
 
     public async start() {
         this.tick();
         setInterval(() => {
             InteractionManager.runAfterInteractions(() => this.tick());
-        }, Config.deadlineWatchPeriod);
+        }, this.envConfig.deadlineWatchPeriod);
     }
 
     private tick() {
