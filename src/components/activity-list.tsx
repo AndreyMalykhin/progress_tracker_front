@@ -536,7 +536,7 @@ class GoalExpiredActivity extends
             <Activity
                 msgId="activities.goalExpired"
                 msgValues={msgValues}
-                iconName={IconName.Expiration}
+                iconName={IconName.Date}
                 iconStyle={styles.goalExpiredIcon}
                 {...restProps}
             />

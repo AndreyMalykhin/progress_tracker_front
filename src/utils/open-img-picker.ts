@@ -5,8 +5,13 @@ const log = makeLog("open-img-picker");
 
 async function openImgPicker() {
     try {
-        return await ImagePicker.openPicker(
-            { includeBase64: false, mediaType: "photo" }) as Image;
+        return await ImagePicker.openPicker({
+            compressImageMaxHeight: 640,
+            compressImageMaxWidth: 640,
+            compressImageQuality: 1,
+            includeBase64: false,
+            mediaType: "photo",
+        }) as Image;
     } catch (e) {
         if (e.code === "E_PICKER_CANCELLED") {
             return null;

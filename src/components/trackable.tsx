@@ -25,6 +25,7 @@ import {
     ViewStyle,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import IconName from "utils/icon-name";
 
 interface ITrackableProps {
     index?: number;
@@ -425,7 +426,11 @@ class Status extends React.PureComponent<IStatusProps> {
         const period = Math.floor(duration! / millisecondsInDay);
         return (
             <View style={styles.status}>
-                <Icon style={styles.statusIcon} name="clock" size={16} />
+                <Icon
+                    style={styles.statusIcon}
+                    name={IconName.Date}
+                    size={16}
+                />
                 <Text style={styles.statusMsg}>
                     <FormattedMessage id={msgId} values={{ period }} />
                 </Text>

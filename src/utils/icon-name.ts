@@ -8,7 +8,7 @@ enum IconName {
     Collapsed = "chevron-down",
     Counter = "counter",
     Expanded = "chevron-up",
-    Expiration = "clock",
+    Date = "clock",
     Friends = "account-multiple",
     GymExercise = "dumbbell",
     InProgress = "format-list-checks",
