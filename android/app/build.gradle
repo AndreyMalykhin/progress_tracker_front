@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-splash-screen')
     compile project(':react-native-fs')
     compile project(':@yfuks/react-native-action-sheet')
     compile project(':react-native-image-crop-picker')

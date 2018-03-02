@@ -11,6 +11,7 @@ import * as React from "react";
 import { compose, QueryProps } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { MessageValue } from "react-intl";
+import SplashScreen from "react-native-splash-screen";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import makeLog from "utils/make-log";
 import { isLoading } from "utils/query-status";
@@ -96,6 +97,10 @@ class AppContainer extends React.Component<IAppContainerProps> {
     public componentWillMount() {
         log.trace("componentWillMount()");
         this.initMessages(this.props);
+    }
+
+    public componentDidMount() {
+        SplashScreen.hide();
     }
 
     public componentWillReceiveProps(nextProps: IAppContainerProps) {
