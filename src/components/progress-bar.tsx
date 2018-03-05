@@ -26,7 +26,7 @@ interface IProgressBarState {
 }
 
 const animationConfig = {
-    duration: 2048,
+    duration: 1024,
     easing: Easing.out(Easing.sin),
 } as Animated.TimingAnimationConfig;
 

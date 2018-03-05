@@ -3,6 +3,7 @@ import { addGenericErrorToast } from "actions/toast-helpers";
 import { isApolloError } from "apollo-client/errors/ApolloError";
 import { IHeaderState } from "components/header";
 import { ITrackableFormProps } from "components/trackable-form";
+import { IWithDIContainerProps } from "components/with-di-container";
 import { IWithHeaderProps } from "components/with-header";
 import { debounce, throttle } from "lodash";
 import TrackableType from "models/trackable-type";
@@ -11,6 +12,7 @@ import { withApollo } from "react-apollo";
 import { FormattedMessage, InjectedIntlProps } from "react-intl";
 import { RouteComponentProps } from "react-router";
 import { IWithApolloProps } from "utils/interfaces";
+import Sound from "utils/sound";
 
 interface ITrackable {
     id: string;
@@ -29,6 +31,7 @@ interface ITrackableFormContainerProps<T extends ITrackable> extends
     RouteComponentProps<{}>,
     IWithHeaderProps,
     IWithApolloProps,
+    IWithDIContainerProps,
     InjectedIntlProps {
     trackable?: T;
     isUserLoggedIn: boolean;

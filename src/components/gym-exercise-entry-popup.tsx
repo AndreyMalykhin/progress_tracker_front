@@ -7,6 +7,7 @@ import {
 import FormTextInput from "components/form-text-input";
 import Modal from "components/modal";
 import * as React from "react";
+import Sound from "utils/sound";
 
 interface IGymExerciseEntryPopupResult {
     date: number;
@@ -75,7 +76,11 @@ class GymExerciseEntryPopup
                 </FormBody>
                 <FormFooter>
                     <FormButtonCancel onPress={onCancel}/>
-                    <FormButtonOk disabled={!isValid} onPress={onSubmit} />
+                    <FormButtonOk
+                        sound={Sound.ProgressChange}
+                        disabled={!isValid}
+                        onPress={onSubmit}
+                    />
                 </FormFooter>
             </Modal>
         );

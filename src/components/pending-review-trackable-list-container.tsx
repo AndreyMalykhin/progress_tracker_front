@@ -19,6 +19,7 @@ import Offline from "components/offline";
 import PendingReviewTrackableList, {
     IPendingReviewTrackableListItemNode,
 } from "components/pending-review-trackable-list";
+import { ToastSeverity } from "components/toast";
 import withDIContainer, {
     IWithDIContainerProps,
 } from "components/with-di-container";
@@ -65,6 +66,7 @@ import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
+import Sound from "utils/sound";
 
 interface IPendingReviewTrackableListContainerProps extends
     IOwnProps,
@@ -247,10 +249,14 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private showToast(
-       msgId: string, msgValues?: { [key: string]: string|number },
+       msgId: string,
+       msgValues?: { [key: string]: string|number },
+       sound?: Sound,
     ) {
         const toast = {
             msg: this.props.intl.formatMessage({ id: msgId }, msgValues),
+            severity: ToastSeverity.Info,
+            sound: sound || null,
         };
         addToast(toast, this.props.client);
     }
@@ -274,6 +280,7 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private async commitApproveItem(id: string, difficulty: Difficulty) {
+        this.props.diContainer.audioManager.play(Sound.Approve);
         let response;
 
         try {
@@ -305,6 +312,7 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private async commitRejectItem(id: string, reason: RejectReason) {
+        this.props.diContainer.audioManager.play(Sound.Reject);
         let response;
 
         try {
@@ -333,6 +341,7 @@ class PendingReviewTrackableListContainer extends React.Component<
 
 export default compose(
     withDIContainer,
+    withApollo,
     withSession,
     withLogin<IPendingReviewTrackableListContainerProps>(
         "pendingReviewList.loginToSeeFriends",
@@ -359,7 +368,8 @@ export default compose(
         Error, (props) => props.data),
     withOffline<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
         Offline, "getPendingReviewTrackables", (props) => props.data),
-    withRefresh<IPendingReviewTrackableListContainerProps>({
+    withRefresh<IPendingReviewTrackableListContainerProps, IGetDataResponse>({
+        dataField: "getPendingReviewTrackables",
         getQuery: (props) => props.data,
         isMyData: (props) => props.audience === Audience.Me,
         isReadonlyData: () => false,
@@ -368,7 +378,6 @@ export default compose(
         EmptyList,
         (props) => props.data.getPendingReviewTrackables.edges,
     ),
-    withApollo,
     withApprove,
     withReject,
     withLoginAction,

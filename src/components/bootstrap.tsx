@@ -3,6 +3,7 @@ import en from "messages/en";
 import { addLocaleData } from "react-intl";
 import * as enLocaleData from "react-intl/locale-data/en";
 
+import { addGenericErrorToast } from "actions/toast-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import * as Bottle from "bottlejs";
@@ -28,6 +29,7 @@ import makeApollo from "utils/make-apollo";
 import makeCache from "utils/make-cache";
 import MultiStackHistory from "utils/multi-stack-history";
 import NetworkTracker from "utils/network-tracker";
+import Sound from "utils/sound";
 
 interface IBootstrapState {
     isDone?: boolean;
@@ -79,6 +81,21 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
 
         await this.diContainer.networkTracker.start();
         this.diContainer.deadlineTracker.start();
+
+        try {
+            await this.diContainer.audioManager.loadAll([
+                Sound.Click,
+                Sound.GoalAchieve,
+                Sound.ProgressChange,
+                Sound.Approve,
+                Sound.Reject,
+                Sound.Remove,
+                Sound.Error,
+            ]);
+        } catch (e) {
+            // no op
+        }
+
         this.setState({ isDone: true });
     }
 }

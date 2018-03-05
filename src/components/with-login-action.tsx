@@ -1,7 +1,10 @@
 import { ILoginResponse, login, loginQuery } from "actions/login-action";
 import { addGenericErrorToast } from "actions/toast-helpers";
 import { isApolloError } from "apollo-client/errors/ApolloError";
-import { withApollo } from "react-apollo";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
+import { compose, withApollo } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { IWithApolloProps } from "utils/interfaces";
 
@@ -14,19 +17,20 @@ function withLoginAction<P>(
 ) {
     const WithLoginAction = graphql<
         ILoginResponse,
-        P & IWithApolloProps,
+        P & IWithLoginActionProps & IWithDIContainerProps & IWithApolloProps,
         P & IWithLoginActionProps
     >(
         loginQuery,
         {
             props: ({ ownProps, mutate }) => {
+                const { client, diContainer } = ownProps;
                 return {
                     onLogin: async () => {
                         try {
-                            return await login(mutate!, ownProps.client);
+                            return await login(mutate!, client);
                         } catch (e) {
                             if (!isApolloError(e)) {
-                                addGenericErrorToast(ownProps.client);
+                                addGenericErrorToast(client);
                             }
 
                             return false;
@@ -37,7 +41,7 @@ function withLoginAction<P>(
         },
     );
 
-    return withApollo(WithLoginAction(component));
+    return WithLoginAction(component);
 }
 
 export { IWithLoginActionProps };

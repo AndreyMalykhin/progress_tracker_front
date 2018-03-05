@@ -1,17 +1,24 @@
 import { DataProxy } from "apollo-cache";
+import { ToastSeverity } from "components/toast";
 import gql from "graphql-tag";
 import Type from "models/type";
+import AudioManager from "utils/audio-manager";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
 import makeLog from "utils/make-log";
+import Sound from "utils/sound";
 
 interface IAddToastFragment {
     msg: string;
+    severity: ToastSeverity;
+    sound: Sound|null;
 }
 
 interface IToastFragment {
     __typename: Type;
     msg: string;
+    severity: ToastSeverity;
+    sound: Sound|null;
 }
 
 interface IUIFragment {
@@ -43,6 +50,8 @@ const uiFragment = gql`
 fragment AddToastUIFragment on UI {
     toasts {
         msg
+        severity
+        sound
     }
 }`;
 
@@ -64,7 +73,8 @@ function addGenericErrorToast(apollo: DataProxy) {
         { __typename: Type.Message, id: `${locale}_errors.unexpected` })!;
     const msg = apollo.readFragment<IMessageFragment>(
         { id: msgFragmentId, fragment: msgFragment })!.text;
-    addToast({ msg }, apollo);
+    const toast = { msg, severity: ToastSeverity.Error, sound: Sound.Error };
+    addToast(toast, apollo);
 }
 
 function removeToast(index: number, apollo: DataProxy) {

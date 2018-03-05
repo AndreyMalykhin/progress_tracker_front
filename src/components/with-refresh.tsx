@@ -4,6 +4,7 @@ import { IWithSessionProps } from "components/with-session";
 import { IWithSyncStatusProps } from "components/with-sync-status";
 import * as React from "react";
 import { QueryProps } from "react-apollo";
+import QueryStatus from "utils/query-status";
 
 interface IWithRefreshProps {
     isRefreshing: boolean;
@@ -11,24 +12,27 @@ interface IWithRefreshProps {
 }
 
 interface IState {
-    isRefreshing: boolean;
+    isRefreshingManually: boolean;
 }
 
 interface IOwnProps extends
     IWithSyncStatusProps, IWithNetworkStatusProps, IWithSessionProps {}
 
-interface IOptions<P> {
-    isMyData: (props: P) => boolean;
-    isReadonlyData: (props: P) => boolean;
-    getQuery: (props: P) => QueryProps;
+interface IOptions<TProps, TData> {
+    dataField: keyof TData;
+    isMyData: (props: TProps) => boolean;
+    isReadonlyData: (props: TProps) => boolean;
+    getQuery: (props: TProps) => QueryProps & TData;
 }
 
-function withRefresh<P extends IOwnProps>(options: IOptions<P>) {
-    return (Component: React.ComponentType<P & IWithRefreshProps>) => {
-        const { isMyData, getQuery, isReadonlyData } = options;
+function withRefresh<TProps extends IOwnProps, TData extends {}>(
+    options: IOptions<TProps, TData>,
+) {
+    return (Component: React.ComponentType<TProps & IWithRefreshProps>) => {
+        const { isMyData, getQuery, isReadonlyData, dataField } = options;
 
-        class WithRefresh extends React.Component<P> {
-            public state: IState = { isRefreshing: false };
+        class WithRefresh extends React.Component<TProps> {
+            public state: IState = { isRefreshingManually: false };
 
             public render() {
                 const { session, isSyncing, isOnline } = this.props;
@@ -36,13 +40,21 @@ function withRefresh<P extends IOwnProps>(options: IOptions<P>) {
                     && (!isSyncing || isReadonlyData(this.props))
                     && (!isAnonymous(session) || !isMyData(this.props));
                 const onRefresh = canRefresh ? this.onRefresh : undefined;
+                const isRefreshing = this.state.isRefreshingManually
+                    || this.isRefreshingAutomatically();
                 return (
                     <Component
-                        isRefreshing={this.state.isRefreshing}
+                        isRefreshing={isRefreshing}
                         onRefresh={onRefresh}
                         {...this.props}
                     />
                 );
+            }
+
+            private isRefreshingAutomatically() {
+                const query = getQuery(this.props);
+                return query[dataField]
+                    && query.networkStatus === QueryStatus.InitialLoading;
             }
 
             private onRefresh = async () => {

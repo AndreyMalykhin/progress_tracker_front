@@ -1,11 +1,14 @@
 import { CacheResolverMap, NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client";
+import { ApolloLink } from "apollo-link";
 import * as Bottle from "bottlejs";
 import DeadlineTracker from "models/deadline-tracker";
 import { makeCacheResolver } from "resolvers/cache-resolver";
 import makeStateResolver from "resolvers/make-state-resolver";
 import IStateResolver from "resolvers/state-resolver";
+import AudioManager from "utils/audio-manager";
 import { IEnvConfig, makeEnvConfig } from "utils/env-config";
+import { makeErrorLink } from "utils/error-link";
 import InMemoryCache from "utils/in-memory-cache";
 import makeApollo from "utils/make-apollo";
 import makeCache from "utils/make-cache";
@@ -50,10 +53,19 @@ class DIContainer {
     public get envConfig(): IEnvConfig {
         return this.impl.envConfig;
     }
+
+    public get audioManager(): AudioManager {
+        return this.impl.audioManager;
+    }
+
+    public get errorLink(): ApolloLink {
+        return this.impl.errorLink;
+    }
 }
 
 function makeDIContainer() {
     const di = new Bottle();
+    di.service("audioManager", AudioManager);
     di.service("deadlineTracker", DeadlineTracker, "apollo", "envConfig");
     di.service("networkTracker", NetworkTracker, "apollo", "envConfig");
     di.service("history", MultiStackHistory);
@@ -62,9 +74,16 @@ function makeDIContainer() {
     di.factory("cacheResolver", (container) => {
         return makeCacheResolver(() => container.apollo);
     });
+    di.serviceFactory("errorLink", makeErrorLink);
     di.serviceFactory("cache", makeCache, "stateResolver", "cacheResolver");
     di.serviceFactory(
-        "apollo", makeApollo, "cache", "stateResolver", "envConfig");
+        "apollo",
+        makeApollo,
+        "cache",
+        "stateResolver",
+        "envConfig",
+        "errorLink",
+    );
     return new DIContainer(di.container);
 }
 

@@ -3,12 +3,14 @@ import * as React from "react";
 import { StyleProp, StyleSheet, Text, ViewStyle } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import IconName from "utils/icon-name";
+import Sound from "utils/sound";
 
 interface ICheckBoxProps {
     isChecked?: boolean;
     isDisabled?: boolean;
     isAnimationDisabled?: boolean;
     style?: StyleProp<ViewStyle>;
+    sound?: Sound;
     onPress?: (isChecked: boolean) => void;
 }
 
@@ -20,12 +22,14 @@ class CheckBox extends React.PureComponent<ICheckBoxProps> {
             isAnimationDisabled,
             children,
             style,
+            sound,
             onPress,
         } = this.props;
         const iconName = isChecked ? IconName.Checked : IconName.Unchecked;
         const iconStyle = isChecked ? iconCheckedStyle : styles.icon;
         return (
             <Button
+                sound={sound}
                 disabled={isDisabled}
                 isAnimationDisabled={isAnimationDisabled}
                 onPress={onPress && this.onPress}

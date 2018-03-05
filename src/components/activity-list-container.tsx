@@ -236,7 +236,8 @@ export default compose(
     withError<IActivityListContainerProps>(Error, (props) => props.data),
     withOffline<IActivityListContainerProps, IGetDataResponse>(
         Offline, "getActivities", (props) => props.data),
-    withRefresh<IActivityListContainerProps>({
+    withRefresh<IActivityListContainerProps, IGetDataResponse>({
+        dataField: "getActivities",
         getQuery: (props) => props.data,
         isMyData: (props) => props.audience === Audience.Me,
         isReadonlyData: (props) => false,

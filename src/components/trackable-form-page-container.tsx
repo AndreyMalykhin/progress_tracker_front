@@ -83,7 +83,7 @@ const withData =
 class TrackableFormPageContainer extends
     React.Component<ITrackableFormPageContainerProps> {
     public render() {
-        const { data, session, match, isOnline, ...restProps } = this.props;
+        const { data, session, match, ...restProps } = this.props;
         const trackable = data && data.getTrackable;
         const trackableType = match.params.type
             || trackable!.__typename as TrackableType;
@@ -100,7 +100,6 @@ class TrackableFormPageContainer extends
 export default compose(
     withRouter,
     withSession,
-    withNetworkStatus,
     withData,
     withLoader<ITrackableFormPageContainerProps, IGetDataResponse>(Loader, {
         dataField: "getTrackable",

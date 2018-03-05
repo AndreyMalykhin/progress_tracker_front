@@ -1,6 +1,7 @@
 import { addGenericErrorToast } from "actions/toast-helpers";
 import { DataProxy } from "apollo-cache";
 import { onError } from "apollo-link-error";
+import AudioManager from "utils/audio-manager";
 import makeLog from "utils/make-log";
 
 interface IContext {
@@ -10,15 +11,18 @@ interface IContext {
 
 const log = makeLog("error-link");
 
-const ErrorLink = onError((error) => {
-    // TODO
-    log.error("error=%o", error);
-    const { cache, isOfflineOperation } =
-        error.operation.getContext() as IContext;
+function makeErrorLink() {
+    return onError((error) => {
+        // TODO send to analytics
 
-    if (!isOfflineOperation) {
-        addGenericErrorToast(cache);
-    }
-});
+        log.error("error=%o", error);
+        const { cache, isOfflineOperation } =
+            error.operation.getContext() as IContext;
 
-export default ErrorLink;
+        if (!isOfflineOperation) {
+            addGenericErrorToast(cache);
+        }
+    });
+}
+
+export { makeErrorLink };

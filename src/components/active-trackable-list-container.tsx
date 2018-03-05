@@ -74,7 +74,7 @@ import {
 import { IHeaderState } from "components/header";
 import Loader from "components/loader";
 import Offline from "components/offline";
-import Toast from "components/toast";
+import Toast, { ToastSeverity } from "components/toast";
 import withDIContainer, {
     IWithDIContainerProps,
 } from "components/with-di-container";
@@ -134,6 +134,7 @@ import openImgPicker from "utils/open-img-picker";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
+import Sound from "utils/sound";
 
 interface IActiveTrackableListContainerProps extends
     IOwnProps,
@@ -1086,6 +1087,8 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private async onCommitRemoveItem(id: string) {
+        this.props.diContainer.audioManager.play(Sound.Remove);
+
         try {
             await this.props.onCommitRemoveItem(id);
         } catch (e) {
@@ -1145,7 +1148,7 @@ class ActiveTrackableListContainer extends React.Component<
             return;
         }
 
-        this.showToast("notifications.goalAchieved");
+        this.showToast("notifications.goalAchieved", Sound.GoalAchieve);
     }
 
     private onStartNewGymExerciseEntry = (id: string) => {
@@ -1157,16 +1160,18 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onStartProveItem = async (id: string) => {
-        if (!this.props.onEnsureUserLoggedIn()) {
+        const { onEnsureUserLoggedIn, diContainer, client } = this.props;
+
+        if (!onEnsureUserLoggedIn()) {
             return;
         }
 
         let image: Image|null;
 
         try {
-            image = await openImgPicker();
+            image = await openImgPicker(diContainer.audioManager);
         } catch (e) {
-            addGenericErrorToast(this.props.client);
+            addGenericErrorToast(client);
             return;
         }
 
@@ -1180,12 +1185,13 @@ class ActiveTrackableListContainer extends React.Component<
     private async commitProveItem(id: string, image: Image) {
         this.setItemProving(id, true, async () => {
             let response: IProveTrackableResponse;
+            const { client, diContainer, onCommitProveItem } = this.props;
 
             try {
-                response = await this.props.onCommitProveItem(id, image);
+                response = await onCommitProveItem(id, image);
             } catch (e) {
                 if (!isApolloError(e)) {
-                    addGenericErrorToast(this.props.client);
+                    addGenericErrorToast(client);
                 }
 
                 return;
@@ -1203,7 +1209,7 @@ class ActiveTrackableListContainer extends React.Component<
                 msgId = "notifications.goalPendingReview";
             }
 
-            this.showToast(msgId);
+            this.showToast(msgId, Sound.Approve);
         });
     }
 
@@ -1244,14 +1250,15 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private async shareProvedGoal(response: IProveTrackableResponse) {
+        const { client, intl, diContainer } = this.props;
         const fragmentId = dataIdFromObject(response.proveTrackable.trackable)!;
-        const title = this.props.client.readFragment<IShareProvedGoalFragment>(
+        const title = client.readFragment<IShareProvedGoalFragment>(
             { id: fragmentId, fragment: shareProvedGoalFragment })!.title;
 
         try {
-            await share("share.provedGoal", this.props.intl, { title });
+            await share("share.provedGoal", intl, { title });
         } catch (e) {
-            addGenericErrorToast(this.props.client);
+            addGenericErrorToast(client);
         }
     }
 
@@ -1367,8 +1374,12 @@ class ActiveTrackableListContainer extends React.Component<
             (item) => (item.item as IActiveTrackableListItem).node.id);
     }
 
-    private showToast(msgId: string) {
-        const toast = { msg: this.props.intl.formatMessage({ id: msgId }) };
+    private showToast(msgId: string, sound: Sound) {
+        const toast = {
+            msg: this.props.intl.formatMessage({ id: msgId }),
+            severity: ToastSeverity.Info,
+            sound,
+        };
         addToast(toast, this.props.client);
     }
 
@@ -1440,7 +1451,8 @@ export default compose(
     withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>(
         "getActiveTrackables", (props) => props.data),
     injectIntl,
-    withRefresh<IActiveTrackableListContainerProps>({
+    withRefresh<IActiveTrackableListContainerProps, IGetDataResponse>({
+        dataField: "getActiveTrackables",
         getQuery: (props) => props.data,
         isMyData: (props) => isMyId(props.match.params.id, props.session),
         isReadonlyData: (props) => false,

@@ -1,18 +1,25 @@
 import { removeToast } from "actions/toast-helpers";
 import ToastList, { IToastListItem } from "components/toast-list";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import gql from "graphql-tag";
 import * as React from "react";
 import { compose, QueryProps, withApollo } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { IWithApolloProps } from "utils/interfaces";
+import Sound from "utils/sound";
 
-interface IToastListContainerProps extends IWithApolloProps {
+interface IToastListContainerProps extends
+    IWithApolloProps, IWithDIContainerProps {
     data: QueryProps & IGetDataResponse;
 }
 
 interface IGetDataResponse {
     ui: {
-        toasts: IToastListItem[];
+        toasts: Array<IToastListItem & {
+            sound?: Sound;
+        }>;
     };
 }
 
@@ -21,6 +28,8 @@ query GetData {
     ui @client {
         toasts {
             msg
+            severity
+            sound
         }
     }
 }`;
@@ -39,12 +48,22 @@ class ToastListContainer extends React.Component<IToastListContainerProps> {
             <ToastList
                 items={data.ui.toasts}
                 onCloseToast={this.onCloseToast}
+                onOpenToast={this.onOpenToast}
             />
         );
     }
 
     private onCloseToast = (index: number) =>
         removeToast(index, this.props.client)
+
+    private onOpenToast = (index: number) => {
+        const sound = this.props.data.ui.toasts[index].sound;
+
+        if (sound) {
+            this.props.diContainer.audioManager.play(sound);
+        }
+    }
 }
 
-export default compose(withData, withApollo)(ToastListContainer);
+export default compose(withDIContainer, withApollo, withData)(
+    ToastListContainer);

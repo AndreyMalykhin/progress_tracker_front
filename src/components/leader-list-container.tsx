@@ -132,7 +132,8 @@ export default compose(
     withError<ILeaderListContainerProps>(Error, (props) => props.data),
     withOffline<ILeaderListContainerProps, IGetDataResponse>(
         Offline, "getLeaders", (props) => props.data),
-    withRefresh<ILeaderListContainerProps>({
+    withRefresh<ILeaderListContainerProps, IGetDataResponse>({
+        dataField: "getLeaders",
         getQuery: (props) => props.data,
         isMyData: (props) => props.audience === Audience.Friends,
         isReadonlyData: () => true,

@@ -24,7 +24,9 @@ import GoalFormContainer, {
 } from "components/goal-form-container";
 import { IHeaderState } from "components/header";
 import TaskGoalForm, { ITask } from "components/task-goal-form";
+import withDIContainer from "components/with-di-container";
 import withHeader from "components/with-header";
+import withNetworkStatus from "components/with-network-status";
 import { debounce, throttle } from "lodash";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
@@ -301,6 +303,8 @@ class TaskGoalFormContainer extends GoalFormContainer<
 export { ITaskGoal };
 export default compose(
     withRouter,
+    withDIContainer,
+    withNetworkStatus,
     withApollo,
     withAddGoal,
     withEditGoal,

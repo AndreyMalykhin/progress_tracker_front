@@ -5108,6 +5108,10 @@ react-native-progress@^3.4.0:
   dependencies:
     prop-types "^15.5.8"
 
+react-native-sound@^0.10.8:
+  version "0.10.8"
+  resolved "https://registry.yarnpkg.com/react-native-sound/-/react-native-sound-0.10.8.tgz#07b785b93eca0ba8dc35b841a0d68799d807f515"
+
 react-native-splash-screen@^3.0.6:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/react-native-splash-screen/-/react-native-splash-screen-3.0.6.tgz#c0bbf2c8ae40a313c4c7044f55e569414ff68332"

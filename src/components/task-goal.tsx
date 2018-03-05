@@ -8,6 +8,7 @@ import { memoize } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
+import Sound from "utils/sound";
 
 interface ITask {
     id: string;
@@ -98,6 +99,7 @@ class Task extends React.PureComponent<ITaskProps> {
                     isAnimationDisabled={true}
                     isDisabled={isDisabled}
                     isChecked={isDone}
+                    sound={Sound.ProgressChange}
                     onPress={this.onPress}
                 >
                     <Text style={titleStyle}>{title}</Text>

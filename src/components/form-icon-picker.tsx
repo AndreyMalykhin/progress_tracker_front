@@ -1,5 +1,8 @@
 import Button, { ButtonIcon } from "components/button";
 import { FormGroup, FormLabel } from "components/form";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import * as React from "react";
 import {
     Dimensions,
@@ -9,6 +12,7 @@ import {
     View,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import Sound from "utils/sound";
 
 interface IFormIconPickerExpandedProps {
     availableIconNames: string[];
@@ -28,7 +32,7 @@ interface IListItemProps {
 }
 
 class FormIconPickerExpanded extends
-    React.PureComponent<IFormIconPickerExpandedProps> {
+    React.PureComponent<IFormIconPickerExpandedProps & IWithDIContainerProps> {
     public render() {
         const columnCount = Math.floor(Dimensions.get("window").width / 80);
         return (
@@ -48,15 +52,23 @@ class FormIconPickerExpanded extends
             <ListItem
                 iconName={info.item}
                 isSelected={this.props.iconName === info.item}
-                onPress={this.props.onSelect}
+                onPress={this.onSelectItem}
             />
         );
+    }
+
+    private onSelectItem = (iconName: string) => {
+        this.props.diContainer.audioManager.play(Sound.Click);
+        this.props.onSelect(iconName);
     }
 
     private getItemKey(item: string) {
         return item;
     }
 }
+
+const EnchanchedFormIconPickerExpanded =
+    withDIContainer(FormIconPickerExpanded);
 
 // tslint:disable-next-line:max-classes-per-file
 class ListItem extends React.PureComponent<IListItemProps> {
@@ -75,9 +87,7 @@ class ListItem extends React.PureComponent<IListItemProps> {
         );
     }
 
-    private onPress = () => {
-        this.props.onPress(this.props.iconName);
-    }
+    private onPress = () => this.props.onPress(this.props.iconName);
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -119,4 +129,7 @@ const styles = StyleSheet.create({
 const expandedIconSelectedStyle =
     [styles.expandedListItemIcon, styles.expandedListItemIconSelected];
 
-export { FormIconPickerExpanded, FormIconPickerCollapsed };
+export {
+    EnchanchedFormIconPickerExpanded as FormIconPickerExpanded,
+    FormIconPickerCollapsed,
+};

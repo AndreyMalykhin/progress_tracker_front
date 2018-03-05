@@ -1,7 +1,7 @@
 import { getSession } from "actions/session-helpers";
 import { setContext } from "apollo-link-context";
 
-const AuthLink = setContext((request, context) => {
+const authLink = setContext((request, context) => {
     const { accessToken } = getSession(context.cache);
 
     if (accessToken) {
@@ -13,4 +13,4 @@ const AuthLink = setContext((request, context) => {
     return context;
 });
 
-export default AuthLink;
+export default authLink;

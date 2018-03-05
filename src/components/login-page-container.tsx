@@ -2,6 +2,7 @@ import { skipLogin } from "actions/skip-login-action";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
 import LoginPage, { ILoginPageProps } from "components/login-page";
+import withDIContainer from "components/with-di-container";
 import withLoginAction, {
     IWithLoginActionProps,
 } from "components/with-login-action";
@@ -27,4 +28,5 @@ class LoginPageContainer extends React.Component<ILoginPageContainerProps> {
     private onSkip = () => skipLogin(this.props.client);
 }
 
-export default compose(withApollo, withLoginAction)(LoginPageContainer);
+export default compose(withDIContainer, withApollo, withLoginAction)(
+    LoginPageContainer);

@@ -1,14 +1,16 @@
-import Toast from "components/toast";
+import Toast, { ToastSeverity } from "components/toast";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 
 interface IToastListProps {
     items: IToastListItem[];
     onCloseToast: (index: number) => void;
+    onOpenToast: (index: number) => void;
 }
 
 interface IToastListItem {
-    msg: React.ReactNode;
+    msg: string;
+    severity: ToastSeverity;
 }
 
 class ToastList extends React.PureComponent<IToastListProps> {
@@ -21,10 +23,16 @@ class ToastList extends React.PureComponent<IToastListProps> {
             return null;
         }
 
+        const item = items[0];
         return (
             <View pointerEvents="box-none" style={styles.container}>
-                <Toast key={this.nextToastId} onClose={this.onCloseToast}>
-                    {items[0].msg}
+                <Toast
+                    key={this.nextToastId}
+                    severity={item.severity}
+                    onClose={this.onCloseToast}
+                    onOpen={this.onOpenToast}
+                >
+                    {item.msg}
                 </Toast>
             </View>
         );
@@ -32,7 +40,13 @@ class ToastList extends React.PureComponent<IToastListProps> {
 
     private onCloseToast = () => {
         ++this.nextToastId;
-        this.props.onCloseToast(0);
+        const index = 0;
+        this.props.onCloseToast(index);
+    }
+
+    private onOpenToast = () => {
+        const index = 0;
+        this.props.onOpenToast(index);
     }
 }
 

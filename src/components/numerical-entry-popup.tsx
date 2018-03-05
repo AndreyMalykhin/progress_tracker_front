@@ -8,6 +8,7 @@ import FormTextInput from "components/form-text-input";
 import Modal from "components/modal";
 import * as React from "react";
 import { TextInput } from "react-native";
+import Sound from "utils/sound";
 
 interface INumericalEntryPopupProps {
     isValid: boolean;
@@ -43,7 +44,11 @@ class NumericalEntryPopup
                 </FormBody>
                 <FormFooter>
                     <FormButtonCancel onPress={onCancel}/>
-                    <FormButtonOk disabled={!isValid} onPress={onSubmit} />
+                    <FormButtonOk
+                        disabled={!isValid}
+                        sound={Sound.ProgressChange}
+                        onPress={onSubmit}
+                    />
                 </FormFooter>
             </Modal>
         );

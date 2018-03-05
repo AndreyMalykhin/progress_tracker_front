@@ -1,3 +1,6 @@
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import * as React from "react";
 import {
     GestureResponderEvent,
@@ -7,14 +10,19 @@ import {
     TouchableWithoutFeedback,
     TouchableWithoutFeedbackProperties,
 } from "react-native";
+import Sound from "utils/sound";
 
 interface ITouchableWithFeedbackProps extends
     TouchableWithoutFeedbackProperties {
     isAnimationDisabled?: boolean;
+    sound?: Sound;
 }
 
 class TouchableWithFeedback extends
-    React.Component<ITouchableWithFeedbackProps> {
+    React.Component<ITouchableWithFeedbackProps & IWithDIContainerProps> {
+    public static defaultProps: ITouchableWithFeedbackProps =
+        { sound: Sound.Click };
+
     public render() {
         const { isAnimationDisabled, children, onPress, ...restProps } =
             this.props;
@@ -36,6 +44,10 @@ class TouchableWithFeedback extends
     }
 
     private onPress = (e: GestureResponderEvent) => {
+        if (this.props.sound) {
+            this.props.diContainer.audioManager.play(this.props.sound);
+        }
+
         requestAnimationFrame(() => {
             if (this.props.onPress) {
                 this.props.onPress(e);
@@ -45,4 +57,4 @@ class TouchableWithFeedback extends
 }
 
 export { ITouchableWithFeedbackProps };
-export default TouchableWithFeedback;
+export default withDIContainer(TouchableWithFeedback);

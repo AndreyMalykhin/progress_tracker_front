@@ -18,7 +18,9 @@ import TrackableFormContainer, {
     ITrackableFormContainerProps,
     ITrackableFormContainerState,
 } from "components/trackable-form-container";
+import withDIContainer from "components/with-di-container";
 import withHeader from "components/with-header";
+import withNetworkStatus from "components/with-network-status";
 import TrackableType from "models/trackable-type";
 import * as React from "react";
 import { compose } from "react-apollo";
@@ -124,6 +126,8 @@ class GymExerciseFormContainer extends TrackableFormContainer<
 export { IGymExercise };
 export default compose(
     withRouter,
+    withDIContainer,
+    withNetworkStatus,
     withApollo,
     withAddGymExercise,
     withEditGymExercise,

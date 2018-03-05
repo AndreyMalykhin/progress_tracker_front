@@ -108,7 +108,7 @@ export default {
     "notifications.goalApproved": "Goal approved!",
     "notifications.goalPendingReview": "Goal is pending review now.",
     "notifications.reviewRewarded":
-        "You have earned {rating} rating for doing review",
+        "You have earned {rating} rating for doing review.",
     "notifications.userReported": "Thank you for improving our service!",
     "numericalEntryForm.entryPlaceholder": "1",
     "numericalGoalForm.maxProgressLabel": "Max progress",

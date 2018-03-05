@@ -163,7 +163,8 @@ export default compose(
         Error, (props) => props.data),
     withOffline<IArchivedTrackableListContainerProps, IGetDataResponse>(
         Offline, "getArchivedTrackables", (props) => props.data),
-    withRefresh<IArchivedTrackableListContainerProps>({
+    withRefresh<IArchivedTrackableListContainerProps, IGetDataResponse>({
+        dataField: "getArchivedTrackables",
         getQuery: (props) => props.data,
         isMyData: (props) => isMyId(props.userId, props.session),
         isReadonlyData: (props) => false,

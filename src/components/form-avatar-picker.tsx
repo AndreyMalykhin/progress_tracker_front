@@ -4,8 +4,11 @@ import Button, { ButtonTitle } from "components/button";
 import { FormGroup } from "components/form";
 import Image from "components/image";
 import Loader from "components/loader";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import * as React from "react";
-import { withApollo } from "react-apollo";
+import { compose, withApollo } from "react-apollo";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import ImagePicker, {
     Image as ImageInfo,
@@ -13,7 +16,8 @@ import ImagePicker, {
 import { IWithApolloProps } from "utils/interfaces";
 import openImgPicker from "utils/open-img-picker";
 
-interface IFormAvatarPickerProps {
+interface IFormAvatarPickerProps extends
+    IWithApolloProps, IWithDIContainerProps {
     style?: StyleProp<ViewStyle>;
     errorMsgId?: string|null;
     uri: string;
@@ -22,8 +26,7 @@ interface IFormAvatarPickerProps {
     onChangeImg: (img: ImageInfo|null) => void;
 }
 
-class FormAvatarPicker extends
-    React.PureComponent<IFormAvatarPickerProps & IWithApolloProps> {
+class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
     public render() {
         const { errorMsgId, uri, disabled, changing, style } = this.props;
         let buttons;
@@ -63,11 +66,12 @@ class FormAvatarPicker extends
 
     private onSelect = async () => {
         let image;
+        const { diContainer, client, onChangeImg } = this.props;
 
         try {
-            image = await openImgPicker();
+            image = await openImgPicker(diContainer.audioManager);
         } catch (e) {
-            addGenericErrorToast(this.props.client);
+            addGenericErrorToast(client);
             return;
         }
 
@@ -75,7 +79,7 @@ class FormAvatarPicker extends
             return;
         }
 
-        this.props.onChangeImg(image);
+        onChangeImg(image);
     }
 
     private onRemove = () => this.props.onChangeImg(null);
@@ -95,4 +99,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default withApollo(FormAvatarPicker);
+export default compose(withApollo, withDIContainer)(FormAvatarPicker);

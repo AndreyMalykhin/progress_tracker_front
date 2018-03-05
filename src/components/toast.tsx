@@ -3,8 +3,15 @@ import * as React from "react";
 import { StyleSheet, View } from "react-native";
 
 interface IToastProps {
+    severity: ToastSeverity;
     duration?: number;
     onClose: () => void;
+    onOpen: () => void;
+}
+
+enum ToastSeverity {
+    Info = "Info",
+    Error = "Error",
 }
 
 class Toast extends React.Component<IToastProps> {
@@ -19,6 +26,10 @@ class Toast extends React.Component<IToastProps> {
                 </Text>
             </View>
         );
+    }
+
+    public componentWillMount() {
+        this.props.onOpen();
     }
 
     public componentDidMount() {
@@ -49,4 +60,5 @@ const styles = StyleSheet.create({
     },
 });
 
+export { ToastSeverity };
 export default Toast;

@@ -41,12 +41,20 @@
 		458A38EBD43D487EB221D8E3 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB401D739EFF44048B6C8389 /* MaterialCommunityIcons.ttf */; };
 		4E48BC556BE4473AB0248F27 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2668A9155F4B45CF81B3E4CA /* Entypo.ttf */; };
 		5151183A1BF648429680E149 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98989FDEADF149ADBC76D6DC /* libRNVectorIcons.a */; };
+		524FC7AA204C19FF0026C3F7 /* goal-achieve.wav in Resources */ = {isa = PBXBuildFile; fileRef = 524FC7A9204C19FF0026C3F7 /* goal-achieve.wav */; };
+		524FC7AC204C1AA50026C3F7 /* progress-change.wav in Resources */ = {isa = PBXBuildFile; fileRef = 524FC7AB204C1AA50026C3F7 /* progress-change.wav */; };
 		525271B4200142F1000B803C /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525271B0200142F0000B803C /* FBSDKCoreKit.framework */; };
 		525271B5200142F1000B803C /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525271B1200142F0000B803C /* FBSDKShareKit.framework */; };
 		525271B6200142F1000B803C /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525271B2200142F1000B803C /* Bolts.framework */; };
 		525271B7200142F1000B803C /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525271B3200142F1000B803C /* FBSDKLoginKit.framework */; };
+		5268C5DD204D3BEE000493F2 /* remove.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5268C5B0204D3BEE000493F2 /* remove.wav */; };
+		5268C5E0204D6F07000493F2 /* approve.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5268C5DE204D6F06000493F2 /* approve.wav */; };
+		5268C5E1204D6F07000493F2 /* reject.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5268C5DF204D6F07000493F2 /* reject.wav */; };
+		5268C5E3204D93C5000493F2 /* error.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5268C5E2204D93C5000493F2 /* error.wav */; };
 		52DAF5E9204433D7001B764D /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 52DAF5E520443399001B764D /* libRNFS.a */; };
 		52DD91432049A23500FA0B7C /* libSplashScreen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 52DD91422049A21D00FA0B7C /* libSplashScreen.a */; };
+		52F2CF16204A302C00921419 /* libRNSound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 52F2CF13204A301C00921419 /* libRNSound.a */; };
+		52F2CF18204A322F00921419 /* click.wav in Resources */ = {isa = PBXBuildFile; fileRef = 52F2CF17204A322F00921419 /* click.wav */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		60C55B5AF6CE49E6887EF5CB /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8FF5FC7C26A0406E8B0F9A74 /* MaterialIcons.ttf */; };
 		60E187CD18E64205BD0A4754 /* libimageCropPicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 273FDF1298B64991967A16E1 /* libimageCropPicker.a */; };
@@ -345,6 +353,13 @@
 			remoteGlobalIDString = 3D7682761D8E76B80014119E;
 			remoteInfo = SplashScreen;
 		};
+		52F2CF12204A301C00921419 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 52F2CEE5204A301C00921419 /* RNSound.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 19825A1E1BD4A89800EE0337;
+			remoteInfo = RNSound;
+		};
 		5E9157321DD0AC6500FF2AA8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */;
@@ -416,12 +431,20 @@
 		4149E77F0B7F4982B64BDDFB /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
 		48FF9BEF2C6B47B183BF7663 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		51382D87DEEC44579D260C3B /* libRNDeviceInfo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNDeviceInfo.a; sourceTree = "<group>"; };
+		524FC7A9204C19FF0026C3F7 /* goal-achieve.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = "goal-achieve.wav"; path = "../src/sounds/goal-achieve.wav"; sourceTree = "<group>"; };
+		524FC7AB204C1AA50026C3F7 /* progress-change.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = "progress-change.wav"; path = "../src/sounds/progress-change.wav"; sourceTree = "<group>"; };
 		525271B0200142F0000B803C /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		525271B1200142F0000B803C /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKShareKit.framework; sourceTree = "<group>"; };
 		525271B2200142F1000B803C /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		525271B3200142F1000B803C /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
+		5268C5B0204D3BEE000493F2 /* remove.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = remove.wav; path = ../src/sounds/remove.wav; sourceTree = "<group>"; };
+		5268C5DE204D6F06000493F2 /* approve.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = approve.wav; path = ../src/sounds/approve.wav; sourceTree = "<group>"; };
+		5268C5DF204D6F07000493F2 /* reject.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = reject.wav; path = ../src/sounds/reject.wav; sourceTree = "<group>"; };
+		5268C5E2204D93C5000493F2 /* error.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = error.wav; path = ../src/sounds/error.wav; sourceTree = "<group>"; };
 		52DAF5B820443399001B764D /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		52DD91132049A21D00FA0B7C /* SplashScreen.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SplashScreen.xcodeproj; path = "../node_modules/react-native-splash-screen/ios/SplashScreen.xcodeproj"; sourceTree = "<group>"; };
+		52F2CEE5204A301C00921419 /* RNSound.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSound.xcodeproj; path = "../node_modules/react-native-sound/RNSound.xcodeproj"; sourceTree = "<group>"; };
+		52F2CF17204A322F00921419 /* click.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = click.wav; path = ../src/sounds/click.wav; sourceTree = "<group>"; };
 		54B3DB3A92FA4DF9B81DA901 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
@@ -462,6 +485,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52F2CF16204A302C00921419 /* libRNSound.a in Frameworks */,
 				52DD91432049A23500FA0B7C /* libSplashScreen.a in Frameworks */,
 				52DAF5E9204433D7001B764D /* libRNFS.a in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
@@ -725,6 +749,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		52F2CEE6204A301C00921419 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				52F2CF13204A301C00921419 /* libRNSound.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		5E91572E1DD0AC6500FF2AA8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -746,6 +778,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				52F2CEE5204A301C00921419 /* RNSound.xcodeproj */,
 				52DD91132049A21D00FA0B7C /* SplashScreen.xcodeproj */,
 				52DAF5B820443399001B764D /* RNFS.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
@@ -780,6 +813,13 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				5268C5E2204D93C5000493F2 /* error.wav */,
+				5268C5DE204D6F06000493F2 /* approve.wav */,
+				5268C5DF204D6F07000493F2 /* reject.wav */,
+				5268C5B0204D3BEE000493F2 /* remove.wav */,
+				524FC7AB204C1AA50026C3F7 /* progress-change.wav */,
+				524FC7A9204C19FF0026C3F7 /* goal-achieve.wav */,
+				52F2CF17204A322F00921419 /* click.wav */,
 				525271AF200142B1000B803C /* Frameworks */,
 				13B07FAE1A68108700A75B9A /* progress_tracker */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -1015,6 +1055,10 @@
 				{
 					ProductGroup = 52DAF5B920443399001B764D /* Products */;
 					ProjectRef = 52DAF5B820443399001B764D /* RNFS.xcodeproj */;
+				},
+				{
+					ProductGroup = 52F2CEE6204A301C00921419 /* Products */;
+					ProjectRef = 52F2CEE5204A301C00921419 /* RNSound.xcodeproj */;
 				},
 				{
 					ProductGroup = 52C1B456200A97A400DE85A1 /* Products */;
@@ -1302,6 +1346,13 @@
 			remoteRef = 52DD91412049A21D00FA0B7C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		52F2CF13204A301C00921419 /* libRNSound.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNSound.a;
+			remoteRef = 52F2CF12204A301C00921419 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1352,12 +1403,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				52F2CF18204A322F00921419 /* click.wav in Resources */,
+				5268C5E0204D6F07000493F2 /* approve.wav in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				4E48BC556BE4473AB0248F27 /* Entypo.ttf in Resources */,
+				5268C5E1204D6F07000493F2 /* reject.wav in Resources */,
 				E2F3B069688A481E90B2C5AE /* EvilIcons.ttf in Resources */,
+				5268C5E3204D93C5000493F2 /* error.wav in Resources */,
+				524FC7AA204C19FF0026C3F7 /* goal-achieve.wav in Resources */,
 				A13662CFD2D4497CB4C8DCB9 /* Feather.ttf in Resources */,
+				524FC7AC204C1AA50026C3F7 /* progress-change.wav in Resources */,
 				B0B6290AB2F44BD1B304F98E /* FontAwesome.ttf in Resources */,
 				AB88DB165EBB4F1F8E302F7E /* Foundation.ttf in Resources */,
+				5268C5DD204D3BEE000493F2 /* remove.wav in Resources */,
 				C57C0387804649B2B28F7F9B /* Ionicons.ttf in Resources */,
 				458A38EBD43D487EB221D8E3 /* MaterialCommunityIcons.ttf in Resources */,
 				60C55B5AF6CE49E6887EF5CB /* MaterialIcons.ttf in Resources */,
@@ -1762,6 +1820,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-image-crop-picker/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-splash-screen/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-sound/RNSound/**",
 				);
 				INFOPLIST_FILE = progress_tracker/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "";
@@ -1796,6 +1855,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-image-crop-picker/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-splash-screen/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-sound/RNSound/**",
 				);
 				INFOPLIST_FILE = progress_tracker/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "";

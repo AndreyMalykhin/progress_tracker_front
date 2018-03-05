@@ -1,6 +1,9 @@
 import { share } from "actions/share-action";
-import { addGenericErrorToast, addToast } from "actions/toast-helpers";
+import { addGenericErrorToast } from "actions/toast-helpers";
 import FriendsSection from "components/friends-section";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withSession, { IWithSessionProps } from "components/with-session";
 import * as React from "react";
@@ -11,7 +14,11 @@ import IconName from "utils/icon-name";
 import { IWithApolloProps } from "utils/interfaces";
 
 interface IFriendsSectionContainerProps extends
-    IWithHeaderProps, IWithSessionProps, IWithApolloProps, InjectedIntlProps {}
+    IWithHeaderProps,
+    IWithSessionProps,
+    IWithApolloProps,
+    InjectedIntlProps,
+    IWithDIContainerProps {}
 
 class FriendsSectionContainer extends
     React.Component<IFriendsSectionContainerProps> {
@@ -46,16 +53,19 @@ class FriendsSectionContainer extends
     }
 
     private onInvite = async () => {
+        const { intl, client, diContainer } = this.props;
+
         try {
-            await share("share.app", this.props.intl);
+            await share("share.app", intl);
         } catch (e) {
-            addGenericErrorToast(this.props.client);
+            addGenericErrorToast(client);
         }
     }
 }
 
 export default compose(
     withHeader,
+    withDIContainer,
     withSession,
     withApollo,
     injectIntl,

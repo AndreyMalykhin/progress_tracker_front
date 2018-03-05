@@ -12,9 +12,8 @@ import { withClientState } from "apollo-link-state";
 import { InjectedIntl } from "react-intl";
 import { AsyncStorage } from "react-native";
 import IStateResolver from "resolvers/state-resolver";
-import AuthLink from "utils/auth-link";
+import authLink from "utils/auth-link";
 import { IEnvConfig } from "utils/env-config";
-import ErrorLink from "utils/error-link";
 import InMemoryCache from "utils/in-memory-cache";
 import makeLog from "utils/make-log";
 import OfflineLink from "utils/offline-link";
@@ -25,15 +24,16 @@ function makeApollo(
     cache: ApolloCache<any>,
     stateResolver: IStateResolver,
     envConfig: IEnvConfig,
+    errorLink: ApolloLink,
 ) {
     const offlineLink = new OfflineLink(envConfig);
     const stateLink = withClientState(
         { cache, resolvers: stateResolver.resolvers });
     const links = [
-        ErrorLink,
+        errorLink,
         offlineLink,
         stateLink,
-        AuthLink,
+        authLink,
         new HttpLink({ uri: envConfig.serverUrl + "/graphql" }),
     ];
 

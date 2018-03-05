@@ -154,7 +154,8 @@ export default compose(
     withError<IFriendListContainerProps>(Error, (props) => props.data),
     withOffline<IFriendListContainerProps, IGetDataResponse>(
         Offline, "getFriends", (props) => props.data),
-    withRefresh<IFriendListContainerProps>({
+    withRefresh<IFriendListContainerProps, IGetDataResponse>({
+        dataField: "getFriends",
         getQuery: (props) => props.data,
         isMyData: () => true,
         isReadonlyData: () => false,

@@ -27,7 +27,6 @@ interface ITrackableFormPageProps {
     trackable?: ITrackable;
     trackableType: TrackableType;
     isUserLoggedIn: boolean;
-    isOnline?: boolean;
 }
 
 class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
@@ -41,14 +40,12 @@ class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
     }
 
     private renderForm() {
-        const { trackable, trackableType, isUserLoggedIn, isOnline } =
-            this.props;
+        const { trackable, trackableType, isUserLoggedIn } = this.props;
         switch (trackableType) {
             case TrackableType.TaskGoal:
             return (
                 <TaskGoalFormContainer
                     isUserLoggedIn={isUserLoggedIn}
-                    isOnline={isOnline}
                     trackable={trackable as ITaskGoal}
                 />
             );
@@ -56,7 +53,6 @@ class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
             return (
                 <NumericalGoalFormContainer
                     isUserLoggedIn={isUserLoggedIn}
-                    isOnline={isOnline}
                     trackable={trackable as INumericalGoal}
                 />
             );
@@ -64,7 +60,6 @@ class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
             return (
                 <CounterFormContainer
                     isUserLoggedIn={isUserLoggedIn}
-                    isOnline={isOnline}
                     trackable={trackable as ICounter}
                 />
             );
@@ -72,7 +67,6 @@ class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
             return (
                 <GymExerciseFormContainer
                     isUserLoggedIn={isUserLoggedIn}
-                    isOnline={isOnline}
                     trackable={trackable as IGymExercise}
                 />
             );

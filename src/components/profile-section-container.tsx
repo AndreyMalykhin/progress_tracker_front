@@ -17,6 +17,7 @@ import Offline from "components/offline";
 import ProfileSection, {
     IProfileSectionNavItem, IProfileSectionProps,
 } from "components/profile-section";
+import { ToastSeverity } from "components/toast";
 import withDIContainer, {
     IWithDIContainerProps,
 } from "components/with-di-container";
@@ -54,6 +55,7 @@ import isMyId from "utils/is-my-id";
 import makeLog from "utils/make-log";
 import QueryStatus, { isLoading } from "utils/query-status";
 import routes from "utils/routes";
+import Sound from "utils/sound";
 
 interface IProfileSectionContainerProps extends
     IOwnProps,
@@ -335,16 +337,18 @@ class ProfileSectionContainer
             return;
         }
 
+        const { onCommitReportUser, remoteData, intl, diContainer, client } =
+            this.props;
+
         try {
-            await this.props.onCommitReportUser(
-                this.props.remoteData.getUser.id, reportReason);
+            await onCommitReportUser(remoteData.getUser.id, reportReason);
         } catch (e) {
             return;
         }
 
-        const msg = this.props.intl.formatMessage(
-            { id: "notifications.userReported" });
-        addToast({ msg }, this.props.client);
+        const msg = intl.formatMessage({ id: "notifications.userReported" });
+        addToast(
+            { severity: ToastSeverity.Info, msg, sound: Sound.Reject }, client);
     }
 
     private onStartNewTrackable = () => {
