@@ -4,12 +4,17 @@ import { QueryProps } from "react-apollo";
 
 type IOwnProps = IWithNetworkStatusProps;
 
+interface IOptions<TProps, TData> {
+    dataField: keyof TData;
+    getQuery: (props: TProps) => QueryProps & TData;
+}
+
 function withOffline<TProps extends IOwnProps, TData extends {}>(
-    Offline: React.ComponentType,
-    dataField: keyof TData,
-    getQuery: (props: TProps) => QueryProps & TData,
+    Offline: React.ComponentType, options: IOptions<TProps, TData>,
 ) {
     return (Component: React.ComponentType<TProps>) => {
+        const { dataField, getQuery } = options;
+
         class WithOffline extends React.Component<TProps> {
             public render() {
                 const query = getQuery(this.props);

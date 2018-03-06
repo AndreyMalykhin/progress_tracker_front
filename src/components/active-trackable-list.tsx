@@ -237,6 +237,7 @@ class ActiveTrackableList extends
                         renderItem={this.renderItem}
                         ListFooterComponent={loader}
                         contentContainerStyle={styles.listContent}
+                        style={styles.list}
                         onEndReached={onEndReached}
                         onEndReachedThreshold={0.5}
                         onViewableItemsChanged={onVisibleItemsChange}
@@ -296,30 +297,46 @@ class ActiveTrackableList extends
     private renderItem = (
         itemInfo: ListRenderItemInfo<IActiveTrackableListItem>,
     ) => {
-        return this.renderNode(itemInfo.item.node, itemInfo.index);
+        const { index, item } = itemInfo;
+        const isFirst = !index;
+        const isLast = index === this.props.items.length - 1;
+        return this.renderNode(item.node, index, isFirst, isLast);
     }
 
-    private renderNode = (node: IActiveTrackableListItemNode, index: number) => {
+    private renderNode = (
+        node: IActiveTrackableListItemNode,
+        index: number,
+        isFirst: boolean,
+        isLast: boolean,
+    ) => {
         switch (node.__typename) {
             case Type.Counter:
-            return this.renderCounter(node as ICounter, index);
+            return this.renderCounter(
+                node as ICounter, index, isFirst, isLast);
             case Type.GymExercise:
-            return this.renderGymExercise(node as IGymExercise, index);
+            return this.renderGymExercise(
+                node as IGymExercise, index, isFirst, isLast);
             case Type.Aggregate:
-            return this.renderAggregate(node as IAggregate, index);
+            return this.renderAggregate(
+                node as IAggregate, index, isFirst, isLast);
             case Type.NumericalGoal:
-            return this.renderNumericalGoal(node as INumericalGoal, index);
+            return this.renderNumericalGoal(
+                node as INumericalGoal, index, isFirst, isLast);
             case Type.TaskGoal:
-            return this.renderTaskGoal(node as ITaskGoal, index);
+            return this.renderTaskGoal(
+                node as ITaskGoal, index, isFirst, isLast);
         }
 
         throw new Error("Unexpected type: " + node.__typename);
     }
 
-    private renderCounter(item: ICounter, index: number) {
+    private renderCounter(
+        item: ICounter, index: number, isFirst: boolean, isLast: boolean,
+    ) {
         const { id, parent, iconName, title, progress, status, creationDate } =
             item;
         const {
+            items,
             itemsMeta,
             isAggregationMode,
             isReorderMode,
@@ -345,6 +362,9 @@ class ActiveTrackableList extends
                 isBatchEditMode={isAggregationMode}
                 isDragged={dragStatus != null}
                 isReorderMode={isReorderMode && !isAggregated}
+                isLast={isLast}
+                isFirst={isFirst}
+                isNested={parent != null}
                 status={status}
                 commands={onGetCounterCommands(id, isAggregated)}
                 duration={Date.now() - creationDate}
@@ -356,9 +376,13 @@ class ActiveTrackableList extends
         );
     }
 
-    private renderGymExercise(item: IGymExercise, index: number) {
-        const { id, iconName, title, recentEntries, status, creationDate } = item;
+    private renderGymExercise(
+        item: IGymExercise, index: number, isFirst: boolean, isLast: boolean,
+    ) {
+        const { id, iconName, title, recentEntries, status, creationDate } =
+            item;
         const {
+            items,
             isAggregationMode,
             isReorderMode,
             itemsMeta,
@@ -373,7 +397,8 @@ class ActiveTrackableList extends
         } = this.props;
         const { isExpanded, isDisabled, isSelected, dragStatus } =
             itemsMeta[id];
-        const items =  onGetGymExerciseItems(id, recentEntries, isExpanded!);
+        const gymExerciseItems =
+            onGetGymExerciseItems(id, recentEntries, isExpanded!);
         return (
             <GymExercise
                 key={id}
@@ -382,14 +407,16 @@ class ActiveTrackableList extends
                 iconName={iconName}
                 title={title}
                 commands={onGetGymExerciseCommands(id)}
-                items={items}
+                items={gymExerciseItems}
                 isSelected={isSelected}
                 isDisabled={isDisabled}
                 isDragged={dragStatus != null}
                 isExpanded={isExpanded}
-                isExpandable={onIsGymExerciseExpandable(items)}
+                isExpandable={onIsGymExerciseExpandable(gymExerciseItems)}
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode}
+                isLast={isLast}
+                isFirst={isFirst}
                 status={status}
                 duration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
@@ -401,7 +428,9 @@ class ActiveTrackableList extends
         );
     }
 
-    private renderNumericalGoal(item: INumericalGoal, index: number) {
+    private renderNumericalGoal(
+        item: INumericalGoal, index: number, isFirst: boolean, isLast: boolean,
+    ) {
         const {
             id,
             parent,
@@ -414,6 +443,7 @@ class ActiveTrackableList extends
             creationDate,
         } = item;
         const {
+            items,
             isAggregationMode,
             isReorderMode,
             itemsMeta,
@@ -449,6 +479,9 @@ class ActiveTrackableList extends
                 isProveable={onIsItemProveable(status)}
                 isProveDisabled={!isOnline}
                 isProving={isProving}
+                isLast={isLast}
+                isFirst={isFirst}
+                isNested={parent != null}
                 status={status}
                 commands={commands}
                 duration={Date.now() - creationDate}
@@ -461,7 +494,9 @@ class ActiveTrackableList extends
         );
     }
 
-    private renderTaskGoal(item: ITaskGoal, index: number) {
+    private renderTaskGoal(
+        item: ITaskGoal, index: number, isFirst: boolean, isLast: boolean,
+    ) {
         const {
             id,
             parent,
@@ -475,6 +510,7 @@ class ActiveTrackableList extends
             creationDate,
         } = item;
         const {
+            items,
             isAggregationMode,
             isReorderMode,
             itemsMeta,
@@ -520,6 +556,9 @@ class ActiveTrackableList extends
                 isExpandable={onIsTaskGoalExpandable(tasks.length)}
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode && !isAggregated}
+                isLast={isLast}
+                isFirst={isFirst}
+                isNested={parent != null}
                 status={status}
                 duration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
@@ -533,7 +572,9 @@ class ActiveTrackableList extends
         );
     }
 
-    private renderAggregate(item: IAggregate, index: number): JSX.Element {
+    private renderAggregate(
+        item: IAggregate, index: number, isFirst: boolean, isLast: boolean,
+    ): JSX.Element {
         const { id, progress, maxTotalProgress, children, status } = item;
         const {
             items,
@@ -547,10 +588,11 @@ class ActiveTrackableList extends
             onPressOutItem,
         } = this.props;
         const { isDisabled, isSelected, dragStatus } = itemsMeta[id];
-        const isAfterAggregate = index > 0
-            && items[index - 1].node.__typename === Type.Aggregate;
-        const isBeforeAggregate = index < items.length - 1
-            && items[index + 1].node.__typename === Type.Aggregate;
+        const childrenElements = children.map((child, i) => {
+            const isFirstChild = !i;
+            const isLastChild = i === children.length - 1;
+            return this.renderNode(child, index, isFirstChild, isLastChild);
+        });
         return (
             <Aggregate
                 key={id}
@@ -564,8 +606,6 @@ class ActiveTrackableList extends
                 isDisabled={isDisabled}
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode}
-                isAfterAggregate={isAfterAggregate}
-                isBeforeAggregate={isBeforeAggregate}
                 isLast={index === items.length - 1}
                 isFirst={!index}
                 commands={onGetAggregateCommands(id)}
@@ -574,7 +614,7 @@ class ActiveTrackableList extends
                 onLayout={onItemLayout}
                 onPressOut={onPressOutItem}
             >
-                {children.map(this.renderNode)}
+                {childrenElements}
             </Aggregate>
         );
     }
@@ -588,13 +628,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    listContent: {
-        paddingLeft: 8,
-        paddingRight: 8,
-        paddingTop: 8,
+    list: {
+        backgroundColor: "#edf0f5",
     },
+    listContent: {},
     reorderablePlaceholder: {
-        borderRadius: 8,
+        backgroundColor: "#000",
     },
 });
 

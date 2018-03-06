@@ -233,9 +233,14 @@ export default compose(
         dataField: "getActivities",
         getQuery: (props) => props.data,
     }),
-    withError<IActivityListContainerProps>(Error, (props) => props.data),
-    withOffline<IActivityListContainerProps, IGetDataResponse>(
-        Offline, "getActivities", (props) => props.data),
+    withError<IActivityListContainerProps, IGetDataResponse>(Error, {
+        dataField: "getActivities",
+        getQuery: (props) => props.data,
+    }),
+    withOffline<IActivityListContainerProps, IGetDataResponse>(Offline, {
+        dataField: "getActivities",
+        getQuery: (props) => props.data,
+    }),
     withRefresh<IActivityListContainerProps, IGetDataResponse>({
         dataField: "getActivities",
         getQuery: (props) => props.data,
@@ -244,6 +249,8 @@ export default compose(
     }),
     withEmptyList<IActivityListContainerProps>(
         EmptyList, (props) => props.data.getActivities.edges),
-    withLoadMore<IActivityListContainerProps, IGetDataResponse>(
-        "getActivities", (props) => props.data),
+    withLoadMore<IActivityListContainerProps, IGetDataResponse>({
+        dataField: "getActivities",
+        getQuery: (props) => props.data,
+    }),
 )(ActivityListContainer);

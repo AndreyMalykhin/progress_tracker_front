@@ -9,7 +9,10 @@ import * as React from "react";
 import { FlatList, ListRenderItemInfo, StyleSheet, Text } from "react-native";
 import QueryStatus from "utils/query-status";
 
-type IItemProps = IArchivedTrackableListItemNode;
+interface IItemProps extends IArchivedTrackableListItemNode {
+    isFirst?: boolean;
+    isLast?: boolean;
+}
 
 interface IArchivedTrackableListItem {
     node: IArchivedTrackableListItemNode;
@@ -50,6 +53,7 @@ class ArchivedTrackableList extends
                 initialNumToRender={4}
                 refreshing={isRefreshing}
                 contentContainerStyle={styles.listContent}
+                style={styles.list}
                 data={items}
                 keyExtractor={this.getItemKey}
                 renderItem={this.onRenderItem}
@@ -64,7 +68,12 @@ class ArchivedTrackableList extends
     private onRenderItem = (
         itemInfo: ListRenderItemInfo<IArchivedTrackableListItem>,
     ) => {
-        return <Item {...itemInfo.item.node} />;
+        const { index } = itemInfo;
+        const isFirst = !index;
+        const isLast = index === this.props.items.length - 1;
+        return (
+            <Item {...itemInfo.item.node} isFirst={isFirst} isLast={isLast} />
+        );
     }
 
     private getItemKey(item: IArchivedTrackableListItem) {
@@ -89,6 +98,8 @@ class Item extends React.PureComponent<IItemProps> {
             creationDate,
             statusChangeDate,
             proofPhotoUrlMedium,
+            isFirst,
+            isLast,
         } = this.props;
         const progressBar = progress !== maxProgress && (
             <ProgressBar
@@ -109,6 +120,8 @@ class Item extends React.PureComponent<IItemProps> {
                 rejectCount={rejectCount}
                 duration={statusChangeDate - creationDate}
                 proofPhotoUrl={proofPhotoUrlMedium}
+                isFirst={isFirst}
+                isLast={isLast}
             >
                 {progressBar}
             </Trackable>
@@ -117,11 +130,10 @@ class Item extends React.PureComponent<IItemProps> {
 }
 
 const styles = StyleSheet.create({
-    listContent: {
-        paddingLeft: 8,
-        paddingRight: 8,
-        paddingTop: 8,
+    list: {
+        backgroundColor: "#edf0f5",
     },
+    listContent: {},
 });
 
 export { IArchivedTrackableListItem, IArchivedTrackableListItemNode };

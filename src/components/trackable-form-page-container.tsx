@@ -106,5 +106,8 @@ export default compose(
         getQuery: (props) => props.data,
         showIfNoQuery: false,
     }),
-    withError<ITrackableFormPageContainerProps>(Error, (props) => props.data),
+    withError<ITrackableFormPageContainerProps, IGetDataResponse>(Error, {
+        dataField: "getTrackable",
+        getQuery: (props) => props.data,
+    }),
 )(TrackableFormPageContainer);

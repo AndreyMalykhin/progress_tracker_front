@@ -20,6 +20,7 @@ import {
     PanResponderGestureState,
     StyleProp,
     StyleSheet,
+    TextStyle,
     TouchableWithoutFeedback,
     View,
     ViewStyle,
@@ -43,10 +44,14 @@ interface ITrackableProps {
     isDragged?: boolean;
     isExpandable?: boolean;
     isExpanded?: boolean;
-    isNoCard?: boolean;
+    isLast?: boolean;
+    isFirst?: boolean;
+    isNested?: boolean;
     commands?: ICommandBarItem[];
     duration?: number;
     style?: StyleProp<ViewStyle>;
+    cardHeaderStyle?: StyleProp<ViewStyle>;
+    cardHeaderTitleStyle?: StyleProp<TextStyle>;
     title: string;
     iconName?: string;
     rating?: number;
@@ -112,13 +117,18 @@ class Trackable extends React.Component<ITrackableProps> {
             isExpandable,
             commands,
             style,
+            cardHeaderStyle,
+            cardHeaderTitleStyle,
             duration,
             proofPhotoUrl,
             isProveable,
             isReviewable,
-            isNoCard,
+            isLast,
+            isFirst,
+            isNested,
             userName,
             userAvatarUrl,
+            parentId,
             onLayout,
             onLongPress,
             onPressOut,
@@ -129,7 +139,14 @@ class Trackable extends React.Component<ITrackableProps> {
         const newContainerStyle = [
             styles.container,
             style,
+            isFirst && styles.containerFirst,
+            isLast && styles.containerLast,
+            isNested && styles.containerNested,
             isDragged && styles.containerDragged,
+        ];
+        const cardBodyStyle = [
+            isNested && styles.cardBodyNested,
+            isLast && styles.cardBodyLast,
         ];
         return (
             <View style={newContainerStyle as any}>
@@ -139,16 +156,16 @@ class Trackable extends React.Component<ITrackableProps> {
                     onLongPress={onLongPress && this.onLongPress}
                     onPressIn={onLayout && this.onPressIn}
                     onPressOut={onPressOut && this.onPressOut}
-                    style={[styles.card, isNoCard && styles.cardAbsent]}
+                    style={styles.card}
                 >
                     {(userName || userAvatarUrl) && this.renderUser()}
-                    <CardHeader style={isNoCard && styles.cardHeaderAbsent}>
+                    <CardHeader style={cardHeaderStyle}>
                         {icon}
-                        <CardTitle text={title} />
+                        <CardTitle style={cardHeaderTitleStyle} text={title} />
                         {commands && commands.length && this.renderCmdBar()}
                     </CardHeader>
                     {proofPhotoUrl && this.renderProofPhoto()}
-                    <CardBody style={isNoCard && styles.cardBodyAbsent}>
+                    <CardBody style={cardBodyStyle as any}>
                         {children}
                         {isExpandable && this.renderExpandBtn()}
                         {this.renderAchievementDetails()}
@@ -463,31 +480,39 @@ const styles = StyleSheet.create({
     card: {
         flex: 1,
     },
-    cardAbsent: {
-        borderWidth: 0,
+    cardBodyLast: {
+        borderBottomWidth: 0,
     },
-    cardBodyAbsent: {
-        paddingBottom: 0,
+    cardBodyNested: {
+        borderBottomWidth: 1,
+        borderColor: "#edf0f5",
+        marginLeft: 8,
+        marginRight: 8,
         paddingLeft: 0,
         paddingRight: 0,
-        paddingTop: 0,
-    },
-    cardHeaderAbsent: {
-        paddingBottom: 0,
-        paddingLeft: 0,
-        paddingRight: 0,
-        paddingTop: 0,
     },
     checkBox: {
-        alignSelf: "center",
-        paddingRight: 8,
+        alignSelf: "flex-start",
+        paddingLeft: 8,
+        paddingTop: 8,
     },
     container: {
+        backgroundColor: "#fff",
         flexDirection: "row",
         marginBottom: 8,
     },
     containerDragged: {
         opacity: 0,
+    },
+    containerFirst: {
+        marginTop: 8,
+    },
+    containerLast: {
+        marginBottom: 8,
+    },
+    containerNested: {
+        marginBottom: 0,
+        marginTop: 0,
     },
     expandBtn: {
         alignSelf: "center",
@@ -510,13 +535,13 @@ const styles = StyleSheet.create({
     },
     statusIcon: {
         color: "#888",
-        lineHeight: 32,
+        lineHeight: 24,
         marginRight: 8,
     },
     statusMsg: {
         color: "#888",
         fontSize: 10,
-        lineHeight: 32,
+        lineHeight: 24,
     },
 });
 

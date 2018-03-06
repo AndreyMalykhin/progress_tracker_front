@@ -495,7 +495,8 @@ class ActiveTrackableListContainer extends React.Component<
         props: IActiveTrackableListContainerProps, context: any,
     ) {
         super(props, context);
-        this.initItemsMeta(props.data.getActiveTrackables.edges);
+        this.state.itemsMeta =
+            this.initItemsMeta(props.data.getActiveTrackables.edges);
         this.onGetGymExerciseItems = memoize(
             this.onGetGymExerciseItems,
             this.resolveOnGetGymExerciseItemsCacheKey,
@@ -580,7 +581,14 @@ class ActiveTrackableListContainer extends React.Component<
         if (nextProps.data.getActiveTrackables.edges !==
             this.props.data.getActiveTrackables.edges
         ) {
-            this.initItemsMeta(nextProps.data.getActiveTrackables.edges);
+            const itemsMeta =
+                this.initItemsMeta(nextProps.data.getActiveTrackables.edges);
+
+            if (this.state.isAggregationMode) {
+                this.updateAggregationTargets(itemsMeta);
+            }
+
+            this.setState({ itemsMeta });
         }
     }
 
@@ -591,7 +599,7 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private initItemsMeta(items: IActiveTrackableListItem[]) {
-        const { itemsMeta } = this.state;
+        const itemsMeta = { ...this.state.itemsMeta };
 
         for (const { node } of items) {
             if (!itemsMeta[node.id]) {
@@ -606,6 +614,8 @@ class ActiveTrackableListContainer extends React.Component<
                 }
             }
         }
+
+        return itemsMeta;
     }
 
     private onGetGymExerciseCommands = (id: string) => {
@@ -1434,9 +1444,14 @@ export default compose(
         dataField: "getActiveTrackables",
         getQuery: (props) => props.data,
     }),
-    withError<IActiveTrackableListContainerProps>(Error, (props) => props.data),
-    withOffline<IActiveTrackableListContainerProps, IGetDataResponse>(
-        Offline, "getActiveTrackables", (props) => props.data),
+    withError<IActiveTrackableListContainerProps, IGetDataResponse>(Error, {
+        dataField: "getActiveTrackables",
+        getQuery: (props) => props.data,
+    }),
+    withOffline<IActiveTrackableListContainerProps, IGetDataResponse>(Offline, {
+        dataField: "getActiveTrackables",
+        getQuery: (props) => props.data,
+    }),
     withApollo,
     withReorder,
     withSetTaskDone,
@@ -1448,8 +1463,10 @@ export default compose(
     withUnaggregate,
     withBreak,
     withAggregate,
-    withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>(
-        "getActiveTrackables", (props) => props.data),
+    withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>({
+        dataField: "getActiveTrackables",
+        getQuery: (props) => props.data,
+    }),
     injectIntl,
     withRefresh<IActiveTrackableListContainerProps, IGetDataResponse>({
         dataField: "getActiveTrackables",

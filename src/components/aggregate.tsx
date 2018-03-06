@@ -44,6 +44,7 @@ class Aggregate extends React.Component<IAggregateProps> {
 
     public render() {
         const {
+            id,
             intl,
             children,
             progress,
@@ -73,22 +74,24 @@ class Aggregate extends React.Component<IAggregateProps> {
 
         const style = [
             styles.container,
-            isDragged ? styles.containerDragged : null,
-            isAfterAggregate ? styles.containerAfterAggregate : null,
-            isBeforeAggregate ? styles.containerBeforeAggregate : null,
-            isFirst ? styles.containerFirst : null,
-            isLast ? styles.containerLast : null,
+            isFirst && styles.containerFirst,
+            isDragged && styles.containerDragged,
         ];
         const title = intl.formatMessage(
             { id: "aggregate.total" }, { progress: progressValue });
         return (
-            <View style={style}>
-                <View ref={this.onLayoutContainerRef as any}>
+            <View style={style as any}>
+                <View
+                    style={styles.content}
+                    ref={this.onLayoutContainerRef as any}
+                >
                     <Trackable
+                        id={id}
+                        isNested={true}
                         isDragged={isDragged}
                         title={title}
-                        isNoCard={true}
-                        style={styles.trackable}
+                        cardHeaderStyle={styles.cardHeader}
+                        cardHeaderTitleStyle={styles.cardHeaderTitle}
                         onGetLayoutRef={this.onGetLayoutRef}
                         {...restProps}
                     >
@@ -106,30 +109,26 @@ class Aggregate extends React.Component<IAggregateProps> {
 }
 
 const styles = StyleSheet.create({
+    cardHeader: {
+        paddingBottom: 0,
+    },
+    cardHeaderTitle: {
+        fontWeight: "bold",
+    },
     container: {
-        marginBottom: 32,
-        marginTop: 24,
-    },
-    containerAfterAggregate: {
-        marginTop: 0,
-    },
-    containerBeforeAggregate: {
-        marginBottom: 24,
+        marginBottom: 8,
     },
     containerDragged: {
         opacity: 0,
     },
     containerFirst: {
-        marginTop: 0,
+        marginTop: 8,
     },
-    containerLast: {
-        marginBottom: 0,
+    content: {
+        backgroundColor: "#fff",
     },
     progressBar: {
         marginTop: 0,
-    },
-    trackable: {
-        marginBottom: 0,
     },
 });
 

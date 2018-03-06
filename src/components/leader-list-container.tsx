@@ -129,9 +129,14 @@ export default compose(
         dataField: "getLeaders",
         getQuery: (props) => props.data,
     }),
-    withError<ILeaderListContainerProps>(Error, (props) => props.data),
-    withOffline<ILeaderListContainerProps, IGetDataResponse>(
-        Offline, "getLeaders", (props) => props.data),
+    withError<ILeaderListContainerProps, IGetDataResponse>(Error, {
+        dataField: "getLeaders",
+        getQuery: (props) => props.data,
+    }),
+    withOffline<ILeaderListContainerProps, IGetDataResponse>(Offline, {
+        dataField: "getLeaders",
+        getQuery: (props) => props.data,
+    }),
     withRefresh<ILeaderListContainerProps, IGetDataResponse>({
         dataField: "getLeaders",
         getQuery: (props) => props.data,
@@ -140,6 +145,8 @@ export default compose(
     }),
     withEmptyList<ILeaderListContainerProps>(
         EmptyList, (props) => props.data.getLeaders.edges),
-    withLoadMore<ILeaderListContainerProps, IGetDataResponse>(
-        "getLeaders", (props) => props.data),
+    withLoadMore<ILeaderListContainerProps, IGetDataResponse>({
+        dataField: "getLeaders",
+        getQuery: (props) => props.data,
+    }),
 )(LeaderListContainer);

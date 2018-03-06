@@ -40,11 +40,10 @@ interface IGymExerciseProps {
     isDisabled?: boolean;
     isReorderMode?: boolean;
     isDragged?: boolean;
+    isFirst?: boolean;
+    isLast?: boolean;
     commands?: ICommandBarItem[];
     duration?: number;
-    cardStyle?: StyleProp<ViewStyle>;
-    cardHeaderStyle?: StyleProp<ViewStyle>;
-    cardBodyStyle?: StyleProp<ViewStyle>;
     style?: StyleProp<ViewStyle>;
     iconName: string;
     title: string;

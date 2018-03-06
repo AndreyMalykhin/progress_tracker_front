@@ -4,7 +4,9 @@ import Image from "components/image";
 import Text from "components/text";
 import * as React from "react";
 import {
+    StyleProp,
     StyleSheet,
+    TextStyle,
     TouchableWithoutFeedback,
     TouchableWithoutFeedbackProperties,
     View,
@@ -30,6 +32,7 @@ interface ICardHeaderProps extends ViewProperties {
 type ICardBodyProps = ViewProperties;
 
 interface ICardTitleProps {
+    style?: StyleProp<TextStyle>;
     text: string;
     isPrimary?: boolean;
     onPress?: () => void;
@@ -98,11 +101,11 @@ class CardHeader extends React.Component<ICardHeaderProps> {
 // tslint:disable-next-line:max-classes-per-file
 class CardTitle extends React.PureComponent<ICardTitleProps> {
     public render() {
-        const { isPrimary, text, onPress } = this.props;
+        const { isPrimary, text, style, onPress } = this.props;
         return (
             <Text
                 numberOfLines={2}
-                style={[styles.title, isPrimary && styles.titlePrimary]}
+                style={[styles.title, style, isPrimary && styles.titlePrimary]}
                 onPress={onPress}
             >
                 {this.props.text}
@@ -153,6 +156,7 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     body: {
+        paddingBottom: 8,
         paddingLeft: 8,
         paddingRight: 8,
     },
@@ -161,9 +165,6 @@ const styles = StyleSheet.create({
     },
     container: {
         backgroundColor: "#fff",
-        borderRadius: 8,
-        borderWidth: 1,
-        overflow: "hidden",
     },
     header: {
         alignItems: "center",
@@ -176,7 +177,11 @@ const styles = StyleSheet.create({
     },
     headerPrimary: {
         borderBottomWidth: 1,
-        paddingBottom: 8,
+        borderColor: "#edf0f5",
+        marginLeft: 8,
+        marginRight: 8,
+        paddingLeft: 0,
+        paddingRight: 0,
     },
     icon: {
         paddingRight: 8,

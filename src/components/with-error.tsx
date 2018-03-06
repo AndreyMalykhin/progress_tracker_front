@@ -3,24 +3,34 @@ import * as React from "react";
 import { QueryProps } from "react-apollo";
 import QueryStatus from "utils/query-status";
 
-function withError<TProps extends {}>(
-    error: React.ComponentType,
-    getQuery: (props: TProps) => QueryProps | undefined,
+interface IOptions<TProps, TData> {
+    dataField: keyof TData;
+    getQuery: (props: TProps) => (QueryProps & TData) | undefined;
+}
+
+function withError<TProps extends {}, TData extends {}>(
+    error: React.ComponentType, options: IOptions<TProps, TData>,
 ) {
     return (Component: React.ComponentType<TProps>) => {
-        return class WithError extends React.Component<TProps> {
+        const { dataField, getQuery } = options;
+
+        class WithError extends React.Component<TProps> {
             public render() {
                 const query = getQuery(this.props);
 
-                if (query && (query.networkStatus === QueryStatus.Error
-                    || query.error)
+                if (query
+                    && (query.error
+                        || query.networkStatus === QueryStatus.Error)
+                    && !query[dataField]
                 ) {
                     return React.createElement(error);
                 }
 
                 return <Component {...this.props} />;
             }
-        };
+        }
+
+        return WithError;
     };
 }
 

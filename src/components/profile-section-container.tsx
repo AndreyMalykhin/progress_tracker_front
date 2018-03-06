@@ -31,7 +31,6 @@ import withNetworkStatus, {
     IWithNetworkStatusProps,
 } from "components/with-network-status";
 import withNoUpdatesInBackground from "components/with-no-updates-in-background";
-import withOffline from "components/with-offline";
 import withSession, { IWithSessionProps } from "components/with-session";
 import withSyncStatus, {
     IWithSyncStatusProps,
@@ -389,8 +388,10 @@ export default compose(
         dataField: "getUser",
         getQuery: (props) => props.remoteData,
     }),
-    withError<IProfileSectionContainerProps>(
-        Error, (props) => props.remoteData),
+    withError<IProfileSectionContainerProps, IGetRemoteDataResponse>(Error, {
+        dataField: "getUser",
+        getQuery: (props) => props.remoteData,
+    }),
     withApollo,
     withReportUser,
     injectIntl,

@@ -320,9 +320,14 @@ export default compose(
         dataField: "getUser",
         getQuery: (props) => props.data,
     }),
-    withError<IProfileFormContainerProps>(Error, (props) => props.data),
-    withOffline<IProfileFormContainerProps, IGetDataResponse>(
-        Offline, "getUser", (props) => props.data),
+    withError<IProfileFormContainerProps, IGetDataResponse>(Error, {
+        dataField: "getUser",
+        getQuery: (props) => props.data,
+    }),
+    withOffline<IProfileFormContainerProps, IGetDataResponse>(Offline, {
+        dataField: "getUser",
+        getQuery: (props) => props.data,
+    }),
     withApollo,
     withSetAvatar,
     withEditUser,

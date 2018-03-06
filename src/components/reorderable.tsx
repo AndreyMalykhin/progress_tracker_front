@@ -169,7 +169,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     placeholder: {
-        backgroundColor: "#000",
         position: "absolute",
     },
 });

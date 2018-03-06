@@ -9,19 +9,25 @@ interface IWithLoadMoreProps {
     onLoadMore: () => void;
 }
 
-interface IResponse {
-    [key: string]: any;
+interface IData {
+    [field: string]: any;
+}
+
+interface IOptions<TProps, TData> {
+    dataField: keyof TData;
+    getQuery: (props: TProps) => QueryProps & TData;
 }
 
 function withLoadMore<
     TProps extends IWithLoadMoreProps & IWithNetworkStatusProps,
-    TResponse extends IResponse
+    TData extends IData
 >(
-    responseField: keyof TResponse,
-    getData: (props: TProps) => QueryProps & TResponse,
+    options: IOptions<TProps, TData>,
 ) {
     return (Component: React.ComponentType<TProps>) => {
-        return class WithLoadMore extends React.Component<TProps> {
+        const { dataField, getQuery } = options;
+
+        class WithLoadMore extends React.Component<TProps> {
             public constructor(props: TProps, context: any) {
                 super(props, context);
                 this.onLoadMore = throttle(this.onLoadMore, 1024);
@@ -34,12 +40,11 @@ function withLoadMore<
             }
 
             private onLoadMore = () => {
-                const data = getData(this.props);
-                const { fetchMore, networkStatus } = data;
-                const response = (data as any)[responseField] as
-                    IConnection<any, any>;
+                const query = getQuery(this.props);
+                const { fetchMore, networkStatus } = query;
+                const data = query[dataField];
 
-                if (!response.pageInfo.hasNextPage
+                if (!data.pageInfo.hasNextPage
                     || isLoading(networkStatus)
                     || !this.props.isOnline
                 ) {
@@ -48,40 +53,41 @@ function withLoadMore<
 
                 try {
                     fetchMore({
-                        updateQuery: this.updateQuery,
-                        variables: { cursor: response.pageInfo.endCursor },
+                        updateQuery: this.updateQuery as any,
+                        variables: { cursor: data.pageInfo.endCursor },
                     });
                 } catch (e) {
                     // already reported
                 }
             }
 
-            private updateQuery(previousResult: IResponse, options: any) {
-                const fetchMoreResult: IResponse = options.fetchMoreResult;
+            private updateQuery(previousResult: TData, updateOptions: any) {
+                const fetchMoreResult: TData = updateOptions.fetchMoreResult;
                 const { edges, pageInfo } =
-                    fetchMoreResult![responseField] as IConnection<any, any>;
+                    fetchMoreResult![dataField] as IConnection<any, any>;
 
                 if (!edges.length) {
                     return {
-                        ...previousResult,
-                        [responseField]: {
-                            ...previousResult[responseField] as object,
+                        ...previousResult as object,
+                        [dataField]: {
+                            ...previousResult[dataField] as object,
                             pageInfo,
                         },
                     };
                 }
 
-                const previousEdges = (previousResult[responseField] as
-                    IConnection<any, any>).edges;
+                const previousEdges = previousResult[dataField].edges;
                 return {
-                    ...fetchMoreResult,
-                    [responseField]: {
-                        ...fetchMoreResult![responseField] as object,
+                    ...fetchMoreResult as object,
+                    [dataField]: {
+                        ...fetchMoreResult![dataField] as object,
                         edges: previousEdges.concat(edges),
                     },
                 };
             }
-        };
+        }
+
+        return WithLoadMore;
     };
 }
 

@@ -35,6 +35,8 @@ interface IItemProps extends ISharedProps {
     statusChangeDate: number;
     proofPhotoUrlMedium: string;
     isReviewable?: boolean;
+    isFirst?: boolean;
+    isLast?: boolean;
     userId?: string;
     userAvatarUrl?: string;
     userName?: string;
@@ -91,6 +93,7 @@ class PendingReviewTrackableList extends
                     initialNumToRender={2}
                     refreshing={isRefreshing}
                     contentContainerStyle={styles.listContent}
+                    style={styles.list}
                     data={items}
                     keyExtractor={this.getItemKey}
                     renderItem={this.onRenderItem}
@@ -108,12 +111,14 @@ class PendingReviewTrackableList extends
         itemInfo: ListRenderItemInfo<IPendingReviewTrackableListItem>,
     ) => {
         const {
+            items,
             audience,
             onApproveItem,
             onEndReached,
             onPressUser,
             onRejectItem,
         } = this.props;
+        const { index } = itemInfo;
         const { user, isReviewed, ...restProps } = itemInfo.item.node;
         const isMy = audience === Audience.Me;
         return (
@@ -122,6 +127,8 @@ class PendingReviewTrackableList extends
                 userName={isMy ? undefined : user.name}
                 userAvatarUrl={isMy ? undefined : user.avatarUrlSmall}
                 isReviewable={!isMy && !isReviewed}
+                isFirst={!index}
+                isLast={index === items.length - 1}
                 audience={audience}
                 onApproveItem={onApproveItem}
                 onEndReached={onEndReached}
@@ -154,6 +161,8 @@ class Item extends React.PureComponent<IItemProps> {
             userAvatarUrl,
             audience,
             isReviewable,
+            isFirst,
+            isLast,
             onPressUser,
             onApproveItem,
             onRejectItem,
@@ -165,6 +174,8 @@ class Item extends React.PureComponent<IItemProps> {
                 userName={userName}
                 userAvatarUrl={userAvatarUrl}
                 isReviewable={isReviewable}
+                isFirst={isFirst}
+                isLast={isLast}
                 id={id}
                 title={title}
                 iconName={iconName}
@@ -185,11 +196,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    listContent: {
-        paddingLeft: 8,
-        paddingRight: 8,
-        paddingTop: 8,
+    list: {
+        backgroundColor: "#edf0f5",
     },
+    listContent: {},
 });
 
 export { IPendingReviewTrackableListItemNode };

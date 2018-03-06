@@ -3,7 +3,6 @@ import { ApolloClient } from "apollo-client";
 import App, { IAppProps } from "components/app";
 import Error from "components/error";
 import Loader from "components/loader";
-import withError from "components/with-error";
 import withLoader from "components/with-loader";
 import gql from "graphql-tag";
 import { History } from "history";

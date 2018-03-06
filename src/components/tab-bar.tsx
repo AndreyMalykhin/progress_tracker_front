@@ -127,6 +127,7 @@ class TabBarItemIcon extends React.PureComponent<ITabBarItemIconProps> {
 const styles = StyleSheet.create({
     container: {
         alignItems: "center",
+        backgroundColor: "#fff",
         flexDirection: "row",
         justifyContent: "space-around",
     },

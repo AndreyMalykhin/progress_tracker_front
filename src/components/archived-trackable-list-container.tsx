@@ -159,10 +159,17 @@ export default compose(
         dataField: "getArchivedTrackables",
         getQuery: (props) => props.data,
     }),
-    withError<IArchivedTrackableListContainerProps>(
-        Error, (props) => props.data),
+    withError<IArchivedTrackableListContainerProps, IGetDataResponse>(Error, {
+        dataField: "getArchivedTrackables",
+        getQuery: (props) => props.data,
+    }),
     withOffline<IArchivedTrackableListContainerProps, IGetDataResponse>(
-        Offline, "getArchivedTrackables", (props) => props.data),
+        Offline,
+        {
+            dataField: "getArchivedTrackables",
+            getQuery: (props) => props.data,
+        },
+    ),
     withRefresh<IArchivedTrackableListContainerProps, IGetDataResponse>({
         dataField: "getArchivedTrackables",
         getQuery: (props) => props.data,
@@ -171,6 +178,8 @@ export default compose(
     }),
     withEmptyList<IArchivedTrackableListContainerProps>(
         EmptyList, (props) => props.data.getArchivedTrackables.edges),
-    withLoadMore<IArchivedTrackableListContainerProps, IGetDataResponse>(
-        "getArchivedTrackables", (props) => props.data),
+    withLoadMore<IArchivedTrackableListContainerProps, IGetDataResponse>({
+        dataField: "getArchivedTrackables",
+        getQuery: (props) => props.data,
+    }),
 )(ArchivedTrackableListContainer);

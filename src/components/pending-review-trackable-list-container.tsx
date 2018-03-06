@@ -364,10 +364,20 @@ export default compose(
             getQuery: (props) => props.data,
         },
     ),
-    withError<IPendingReviewTrackableListContainerProps>(
-        Error, (props) => props.data),
+    withError<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
+        Error,
+        {
+            dataField: "getPendingReviewTrackables",
+            getQuery: (props) => props.data,
+        },
+    ),
     withOffline<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
-        Offline, "getPendingReviewTrackables", (props) => props.data),
+        Offline,
+        {
+            dataField: "getPendingReviewTrackables",
+            getQuery: (props) => props.data,
+        },
+    ),
     withRefresh<IPendingReviewTrackableListContainerProps, IGetDataResponse>({
         dataField: "getPendingReviewTrackables",
         getQuery: (props) => props.data,
@@ -381,8 +391,10 @@ export default compose(
     withApprove,
     withReject,
     withLoginAction,
-    withLoadMore<IPendingReviewTrackableListContainerProps, IGetDataResponse>(
-        "getPendingReviewTrackables", (props) => props.data),
+    withLoadMore<IPendingReviewTrackableListContainerProps, IGetDataResponse>({
+        dataField: "getPendingReviewTrackables",
+        getQuery: (props) => props.data,
+    }),
     injectIntl,
     withEnsureUserLoggedIn,
 )(PendingReviewTrackableListContainer);

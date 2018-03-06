@@ -151,9 +151,14 @@ export default compose(
         dataField: "getFriends",
         getQuery: (props) => props.data,
     }),
-    withError<IFriendListContainerProps>(Error, (props) => props.data),
-    withOffline<IFriendListContainerProps, IGetDataResponse>(
-        Offline, "getFriends", (props) => props.data),
+    withError<IFriendListContainerProps, IGetDataResponse>(Error, {
+        dataField: "getFriends",
+        getQuery: (props) => props.data,
+    }),
+    withOffline<IFriendListContainerProps, IGetDataResponse>(Offline, {
+        dataField: "getFriends",
+        getQuery: (props) => props.data,
+    }),
     withRefresh<IFriendListContainerProps, IGetDataResponse>({
         dataField: "getFriends",
         getQuery: (props) => props.data,
@@ -162,7 +167,9 @@ export default compose(
     }),
     withEmptyList<IFriendListContainerProps>(
         EmptyList, (props) => props.data.getFriends.edges),
-    withLoadMore<IFriendListContainerProps, IGetDataResponse>(
-        "getFriends", (props) => props.data),
+    withLoadMore<IFriendListContainerProps, IGetDataResponse>({
+        dataField: "getFriends",
+        getQuery: (props) => props.data,
+    }),
     withSetMuted,
 )(FriendListContainer);
