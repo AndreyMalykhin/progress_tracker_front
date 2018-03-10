@@ -1,5 +1,12 @@
 import Aggregate from "components/aggregate";
 import { ICommandBarItem } from "components/command-bar";
+import {
+    BorderColor,
+    CardStyle,
+    Color,
+    Gap,
+    StateColor,
+} from "components/common-styles";
 import Counter from "components/counter";
 import EmptyList from "components/empty-list";
 import GymExercise, {
@@ -50,7 +57,6 @@ interface IBaseNode {
     id: string;
     order: number;
     status: TrackableStatus;
-    statusChangeDate?: number;
     isPublic: boolean;
     creationDate: number;
     parent?: {
@@ -125,7 +131,7 @@ interface IActiveTrackableListProps extends IExtraData, IWithRefreshProps {
     onGymExerciseEntryPopupClose: (entry?: IGymExerciseEntryPopupResult) =>
         void;
     onProveItem: (id: string) => void;
-    onSetTaskDone: (taskId: string, isDone: boolean) => void;
+    onSetTaskDone?: (taskId: string, isDone: boolean) => void;
     onGetAggregateCommands: (id: string) => ICommandBarItem[]|undefined;
     onGetCounterCommands: (id: string, isAggregated: boolean) =>
         ICommandBarItem[]|undefined;
@@ -367,7 +373,7 @@ class ActiveTrackableList extends
                 isNested={parent != null}
                 status={status}
                 commands={onGetCounterCommands(id, isAggregated)}
-                duration={Date.now() - creationDate}
+                statusDuration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
                 onPressOut={onPressOutItem}
@@ -418,7 +424,7 @@ class ActiveTrackableList extends
                 isLast={isLast}
                 isFirst={isFirst}
                 status={status}
-                duration={Date.now() - creationDate}
+                statusDuration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
                 onExpandChange={onToggleItemExpand}
@@ -484,7 +490,7 @@ class ActiveTrackableList extends
                 isNested={parent != null}
                 status={status}
                 commands={commands}
-                duration={Date.now() - creationDate}
+                statusDuration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
                 onProve={onProveItem}
@@ -560,7 +566,7 @@ class ActiveTrackableList extends
                 isFirst={isFirst}
                 isNested={parent != null}
                 status={status}
-                duration={Date.now() - creationDate}
+                statusDuration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
                 onExpandChange={onToggleItemExpand}
@@ -628,12 +634,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    list: {
-        backgroundColor: "#edf0f5",
-    },
+    list: {},
     listContent: {},
     reorderablePlaceholder: {
-        backgroundColor: "#000",
+        backgroundColor: CardStyle.backgroundColor,
+        borderColor: BorderColor.normal,
+        borderWidth: 1,
+        opacity: 0.5,
     },
 });
 

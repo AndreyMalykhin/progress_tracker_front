@@ -12,7 +12,15 @@ import QueryStatus from "utils/query-status";
 interface IItemProps extends IArchivedTrackableListItemNode {
     isFirst?: boolean;
     isLast?: boolean;
+    onGetStatusDuration: IArchivedTrackableListOnGetStatusDuration;
 }
+
+type IArchivedTrackableListOnGetStatusDuration = (
+    status: TrackableStatus,
+    statusChangeDate: number,
+    creationDate: number,
+    achievementDate?: number,
+) => number;
 
 interface IArchivedTrackableListItem {
     node: IArchivedTrackableListItemNode;
@@ -31,6 +39,7 @@ interface IArchivedTrackableListItemNode {
     rejectCount?: number;
     creationDate: number;
     statusChangeDate: number;
+    achievementDate?: number;
     proofPhotoUrlMedium?: string;
 }
 
@@ -39,6 +48,7 @@ interface IArchivedTrackableListProps extends IWithRefreshProps {
     queryStatus: QueryStatus;
     trackableStatus: TrackableStatus;
     onEndReached: () => void;
+    onGetStatusDuration: IArchivedTrackableListOnGetStatusDuration;
 }
 
 class ArchivedTrackableList extends
@@ -69,10 +79,16 @@ class ArchivedTrackableList extends
         itemInfo: ListRenderItemInfo<IArchivedTrackableListItem>,
     ) => {
         const { index } = itemInfo;
+        const { items, onGetStatusDuration } = this.props;
         const isFirst = !index;
-        const isLast = index === this.props.items.length - 1;
+        const isLast = index === items.length - 1;
         return (
-            <Item {...itemInfo.item.node} isFirst={isFirst} isLast={isLast} />
+            <Item
+                {...itemInfo.item.node}
+                isFirst={isFirst}
+                isLast={isLast}
+                onGetStatusDuration={onGetStatusDuration}
+            />
         );
     }
 
@@ -97,9 +113,11 @@ class Item extends React.PureComponent<IItemProps> {
             rejectCount,
             creationDate,
             statusChangeDate,
+            achievementDate,
             proofPhotoUrlMedium,
             isFirst,
             isLast,
+            onGetStatusDuration,
         } = this.props;
         const progressBar = progress !== maxProgress && (
             <ProgressBar
@@ -108,7 +126,8 @@ class Item extends React.PureComponent<IItemProps> {
                 mode={progressDisplayMode}
             />
         );
-
+        const statusDuration = onGetStatusDuration(
+            status, statusChangeDate, creationDate, achievementDate);
         return (
             <Trackable
                 id={id}
@@ -118,7 +137,7 @@ class Item extends React.PureComponent<IItemProps> {
                 rating={rating}
                 approveCount={approveCount}
                 rejectCount={rejectCount}
-                duration={statusChangeDate - creationDate}
+                statusDuration={statusDuration}
                 proofPhotoUrl={proofPhotoUrlMedium}
                 isFirst={isFirst}
                 isLast={isLast}
@@ -130,11 +149,13 @@ class Item extends React.PureComponent<IItemProps> {
 }
 
 const styles = StyleSheet.create({
-    list: {
-        backgroundColor: "#edf0f5",
-    },
+    list: {},
     listContent: {},
 });
 
-export { IArchivedTrackableListItem, IArchivedTrackableListItemNode };
+export {
+    IArchivedTrackableListItem,
+    IArchivedTrackableListItemNode,
+    IArchivedTrackableListOnGetStatusDuration,
+};
 export default ArchivedTrackableList;

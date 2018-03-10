@@ -1,7 +1,24 @@
 import Avatar from "components/avatar";
+import {
+    AvatarStyle,
+    Color,
+    FontWeightStyle,
+    Gap,
+    rem,
+    UserListContentStyle,
+    UserListItemStyle,
+} from "components/common-styles";
 import Loader from "components/loader";
 import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
+import {
+    BodyText,
+    CalloutText,
+    Caption1Text,
+    LargeTitleText,
+    Title1Text,
+    Title2Text,
+} from "components/typography";
 import { IWithRefreshProps } from "components/with-refresh";
 import * as React from "react";
 import {
@@ -85,16 +102,20 @@ class Item extends React.PureComponent<IItemProps> {
                 onPress={this.onPress}
             >
                 <View style={styles.itemUser}>
-                    <Text style={styles.itemUserIndex}>{index + 1}</Text>
+                    <Title2Text style={styles.itemUserIndex}>
+                        {index + 1}
+                    </Title2Text>
                     <Avatar
                         style={styles.itemUserAvatar}
                         size="medium"
                         uri={avatarUrlSmall}
                     />
-                    <Text style={styles.itemUserName} numberOfLines={1}>
+                    <BodyText style={styles.itemUserName} numberOfLines={1}>
                         {name}
-                    </Text>
-                    <Text style={styles.itemUserRating}>{rating}</Text>
+                    </BodyText>
+                    <Caption1Text style={styles.itemUserRating}>
+                        {rating}
+                    </Caption1Text>
                 </View>
             </TouchableWithFeedback>
         );
@@ -103,36 +124,37 @@ class Item extends React.PureComponent<IItemProps> {
     private onPress = () => this.props.onPress(this.props.id);
 }
 
+const itemHeight = AvatarStyle.medium.height;
+
 const styles = StyleSheet.create({
     item: {
-        paddingBottom: 32,
+        ...UserListItemStyle,
     },
     itemUser: {
         alignItems: "center",
         flexDirection: "row",
     },
     itemUserAvatar: {
-        marginLeft: 8,
-        marginRight: 8,
+        marginLeft: Gap.single,
+        marginRight: Gap.single,
     },
     itemUserIndex: {
-        fontSize: 24,
+        ...FontWeightStyle.bold,
+        lineHeight: itemHeight,
         textAlign: "center",
-        width: 48,
+        width: rem(4.8),
     },
     itemUserName: {
         flex: 1,
-        lineHeight: 48,
+        lineHeight: itemHeight,
     },
     itemUserRating: {
-        fontWeight: "bold",
-        lineHeight: 48,
-        marginLeft: 8,
+        color: Color.grayDark,
+        lineHeight: itemHeight,
+        marginLeft: Gap.single,
     },
     listContent: {
-        paddingLeft: 8,
-        paddingRight: 8,
-        paddingTop: 8,
+        ...UserListContentStyle,
     },
 });
 

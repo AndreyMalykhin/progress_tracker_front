@@ -1,3 +1,4 @@
+import { rem } from "components/common-styles";
 import Toast, { ToastSeverity } from "components/toast";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         alignItems: "center",
         justifyContent: "flex-end",
-        paddingBottom: 64,
+        paddingBottom: rem(6.4),
     },
 });
 

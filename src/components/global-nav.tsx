@@ -1,3 +1,5 @@
+import { BorderColor } from "components/common-styles";
+import Icon from "components/icon";
 import NavBar, { INavBarItem, INavBarItemRenderer } from "components/nav-bar";
 import TabBar, {
     TabBarItem,
@@ -6,7 +8,6 @@ import TabBar, {
 } from "components/tab-bar";
 import * as React from "react";
 import { StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface IGlobalNavProps {
     items: INavBarItem[];
@@ -46,6 +47,7 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
 
 const styles = StyleSheet.create({
     container: {
+        borderColor: BorderColor.dark,
         borderTopWidth: 1,
     },
 });

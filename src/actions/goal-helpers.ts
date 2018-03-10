@@ -9,6 +9,7 @@ interface ISetProgressFragment {
     progress: number;
     maxProgress: number;
     status: TrackableStatus;
+    achievementDate?: number;
     statusChangeDate?: number;
     parent?: IUpdateProgressAggregateFragment;
 }
@@ -26,6 +27,7 @@ function setProgress(goal: ISetProgressFragment, value: number) {
         goal.progress = goal.maxProgress;
         goal.status = TrackableStatus.PendingProof;
         goal.statusChangeDate = Date.now();
+        goal.achievementDate = goal.statusChangeDate;
     }
 
     if (goal.parent) {

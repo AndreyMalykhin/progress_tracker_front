@@ -11,8 +11,9 @@ interface INumericalEntryPopupContainerState {
     entryError?: string|null;
 }
 
-class NumericalEntryPopupContainer extends
-    React.Component<INumericalEntryPopupContainerProps, INumericalEntryPopupContainerState> {
+class NumericalEntryPopupContainer extends React.Component<
+    INumericalEntryPopupContainerProps, INumericalEntryPopupContainerState
+> {
     public state: INumericalEntryPopupContainerState = {};
 
     public constructor(

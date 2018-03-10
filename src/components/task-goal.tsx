@@ -1,9 +1,17 @@
 import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
+import {
+    Color,
+    Gap,
+    ProgressBarStyle,
+    rem,
+    TouchableStyle,
+} from "components/common-styles";
 import IGoalProps from "components/goal-props";
 import ProgressBar from "components/progress-bar";
 import Text from "components/text";
 import Trackable from "components/trackable";
+import { BodyText } from "components/typography";
 import { memoize } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -22,7 +30,7 @@ interface ITaskGoalProps extends IGoalProps {
     isExpanded?: boolean;
     isExpandable?: boolean;
     onExpandChange: (id: string, isExpanded: boolean) => void;
-    onSetTaskDone: (taskId: string, isDone: boolean) => void;
+    onSetTaskDone?: (taskId: string, isDone: boolean) => void;
 }
 
 interface ITaskProps {
@@ -30,7 +38,7 @@ interface ITaskProps {
     title: string;
     isDone?: boolean;
     isDisabled?: boolean;
-    onSetDone: (id: string, isDone: boolean) => void;
+    onSetDone?: (id: string, isDone: boolean) => void;
 }
 
 class TaskGoal extends React.PureComponent<ITaskGoalProps> {
@@ -91,7 +99,7 @@ class TaskGoal extends React.PureComponent<ITaskGoalProps> {
 // tslint:disable-next-line:max-classes-per-file
 class Task extends React.PureComponent<ITaskProps> {
     public render() {
-        const { isDone, title, isDisabled } = this.props;
+        const { isDone, title, isDisabled, onSetDone } = this.props;
         const titleStyle = isDone ? taskTitleDoneStyle : styles.taskTitle;
         return (
             <View style={styles.task}>
@@ -100,9 +108,12 @@ class Task extends React.PureComponent<ITaskProps> {
                     isDisabled={isDisabled}
                     isChecked={isDone}
                     sound={Sound.ProgressChange}
-                    onPress={this.onPress}
+                    iconCheckedStyle={styles.taskCheckBoxChecked}
+                    onPress={onSetDone && this.onPress}
                 >
-                    <Text style={titleStyle}>{title}</Text>
+                    <BodyText style={titleStyle} disabled={isDone}>
+                        {title}
+                    </BodyText>
                 </CheckBox>
             </View>
         );
@@ -110,20 +121,23 @@ class Task extends React.PureComponent<ITaskProps> {
 
     private onPress = (isChecked: boolean) => {
         const { onSetDone, id } = this.props;
-        onSetDone(id, isChecked);
+        onSetDone!(id, isChecked);
     }
 }
 
 const styles = StyleSheet.create({
     task: {
-        paddingVertical: 8,
+        paddingBottom: Gap.single,
+    },
+    taskCheckBoxChecked: {
+        color: ProgressBarStyle.color,
     },
     taskTitle: {
         alignSelf: "flex-start",
         flex: 1,
         flexWrap: "wrap",
-        lineHeight: 32,
-        paddingLeft: 8,
+        paddingLeft: Gap.single,
+        paddingTop: rem(1.2),
     },
     taskTitleDone: {
         textDecorationLine: "line-through",

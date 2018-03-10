@@ -29,6 +29,7 @@ interface IAddNumericalGoalResponse {
             proofPhotoUrlMedium: null;
             status: TrackableStatus;
             statusChangeDate: null;
+            achievementDate: null;
             creationDate: number;
             title: string;
             user: {
@@ -68,6 +69,7 @@ mutation AddNumericalGoal($goal: AddNumericalGoalInput!) {
             proofPhotoUrlMedium
             status
             statusChangeDate
+            achievementDate
             creationDate
             title
             user {
@@ -130,14 +132,15 @@ function getOptimisticResponse(
             __typename: Type.AddNumericalGoalResponse,
             trackable: {
                 __typename: Type.NumericalGoal,
+                achievementDate: null,
                 creationDate: currentDate,
                 deadlineDate: goal.deadlineDate || null,
                 difficulty: goal.difficulty,
                 iconName: goal.iconName,
                 id: uuid(),
                 isPublic: goal.isPublic,
-                isReviewed: null,
                 maxProgress: goal.maxProgress,
+                myReviewStatus: null,
                 order: currentDate,
                 parent: null,
                 progress: 0,

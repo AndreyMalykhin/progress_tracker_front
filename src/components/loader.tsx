@@ -1,26 +1,33 @@
+import { Gap, TouchableStyle } from "components/common-styles";
 import * as React from "react";
 import {
     ActivityIndicator,
+    ActivityIndicatorProperties,
     StyleProp,
     StyleSheet,
     View,
     ViewStyle,
 } from "react-native";
 
-interface ILoaderProps {
+interface ILoaderProps extends ActivityIndicatorProperties {
     isNoFillParent?: boolean;
-    style?: StyleProp<ViewStyle>;
 }
 
 class Loader extends React.Component<ILoaderProps> {
     public render() {
-        const { style, isNoFillParent } = this.props;
+        const { style, isNoFillParent, ...restProps } = this.props;
         const newStyle = [
             styles.indicator,
             style,
             isNoFillParent && styles.indicatorNoFillParent,
         ];
-        return <ActivityIndicator style={newStyle as any} />;
+        return (
+            <ActivityIndicator
+                style={newStyle as any}
+                size="large"
+                {...restProps}
+            />
+        );
     }
 }
 
@@ -29,11 +36,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flex: 1,
         justifyContent: "center",
-        minHeight: 32,
     },
     indicatorNoFillParent: {
         flex: 0,
     },
 });
 
+export { ILoaderProps };
 export default Loader;

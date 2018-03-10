@@ -13,20 +13,18 @@ import graphql from "react-apollo/graphql";
 import { MutationFunc } from "react-apollo/types";
 import { IWithApolloProps } from "utils/interfaces";
 
-interface ILoginPageContainerProps extends
-    IWithApolloProps, IWithLoginActionProps {
+interface ILoginPageContainerProps extends IWithApolloProps {
     onSkip: () => void;
 }
 
 class LoginPageContainer extends React.Component<ILoginPageContainerProps> {
     public render() {
         return (
-            <LoginPage onSkip={this.onSkip} onLogin={this.props.onLogin} />
+            <LoginPage onSkip={this.onSkip} />
         );
     }
 
     private onSkip = () => skipLogin(this.props.client);
 }
 
-export default compose(withDIContainer, withApollo, withLoginAction)(
-    LoginPageContainer);
+export default compose(withDIContainer, withApollo)(LoginPageContainer);

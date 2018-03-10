@@ -1,5 +1,7 @@
 import Button, { ButtonTitle } from "components/button";
+import { Gap, rem } from "components/common-styles";
 import Image from "components/image";
+import LoginContainer from "components/login-container";
 import { IWithLoginActionProps } from "components/with-login-action";
 import * as React from "react";
 import {
@@ -11,7 +13,7 @@ import {
 } from "react-native";
 import { withRouter } from "react-router";
 
-interface ILoginPageProps extends IWithLoginActionProps {
+interface ILoginPageProps {
     onSkip: () => void;
 }
 
@@ -23,10 +25,8 @@ class LoginPage extends React.Component<ILoginPageProps> {
                     source={{ uri: "https://loremflickr.com/512/512/cat" }}
                     style={styles.logo}
                 />
-                <Button style={styles.btn} onPress={this.props.onLogin}>
-                    <ButtonTitle msgId="common.login" />
-                </Button>
-                <Button style={styles.btn} onPress={this.props.onSkip}>
+                <LoginContainer isNoFillParent={true} />
+                <Button style={styles.skipBtn} onPress={this.props.onSkip}>
                     <ButtonTitle msgId="intro.skip" />
                 </Button>
             </View>
@@ -35,9 +35,6 @@ class LoginPage extends React.Component<ILoginPageProps> {
 }
 
 const styles = StyleSheet.create({
-    btn: {
-        marginBottom: 8,
-    },
     container: {
         alignItems: "center",
         flex: 1,
@@ -45,8 +42,11 @@ const styles = StyleSheet.create({
     },
     logo: {
         height: 128,
-        marginBottom: 64,
+        marginBottom: rem(6.4),
         width: 128,
+    },
+    skipBtn: {
+        marginTop: Gap.double,
     },
 });
 

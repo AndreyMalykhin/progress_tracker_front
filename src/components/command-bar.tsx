@@ -1,9 +1,11 @@
 import ActionSheet from "components/action-sheet";
 import Button, { ButtonIcon } from "components/button";
+import { IconStyle } from "components/common-styles";
+import Icon from "components/icon";
 import * as React from "react";
 import { InjectedIntlProps, injectIntl } from "react-intl";
 import { StyleProp, StyleSheet, ViewStyle } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import IconName from "utils/icon-name";
 
 interface ICommandBarItem {
     msgId: string;
@@ -24,14 +26,14 @@ class CommandBar extends
         const { style, isDisabled } = this.props;
         return (
             <Button
-                style={[styles.button, style]}
+                style={[styles.btn, style]}
                 disabled={isDisabled}
                 onPress={this.onOpen}
             >
                 <ButtonIcon
+                    active={false}
                     disabled={isDisabled}
-                    style={styles.buttonIcon}
-                    name="dots-horizontal"
+                    name={IconName.Commands}
                     component={Icon}
                 />
             </Button>
@@ -65,11 +67,11 @@ class CommandBar extends
 }
 
 const styles = StyleSheet.create({
-    button: {
-        padding: 0,
-    },
-    buttonIcon: {
-        color: "#000",
+    btn: {
+        paddingBottom: 0,
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
     },
 });
 

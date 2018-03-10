@@ -26,6 +26,7 @@ interface ISetTaskDoneResponse {
                 id: string;
                 progress: number;
                 status: TrackableStatus;
+                achievementDate?: number;
                 statusChangeDate?: number;
                 parent?: {
                     id: string;
@@ -55,6 +56,7 @@ interface ITaskFragment {
         progress: number;
         maxProgress: number;
         status: TrackableStatus;
+        achievementDate: number;
         statusChangeDate: number;
         parent?: IUpdateProgressAggregateFragment;
     };
@@ -67,15 +69,14 @@ fragment SetTaskDoneTaskFragment on Task {
     id
     isDone
     goal {
-        ... on TaskGoal {
-            id
-            progress
-            maxProgress
-            status
-            statusChangeDate
-            parent {
-                ...UpdateProgressAggregateFragment
-            }
+        id
+        progress
+        maxProgress
+        status
+        achievementDate
+        statusChangeDate
+        parent {
+            ...UpdateProgressAggregateFragment
         }
     }
 }`;
@@ -87,15 +88,14 @@ mutation SetTaskDone($id: ID!, $isDone: Boolean!) {
             id
             isDone
             goal {
-                ... on TaskGoal {
+                id
+                progress
+                status
+                achievementDate
+                statusChangeDate
+                parent {
                     id
                     progress
-                    status
-                    statusChangeDate
-                    parent {
-                        id
-                        progress
-                    }
                 }
             }
         }

@@ -1,4 +1,14 @@
+import {
+    BorderColor,
+    BorderRadius,
+    Color,
+    Gap,
+    rem,
+    SeverityColor,
+    TouchableStyle,
+} from "components/common-styles";
 import Text from "components/text";
+import { BodyText } from "components/typography";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -11,7 +21,7 @@ interface IToastProps {
 
 enum ToastSeverity {
     Info = "Info",
-    Error = "Error",
+    Danger = "Danger",
 }
 
 class Toast extends React.Component<IToastProps> {
@@ -19,11 +29,11 @@ class Toast extends React.Component<IToastProps> {
     private timeoutId?: number;
 
     public render() {
+        const { children, severity } = this.props;
+        const style = [styles.container, severityToStyleMap[severity]];
         return (
-            <View style={styles.container}>
-                <Text style={styles.msg}>
-                    {this.props.children}
-                </Text>
+            <View style={style}>
+                <BodyText light={true} style={styles.msg}>{children}</BodyText>
             </View>
         );
     }
@@ -45,20 +55,30 @@ class Toast extends React.Component<IToastProps> {
 const styles = StyleSheet.create({
     container: {
         alignItems: "center",
-        backgroundColor: "#000",
-        borderRadius: 8,
-        margin: 8,
-        minWidth: 256,
-        paddingBottom: 8,
-        paddingLeft: 16,
-        paddingRight: 16,
-        paddingTop: 8,
+        borderRadius: BorderRadius.single,
+        marginBottom: Gap.single,
+        marginLeft: Gap.single,
+        marginRight: Gap.single,
+        marginTop: Gap.single,
+        minWidth: rem(25.6),
+        paddingBottom: Gap.double,
+        paddingLeft: Gap.double,
+        paddingRight: Gap.double,
+        paddingTop: Gap.double,
     },
-    msg: {
-        color: "#fff",
-        lineHeight: 32,
+    containerDangerous: {
+        backgroundColor: SeverityColor.dangerDark,
     },
+    containerInformational: {
+        backgroundColor: SeverityColor.info,
+    },
+    msg: {},
 });
+
+const severityToStyleMap = {
+    [ToastSeverity.Danger]: styles.containerDangerous,
+    [ToastSeverity.Info]: styles.containerInformational,
+};
 
 export { ToastSeverity };
 export default Toast;

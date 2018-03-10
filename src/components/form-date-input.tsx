@@ -16,8 +16,9 @@ interface IFormDateInputState {
     isPickerOpen?: boolean;
 }
 
-class FormDateInput extends
-    React.Component<IFormDateInputProps & InjectedIntlProps, IFormDateInputState> {
+class FormDateInput extends React.Component<
+    IFormDateInputProps & InjectedIntlProps, IFormDateInputState
+> {
     public state: IFormDateInputState = {};
 
     public render() {
@@ -39,15 +40,15 @@ class FormDateInput extends
     }
 
     private renderPicker() {
-        const { intl } = this.props;
+        const { intl, value, minValue } = this.props;
         const cancelLabel = intl.formatMessage({ id: "common.cancel" });
         const confirmLabel = intl.formatMessage({ id: "common.ok" });
         const title = intl.formatMessage({ id: "datePicker.title" });
         return (
             <DateTimePicker
                 isVisible={true}
-                date={this.props.value}
-                minimumDate={this.props.minValue}
+                date={value}
+                minimumDate={minValue}
                 cancelTextIOS={cancelLabel}
                 confirmTextIOS={confirmLabel}
                 titleIOS={title}

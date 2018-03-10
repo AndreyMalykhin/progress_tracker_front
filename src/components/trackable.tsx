@@ -1,4 +1,4 @@
-import Button, { ButtonTitle } from "components/button";
+import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import Card, {
     CardAvatar,
     CardBody,
@@ -9,9 +9,22 @@ import Card, {
 } from "components/card";
 import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
+import {
+    BorderColor,
+    CardStyle,
+    Color,
+    Gap,
+    IconStyle,
+    rem,
+    TouchableStyle,
+    TypographyStyle,
+} from "components/common-styles";
+import Icon from "components/icon";
 import Image from "components/image";
 import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
+import { CalloutText, FootnoteText } from "components/typography";
+import ReviewStatus from "models/review-status";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
@@ -25,7 +38,6 @@ import {
     View,
     ViewStyle,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import IconName from "utils/icon-name";
 
 interface ITrackableProps {
@@ -47,8 +59,9 @@ interface ITrackableProps {
     isLast?: boolean;
     isFirst?: boolean;
     isNested?: boolean;
+    myReviewStatus?: ReviewStatus;
     commands?: ICommandBarItem[];
-    duration?: number;
+    statusDuration?: number;
     style?: StyleProp<ViewStyle>;
     cardHeaderStyle?: StyleProp<ViewStyle>;
     cardHeaderTitleStyle?: StyleProp<TextStyle>;
@@ -73,15 +86,13 @@ interface ITrackableProps {
     onReject?: (id: string) => void;
 }
 
-interface IReviewControlsProps {
-    onApprove: () => void;
-    onReject: () => void;
-}
-
 interface IAchievementDetailsProps {
+    reviewStatus?: ReviewStatus;
     rejectCount?: number;
     approveCount?: number;
     rating?: number;
+    onApprove?: () => void;
+    onReject?: () => void;
 }
 
 interface IStatusProps {
@@ -119,7 +130,7 @@ class Trackable extends React.Component<ITrackableProps> {
             style,
             cardHeaderStyle,
             cardHeaderTitleStyle,
-            duration,
+            statusDuration,
             proofPhotoUrl,
             isProveable,
             isReviewable,
@@ -134,8 +145,8 @@ class Trackable extends React.Component<ITrackableProps> {
             onPressOut,
         } = this.props;
         const icon = iconName && <CardIcon name={iconName} component={Icon} />;
-        const statusElement =
-            duration != null && <Status duration={duration} status={status} />;
+        const statusElement = statusDuration != null
+            && <Status duration={statusDuration} status={status} />;
         const newContainerStyle = [
             styles.container,
             style,
@@ -170,7 +181,6 @@ class Trackable extends React.Component<ITrackableProps> {
                         {isExpandable && this.renderExpandBtn()}
                         {this.renderAchievementDetails()}
                         {isProveable && this.renderProveBtn()}
-                        {isReviewable && this.renderReviewControls()}
                         {statusElement}
                     </CardBody>
                 </Card>
@@ -205,15 +215,6 @@ class Trackable extends React.Component<ITrackableProps> {
         );
     }
 
-    private renderReviewControls() {
-        return (
-            <ReviewControls
-                onApprove={this.onApprove}
-                onReject={this.onReject}
-            />
-        );
-    }
-
     private renderProofPhoto() {
         return (
             <Image
@@ -225,7 +226,13 @@ class Trackable extends React.Component<ITrackableProps> {
     }
 
     private renderAchievementDetails() {
-        const { rating, approveCount, rejectCount} = this.props;
+        const {
+            rating,
+            approveCount,
+            rejectCount,
+            isReviewable,
+            myReviewStatus,
+        } = this.props;
 
         if (rating == null && approveCount == null && rejectCount == null) {
             return null;
@@ -236,6 +243,9 @@ class Trackable extends React.Component<ITrackableProps> {
                 approveCount={approveCount}
                 rejectCount={rejectCount}
                 rating={rating}
+                reviewStatus={myReviewStatus}
+                onApprove={isReviewable ? this.onApprove : undefined}
+                onReject={isReviewable ? this.onReject : undefined}
             />
         );
     }
@@ -329,55 +339,65 @@ class Trackable extends React.Component<ITrackableProps> {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class ReviewControls extends React.PureComponent<IReviewControlsProps> {
-    public render() {
-        const { onApprove, onReject } = this.props;
-        return (
-            <View style={styles.reviewControls}>
-                <Button onPress={onApprove}>
-                    <ButtonTitle
-                        style={styles.approveBtnTitle}
-                        msgId="trackable.approve"
-                    />
-                </Button>
-                <Button onPress={onReject}>
-                    <ButtonTitle
-                        dangerous={true}
-                        style={styles.rejectBtnTitle}
-                        msgId="trackable.reject"
-                    />
-                </Button>
-            </View>
-        );
-    }
-}
-
-// tslint:disable-next-line:max-classes-per-file
 class AchievementDetails extends React.PureComponent<IAchievementDetailsProps> {
     public render() {
-        const {rating, approveCount, rejectCount} = this.props;
+        const {
+            rating,
+            approveCount,
+            rejectCount,
+            reviewStatus,
+            onApprove,
+            onReject,
+        } = this.props;
+        const ratingElement = this.renderItem(
+            IconName.Rating, styles.achievementDetailsItemIconRating, rating);
+        const approvesElement = this.renderItem(
+            IconName.Approve,
+            styles.achievementDetailsItemIconApproves,
+            approveCount,
+            onApprove,
+            reviewStatus === ReviewStatus.Approved,
+        );
+        const rejectsElement = this.renderItem(
+            IconName.Reject,
+            styles.achievementDetailsItemIconRejects,
+            rejectCount,
+            onReject,
+            reviewStatus === ReviewStatus.Rejected,
+        );
         return (
             <View style={styles.achievementDetails}>
-                {this.renderItem("star-circle", rating)}
-                {this.renderItem("check", approveCount)}
-                {this.renderItem("close", rejectCount)}
+                {ratingElement}
+                {approvesElement}
+                {rejectsElement}
             </View>
         );
     }
 
-    private renderItem(iconName: string, value?: number) {
+    private renderItem(
+        iconName: IconName,
+        iconStyle: TextStyle,
+        value?: number,
+        onPress?: () => void,
+        isActive?: boolean,
+    ) {
         if (value == null) {
             return null;
         }
 
         return (
             <View style={styles.achievementDetailsItem}>
-                <Icon
-                    style={styles.achievementDetailsItemIcon}
-                    name={iconName}
-                    size={32}
-                />
-                <Text style={styles.achievementDetailsItemValue}>{value}</Text>
+                <Button onPress={onPress} disabled={!onPress}>
+                    <ButtonIcon
+                        active={isActive}
+                        component={Icon}
+                        style={[styles.achievementDetailsItemIcon, iconStyle]}
+                        name={iconName}
+                    />
+                </Button>
+                <CalloutText style={styles.achievementDetailsItemValue}>
+                    {value}
+                </CalloutText>
             </View>
         );
     }
@@ -409,7 +429,6 @@ class ExpandButton extends React.PureComponent<IExpandButtonProps> {
 class ProveButton extends React.PureComponent<IProveButtonProps> {
     public render() {
         const { isDisabled, isLoading, onPress } = this.props;
-
         return (
             <Button
                 style={styles.proveBtn}
@@ -417,7 +436,11 @@ class ProveButton extends React.PureComponent<IProveButtonProps> {
                 loading={isLoading}
                 onPress={onPress}
             >
-                <ButtonTitle disabled={isDisabled} msgId="trackable.prove" />
+                <ButtonTitle
+                    primary={true}
+                    disabled={isDisabled}
+                    msgId="trackable.prove"
+                />
             </Button>
         );
     }
@@ -434,6 +457,7 @@ class Status extends React.PureComponent<IStatusProps> {
             msgId = "trackable.expirationPeriod";
             break;
             case TrackableStatus.Active:
+            case TrackableStatus.PendingProof:
             msgId = "trackable.activePeriod";
             break;
             default:
@@ -446,36 +470,35 @@ class Status extends React.PureComponent<IStatusProps> {
                 <Icon
                     style={styles.statusIcon}
                     name={IconName.Date}
-                    size={16}
+                    size={TypographyStyle.footnote.lineHeight}
                 />
-                <Text style={styles.statusMsg}>
+                <FootnoteText style={styles.statusMsg}>
                     <FormattedMessage id={msgId} values={{ period }} />
-                </Text>
+                </FootnoteText>
             </View>
         );
     }
 }
 
+const trackableMargin = Gap.double;
+
 const styles = StyleSheet.create({
     achievementDetails: {
         flexDirection: "row",
-        justifyContent: "space-around",
-        paddingBottom: 8,
-        paddingTop: 16,
     },
     achievementDetailsItem: {
-        alignItems: "flex-start",
+        flex: 1,
         flexDirection: "row",
+        justifyContent: "center",
     },
     achievementDetailsItemIcon: {
-        lineHeight: 32,
-        marginRight: 8,
+        color: IconStyle.color,
     },
+    achievementDetailsItemIconApproves: {},
+    achievementDetailsItemIconRating: {},
+    achievementDetailsItemIconRejects: {},
     achievementDetailsItemValue: {
-        lineHeight: 32,
-    },
-    approveBtnTitle: {
-        color: "#0076ff",
+        lineHeight: TouchableStyle.minHeight,
     },
     card: {
         flex: 1,
@@ -485,30 +508,30 @@ const styles = StyleSheet.create({
     },
     cardBodyNested: {
         borderBottomWidth: 1,
-        borderColor: "#edf0f5",
-        marginLeft: 8,
-        marginRight: 8,
+        borderColor: BorderColor.light,
+        marginLeft: Gap.single,
+        marginRight: Gap.single,
         paddingLeft: 0,
         paddingRight: 0,
     },
     checkBox: {
         alignSelf: "flex-start",
-        paddingLeft: 8,
-        paddingTop: 8,
+        paddingLeft: Gap.single,
+        paddingTop: Gap.single,
     },
     container: {
-        backgroundColor: "#fff",
+        backgroundColor: CardStyle.backgroundColor,
         flexDirection: "row",
-        marginBottom: 8,
+        marginBottom: trackableMargin,
     },
     containerDragged: {
         opacity: 0,
     },
     containerFirst: {
-        marginTop: 8,
+        marginTop: trackableMargin,
     },
     containerLast: {
-        marginBottom: 8,
+        marginBottom: trackableMargin,
     },
     containerNested: {
         marginBottom: 0,
@@ -518,32 +541,25 @@ const styles = StyleSheet.create({
         alignSelf: "center",
     },
     proofPhoto: {
-        height: 256,
+        height: rem(25.6),
+        marginBottom: Gap.single,
     },
     proveBtn: {
         alignSelf: "center",
     },
-    rejectBtnTitle: {},
-    reviewControls: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        marginBottom: 8,
-    },
     status: {
         alignItems: "flex-start",
         flexDirection: "row",
+        paddingTop: Gap.single,
     },
     statusIcon: {
-        color: "#888",
-        lineHeight: 24,
-        marginRight: 8,
+        color: Color.grayDark,
+        marginRight: Gap.single,
     },
     statusMsg: {
-        color: "#888",
-        fontSize: 10,
-        lineHeight: 24,
+        color: Color.grayDark,
     },
 });
 
-export { ITrackableProps };
+export { ITrackableProps, trackableMargin };
 export default Trackable;

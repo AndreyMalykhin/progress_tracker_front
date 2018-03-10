@@ -1,6 +1,13 @@
 import { ICommandBarItem } from "components/command-bar";
+import {
+    CardStyle,
+    Color,
+    FontWeightStyle,
+    Gap,
+    TypographyStyle,
+} from "components/common-styles";
 import ProgressBar from "components/progress-bar";
-import Trackable from "components/trackable";
+import Trackable, { trackableMargin } from "components/trackable";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -77,8 +84,8 @@ class Aggregate extends React.Component<IAggregateProps> {
             isFirst && styles.containerFirst,
             isDragged && styles.containerDragged,
         ];
-        const title = intl.formatMessage(
-            { id: "aggregate.total" }, { progress: progressValue });
+        const title = intl.formatMessage({ id: "aggregate.total" },
+            { progress: progressValue });
         return (
             <View style={style as any}>
                 <View
@@ -113,19 +120,19 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
     },
     cardHeaderTitle: {
-        fontWeight: "bold",
+        ...TypographyStyle.footnote,
     },
     container: {
-        marginBottom: 8,
+        marginBottom: trackableMargin,
     },
     containerDragged: {
         opacity: 0,
     },
     containerFirst: {
-        marginTop: 8,
+        marginTop: trackableMargin,
     },
     content: {
-        backgroundColor: "#fff",
+        backgroundColor: CardStyle.backgroundColor,
     },
     progressBar: {
         marginTop: 0,

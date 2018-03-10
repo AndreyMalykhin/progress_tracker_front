@@ -3,6 +3,7 @@ import Loader from "components/loader";
 import Trackable, { ITrackableProps } from "components/trackable";
 import { IWithRefreshProps } from "components/with-refresh";
 import Audience from "models/audience";
+import ReviewStatus from "models/review-status";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import {
@@ -20,8 +21,8 @@ interface ISharedProps {
     audience: Audience;
     onEndReached: () => void;
     onPressUser: (id: string) => void;
-    onApproveItem: (id: string) => void;
-    onRejectItem: (id: string) => void;
+    onApproveItem?: (id: string) => void;
+    onRejectItem?: (id: string) => void;
 }
 
 interface IItemProps extends ISharedProps {
@@ -32,11 +33,12 @@ interface IItemProps extends ISharedProps {
     approveCount: number;
     rejectCount: number;
     creationDate: number;
-    statusChangeDate: number;
+    achievementDate: number;
     proofPhotoUrlMedium: string;
     isReviewable?: boolean;
     isFirst?: boolean;
     isLast?: boolean;
+    myReviewStatus?: ReviewStatus;
     userId?: string;
     userAvatarUrl?: string;
     userName?: string;
@@ -50,9 +52,9 @@ interface IPendingReviewTrackableListItemNode {
     approveCount: number;
     rejectCount: number;
     creationDate: number;
-    statusChangeDate: number;
+    achievementDate: number;
     proofPhotoUrlMedium: string;
-    isReviewed?: boolean;
+    myReviewStatus: ReviewStatus;
     user: {
         id: string;
         name: string;
@@ -119,14 +121,15 @@ class PendingReviewTrackableList extends
             onRejectItem,
         } = this.props;
         const { index } = itemInfo;
-        const { user, isReviewed, ...restProps } = itemInfo.item.node;
+        const { user, myReviewStatus, ...restProps } = itemInfo.item.node;
         const isMy = audience === Audience.Me;
         return (
             <Item
                 userId={isMy ? undefined : user.id}
                 userName={isMy ? undefined : user.name}
                 userAvatarUrl={isMy ? undefined : user.avatarUrlSmall}
-                isReviewable={!isMy && !isReviewed}
+                myReviewStatus={myReviewStatus}
+                isReviewable={!isMy && !myReviewStatus}
                 isFirst={!index}
                 isLast={index === items.length - 1}
                 audience={audience}
@@ -154,7 +157,7 @@ class Item extends React.PureComponent<IItemProps> {
             approveCount,
             rejectCount,
             creationDate,
-            statusChangeDate,
+            achievementDate,
             proofPhotoUrlMedium,
             userId,
             userName,
@@ -163,11 +166,11 @@ class Item extends React.PureComponent<IItemProps> {
             isReviewable,
             isFirst,
             isLast,
+            myReviewStatus,
             onPressUser,
             onApproveItem,
             onRejectItem,
         } = this.props;
-        const isMy = audience === Audience.Me;
         return (
             <Trackable
                 userId={userId}
@@ -182,8 +185,9 @@ class Item extends React.PureComponent<IItemProps> {
                 status={status}
                 approveCount={approveCount}
                 rejectCount={rejectCount}
-                duration={statusChangeDate - creationDate}
+                statusDuration={achievementDate - creationDate}
                 proofPhotoUrl={proofPhotoUrlMedium}
+                myReviewStatus={myReviewStatus}
                 onPressUser={onPressUser}
                 onApprove={onApproveItem}
                 onReject={onRejectItem}
@@ -196,9 +200,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    list: {
-        backgroundColor: "#edf0f5",
-    },
+    list: {},
     listContent: {},
 });
 

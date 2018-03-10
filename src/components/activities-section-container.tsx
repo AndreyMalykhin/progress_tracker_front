@@ -1,9 +1,11 @@
 import ActivitiesSection from "components/activities-section";
 import { INavBarItem } from "components/nav-bar";
+import Text from "components/text";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import Audience from "models/audience";
 import * as React from "react";
-import { FormattedMessage } from "react-intl";
+import { compose } from "react-apollo";
+import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { RouteComponentProps } from "react-router";
 import routes from "utils/routes";
 
@@ -12,7 +14,7 @@ interface IRouteParams {
 }
 
 interface IActivitiesSectionContainerProps extends
-    IWithHeaderProps, RouteComponentProps<IRouteParams> {}
+    IWithHeaderProps, RouteComponentProps<IRouteParams>, InjectedIntlProps {}
 
 const friendsAudienceRoute =
     routes.activities.path.replace(":audience", Audience.Friends);
@@ -57,10 +59,10 @@ class ActivitiesSectionContainer extends
     }
 
     private updateHeader() {
-        this.props.header.replace({
-            title: <FormattedMessage id="globalNavigation.activities" />,
-        });
+        const title = this.props.intl.formatMessage(
+            { id: "globalNavigation.activities" });
+        this.props.header.replace({ title });
     }
 }
 
-export default withHeader(ActivitiesSectionContainer);
+export default compose(withHeader, injectIntl)(ActivitiesSectionContainer);

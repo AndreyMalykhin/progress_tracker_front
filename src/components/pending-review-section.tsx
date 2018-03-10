@@ -1,3 +1,4 @@
+import { ListStyle } from "components/common-styles";
 import { INavBarItem } from "components/nav-bar";
 import PendingReviewTrackableListContainer from "components/pending-review-trackable-list-container";
 import SecondaryNav from "components/secondary-nav";
@@ -33,6 +34,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     content: {
+        backgroundColor: ListStyle.backgroundColor,
         flex: 1,
     },
 });

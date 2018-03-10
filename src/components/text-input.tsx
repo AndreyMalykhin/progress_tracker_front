@@ -1,4 +1,14 @@
 import Button, { ButtonIcon } from "components/button";
+import {
+    BorderColor,
+    Gap,
+    rem,
+    SeverityColor,
+    StateColor,
+    TouchableStyle,
+    TypographyStyle,
+} from "components/common-styles";
+import Icon from "components/icon";
 import * as React from "react";
 import {
     StyleProp,
@@ -8,9 +18,10 @@ import {
     View,
     ViewStyle,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import IconName from "utils/icon-name";
 
 interface ITextInputProps extends TextInputProperties {
+    borderless?: boolean;
     disabled?: boolean;
     containerStyle?: StyleProp<ViewStyle>;
     clearable?: boolean;
@@ -28,19 +39,21 @@ class TextInput extends React.Component<ITextInputProps> {
             containerStyle,
             disabled,
             editable,
+            borderless,
             onRef,
             ...restProps,
         } = this.props;
         const newContainerStyle = [
             styles.container,
             containerStyle,
-            invalid ? styles.containerInvalid : null,
-            disabled ? styles.containerDisabled : null,
+            borderless && styles.containerBorderless,
+            invalid && styles.containerInvalid,
+            disabled && styles.containerDisabled,
         ];
         const controlStyle = [
             styles.control,
             style,
-            disabled ? styles.controlDisabled : null,
+            disabled && styles.controlDisabled,
         ];
         return (
             <View style={newContainerStyle as any}>
@@ -59,7 +72,10 @@ class TextInput extends React.Component<ITextInputProps> {
     private renderClearBtn() {
         return (
             <Button onPress={this.props.onClear}>
-                <ButtonIcon component={Icon} name="close-circle" />
+                <ButtonIcon
+                    component={Icon}
+                    name={IconName.Remove}
+                />
             </Button>
         );
     }
@@ -69,22 +85,27 @@ const styles = StyleSheet.create({
     container: {
         alignItems: "center",
         borderBottomWidth: 1,
+        borderColor: BorderColor.dark,
         flexDirection: "row",
     },
+    containerBorderless: {
+        borderColor: "transparent",
+    },
     containerDisabled: {
-        borderColor: "#ccc",
+        borderColor: StateColor.disabled,
     },
     containerInvalid: {
-        borderColor: "#f00",
+        borderColor: SeverityColor.danger,
     },
     control: {
+        ...TypographyStyle.body,
         borderBottomWidth: 0,
         flex: 1,
-        height: 32,
-        marginTop: 4,
+        height: TouchableStyle.minHeight,
+        marginTop: rem(0.4),
     },
     controlDisabled: {
-        color: "#ccc",
+        color: StateColor.disabled,
     },
 });
 

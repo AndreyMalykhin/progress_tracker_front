@@ -1,3 +1,12 @@
+import {
+    BorderColor,
+    BorderRadius,
+    Color,
+    Gap,
+    StateColor,
+    TouchableStyle,
+    TypographyStyle,
+} from "components/common-styles";
 import NavBar, {
     INavBarItem,
     INavBarItemRenderer,
@@ -9,7 +18,7 @@ import TabBar, {
     TabBarItemTitle,
 } from "components/tab-bar";
 import * as React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 interface ISecondaryNavProps {
     items: INavBarItem[];
@@ -29,6 +38,8 @@ class SecondaryNav extends React.Component<ISecondaryNavProps> {
     private renderItem: INavBarItemRenderer = (
         path, isActive, onSelect, titleMsgId, iconName,
     ) => {
+        const contentStyle =
+            [styles.itemContent, isActive && styles.itemContentActive];
         return (
             <TabBarItem
                 key={path}
@@ -38,12 +49,14 @@ class SecondaryNav extends React.Component<ISecondaryNavProps> {
                 activeStyle={styles.itemActive}
                 onSelect={onSelect}
             >
-                <TabBarItemTitle
-                    active={isActive}
-                    msgId={titleMsgId!}
-                    style={styles.itemTitle}
-                    activeStyle={styles.itemTitleActive}
-                />
+                <View style={contentStyle as any}>
+                    <TabBarItemTitle
+                        active={isActive}
+                        msgId={titleMsgId!}
+                        style={styles.itemTitle}
+                        activeStyle={styles.itemTitleActive}
+                    />
+                </View>
             </TabBarItem>
         );
     }
@@ -52,24 +65,28 @@ class SecondaryNav extends React.Component<ISecondaryNavProps> {
 const styles = StyleSheet.create({
     container: {
         borderBottomWidth: 1,
+        borderColor: BorderColor.light,
     },
     item: {
-        borderRadius: 16,
-        marginBottom: 8,
-        marginLeft: 8,
-        marginRight: 8,
-        marginTop: 8,
-        paddingBottom: 4,
-        paddingLeft: 4,
-        paddingRight: 4,
-        paddingTop: 4,
+        paddingBottom: Gap.single,
+        paddingLeft: Gap.single,
+        paddingRight: Gap.single,
+        paddingTop: Gap.single,
     },
-    itemActive: {
-        backgroundColor: "#0076ff",
+    itemActive: {},
+    itemContent: {
+        alignItems: "center",
+        alignSelf: "stretch",
+        borderRadius: BorderRadius.double,
+        flex: 1,
+        justifyContent: "center",
+    },
+    itemContentActive: {
+        backgroundColor: StateColor.active,
     },
     itemTitle: {},
     itemTitleActive: {
-        color: "#fff",
+        color: Color.white,
     },
 });
 

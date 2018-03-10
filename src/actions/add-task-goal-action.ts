@@ -28,6 +28,7 @@ interface IAddTaskGoalResponse {
             progressDisplayMode: ProgressDisplayMode;
             proofPhotoUrlMedium: null;
             status: TrackableStatus;
+            achievementDate: null;
             statusChangeDate: null;
             creationDate: number;
             tasks: Array<{
@@ -77,6 +78,7 @@ mutation AddTaskGoal($goal: AddTaskGoalInput!) {
             progressDisplayMode
             proofPhotoUrlMedium
             status
+            achievementDate
             statusChangeDate
             creationDate
             tasks {
@@ -154,14 +156,15 @@ function getOptimisticResponse(
             __typename: Type.AddTaskGoalResponse,
             trackable: {
                 __typename: Type.TaskGoal,
+                achievementDate: null,
                 creationDate: currentDate,
                 deadlineDate: goal.deadlineDate || null,
                 difficulty: goal.difficulty,
                 iconName: goal.iconName,
                 id: goalId,
                 isPublic: goal.isPublic,
-                isReviewed: null,
                 maxProgress: goal.tasks.length,
+                myReviewStatus: null,
                 order: currentDate,
                 parent: null,
                 progress: 0,

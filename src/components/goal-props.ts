@@ -1,5 +1,6 @@
 import { ICommandBarItem } from "components/command-bar";
 import ProgressDisplayMode from "models/progress-display-mode";
+import ReviewStatus from "models/review-status";
 import TrackableStatus from "models/trackable-status";
 import { LayoutRectangle, StyleProp, ViewStyle } from "react-native";
 
@@ -20,11 +21,12 @@ interface IGoalProps {
     isLast?: boolean;
     isNested?: boolean;
     commands?: ICommandBarItem[];
-    duration?: number;
+    statusDuration?: number;
     style?: StyleProp<ViewStyle>;
     iconName: string;
     title: string;
     progress: number;
+    myReviewStatus?: ReviewStatus;
     maxProgress: number;
     progressDisplayMode: ProgressDisplayMode;
     onProve: (id: string) => void;

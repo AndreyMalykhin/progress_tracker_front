@@ -1,6 +1,17 @@
 import { ICommandBarItem } from "components/command-bar";
+import {
+    FontWeightStyle,
+    Gap,
+    TypographyStyle,
+} from "components/common-styles";
 import Text from "components/text";
 import Trackable from "components/trackable";
+import {
+    BodyText,
+    CalloutText,
+    Caption1Text,
+    SubheadText,
+} from "components/typography";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { FormattedDate, FormattedMessage } from "react-intl";
@@ -43,7 +54,7 @@ interface IGymExerciseProps {
     isFirst?: boolean;
     isLast?: boolean;
     commands?: ICommandBarItem[];
-    duration?: number;
+    statusDuration?: number;
     style?: StyleProp<ViewStyle>;
     iconName: string;
     title: string;
@@ -60,9 +71,11 @@ interface IGymExerciseProps {
 class GymExercise extends React.PureComponent<IGymExerciseProps> {
     public render() {
         const { items, isExpanded, ...restProps } = this.props;
+        const table = items.length ?
+            <Table items={items} isExpanded={isExpanded} /> : null;
         return (
             <Trackable isExpanded={isExpanded} {...restProps}>
-                <Table items={items} isExpanded={isExpanded} />
+                {table}
             </Trackable>
         );
     }
@@ -144,8 +157,9 @@ class Table extends React.PureComponent<ITableProps> {
     private renderCell(
         content: string|JSX.Element, key: string|number, inHeader: boolean,
     ) {
+        const Component = inHeader ? Caption1Text : CalloutText;
         const style = inHeader ? tableHeaderCellStyle : styles.tableCell;
-        return <Text key={key} style={style}>{content}</Text>;
+        return <Component key={key} style={style}>{content}</Component>;
     }
 
     private renderEntry(
@@ -165,29 +179,26 @@ class Table extends React.PureComponent<ITableProps> {
 
 const styles = StyleSheet.create({
     table: {
-        marginBottom: 8,
+        paddingBottom: Gap.single,
+        paddingTop: Gap.single,
     },
     tableBody: {
         flexDirection: "row",
     },
     tableCell: {
-        fontSize: 12,
-        lineHeight: 16,
-        paddingLeft: 4,
-        paddingRight: 4,
+        paddingLeft: Gap.half,
+        paddingRight: Gap.half,
         textAlign: "center",
     },
     tableCellHeader: {
         flex: 1,
-        fontSize: 14,
-        fontWeight: "bold",
-        lineHeight: 32,
     },
     tableColumn: {
         flex: 1,
     },
     tableHeader: {
         flexDirection: "row",
+        paddingBottom: Gap.single,
     },
 });
 

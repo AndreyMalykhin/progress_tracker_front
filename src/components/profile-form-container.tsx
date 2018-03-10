@@ -203,6 +203,8 @@ class ProfileFormContainer extends
     }
 
     private updateHeader(isValid: boolean) {
+        const title =
+            this.props.intl.formatMessage({ id: "profileForm.title" });
         this.props.header.replace({
             hideBackCommand: true,
             rightCommands: [
@@ -212,7 +214,7 @@ class ProfileFormContainer extends
                     onRun: this.onDone,
                 },
             ],
-            title: <FormattedMessage id="profileForm.title" />,
+            title,
         });
     }
 

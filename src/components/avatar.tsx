@@ -1,3 +1,4 @@
+import { AvatarStyle, rem } from "components/common-styles";
 import Image from "components/image";
 import * as React from "react";
 import { ImageStyle, StyleProp, StyleSheet } from "react-native";
@@ -8,14 +9,10 @@ interface IAvatarProps {
     style?: StyleProp<ImageStyle>;
 }
 
-const sizeSmall = 32;
-const sizeMedium = 48;
-const sizeLarge = 256;
-
 class Avatar extends React.PureComponent<IAvatarProps> {
     public render() {
         const { uri, size, style } = this.props;
-        const newStyle = [sizeToStyleMap[size], style];
+        const newStyle = [styles.img, sizeToStyleMap[size], style];
         return (
             <Image
                 resizeMode="cover"
@@ -27,23 +24,15 @@ class Avatar extends React.PureComponent<IAvatarProps> {
 }
 
 const styles = StyleSheet.create({
+    img: {},
     imgLarge: {
-        borderRadius: sizeLarge / 2,
-        borderWidth: 1,
-        height: sizeLarge,
-        width: sizeLarge,
+        ...AvatarStyle.large,
     },
     imgMedium: {
-        borderRadius: sizeMedium / 2,
-        borderWidth: 1,
-        height: sizeMedium,
-        width: sizeMedium,
+        ...AvatarStyle.medium,
     },
     imgSmall: {
-        borderRadius: sizeSmall / 2,
-        borderWidth: 1,
-        height: sizeSmall,
-        width: sizeSmall,
+        ...AvatarStyle.small,
     },
 });
 

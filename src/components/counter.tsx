@@ -1,6 +1,8 @@
 import { ICommandBarItem } from "components/command-bar";
+import { Gap, TouchableStyle } from "components/common-styles";
 import Text from "components/text";
 import Trackable from "components/trackable";
+import { BodyText, CalloutText } from "components/typography";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import {
@@ -24,7 +26,7 @@ interface ICounterProps {
     isLast?: boolean;
     isNested?: boolean;
     commands?: ICommandBarItem[];
-    duration?: number;
+    statusDuration?: number;
     style?: StyleProp<ViewStyle>;
     iconName: string;
     title: string;
@@ -40,7 +42,7 @@ class Counter extends React.PureComponent<ICounterProps> {
         const { progress, ...restProps } = this.props;
         return (
             <Trackable {...restProps}>
-                <Text style={styles.progress}>{progress}</Text>
+                <CalloutText style={styles.progress}>{progress}</CalloutText>
             </Trackable>
         );
     }
@@ -48,7 +50,7 @@ class Counter extends React.PureComponent<ICounterProps> {
 
 const styles = StyleSheet.create({
     progress: {
-        lineHeight: 32,
+        paddingBottom: Gap.single,
         textAlign: "center",
     },
 });

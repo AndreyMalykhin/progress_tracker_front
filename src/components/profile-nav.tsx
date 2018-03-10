@@ -1,3 +1,11 @@
+import {
+    BorderColor,
+    Color,
+    Gap,
+    StateColor,
+    TypographyStyle,
+} from "components/common-styles";
+import Icon from "components/icon";
 import NavBar, {
     INavBarItem,
     INavBarItemRenderer,
@@ -10,7 +18,6 @@ import TabBar, {
 } from "components/tab-bar";
 import * as React from "react";
 import { StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface IProfileNavProps {
     items: INavBarItem[];
@@ -50,6 +57,7 @@ class ProfileNav extends React.Component<IProfileNavProps> {
                     disabled={isDisabled}
                     active={isActive}
                     msgId={titleMsgId!}
+                    style={styles.itemTitle}
                 />
             </TabBarItem>
         );
@@ -59,6 +67,12 @@ class ProfileNav extends React.Component<IProfileNavProps> {
 const styles = StyleSheet.create({
     container: {
         borderBottomWidth: 1,
+        borderColor: BorderColor.light,
+        paddingBottom: Gap.single,
+        paddingTop: Gap.single,
+    },
+    itemTitle: {
+        ...TypographyStyle.caption1,
     },
 });
 

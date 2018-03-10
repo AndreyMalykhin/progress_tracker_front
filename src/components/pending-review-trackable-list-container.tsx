@@ -145,7 +145,6 @@ query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
             node {
                 id
                 status
-                statusChangeDate
                 creationDate
                 user @skip(if: $skipUser) {
                     id
@@ -157,7 +156,8 @@ query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
                     iconName
                 }
                 ... on IGoal {
-                    isReviewed
+                    achievementDate
+                    myReviewStatus
                     approveCount
                     rejectCount
                     proofPhotoUrlMedium

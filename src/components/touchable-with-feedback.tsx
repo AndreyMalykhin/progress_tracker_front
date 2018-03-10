@@ -44,8 +44,10 @@ class TouchableWithFeedback extends
     }
 
     private onPress = (e: GestureResponderEvent) => {
-        if (this.props.sound) {
-            this.props.diContainer.audioManager.play(this.props.sound);
+        const { onPress, sound, diContainer } = this.props;
+
+        if (onPress && sound) {
+            diContainer.audioManager.play(sound);
         }
 
         requestAnimationFrame(() => {

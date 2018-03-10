@@ -1,11 +1,28 @@
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
+import {
+    AvatarStyle,
+    BorderColor,
+    Color,
+    FontWeightStyle,
+    Gap,
+    IconStyle,
+    TouchableStyle,
+    TypographyStyle,
+} from "components/common-styles";
+import Icon from "components/icon";
 import Image from "components/image";
 import Text from "components/text";
+import {
+    BodyText,
+    Caption1Text,
+    Caption2Text,
+    SubheadText,
+    Title3Text,
+} from "components/typography";
 import * as React from "react";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
 
@@ -18,12 +35,12 @@ interface IHeaderCmd {
     onRun?: () => void;
 }
 
-interface IHeaderCmdProps extends IHeaderCmd {
+interface ICmdProps extends IHeaderCmd {
     style?: StyleProp<ViewStyle>;
 }
 
 interface IHeaderState {
-    title?: ReactNode;
+    title?: string;
     subtitleIcon?: string;
     subtitleText?: string|number;
     leftCommand?: IHeaderCmd;
@@ -33,7 +50,7 @@ interface IHeaderState {
 }
 
 interface ITitleProps {
-    text: ReactNode;
+    text: string;
 }
 
 interface ISubtitleProps {
@@ -42,8 +59,6 @@ interface ISubtitleProps {
 }
 
 type IHeaderProps = RouteComponentProps<{}>;
-
-const cmdSize = 32;
 
 class Header extends React.Component<IHeaderProps> {
     public render() {
@@ -67,12 +82,12 @@ class Header extends React.Component<IHeaderProps> {
         let leftCmdElement;
 
         if (leftCommand) {
-            leftCmdElement = <HeaderCmd key={cmdIndex} {...leftCommand} />;
+            leftCmdElement = <Cmd key={cmdIndex} {...leftCommand} />;
             ++cmdIndex;
         }
 
         const rightCommandElements = rightCommands && rightCommands.map(
-            (cmd, i) => <HeaderCmd key={i} {...cmd} />);
+            (cmd, i) => <Cmd key={i} {...cmd} />);
         const subtitle = subtitleText != null || subtitleIcon != null ?
             <Subtitle text={subtitleText} iconName={subtitleIcon} /> : null;
         return (
@@ -99,7 +114,7 @@ class Header extends React.Component<IHeaderProps> {
 
     private renderBackCmd(index: number, onRun?: () => void) {
         return (
-            <HeaderCmd
+            <Cmd
                 style={styles.cmdBack}
                 key={index}
                 iconName={IconName.Back}
@@ -113,7 +128,7 @@ class Header extends React.Component<IHeaderProps> {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
+class Cmd extends React.PureComponent<ICmdProps> {
     public render() {
         const { style, isPrimary, msgId, iconName, imgUrl, isDisabled, onRun } =
             this.props;
@@ -125,7 +140,6 @@ class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
                     disabled={isDisabled}
                     component={Icon}
                     name={iconName}
-                    size={cmdSize}
                 />
             );
         } else if (imgUrl) {
@@ -158,7 +172,11 @@ class HeaderCmd extends React.PureComponent<IHeaderCmdProps> {
 // tslint:disable-next-line:max-classes-per-file
 class Title extends React.PureComponent<ITitleProps> {
     public render() {
-        return <Text style={styles.title}>{this.props.text}</Text>;
+        return (
+            <BodyText style={styles.title} numberOfLines={1}>
+                {this.props.text}
+            </BodyText>
+        );
     }
 }
 
@@ -170,35 +188,33 @@ class Subtitle extends React.PureComponent<ISubtitleProps> {
             <Icon
                 style={styles.subtitleIcon}
                 name={iconName}
-                size={12}
+                size={TypographyStyle.caption2.lineHeight}
             />
         );
         return (
             <View style={styles.subtitle}>
                 {icon}
-                <Text style={styles.subtitleText}>{text}</Text>
+                <Caption2Text style={styles.subtitleText} numberOfLines={1}>
+                    {text}
+                </Caption2Text>
             </View>
         );
     }
 }
 
+const subtitleColor = Color.grayDark;
+
 const styles = StyleSheet.create({
-    cmdBack: {
-        marginRight: 16,
-    },
+    cmdBack: {},
     cmdImg: {
-        borderRadius: cmdSize / 2,
-        borderWidth: 1,
-        height: cmdSize,
-        width: cmdSize,
+        ...AvatarStyle.small,
     },
     cmdTitle: {},
     container: {
         borderBottomWidth: 1,
+        borderColor: BorderColor.dark,
         flexDirection: "row",
-        height: 48,
-        paddingLeft: 8,
-        paddingRight: 8,
+        height: TouchableStyle.minHeight,
     },
     leftSection: {
         alignItems: "center",
@@ -221,17 +237,16 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     subtitleIcon: {
-        color: "#888",
-        lineHeight: 16,
-        marginLeft: 4,
-        marginRight: 4,
+        color: subtitleColor,
+        marginLeft: Gap.half,
+        marginRight: Gap.half,
     },
     subtitleText: {
-        color: "#888",
-        fontSize: 12,
-        lineHeight: 16,
+        color: subtitleColor,
     },
-    title: {},
+    title: {
+        ...FontWeightStyle.bold,
+    },
 });
 
 export { IHeaderState, IHeaderCmd };

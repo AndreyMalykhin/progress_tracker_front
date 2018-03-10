@@ -1,5 +1,7 @@
 import Button, { ButtonTitle } from "components/button";
+import { Gap } from "components/common-styles";
 import Text from "components/text";
+import { BodyText } from "components/typography";
 import { IWithRefreshProps } from "components/with-refresh";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
@@ -17,9 +19,9 @@ class EmptyList extends React.Component<IEmptyListProps> {
         );
         return (
             <View style={styles.container}>
-                <Text style={styles.msg}>
+                <BodyText style={styles.msg}>
                     <FormattedMessage id="common.noData" />
-                </Text>
+                </BodyText>
                 {refreshBtn}
             </View>
         );
@@ -33,7 +35,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     msg: {
-        lineHeight: 32,
+        paddingBottom: Gap.single,
+        paddingTop: Gap.single,
     },
 });
 

@@ -39,6 +39,8 @@ class FriendsSectionContainer extends
     }
 
     private updateHeader(props: IFriendsSectionContainerProps) {
+        const title = this.props.intl.formatMessage(
+            { id: "globalNavigation.friends" });
         props.header.replace({
             rightCommands: [
                 {
@@ -48,7 +50,7 @@ class FriendsSectionContainer extends
                     onRun: this.onInvite,
                 },
             ],
-            title: <FormattedMessage id="globalNavigation.friends" />,
+            title,
         });
     }
 

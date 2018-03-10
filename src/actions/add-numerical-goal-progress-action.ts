@@ -1,4 +1,7 @@
-import { prependActivity, prependGoalAchievedActivity } from "actions/activity-helpers";
+import {
+    prependActivity,
+    prependGoalAchievedActivity,
+} from "actions/activity-helpers";
 import {
     IUpdateProgressAggregateFragment,
     updateProgressFragment,
@@ -23,6 +26,7 @@ interface IAddNumericalGoalProgressResponse {
             progress: number;
             status: TrackableStatus;
             statusChangeDate?: number;
+            achievementDate?: number;
             parent?: {
                 id: string;
                 progress: number;
@@ -38,6 +42,7 @@ interface IGoalFragment {
     maxProgress: number;
     status: TrackableStatus;
     statusChangeDate?: number;
+    achievementDate?: number;
     parent?: IUpdateProgressAggregateFragment;
 }
 
@@ -50,6 +55,7 @@ fragment AddNumericalGoalProgressFragment on NumericalGoal {
     maxProgress
     status
     statusChangeDate
+    achievementDate
     parent {
         ...UpdateProgressAggregateFragment
     }
@@ -59,15 +65,14 @@ const addNumericalGoalProgressQuery = gql`
 mutation AddNumericalGoalProgress($id: ID!, $value: Float!) {
     addNumericalGoalProgress(id: $id, value: $value) {
         trackable {
-            ... on NumericalGoal {
+            id
+            progress
+            status
+            achievementDate
+            statusChangeDate
+            parent {
                 id
                 progress
-                status
-                statusChangeDate
-                parent {
-                    id
-                    progress
-                }
             }
         }
     }

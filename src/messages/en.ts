@@ -40,7 +40,7 @@ export default {
     "commands.addProgress": "Add progress",
     "commands.aggregate": "Aggregate",
     "commands.back": "Back",
-    "commands.break": "Break",
+    "commands.break": "Unaggregate",
     "commands.edit": "Edit",
     "commands.new": "New",
     "commands.profile": "Profile",

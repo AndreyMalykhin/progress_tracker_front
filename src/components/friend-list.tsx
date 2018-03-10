@@ -1,8 +1,19 @@
 import Avatar from "components/avatar";
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
+import {
+    AvatarStyle,
+    Gap,
+    IconStyle,
+    SeverityColor,
+    StateColor,
+    UserListContentStyle,
+    UserListItemStyle,
+} from "components/common-styles";
+import Icon from "components/icon";
 import Loader from "components/loader";
 import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
+import { BodyText } from "components/typography";
 import { IWithRefreshProps } from "components/with-refresh";
 import * as React from "react";
 import {
@@ -11,7 +22,7 @@ import {
     StyleSheet,
     View,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import IconName from "utils/icon-name";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
@@ -86,8 +97,6 @@ class FriendList extends React.PureComponent<IFriendListProps> {
 class Item extends React.PureComponent<IItemProps> {
     public render() {
         const { isMuted, name, avatarUrlSmall } = this.props;
-        const muteBtnStyle =
-            isMuted ? styles.itemMuteBtnActive : null;
         return (
             <View style={styles.item}>
                 <TouchableWithFeedback
@@ -100,15 +109,16 @@ class Item extends React.PureComponent<IItemProps> {
                             size="medium"
                             uri={avatarUrlSmall}
                         />
-                        <Text style={styles.itemUserName} numberOfLines={1}>
+                        <BodyText style={styles.itemUserName} numberOfLines={1}>
                             {name}
-                        </Text>
+                        </BodyText>
                     </View>
                 </TouchableWithFeedback>
                 <Button style={styles.itemMuteBtn} onPress={this.onSetMuted}>
                     <ButtonIcon
-                        style={muteBtnStyle}
-                        name={isMuted ? "volume-off" : "volume-high"}
+                        disabled={isMuted}
+                        active={!isMuted}
+                        name={isMuted ? IconName.Muted : IconName.Unmuted}
                         component={Icon}
                     />
                 </Button>
@@ -124,31 +134,26 @@ class Item extends React.PureComponent<IItemProps> {
 
 const styles = StyleSheet.create({
     item: {
+        ...UserListItemStyle,
         alignItems: "center",
         flexDirection: "row",
-        paddingBottom: 32,
     },
     itemMuteBtn: {
-        paddingLeft: 8,
-    },
-    itemMuteBtnActive: {
-        color: "#ff3b30",
+        paddingLeft: Gap.single,
     },
     itemUser: {
         flex: 1,
         flexDirection: "row",
     },
     itemUserAvatar: {
-        marginRight: 8,
+        marginRight: Gap.single,
     },
     itemUserName: {
         flex: 1,
-        lineHeight: 48,
+        lineHeight: AvatarStyle.medium.height,
     },
     listContent: {
-        paddingLeft: 8,
-        paddingRight: 8,
-        paddingTop: 8,
+        ...UserListContentStyle,
     },
 });
 

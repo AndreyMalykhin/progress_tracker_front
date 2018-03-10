@@ -1,8 +1,19 @@
+import {
+    BorderRadius,
+    Color,
+    FontWeightStyle,
+    Gap,
+    SeverityColor,
+    StateColor,
+    TouchableStyle,
+} from "components/common-styles";
+import { IIconProps } from "components/icon";
 import Loader from "components/loader";
 import Text from "components/text";
 import TouchableWithFeedback, {
     ITouchableWithFeedbackProps,
 } from "components/touchable-with-feedback";
+import { BodyText } from "components/typography";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import {
@@ -11,14 +22,15 @@ import {
     TextStyle,
     View,
 } from "react-native";
-import { IconProps } from "react-native-vector-icons/Icon";
 
 interface IButtonProps extends ITouchableWithFeedbackProps {
+    raised?: boolean;
     vertical?: boolean;
     loading?: boolean;
 }
 
 interface IButtonTitleProps {
+    raised?: boolean;
     primary?: boolean;
     disabled?: boolean;
     dangerous?: boolean;
@@ -27,15 +39,22 @@ interface IButtonTitleProps {
     msgValues?: { [key: string]: string };
 }
 
-interface IButtonIconProps extends IconProps {
-    disabled?: boolean;
-    component: React.ComponentType<IconProps>;
+interface IButtonIconProps extends IIconProps {
+    raised?: boolean;
+    component: React.ComponentType<IIconProps>;
 }
 
 class Button extends React.Component<IButtonProps> {
     public render() {
-        const { children, loading, disabled, style, vertical, ...restProps } =
-            this.props;
+        const {
+            children,
+            loading,
+            disabled,
+            style,
+            vertical,
+            raised,
+            ...restProps,
+        } = this.props;
         let content;
 
         if (loading) {
@@ -46,10 +65,12 @@ class Button extends React.Component<IButtonProps> {
             content = <View style={contentStyle}>{children}</View>;
         }
 
+        const newStyle =
+            [styles.container, raised && styles.containerRaised, style];
         return (
             <TouchableWithFeedback
                 disabled={disabled}
-                style={[styles.container, style]}
+                style={newStyle as any}
                 {...restProps}
             >
                 {content}
@@ -61,20 +82,23 @@ class Button extends React.Component<IButtonProps> {
 // tslint:disable-next-line:max-classes-per-file
 class ButtonTitle extends React.PureComponent<IButtonTitleProps> {
     public render() {
-        const { msgId, msgValues, disabled, style, primary, dangerous } =
-            this.props;
+        const { msgId, msgValues, disabled, style, primary, dangerous, raised }
+            = this.props;
         const newStyle = [
-            styles.text,
             styles.title,
             style,
-            primary ? styles.titlePrimary : null,
-            dangerous ? styles.titleDangerous : null,
-            disabled ? styles.textDisabled : null,
+            primary && styles.titlePrimary,
         ];
         return (
-            <Text style={newStyle as any}>
+            <BodyText
+                active={true}
+                activeStyle={raised && styles.titleRaised}
+                disabled={disabled}
+                dangerous={dangerous}
+                style={newStyle as any}
+            >
                 <FormattedMessage id={msgId} values={msgValues} />
-            </Text>
+            </BodyText>
         );
     }
 }
@@ -82,42 +106,56 @@ class ButtonTitle extends React.PureComponent<IButtonTitleProps> {
 // tslint:disable-next-line:max-classes-per-file
 class ButtonIcon extends React.PureComponent<IButtonIconProps> {
     public render() {
-        const { component: Component, style, disabled, ...restProps } =
+        const { component: Component, style, raised, ...restProps } =
             this.props;
-        const newStyle = [
-            styles.text,
-            style,
-            disabled ? styles.textDisabled : null,
-        ];
-        return <Component style={newStyle as any} size={32} {...restProps} />;
+        return (
+            <Component
+                active={true}
+                activeStyle={raised && styles.iconRaised}
+                style={[styles.icon, style]}
+                {...restProps}
+            />
+        );
     }
 }
 
+const minHeight = TouchableStyle.minHeight;
 const styles = StyleSheet.create({
     container: {
-        minHeight: 32,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight,
+        minWidth: TouchableStyle.minWidth,
+    },
+    containerRaised: {
+        backgroundColor: TouchableStyle.color,
+        borderRadius: minHeight / 2,
+        paddingLeft: Gap.double,
+        paddingRight: Gap.double,
     },
     content: {
         alignItems: "center",
         flexDirection: "row",
     },
-    text: {
-        color: "#0076ff",
+    icon: {
+        lineHeight: minHeight,
+    },
+    iconRaised: {
+        color: Color.white,
     },
     textContainerVertical: {
         flexDirection: "column",
     },
-    textDisabled: {
-        color: "#ccc",
-    },
     title: {
-        lineHeight: 32,
-    },
-    titleDangerous: {
-        color: "#ff3b30",
+        lineHeight: minHeight,
+        paddingLeft: Gap.single,
+        paddingRight: Gap.single,
     },
     titlePrimary: {
-        fontWeight: "bold",
+        ...FontWeightStyle.bold,
+    },
+    titleRaised: {
+        color: Color.white,
     },
 });
 

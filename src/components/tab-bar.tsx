@@ -1,7 +1,15 @@
+import {
+    Color,
+    Gap,
+    StateColor,
+    TouchableStyle,
+} from "components/common-styles";
+import { IIconProps } from "components/icon";
 import Text from "components/text";
 import TouchableWithFeedback, {
     ITouchableWithFeedbackProps,
 } from "components/touchable-with-feedback";
+import { Caption1Text, SubheadText } from "components/typography";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import {
@@ -13,7 +21,6 @@ import {
     ViewProperties,
     ViewStyle,
 } from "react-native";
-import { IconProps } from "react-native-vector-icons/Icon";
 
 interface ITabBarItemTitleProps extends TextProperties {
     active?: boolean;
@@ -32,10 +39,9 @@ interface ITabBarItemProps extends ITouchableWithFeedbackProps {
 
 type ITabBarProps = ViewProperties;
 
-interface ITabBarItemIconProps extends IconProps {
-    active?: boolean;
+interface ITabBarItemIconProps extends IIconProps {
     disabled?: boolean;
-    component: React.ComponentType<IconProps>;
+    component: React.ComponentType<IIconProps>;
 }
 
 class TabBar extends React.Component<ITabBarProps> {
@@ -82,17 +88,16 @@ class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
     public render() {
         const { style, active, activeStyle, disabled, msgId, msgValues } =
             this.props;
-        const newStyle = [
-            styles.itemTitle,
-            style,
-            active && styles.itemTitleActive,
-            active && activeStyle,
-            disabled && styles.itemTitleDisabled,
-        ];
         return (
-            <Text style={newStyle as any}>
+            <SubheadText
+                active={active}
+                disabled={disabled}
+                style={[styles.itemTitle, style]}
+                activeStyle={activeStyle}
+                numberOfLines={1}
+            >
                 <FormattedMessage id={msgId} values={msgValues} />
-            </Text>
+            </SubheadText>
         );
     }
 }
@@ -100,62 +105,29 @@ class TabBarItemTitle extends React.PureComponent<ITabBarItemTitleProps> {
 // tslint:disable-next-line:max-classes-per-file
 class TabBarItemIcon extends React.PureComponent<ITabBarItemIconProps> {
     public render() {
-        const {
-            component: Component,
-            style,
-            active,
-            disabled,
-            children,
-            ...restProps,
-        } = this.props;
-        const newStyle = [
-            styles.itemIcon,
-            style,
-            active && styles.itemIconActive,
-            disabled && styles.itemIconDisabled,
-        ];
-        return (
-            <Component
-                size={32}
-                style={newStyle as any}
-                {...restProps}
-            />
-        );
+        const { component: Component, ...restProps } = this.props;
+        return <Component {...restProps} />;
     }
 }
 
 const styles = StyleSheet.create({
     container: {
         alignItems: "center",
-        backgroundColor: "#fff",
+        backgroundColor: Color.white,
         flexDirection: "row",
         justifyContent: "space-around",
     },
     item: {
-        alignItems: "center",
         flex: 1,
-        justifyContent: "center",
-        paddingBottom: 8,
-        paddingTop: 8,
+        minHeight: TouchableStyle.minHeight,
     },
     itemContent: {
         alignItems: "center",
-    },
-    itemIcon: {},
-    itemIconActive: {
-        color: "#0076ff",
-    },
-    itemIconDisabled: {
-        color: "#ccc",
+        flex: 1,
+        justifyContent: "center",
     },
     itemTitle: {
         flexDirection: "column",
-    },
-    itemTitleActive: {
-        color: "#0076ff",
-    },
-    itemTitleDisabled: {
-        color: "#ccc",
     },
 });
 

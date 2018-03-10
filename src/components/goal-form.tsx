@@ -1,4 +1,5 @@
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
+import { rem } from "components/common-styles";
 import {
     FormBody,
     FormError,
@@ -17,6 +18,7 @@ import FormTextInput from "components/form-text-input";
 import Text from "components/text";
 import TextInput from "components/text-input";
 import TrackableForm, { ITrackableFormProps } from "components/trackable-form";
+import { BodyText, CalloutText, Caption1Text } from "components/typography";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import Type from "models/type";
@@ -26,7 +28,6 @@ import {
     StyleSheet,
     View,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface IGoalFormProps extends ITrackableFormProps {
     difficulty: Difficulty;
@@ -100,9 +101,9 @@ class GoalForm extends
         const msgId =
             this.props.onGetDifficultyTitleMsgId(this.props.difficulty);
         return (
-            <Text style={styles.difficultyTitle}>
+            <CalloutText style={styles.difficultyTitle} numberOfLines={1}>
                 <FormattedMessage id={msgId} />
-            </Text>
+            </CalloutText>
         );
     }
 
@@ -134,8 +135,8 @@ class GoalForm extends
 
 const styles = StyleSheet.create({
     difficultyTitle: {
-        flexBasis: 96,
         textAlign: "center",
+        width: rem(12.8),
     },
 });
 

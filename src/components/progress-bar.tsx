@@ -1,4 +1,13 @@
+import {
+    BorderRadius,
+    BrandColor,
+    Color,
+    Gap,
+    ProgressBarStyle,
+    TypographyStyle,
+} from "components/common-styles";
 import Text from "components/text";
+import { CalloutText } from "components/typography";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
 import { FormattedNumber } from "react-intl";
@@ -61,13 +70,15 @@ class ProgressBar extends
                     progress={normalizedValue}
                     width={this.state.width}
                     height={height}
-                    color={"#0076ff"}
+                    color={ProgressBarStyle.color}
                     unfilledColor={backgroundColor}
                     borderRadius={borderRadius}
                     borderWidth={0}
                     useNativeDriver={true}
                 />
-                <Text style={styles.value}>{formattedValue}</Text>
+                <CalloutText style={styles.value} light={true}>
+                    {formattedValue}
+                </CalloutText>
             </View>
         );
     }
@@ -80,27 +91,21 @@ class ProgressBar extends
         this.setState({ width: evt.nativeEvent.layout.width })
 }
 
-const height = 16;
-const backgroundColor = "#000";
-const borderRadius = 8;
+const height = TypographyStyle.calloutLight.lineHeight!;
+const backgroundColor = BrandColor.primary;
+const borderRadius = BorderRadius.double;
 
 const styles = StyleSheet.create({
     container: {
         backgroundColor,
         borderRadius,
-        marginBottom: 8,
-        marginTop: 8,
+        marginBottom: Gap.single,
     },
     value: {
+        ...StyleSheet.absoluteFillObject,
         backgroundColor: "transparent",
-        bottom: 0,
-        color: "#fff",
-        left: 0,
         lineHeight: height,
-        position: "absolute",
-        right: 0,
         textAlign: "center",
-        top: 0,
     },
 });
 

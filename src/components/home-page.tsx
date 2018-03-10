@@ -34,15 +34,6 @@ const navItems: INavItem[] = [
         titleMsgId: "globalNavigation.profile",
     },
     {
-        component: LeadersSectionContainer,
-        iconName: IconName.Leaders,
-        matchExact: routes.leaders.exact,
-        matchPath: routes.leaders.path,
-        navigateToPath: routes.leaders.path.replace(
-            ":audience", Audience.Global),
-        titleMsgId: "globalNavigation.leaders",
-    },
-    {
         component: PendingReviewSectionContainer,
         iconName: IconName.Review,
         matchExact: routes.pendingReview.exact,
@@ -52,12 +43,13 @@ const navItems: INavItem[] = [
         titleMsgId: "globalNavigation.pendingReview",
     },
     {
-        component: FriendsSectionContainer,
-        iconName: IconName.Friends,
-        matchExact: routes.friends.exact,
-        matchPath: routes.friends.path,
-        navigateToPath: routes.friends.path,
-        titleMsgId: "globalNavigation.friends",
+        component: LeadersSectionContainer,
+        iconName: IconName.Leaders,
+        matchExact: routes.leaders.exact,
+        matchPath: routes.leaders.path,
+        navigateToPath: routes.leaders.path.replace(
+            ":audience", Audience.Global),
+        titleMsgId: "globalNavigation.leaders",
     },
     {
         component: ActivitiesSectionContainer,
@@ -67,6 +59,14 @@ const navItems: INavItem[] = [
         navigateToPath: routes.activities.path.replace(
             ":audience", Audience.Me),
         titleMsgId: "globalNavigation.activities",
+    },
+    {
+        component: FriendsSectionContainer,
+        iconName: IconName.Friends,
+        matchExact: routes.friends.exact,
+        matchPath: routes.friends.path,
+        navigateToPath: routes.friends.path,
+        titleMsgId: "globalNavigation.friends",
     },
 ];
 

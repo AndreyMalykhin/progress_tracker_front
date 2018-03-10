@@ -1,7 +1,23 @@
 import Avatar from "components/avatar";
+import {
+    CardStyle,
+    Color,
+    FontWeightStyle,
+    Gap,
+    ProgressBarStyle,
+    rem,
+    TouchableStyle,
+} from "components/common-styles";
+import Icon from "components/icon";
 import Loader from "components/loader";
 import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
+import {
+    BodyText,
+    Caption1Text,
+    HeadlineText,
+    SubheadText,
+} from "components/typography";
 import { IWithRefreshProps } from "components/with-refresh";
 import Audience from "models/audience";
 import TrackableType from "models/trackable-type";
@@ -18,7 +34,6 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import IconName from "utils/icon-name";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
@@ -444,14 +459,14 @@ class ActivityList extends React.PureComponent<IActivityListProps> {
 class SectionHeader extends React.PureComponent<ISectionHeaderProps> {
     public render() {
         return (
-            <Text style={styles.sectionHeader}>
+            <SubheadText style={styles.sectionHeader}>
                 <FormattedDate
                     value={this.props.date}
                     year="numeric"
                     month="long"
                     day="numeric"
                 />
-            </Text>
+            </SubheadText>
         );
     }
 }
@@ -459,14 +474,16 @@ class SectionHeader extends React.PureComponent<ISectionHeaderProps> {
 // tslint:disable-next-line:max-classes-per-file
 class TrackableTitle extends React.PureComponent<ITrackableTitleProps> {
     public render() {
-        return <Text style={styles.trackableTitle}>{this.props.text}</Text>;
+        return (
+            <BodyText style={styles.trackableTitle}>{this.props.text}</BodyText>
+        );
     }
 }
 
 // tslint:disable-next-line:max-classes-per-file
 class Number extends React.PureComponent<INumberProps> {
     public render() {
-        return <Text style={styles.number}>{this.props.value}</Text>;
+        return <BodyText style={styles.number}>{this.props.value}</BodyText>;
     }
 }
 
@@ -474,9 +491,9 @@ class Number extends React.PureComponent<INumberProps> {
 class UserName extends React.PureComponent<IUserNameProps> {
     public render() {
         return (
-            <Text style={styles.userName} onPress={this.onPress}>
+            <BodyText style={styles.userName} onPress={this.onPress}>
                 {this.props.name}
-            </Text>
+            </BodyText>
         );
     }
 
@@ -628,6 +645,7 @@ class GymExerciseEntryAddedActivity extends
                 msgId="activities.gymExerciseEntryAdded"
                 msgValues={msgValues}
                 iconName={IconName.ProgressChange}
+                iconStyle={styles.gymExerciseEntryAddedIcon}
                 {...restProps}
             />
         );
@@ -669,6 +687,7 @@ class CounterProgressChangedActivity extends
                 msgId="activities.counterProgressChanged"
                 msgValues={msgValues}
                 iconName={IconName.ProgressChange}
+                iconStyle={styles.counterProgressChangedIcon}
                 {...restProps}
             />
         );
@@ -689,6 +708,7 @@ class NumericalGoalProgressChangedActivity extends
                 msgId="activities.numericalGoalProgressChanged"
                 msgValues={msgValues}
                 iconName={IconName.ProgressChange}
+                iconStyle={styles.numericalGoalProgressChangedIcon}
                 {...restProps}
             />
         );
@@ -701,7 +721,8 @@ class TaskGoalProgressChangedActivity extends
     public render() {
         const { trackableTitle, taskTitle, ...restProps } = this.props;
         const msgValues = {
-            taskTitle: <Text style={styles.taskTitle}>{taskTitle}</Text>,
+            taskTitle:
+                <BodyText style={styles.taskTitle}>{taskTitle}</BodyText>,
             trackableTitle: <TrackableTitle text={trackableTitle} />,
         };
         return (
@@ -709,6 +730,7 @@ class TaskGoalProgressChangedActivity extends
                 msgId="activities.taskGoalProgressChanged"
                 msgValues={msgValues}
                 iconName={IconName.ProgressChange}
+                iconStyle={styles.taskGoalProgressChangedIcon}
                 {...restProps}
             />
         );
@@ -741,7 +763,6 @@ class Activity extends React.Component<IActivityProps> {
                 </FormattedMessage>
                 <Icon
                     name={iconName}
-                    size={32}
                     style={[styles.activityIcon, iconStyle]}
                 />
             </View>
@@ -751,11 +772,9 @@ class Activity extends React.Component<IActivityProps> {
     private renderMsg = (...parts: Array< React.ReactElement<any> >) => {
         const { userName, userId, onPressUser } = this.props;
         const userNameElement = userName && (
-            <UserName
-                id={userId!}
-                name={`${userName}\n`}
-                onPress={onPressUser}
-            />
+            <SubheadText style={styles.userName}>
+                {`${userName}\n`}
+            </SubheadText>
         );
         const msg = React.Children.map(parts, (part, i) => {
             return React.isValidElement(part) ? React.cloneElement(
@@ -764,10 +783,10 @@ class Activity extends React.Component<IActivityProps> {
         const style =
             [styles.activityMsg, !userName && styles.activityMsgUserless];
         return (
-            <Text style={style as any}>
+            <BodyText style={style as any}>
                 {userNameElement}
                 {msg}
-            </Text>
+            </BodyText>
         );
     }
 
@@ -778,74 +797,86 @@ const styles = StyleSheet.create({
     activity: {
         alignItems: "flex-start",
         flexDirection: "row",
-        paddingBottom: 16,
-        paddingTop: 16,
+        paddingBottom: Gap.double,
+        paddingTop: Gap.double,
     },
     activityAvatar: {
-        marginRight: 8,
+        marginRight: Gap.single,
     },
-    activityFirst: {
-    },
+    activityFirst: {},
     activityIcon: {
-        color: "#FF8A00",
-        marginLeft: 8,
+        color: Color.orange,
+        marginLeft: Gap.single,
     },
     activityMsg: {
         flex: 1,
         flexWrap: "wrap",
     },
     activityMsgUserless: {
-        paddingBottom: 8,
-        paddingTop: 8,
+        paddingBottom: rem(0.4),
+        paddingTop: rem(0.4),
     },
     activityUserless: {
-        paddingBottom: 8,
-        paddingTop: 8,
+        paddingBottom: Gap.single,
+        paddingTop: Gap.single,
+    },
+    counterProgressChangedIcon: {
+        color: ProgressBarStyle.color,
     },
     externalGoalReviewedIconApproved: {
-        color: "#43D459",
+        color: Color.orange,
     },
     externalGoalReviewedIconRejected: {
-        color: "#ff3b30",
+        color: Color.red,
     },
     goalAchievedIcon: {
-        color: "#43D459",
+        color: Color.green,
     },
     goalApprovedIcon: {
-        color: "#43D459",
+        color: Color.orange,
     },
     goalExpiredIcon: {
-        color: "#888",
+        color: Color.grayDark,
     },
     goalRejectedIcon: {
-        color: "#ff3b30",
+        color: Color.red,
+    },
+    gymExerciseEntryAddedIcon: {
+        color: ProgressBarStyle.color,
     },
     listContent: {
-        paddingLeft: 8,
-        paddingRight: 8,
-        paddingTop: 8,
+        paddingLeft: Gap.single,
+        paddingRight: Gap.single,
+        paddingTop: Gap.single,
     },
     number: {
-        fontWeight: "bold",
+        ...FontWeightStyle.bold,
+    },
+    numericalGoalProgressChangedIcon: {
+        color: ProgressBarStyle.color,
     },
     sectionHeader: {
-        color: "#ccc",
-        paddingBottom: 8,
-        paddingTop: 8,
+        backgroundColor: CardStyle.backgroundColor,
+        color: Color.gray,
+        paddingBottom: Gap.single,
+        paddingTop: Gap.single,
         textAlign: "center",
     },
+    taskGoalProgressChangedIcon: {
+        color: ProgressBarStyle.color,
+    },
     taskTitle: {
-        fontWeight: "bold",
+        ...FontWeightStyle.bold,
         textDecorationLine: "line-through",
     },
     trackableAddedIcon: {
-        color: "#0076ff",
+        color: Color.blue,
     },
     trackableTitle: {
-        fontWeight: "bold",
+        ...FontWeightStyle.bold,
     },
     userName: {
-        color: "#888",
+        color: Color.grayDark,
     },
 });
 

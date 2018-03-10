@@ -89,6 +89,7 @@ import withFetchPolicy, {
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
+import withLoginAction from "components/with-login-action";
 import withNetworkStatus, {
     IWithNetworkStatusProps,
 } from "components/with-network-status";
@@ -398,6 +399,7 @@ fragment ActiveTrackableListTaskGoalFragment on TaskGoal {
     progressDisplayMode
     difficulty
     deadlineDate
+    achievementDate
     tasks {
         id
         goal {
@@ -419,6 +421,7 @@ fragment ActiveTrackableListNumericalGoalFragment on NumericalGoal {
     progressDisplayMode
     difficulty
     deadlineDate
+    achievementDate
 }
 
 fragment ActiveTrackableListAggregateFragment on Aggregate {
@@ -542,7 +545,7 @@ class ActiveTrackableListContainer extends React.Component<
                 onNumericalEntryPopupClose={numericalEntryPopup.onClose}
                 onGymExerciseEntryPopupClose={gymExerciseEntryPopup.onClose}
                 onProveItem={this.onStartProveItem}
-                onSetTaskDone={this.onSetTaskDone}
+                onSetTaskDone={this.isMy() ? this.onSetTaskDone : undefined}
                 onGetAggregateCommands={this.onGetAggregateCommands}
                 onGetCounterCommands={this.onGetCounterCommands}
                 onGetGymExerciseCommands={this.onGetGymExerciseCommands}
@@ -1394,10 +1397,6 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onSetTaskDone = async (taskId: string, isDone: boolean) => {
-        if (!this.isMy()) {
-            return;
-        }
-
         let response;
 
         try {
@@ -1474,5 +1473,6 @@ export default compose(
         isMyData: (props) => isMyId(props.match.params.id, props.session),
         isReadonlyData: (props) => false,
     }),
+    withLoginAction,
     withEnsureUserLoggedIn,
 )(ActiveTrackableListContainer);

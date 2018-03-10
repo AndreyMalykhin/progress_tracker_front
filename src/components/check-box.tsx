@@ -1,7 +1,8 @@
 import Button, { ButtonIcon } from "components/button";
+import { IconStyle, TouchableStyle } from "components/common-styles";
+import Icon from "components/icon";
 import * as React from "react";
 import { StyleProp, StyleSheet, Text, ViewStyle } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import IconName from "utils/icon-name";
 import Sound from "utils/sound";
 
@@ -10,6 +11,7 @@ interface ICheckBoxProps {
     isDisabled?: boolean;
     isAnimationDisabled?: boolean;
     style?: StyleProp<ViewStyle>;
+    iconCheckedStyle?: StyleProp<ViewStyle>;
     sound?: Sound;
     onPress?: (isChecked: boolean) => void;
 }
@@ -18,6 +20,7 @@ class CheckBox extends React.PureComponent<ICheckBoxProps> {
     public render() {
         const {
             isChecked,
+            iconCheckedStyle,
             isDisabled,
             isAnimationDisabled,
             children,
@@ -26,7 +29,6 @@ class CheckBox extends React.PureComponent<ICheckBoxProps> {
             onPress,
         } = this.props;
         const iconName = isChecked ? IconName.Checked : IconName.Unchecked;
-        const iconStyle = isChecked ? iconCheckedStyle : styles.icon;
         return (
             <Button
                 sound={sound}
@@ -36,8 +38,10 @@ class CheckBox extends React.PureComponent<ICheckBoxProps> {
                 style={[styles.container, style]}
             >
                 <ButtonIcon
+                    active={isChecked}
+                    activeStyle={iconCheckedStyle}
                     disabled={isDisabled}
-                    style={iconStyle}
+                    style={styles.icon}
                     name={iconName}
                     component={Icon}
                 />
@@ -51,18 +55,16 @@ class CheckBox extends React.PureComponent<ICheckBoxProps> {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 0,
+        paddingBottom: 0,
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
     },
     icon: {
+        ...IconStyle,
         alignSelf: "flex-start",
-        color: "#000",
-    },
-    iconChecked: {
-        color: "#0076ff",
     },
 });
-
-const iconCheckedStyle = [styles.icon, styles.iconChecked];
 
 export { ICheckBoxProps };
 export default CheckBox;

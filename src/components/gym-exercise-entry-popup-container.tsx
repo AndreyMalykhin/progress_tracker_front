@@ -19,8 +19,9 @@ interface IGymExerciseEntryPopupContainerState {
 
 const validationDelay = 512;
 
-class GymExerciseEntryPopupContainer extends
-    React.Component<IGymExerciseEntryPopupContainerProps, IGymExerciseEntryPopupContainerState> {
+class GymExerciseEntryPopupContainer extends React.Component<
+    IGymExerciseEntryPopupContainerProps, IGymExerciseEntryPopupContainerState
+> {
     public state: IGymExerciseEntryPopupContainerState = {};
 
     public constructor(

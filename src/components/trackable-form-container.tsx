@@ -47,6 +47,7 @@ interface ITrackableFormContainerState {
     share?: boolean;
 }
 
+// TODO
 const icons = [
     "access-point", "access-point-network", "account", "account-alert",
     "account-box", "account-box-outline", "account-card-details",
@@ -164,10 +165,12 @@ abstract class TrackableFormContainer<
             const isIconPickerOpen = !prevState.isIconPickerOpen;
 
             if (isIconPickerOpen) {
+                const title = this.props.intl.formatMessage(
+                    { id: "trackableForm.iconLabel" });
                 this.props.header.push({
                     onBack: this.onCloseIconPicker,
                     rightCommands: [],
-                    title: <FormattedMessage id="trackableForm.iconLabel" />,
+                    title,
                 });
             }
 
@@ -237,6 +240,8 @@ abstract class TrackableFormContainer<
     }
 
     private updateHeader(isValid: boolean) {
+        const title = this.props.intl.formatMessage(
+            { id: this.getTitleMsgId() });
         this.props.header.replace({
             hideBackCommand: !this.isNew(),
             rightCommands: [
@@ -246,7 +251,7 @@ abstract class TrackableFormContainer<
                     onRun: this.onDone,
                 },
             ],
-            title: <FormattedMessage id={this.getTitleMsgId()} />,
+            title,
         });
     }
 

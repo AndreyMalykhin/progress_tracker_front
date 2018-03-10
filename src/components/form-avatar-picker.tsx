@@ -1,6 +1,7 @@
 import { addGenericErrorToast } from "actions/toast-helpers";
 import Avatar from "components/avatar";
 import Button, { ButtonTitle } from "components/button";
+import { BorderColor, CardStyle, Color, Gap } from "components/common-styles";
 import { FormGroup } from "components/form";
 import Image from "components/image";
 import Loader from "components/loader";
@@ -89,13 +90,14 @@ const styles = StyleSheet.create({
     buttonsContainer: {
         flexDirection: "row",
         justifyContent: "space-around",
-        marginTop: 8,
+        marginTop: Gap.single,
     },
     container: {
         alignItems: "center",
+        backgroundColor: Color.grayLight,
     },
     loader: {
-        marginTop: 8,
+        marginTop: Gap.single,
     },
 });
 

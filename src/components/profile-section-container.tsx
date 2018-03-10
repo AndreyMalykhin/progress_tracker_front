@@ -44,7 +44,6 @@ import { compose, withApollo } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { InjectedIntlProps, injectIntl } from "react-intl";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RouteComponentProps, withRouter } from "react-router";
 import defaultId from "utils/default-id";
 import getDataOrQueryStatus from "utils/get-data-or-query-status";

@@ -1,27 +1,45 @@
-import Button, { ButtonTitle } from "components/button";
+import Button, { ButtonIcon, ButtonTitle } from "components/button";
+import { Color, Gap } from "components/common-styles";
+import Icon from "components/icon";
 import Text from "components/text";
+import { BodyText, FootnoteText } from "components/typography";
 import { IWithLoginActionProps } from "components/with-login-action";
 import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import { StyleSheet, View } from "react-native";
+import IconName from "utils/icon-name";
 
 interface ILoginProps {
+    isNoFillParent?: boolean;
     msgId?: string;
 }
 
 class Login extends React.Component<ILoginProps & IWithLoginActionProps> {
     public render() {
-        const { msgId, onLogin } = this.props;
+        const { msgId, isNoFillParent, onLogin } = this.props;
         const msg = msgId && (
-            <Text style={styles.msg}>
+            <BodyText style={styles.msg}>
                 <FormattedMessage id={msgId} />
-            </Text>
+            </BodyText>
         );
+        const style = [
+            styles.container,
+            isNoFillParent && styles.containerNoFillParent,
+        ];
         return (
-            <View style={styles.container}>
+            <View style={style as any}>
                 {msg}
-                <Button style={styles.btn} onPress={onLogin}>
-                    <ButtonTitle msgId="common.login" />
+                <Button raised={true} style={styles.btn} onPress={onLogin}>
+                    <ButtonIcon
+                        raised={true}
+                        component={Icon}
+                        name={IconName.Facebook}
+                    />
+                    <ButtonTitle
+                        primary={true}
+                        raised={true}
+                        msgId="common.login"
+                    />
                 </Button>
             </View>
         );
@@ -31,14 +49,18 @@ class Login extends React.Component<ILoginProps & IWithLoginActionProps> {
 const styles = StyleSheet.create({
     btn: {
         alignSelf: "center",
+        backgroundColor: "#395ca9",
     },
     container: {
         alignItems: "center",
         flex: 1,
         justifyContent: "center",
     },
+    containerNoFillParent: {
+        flex: 0,
+    },
     msg: {
-        lineHeight: 32,
+        paddingBottom: Gap.double,
     },
 });
 

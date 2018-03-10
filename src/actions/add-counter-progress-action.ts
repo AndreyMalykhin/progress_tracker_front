@@ -49,13 +49,11 @@ const addCounterProgressQuery = gql`
 mutation AddCounterProgress($id: ID!, $value: Float!) {
     addCounterProgress(id: $id, value: $value) {
         trackable {
-            ... on Counter {
+            id
+            progress
+            parent {
                 id
                 progress
-                parent {
-                    id
-                    progress
-                }
             }
         }
     }

@@ -38,7 +38,7 @@ interface IProveTrackableResponse {
         trackable: {
             __typename: Type;
             id: string;
-            isReviewed: null;
+            myReviewStatus: null;
             proofPhotoUrlMedium: string;
             status: TrackableStatus;
             statusChangeDate: number;
@@ -76,7 +76,7 @@ mutation ProveTrackable($id: ID!, $assetId: ID!) {
         trackable {
             id
             ... on IGoal {
-                isReviewed
+                myReviewStatus
                 proofPhotoUrlMedium
                 approveCount
                 rejectCount
@@ -193,7 +193,7 @@ function getOptimisticResponse(
                 __typename,
                 approveCount: status === TrackableStatus.Approved ? null : 0,
                 id: trackableId,
-                isReviewed: null,
+                myReviewStatus: null,
                 parent: null,
                 proofPhotoUrlMedium: photo.path,
                 rating: null,

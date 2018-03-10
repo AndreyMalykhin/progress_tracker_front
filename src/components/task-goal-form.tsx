@@ -1,4 +1,5 @@
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
+import { BorderColor } from "components/common-styles";
 import {
     FormBody,
     FormError,
@@ -27,8 +28,6 @@ import {
     TextInput as NativeTextInput,
     View,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import memoizedStyle from "utils/memoized-style";
 
 interface ITask {
     id: string;
@@ -219,20 +218,15 @@ class TaskListItem extends React.PureComponent<ITaskListItemProps> {
             onChangeTitle,
             onRemove,
         } = this.props;
-        const inputStyle = memoizedStyle([
-            styles.taskListItem,
-            id ? styles.taskListItemNew : null,
-            isFocused ? styles.taskListItemFocused : null,
-        ]);
         return (
             <View>
                 <TextInput
                     onRef={this.onInputRef as any}
-                    containerStyle={inputStyle}
                     value={title}
                     placeholder={placeholder}
                     clearable={isFocused && onRemove != null}
                     invalid={errorMsgId != null}
+                    borderless={!isFocused}
                     onClear={this.onRemove}
                     onChangeText={this.onChangeTitle}
                     onFocus={this.onFocus}
@@ -265,15 +259,7 @@ class TaskListItem extends React.PureComponent<ITaskListItemProps> {
     }
 }
 
-const styles = StyleSheet.create({
-    taskListItem: {
-        borderColor: "transparent",
-    },
-    taskListItemFocused: {
-        borderColor: "#000",
-    },
-    taskListItemNew: {},
-});
+const styles = StyleSheet.create({});
 
 export { ITask };
 export default injectIntl(TaskGoalForm);

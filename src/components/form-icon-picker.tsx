@@ -1,5 +1,7 @@
 import Button, { ButtonIcon } from "components/button";
+import { Gap, TouchableStyle } from "components/common-styles";
 import { FormGroup, FormLabel } from "components/form";
+import Icon from "components/icon";
 import withDIContainer, {
     IWithDIContainerProps,
 } from "components/with-di-container";
@@ -11,7 +13,6 @@ import {
     StyleSheet,
     View,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Sound from "utils/sound";
 
 interface IFormIconPickerExpandedProps {
@@ -34,7 +35,10 @@ interface IListItemProps {
 class FormIconPickerExpanded extends
     React.PureComponent<IFormIconPickerExpandedProps & IWithDIContainerProps> {
     public render() {
-        const columnCount = Math.floor(Dimensions.get("window").width / 80);
+        const columnWidth =
+            (expandedListItemIconPadding * 2) + expandedListItemIconSize;
+        const columnCount =
+            Math.floor(Dimensions.get("window").width / columnWidth);
         return (
             <FlatList
                 key={columnCount}
@@ -73,14 +77,13 @@ const EnchanchedFormIconPickerExpanded =
 // tslint:disable-next-line:max-classes-per-file
 class ListItem extends React.PureComponent<IListItemProps> {
     public render() {
-        const style = this.props.isSelected ? expandedIconSelectedStyle
-            : styles.expandedListItemIcon;
         return (
             <View style={styles.expandedListItem}>
                 <Icon
-                    size={48}
+                    active={this.props.isSelected}
+                    size={expandedListItemIconSize}
                     name={this.props.iconName}
-                    style={style}
+                    style={styles.expandedListItemIcon}
                     onPress={this.onPress}
                 />
             </View>
@@ -109,25 +112,22 @@ class FormIconPickerCollapsed extends
     }
 }
 
+const expandedListItemIconSize = TouchableStyle.minHeight;
+const expandedListItemIconPadding = Gap.double;
+
 const styles = StyleSheet.create({
     collapsedContainer: {},
-    collapsedIcon: {
-        color: "#0076ff",
-    },
     expandedList: {
         alignSelf: "center",
     },
     expandedListItem: {},
     expandedListItemIcon: {
-        padding: 16,
-    },
-    expandedListItemIconSelected: {
-        color: "#0076ff",
+        paddingBottom: expandedListItemIconPadding,
+        paddingLeft: expandedListItemIconPadding,
+        paddingRight: expandedListItemIconPadding,
+        paddingTop: expandedListItemIconPadding,
     },
 });
-
-const expandedIconSelectedStyle =
-    [styles.expandedListItemIcon, styles.expandedListItemIconSelected];
 
 export {
     EnchanchedFormIconPickerExpanded as FormIconPickerExpanded,

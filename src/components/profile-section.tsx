@@ -1,3 +1,4 @@
+import { ListStyle } from "components/common-styles";
 import { INavBarItem } from "components/nav-bar";
 import ProfileNav from "components/profile-nav";
 import StackingSwitch from "components/stacking-switch";
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     content: {
+        backgroundColor: ListStyle.backgroundColor,
         flex: 1,
     },
 });

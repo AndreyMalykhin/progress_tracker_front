@@ -73,7 +73,7 @@ function addGenericErrorToast(apollo: DataProxy) {
         { __typename: Type.Message, id: `${locale}_errors.unexpected` })!;
     const msg = apollo.readFragment<IMessageFragment>(
         { id: msgFragmentId, fragment: msgFragment })!.text;
-    const toast = { msg, severity: ToastSeverity.Error, sound: Sound.Error };
+    const toast = { msg, severity: ToastSeverity.Danger, sound: Sound.Error };
     addToast(toast, apollo);
 }
 

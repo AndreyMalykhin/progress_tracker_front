@@ -1,3 +1,4 @@
+import { BorderRadius, Color, rem } from "components/common-styles";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import ModalImpl, { ModalProps } from "react-native-modal";
@@ -25,9 +26,9 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     content: {
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        minWidth: 256,
+        backgroundColor: Color.white,
+        borderRadius: BorderRadius.single,
+        minWidth: rem(25.6),
     },
 });
 

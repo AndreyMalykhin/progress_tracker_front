@@ -4,7 +4,7 @@ import withHeader, { IWithHeaderProps } from "components/with-header";
 import Audience from "models/audience";
 import * as React from "react";
 import { compose } from "react-apollo";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import routes from "utils/routes";
 
@@ -13,7 +13,7 @@ interface IRouteParams {
 }
 
 interface IPendingReviewSectionContainerProps extends
-    IWithHeaderProps, RouteComponentProps<IRouteParams> {}
+    IWithHeaderProps, RouteComponentProps<IRouteParams>, InjectedIntlProps {}
 
 const globalAudienceRoute =
     routes.pendingReview.path.replace(":audience", Audience.Global);
@@ -67,10 +67,11 @@ class PendingReviewSectionContainer extends
     }
 
     private updateHeader() {
-        this.props.header.replace({
-            title: <FormattedMessage id="globalNavigation.pendingReview" />,
-        });
+        const title = this.props.intl.formatMessage(
+            { id: "globalNavigation.pendingReview" });
+        this.props.header.replace({ title });
     }
 }
 
-export default compose(withRouter, withHeader)(PendingReviewSectionContainer);
+export default compose(withRouter, withHeader, injectIntl)(
+    PendingReviewSectionContainer);

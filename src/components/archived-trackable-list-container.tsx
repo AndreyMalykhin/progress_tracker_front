@@ -1,5 +1,6 @@
 import ArchivedTrackableList, {
     IArchivedTrackableListItemNode,
+    IArchivedTrackableListOnGetStatusDuration,
 } from "components/archived-trackable-list";
 import EmptyList from "components/empty-list";
 import Error from "components/error";
@@ -82,6 +83,7 @@ query GetData(
                     iconName
                 }
                 ... on IGoal {
+                    achievementDate
                     progress
                     maxProgress
                     progressDisplayMode
@@ -138,8 +140,16 @@ class ArchivedTrackableListContainer extends
                 queryStatus={data.networkStatus}
                 onEndReached={onLoadMore}
                 onRefresh={onRefresh}
+                onGetStatusDuration={this.onGetStatusDuration}
             />
         );
+    }
+
+    private onGetStatusDuration: IArchivedTrackableListOnGetStatusDuration = (
+        status, statusChangeDate, creationDate, achievementDate,
+    ) => {
+        return status === TrackableStatus.Expired ?
+            statusChangeDate - creationDate : achievementDate! - creationDate;
     }
 }
 

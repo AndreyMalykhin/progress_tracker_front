@@ -3,8 +3,17 @@ import Button, {
     ButtonTitle,
     IButtonProps,
 } from "components/button";
+import {
+    FontWeightStyle,
+    Gap,
+    SeverityColor,
+    StateColor,
+    TouchableStyle,
+} from "components/common-styles";
+import Icon from "components/icon";
 import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
+import { BodyText, FootnoteText, SubheadText } from "components/typography";
 import * as React from "react";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import {
@@ -16,7 +25,6 @@ import {
     View,
     ViewStyle,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import IconName from "utils/icon-name";
 
 interface IFormBodyProps {
@@ -158,11 +166,7 @@ class FormSectionTitle extends React.PureComponent<IFormSectionTitleProps> {
                     labelMsgId={this.props.msgId}
                     horizontal={true}
                 >
-                    <Icon
-                        style={styles.sectionIcon}
-                        name={iconName}
-                        size={32}
-                    />
+                    <Icon active={true} name={iconName} />
                 </FormGroup>
             </TouchableWithFeedback>
         );
@@ -178,9 +182,9 @@ class FormError extends React.PureComponent<IFormErrorProps> {
     public render() {
         const { msgId, msgValues } = this.props;
         return (
-            <Text style={styles.error}>
+            <BodyText dangerous={true} style={styles.error}>
                 <FormattedMessage id={msgId} values={msgValues} />
-            </Text>
+            </BodyText>
         );
     }
 }
@@ -189,16 +193,14 @@ class FormError extends React.PureComponent<IFormErrorProps> {
 class FormLabel extends React.PureComponent<IFormLabelProps> {
     public render() {
         const { invalid, msgId, msgValues, disabled, style } = this.props;
-        const newStyle = [
-            styles.label,
-            style,
-            disabled ? styles.labelDisabled : null,
-            invalid ? styles.labelInvalid : null,
-        ];
         return (
-            <Text style={newStyle as any}>
+            <SubheadText
+                disabled={disabled}
+                dangerous={invalid}
+                style={[styles.label, style]}
+            >
                 <FormattedMessage id={msgId} values={msgValues} />
-            </Text>
+            </SubheadText>
         );
     }
 }
@@ -207,11 +209,10 @@ class FormLabel extends React.PureComponent<IFormLabelProps> {
 class FormHint extends React.PureComponent<IFormHintProps> {
     public render() {
         const { msgId, msgValues, disabled } = this.props;
-        const style = disabled ? hintDisabledStyle : styles.hint;
         return (
-            <Text style={style}>
+            <FootnoteText disabled={disabled} style={styles.hint}>
                 <FormattedMessage id={msgId} values={msgValues} />
-            </Text>
+            </FootnoteText>
         );
     }
 }
@@ -247,17 +248,22 @@ class FormButtonCancel extends React.PureComponent<IFormButtonCancelProps> {
 const styles = StyleSheet.create({
     body: {},
     error: {
-        color: "#f00",
-        marginTop: 8,
+        marginTop: Gap.single,
     },
     footer: {
         alignItems: "center",
         flexDirection: "row",
         justifyContent: "space-around",
-        padding: 8,
+        paddingBottom: Gap.single,
+        paddingLeft: Gap.single,
+        paddingRight: Gap.single,
+        paddingTop: Gap.single,
     },
     group: {
-        padding: 16,
+        paddingBottom: Gap.double,
+        paddingLeft: Gap.double,
+        paddingRight: Gap.double,
+        paddingTop: Gap.double,
     },
     groupContent: {},
     groupContentHorizontal: {
@@ -266,31 +272,17 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     hint: {
-        marginTop: 8,
-    },
-    hintDisabled: {
-        color: "#ccc",
+        paddingTop: Gap.single,
     },
     label: {
-        fontWeight: "bold",
-        lineHeight: 32,
-    },
-    labelDisabled: {
-        color: "#ccc",
-    },
-    labelInvalid: {
-        color: "#f00",
-    },
-    sectionIcon: {
-        color: "#0076ff",
+        ...FontWeightStyle.bold,
     },
     sectionTitle: {
-        color: "#0076ff",
-        fontWeight: "normal",
+        ...FontWeightStyle.regular,
+        color: TouchableStyle.color,
     },
 });
 
-const hintDisabledStyle = [styles.hint, styles.hintDisabled];
 const groupContentHorizontalStyle =
     [styles.groupContent, styles.groupContentHorizontal];
 

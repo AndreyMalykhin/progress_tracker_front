@@ -3,7 +3,8 @@ import { INavBarItem } from "components/nav-bar";
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import Audience from "models/audience";
 import * as React from "react";
-import { FormattedMessage } from "react-intl";
+import { compose } from "react-apollo";
+import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { RouteComponentProps } from "react-router";
 import routes from "utils/routes";
 
@@ -12,7 +13,7 @@ interface IRouteParams {
 }
 
 interface ILeadersSectionContainerProps extends
-    IWithHeaderProps, RouteComponentProps<IRouteParams> {}
+    IWithHeaderProps, RouteComponentProps<IRouteParams>, InjectedIntlProps {}
 
 const friendsAudienceRoute =
     routes.leaders.path.replace(":audience", Audience.Friends);
@@ -57,10 +58,10 @@ class LeadersSectionContainer extends
     }
 
     private updateHeader() {
-        this.props.header.replace({
-            title: <FormattedMessage id="globalNavigation.leaders" />,
-        });
+        const title = this.props.intl.formatMessage(
+            { id: "globalNavigation.leaders" });
+        this.props.header.replace({ title });
     }
 }
 
-export default withHeader(LeadersSectionContainer);
+export default compose(withHeader, injectIntl)(LeadersSectionContainer);

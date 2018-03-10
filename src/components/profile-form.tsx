@@ -46,7 +46,7 @@ class ProfileForm extends React.Component<IProfileFormProps> {
             authGroup = (
                 <FormGroup>
                     <Button style={styles.logoutBtn} onPress={onLogout}>
-                        <ButtonTitle msgId="common.logout" />
+                        <ButtonTitle dangerous={true} msgId="common.logout" />
                     </Button>
                 </FormGroup>
             );
@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     logoutBtn: {
+        alignSelf: "center",
     },
 });
 

@@ -10,6 +10,7 @@ import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
 import Difficulty from "models/difficulty";
+import ReviewStatus from "models/review-status";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import dataIdFromObject from "utils/data-id-from-object";
@@ -37,7 +38,7 @@ async function approveTrackable(
     const counterField = "approveCount";
     const result = await mutate({
         optimisticResponse: getOptimisticResponse(
-            id, counterField, mutationName, apollo),
+            id, counterField, mutationName, ReviewStatus.Approved, apollo),
         update: (proxy, response) => {
             const responseData =
                 (response.data as IApproveTrackableResponse).approveTrackable;

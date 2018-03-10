@@ -1,7 +1,19 @@
 import Avatar from "components/avatar";
 import CommandBar, { ICommandBarProps } from "components/command-bar";
+import {
+    BorderColor,
+    CardStyle,
+    Color,
+    FontWeightStyle,
+    Gap,
+    IconStyle,
+    rem,
+    TouchableStyle,
+    TypographyStyle,
+} from "components/common-styles";
 import Image from "components/image";
 import Text from "components/text";
+import { Caption1Text, HeadlineText, SubheadText } from "components/typography";
 import * as React from "react";
 import {
     StyleProp,
@@ -102,14 +114,15 @@ class CardHeader extends React.Component<ICardHeaderProps> {
 class CardTitle extends React.PureComponent<ICardTitleProps> {
     public render() {
         const { isPrimary, text, style, onPress } = this.props;
+        const Component = isPrimary ? SubheadText : HeadlineText;
         return (
-            <Text
+            <Component
                 numberOfLines={2}
                 style={[styles.title, style, isPrimary && styles.titlePrimary]}
                 onPress={onPress}
             >
                 {this.props.text}
-            </Text>
+            </Component>
         );
     }
 }
@@ -129,11 +142,7 @@ class CardIcon extends React.PureComponent<ICardIconProps> {
     public render() {
         const { component: Component, style, ...restProps } = this.props;
         return (
-            <Component
-                size={32}
-                style={[styles.icon, style]}
-                {...restProps}
-            />
+            <Component style={[styles.icon, style]} {...restProps} />
         );
     }
 }
@@ -153,46 +162,44 @@ class CardCommandBar extends React.PureComponent<ICardCommandBarProps> {
 
 const styles = StyleSheet.create({
     avatar: {
-        marginRight: 8,
+        marginRight: Gap.single,
     },
     body: {
-        paddingBottom: 8,
-        paddingLeft: 8,
-        paddingRight: 8,
+        paddingBottom: Gap.single,
+        paddingLeft: Gap.single,
+        paddingRight: Gap.single,
     },
     commandBar: {
-        paddingLeft: 8,
+        paddingLeft: Gap.single,
     },
     container: {
-        backgroundColor: "#fff",
+        ...CardStyle,
     },
     header: {
         alignItems: "center",
         flexDirection: "row",
-        minHeight: 32,
-        paddingBottom: 8,
-        paddingLeft: 8,
-        paddingRight: 8,
-        paddingTop: 8,
+        minHeight: TouchableStyle.minHeight,
+        paddingBottom: Gap.single,
+        paddingLeft: Gap.single,
+        paddingRight: Gap.single,
+        paddingTop: Gap.single,
     },
     headerPrimary: {
         borderBottomWidth: 1,
-        borderColor: "#edf0f5",
-        marginLeft: 8,
-        marginRight: 8,
+        borderColor: BorderColor.light,
+        marginLeft: Gap.single,
+        marginRight: Gap.single,
         paddingLeft: 0,
         paddingRight: 0,
     },
     icon: {
-        paddingRight: 8,
+        paddingRight: Gap.single,
     },
     title: {
         flex: 1,
-        paddingBottom: 2,
+        paddingBottom: rem(0.4),
     },
-    titlePrimary: {
-        fontWeight: "bold",
-    },
+    titlePrimary: {},
 });
 
 export {
