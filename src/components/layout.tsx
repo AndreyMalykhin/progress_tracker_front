@@ -1,3 +1,4 @@
+import { Color, HeaderStyle } from "components/common-styles";
 import HomePage from "components/home-page";
 import LoginPageContainer from "components/login-page-container";
 import ProfileFormPage from "components/profile-form-page";
@@ -6,7 +7,7 @@ import ToastListContainer from "components/toast-list-container";
 import TrackableFormPageContainer from "components/trackable-form-page-container";
 import { IWithSessionProps } from "components/with-session";
 import * as React from "react";
-import { StatusBar, StyleSheet, View } from "react-native";
+import { Platform, StatusBar, StyleSheet, View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
 import routes from "utils/routes";
 
@@ -15,9 +16,14 @@ interface ILayoutProps {}
 
 class Layout extends React.Component<ILayoutProps & IWithSessionProps> {
     public render() {
+        const statusBar = this.props.session.userId ? (
+            <View style={styles.statusBar}>
+                <StatusBar />
+            </View>
+        ) : <StatusBar hidden={true} />;
         return (
             <View style={styles.container}>
-                <StatusBar />
+                {statusBar}
                 <StackingSwitch>
                     <Route
                         exact={routes.trackableNew.exact}
@@ -48,7 +54,10 @@ class Layout extends React.Component<ILayoutProps & IWithSessionProps> {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 20,
+    },
+    statusBar: {
+        backgroundColor: HeaderStyle.backgroundColor,
+        height: Platform.OS === "ios" ? 20 : StatusBar.currentHeight,
     },
 });
 

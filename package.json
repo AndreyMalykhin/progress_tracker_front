@@ -16,6 +16,7 @@
     "@types/react-intl": "^2.3.3",
     "@types/react-native": "^0.51.7",
     "@types/react-native-fbsdk": "^0.6.0",
+    "@types/react-native-fs": "^2.8.1",
     "@types/react-native-vector-icons": "^4.4.2",
     "@types/react-router-native": "^4.0.2",
     "@types/react-test-renderer": "^16.0.0",

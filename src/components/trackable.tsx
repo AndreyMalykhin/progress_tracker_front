@@ -504,7 +504,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     cardBodyLast: {
-        borderBottomWidth: 0,
+        borderBottomWidth: 1,
+        borderColor: BorderColor.light,
     },
     cardBodyNested: {
         borderBottomWidth: 1,
@@ -521,6 +522,9 @@ const styles = StyleSheet.create({
     },
     container: {
         backgroundColor: CardStyle.backgroundColor,
+        borderBottomWidth: 1,
+        borderColor: BorderColor.light,
+        borderTopWidth: 1,
         flexDirection: "row",
         marginBottom: trackableMargin,
     },
@@ -528,12 +532,16 @@ const styles = StyleSheet.create({
         opacity: 0,
     },
     containerFirst: {
+        borderTopWidth: 1,
         marginTop: trackableMargin,
     },
     containerLast: {
+        borderBottomWidth: 1,
         marginBottom: trackableMargin,
     },
     containerNested: {
+        borderBottomWidth: 0,
+        borderTopWidth: 0,
         marginBottom: 0,
         marginTop: 0,
     },

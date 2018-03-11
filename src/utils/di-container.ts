@@ -14,6 +14,7 @@ import makeApollo from "utils/make-apollo";
 import makeCache from "utils/make-cache";
 import MultiStackHistory from "utils/multi-stack-history";
 import NetworkTracker from "utils/network-tracker";
+import UploadLink from "utils/upload-link";
 
 class DIContainer {
     private impl: Bottle.IContainer;
@@ -61,6 +62,10 @@ class DIContainer {
     public get errorLink(): ApolloLink {
         return this.impl.errorLink;
     }
+
+    public get uploadLink(): UploadLink {
+        return this.impl.uploadLink;
+    }
 }
 
 function makeDIContainer() {
@@ -69,6 +74,7 @@ function makeDIContainer() {
     di.service("deadlineTracker", DeadlineTracker, "apollo", "envConfig");
     di.service("networkTracker", NetworkTracker, "apollo", "envConfig");
     di.service("history", MultiStackHistory);
+    di.service("uploadLink", UploadLink, "envConfig");
     di.factory("envConfig", makeEnvConfig);
     di.factory("stateResolver", makeStateResolver);
     di.factory("cacheResolver", (container) => {
@@ -83,6 +89,7 @@ function makeDIContainer() {
         "stateResolver",
         "envConfig",
         "errorLink",
+        "uploadLink",
     );
     return new DIContainer(di.container);
 }

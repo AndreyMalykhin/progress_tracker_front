@@ -10,6 +10,8 @@ enum Type {
     AddTaskGoalResponse = "AddTaskGoalResponse",
     AggregateTrackablesResponse = "AggregateTrackablesResponse",
     Aggregate = "Aggregate",
+    Asset = "Asset",
+    Avatar = "Avatar",
     BreakAggregateResponse = "BreakAggregateResponse",
     Counter = "Counter",
     CounterProgressChangedActivity = "CounterProgressChangedActivity",
@@ -59,6 +61,8 @@ enum Type {
     TrackableConnection = "TrackableConnection",
     TrackableEdge = "TrackableEdge",
     UI = "UI",
+    UploadAssetResponse = "UploadAssetResponse",
+    UploadAvatarResponse = "UploadAvatarResponse",
     User = "User",
     UnaggregateTrackableResponse = "UnaggregateTrackableResponse",
 }

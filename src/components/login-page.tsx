@@ -7,6 +7,7 @@ import * as React from "react";
 import {
     Dimensions,
     ImageURISource,
+    StatusBar,
     StyleSheet,
     Text,
     View,

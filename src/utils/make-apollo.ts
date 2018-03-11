@@ -17,6 +17,7 @@ import { IEnvConfig } from "utils/env-config";
 import InMemoryCache from "utils/in-memory-cache";
 import makeLog from "utils/make-log";
 import OfflineLink from "utils/offline-link";
+import UploadLink from "utils/upload-link";
 
 const log = makeLog("make-apollo");
 
@@ -25,6 +26,7 @@ function makeApollo(
     stateResolver: IStateResolver,
     envConfig: IEnvConfig,
     errorLink: ApolloLink,
+    uploadLink: UploadLink,
 ) {
     const offlineLink = new OfflineLink(envConfig);
     const stateLink = withClientState(
@@ -34,6 +36,7 @@ function makeApollo(
         offlineLink,
         stateLink,
         authLink,
+        uploadLink,
         new HttpLink({ uri: envConfig.serverUrl + "/graphql" }),
     ];
 

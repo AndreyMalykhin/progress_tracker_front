@@ -95,6 +95,8 @@ const styles = StyleSheet.create({
     container: {
         alignItems: "center",
         backgroundColor: Color.grayLight,
+        borderBottomWidth: 1,
+        borderColor: BorderColor.light,
     },
     loader: {
         marginTop: Gap.single,

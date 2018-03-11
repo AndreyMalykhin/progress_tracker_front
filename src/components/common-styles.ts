@@ -14,7 +14,8 @@ const Color = {
     gray: "#bdbdbd",
     grayDark: "#757575",
     grayDark2: "#424242",
-    grayLight: "#eeeeee",
+    grayLight: "#fafafa",
+    grayLight2: "#f5f5f5",
     green: "#4caf50",
     greenDark: "#2e7d32",
     orange: "#ff9800",
@@ -47,7 +48,7 @@ const StateColor = {
 
 const BorderColor = {
     dark: Color.grayDark,
-    light: Color.grayLight,
+    light: Color.grayLight2,
     normal: Color.gray,
 };
 
@@ -149,6 +150,10 @@ const ProgressBarStyle = {
     color: Color.green,
 };
 
+const HeaderStyle = {
+    backgroundColor: Color.grayLight2,
+};
+
 function rem(value: number) {
     return value * 10;
 }
@@ -172,4 +177,5 @@ export {
     UserListContentStyle,
     UserListItemStyle,
     ProgressBarStyle,
+    HeaderStyle,
 };

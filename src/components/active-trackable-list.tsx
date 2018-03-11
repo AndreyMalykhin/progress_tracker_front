@@ -637,10 +637,10 @@ const styles = StyleSheet.create({
     list: {},
     listContent: {},
     reorderablePlaceholder: {
-        backgroundColor: CardStyle.backgroundColor,
+        backgroundColor: Color.grayLight2,
         borderColor: BorderColor.normal,
         borderWidth: 1,
-        opacity: 0.5,
+        opacity: 0.75,
     },
 });
 

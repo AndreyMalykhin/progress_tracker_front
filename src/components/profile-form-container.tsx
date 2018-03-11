@@ -96,7 +96,6 @@ const withSetAvatar =
                             img,
                             mutate!,
                             ownProps.client,
-                            ownProps.diContainer.envConfig,
                         ),
                 };
             },
@@ -157,7 +156,7 @@ class ProfileFormContainer extends
             <ProfileForm
                 avatarError={avatarError}
                 avatarUri={avatarUri}
-                isAvatarDisabled={!isUserLoggedIn || !isOnline}
+                isAvatarDisabled={!isUserLoggedIn}
                 isAvatarChanging={isAvatarChanging}
                 isNameDisabled={!isUserLoggedIn}
                 isUserLoggedIn={isUserLoggedIn}

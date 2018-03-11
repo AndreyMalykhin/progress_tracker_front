@@ -9,6 +9,7 @@ import {
     prependPendingReviewTrackables,
 } from "actions/pending-review-trackables-helpers";
 import { getSession } from "actions/session-helpers";
+import { uploadAsset } from "actions/upload-asset-action";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient, ApolloError } from "apollo-client";
@@ -113,18 +114,12 @@ async function proveTrackable(
     photo: Image,
     mutate: MutationFunc<IProveTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
-    envConfig: IEnvConfig,
 ) {
-    const uploadResponse =
-        await uploadFile(photo.path, photo.mime, "/assets", apollo, envConfig);
-
-    if (uploadResponse.status !== 200) {
-        throw new Error("File upload failed");
-    }
-
-    const assetId = uploadResponse.payload.id;
-    const result = await mutate({
-        optimisticResponse: getOptimisticResponse(id, photo, apollo),
+    const uploadResult = await uploadAsset(photo.path, photo.mime, apollo);
+    const { id: assetId, urlMedium: assetUrl } =
+        uploadResult.uploadAsset.asset;
+    const proveResult = await mutate({
+        optimisticResponse: getOptimisticResponse(id, assetUrl, apollo),
         update: (proxy, response) => {
             const responseData = response.data as IProveTrackableResponse;
             updateActiveTrackables(responseData, proxy);
@@ -139,7 +134,7 @@ async function proveTrackable(
         },
         variables: { id, assetId },
     });
-    return result.data;
+    return proveResult.data as IProveTrackableResponse;
 }
 
 function updateActiveTrackables(
@@ -171,7 +166,7 @@ function updatePendingReviewTrackables(
 
 function getOptimisticResponse(
     trackableId: string,
-    photo: Image,
+    proofPhotoUrlMedium: string,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     const trackable = apollo.readQuery<IGetTrackableByIdResponse>({
@@ -195,7 +190,7 @@ function getOptimisticResponse(
                 id: trackableId,
                 myReviewStatus: null,
                 parent: null,
-                proofPhotoUrlMedium: photo.path,
+                proofPhotoUrlMedium,
                 rating: null,
                 rejectCount: status === TrackableStatus.Approved ? null : 0,
                 status,

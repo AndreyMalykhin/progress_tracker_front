@@ -5,6 +5,7 @@ import {
     IEditUserResponse,
 } from "actions/edit-user-action";
 import { getSession } from "actions/session-helpers";
+import { uploadAvatar } from "actions/upload-avatar-action";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import gql from "graphql-tag";
@@ -53,36 +54,38 @@ async function setUserAvatar(
     img: Image|null,
     mutate: MutationFunc<ISetUserAvatarResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
-    envConfig: IEnvConfig,
 ) {
     let avatarId;
+    let avatarUrlSmall;
+    let avatarUrlMedium;
 
     if (img) {
-        const response =
-            await uploadFile(img.path, img.mime, "/avatars", apollo, envConfig);
-
-        if (response.status !== 200) {
-            throw new Error("File upload failed");
-        }
-
-        avatarId = response.payload.id;
+        const uploadResponse = await uploadAvatar(img.path, img.mime, apollo);
+        const { avatar } = uploadResponse.uploadAvatar;
+        avatarId = avatar.id;
+        avatarUrlSmall = avatar.urlSmall;
+        avatarUrlMedium = avatar.urlMedium;
     }
 
-    return await mutate({
-        optimisticResponse: getOptimisticResponse(img, apollo),
+    const response = await mutate({
+        optimisticResponse: getOptimisticResponse(
+            apollo, avatarUrlSmall, avatarUrlMedium),
         variables: { avatarId },
     });
+    return response.data as ISetUserAvatarResponse;
 }
 
 function getOptimisticResponse(
-    img: Image|null, apollo: ApolloClient<NormalizedCacheObject>,
+    apollo: ApolloClient<NormalizedCacheObject>,
+    imgUrlSmall?: string,
+    imgUrlMedium?: string,
 ) {
     const fragmentId = dataIdFromObject(
         { __typename: Type.User, id: getSession(apollo).userId })!;
     const user = apollo.readFragment<ISetUserAvatarFragment>(
         { id: fragmentId, fragment: setUserAvatarFragment })!;
-    user.avatarUrlSmall = img ? img.path : defaultAvatar.urlSmall;
-    user.avatarUrlMedium = img ? img.path : defaultAvatar.urlMedium;
+    user.avatarUrlSmall = imgUrlSmall || defaultAvatar.urlSmall;
+    user.avatarUrlMedium = imgUrlMedium || defaultAvatar.urlMedium;
     return {
         __typename: Type.Mutation,
         setUserAvatar: {

@@ -5,6 +5,7 @@ import {
     Color,
     FontWeightStyle,
     Gap,
+    HeaderStyle,
     IconStyle,
     TouchableStyle,
     TypographyStyle,
@@ -211,6 +212,7 @@ const styles = StyleSheet.create({
     },
     cmdTitle: {},
     container: {
+        ...HeaderStyle,
         borderBottomWidth: 1,
         borderColor: BorderColor.dark,
         flexDirection: "row",

@@ -241,9 +241,9 @@ const withProve =
             props: ({ ownProps, mutate }) => {
                 return {
                     onCommitProveItem: (id: string, photo: Image) => {
-                        const { client, diContainer } = ownProps;
+                        const { client } = ownProps;
                         return proveTrackable(
-                            id, photo, mutate!, client, diContainer.envConfig);
+                            id, photo, mutate!, client);
                     },
                 } as Partial<IActiveTrackableListContainerProps>;
             },
@@ -1173,12 +1173,7 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onStartProveItem = async (id: string) => {
-        const { onEnsureUserLoggedIn, diContainer, client } = this.props;
-
-        if (!onEnsureUserLoggedIn()) {
-            return;
-        }
-
+        const { diContainer, client } = this.props;
         let image: Image|null;
 
         try {
