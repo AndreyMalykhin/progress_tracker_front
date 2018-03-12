@@ -1,12 +1,12 @@
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import {
     AvatarStyle,
-    BorderColor,
     Color,
     FontWeightStyle,
     Gap,
     HeaderStyle,
     IconStyle,
+    ShadeColor,
     TouchableStyle,
     TypographyStyle,
 } from "components/common-styles";
@@ -214,7 +214,6 @@ const styles = StyleSheet.create({
     container: {
         ...HeaderStyle,
         borderBottomWidth: 1,
-        borderColor: BorderColor.dark,
         flexDirection: "row",
         height: TouchableStyle.minHeight,
     },

@@ -1,30 +1,32 @@
 import { IGoalFormProps } from "components/goal-form";
-import TrackableFormContainer, {
-    IEditTrackableFragment,
-    ITrackable,
-    ITrackableFormContainerProps,
-    ITrackableFormContainerState,
-} from "components/trackable-form-container";
+import PrimitiveTrackableFormContainer, {
+    IEditPrimitiveTrackableFragment,
+    IPrimitiveTrackable,
+    IPrimitiveTrackableFormContainerProps,
+    IPrimitiveTrackableFormContainerState,
+} from "components/primitive-trackable-form-container";
 import { debounce, throttle } from "lodash";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
 
-interface IGoal extends ITrackable {
+interface IGoal extends IPrimitiveTrackable {
     difficulty: Difficulty;
     progressDisplayMode: ProgressDisplayMode;
     deadlineDate?: number|null;
 }
 
-interface IEditGoalFragment extends IEditTrackableFragment {
+interface IEditGoalFragment extends IEditPrimitiveTrackableFragment {
     difficulty?: Difficulty;
     progressDisplayMode?: ProgressDisplayMode;
     deadlineDate?: number|null;
 }
 
-type IGoalFormContainerProps<T extends IGoal> = ITrackableFormContainerProps<T>;
+type IGoalFormContainerProps<T extends IGoal> =
+    IPrimitiveTrackableFormContainerProps<T>;
 
-interface IGoalFormContainerState extends ITrackableFormContainerState {
+interface IGoalFormContainerState extends
+    IPrimitiveTrackableFormContainerState {
     difficulty: Difficulty;
     deadlineDate?: Date;
     progressDisplayMode: ProgressDisplayMode;
@@ -57,7 +59,7 @@ abstract class GoalFormContainer<
     TEditGoalFragment extends IEditGoalFragment,
     TProps extends IGoalFormContainerProps<TGoal>,
     TState extends IGoalFormContainerState
-> extends TrackableFormContainer<TGoal, TEditGoalFragment, TProps, TState> {
+> extends PrimitiveTrackableFormContainer<TGoal, TEditGoalFragment, TProps, TState> {
     protected minDeadlineDate: Date;
 
     public constructor(props: TProps, context: any) {

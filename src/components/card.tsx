@@ -1,13 +1,13 @@
 import Avatar from "components/avatar";
 import CommandBar, { ICommandBarProps } from "components/command-bar";
 import {
-    BorderColor,
     CardStyle,
     Color,
     FontWeightStyle,
     Gap,
     IconStyle,
     rem,
+    ShadeColor,
     TouchableStyle,
     TypographyStyle,
 } from "components/common-styles";
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     },
     headerPrimary: {
         borderBottomWidth: 1,
-        borderColor: BorderColor.light,
+        borderColor: ShadeColor.light2,
         marginLeft: Gap.single,
         marginRight: Gap.single,
         paddingLeft: 0,

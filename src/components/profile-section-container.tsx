@@ -363,7 +363,7 @@ class ProfileSectionContainer
             return;
         }
 
-        this.props.history.push(routes.trackableNew.path.replace(
+        this.props.history.push(routes.trackableAdd.path.replace(
             ":type", type.toString()));
     }
 }

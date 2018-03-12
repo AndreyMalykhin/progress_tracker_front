@@ -1,5 +1,5 @@
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
-import { BorderColor } from "components/common-styles";
+import { ShadeColor } from "components/common-styles";
 import {
     FormBody,
     FormError,

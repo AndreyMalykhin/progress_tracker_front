@@ -5,6 +5,7 @@ import { History } from "history";
 import * as React from "react";
 import { IntlProvider } from "react-intl";
 import { Router } from "react-router";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
 interface IAppProps {
@@ -13,8 +14,11 @@ interface IAppProps {
     messages: { [id: string]: string };
 }
 
-class App extends React.Component<IAppProps> {
+const log = makeLog("app");
+
+class App extends React.PureComponent<IAppProps> {
     public render() {
+        log.trace("render()");
         const { locale, messages } = this.props;
         return (
             <IntlProvider

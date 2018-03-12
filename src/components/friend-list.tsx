@@ -2,6 +2,7 @@ import Avatar from "components/avatar";
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import {
     AvatarStyle,
+    CardStyle,
     Gap,
     IconStyle,
     SeverityColor,
@@ -66,6 +67,7 @@ class FriendList extends React.PureComponent<IFriendListProps> {
                 data={items}
                 keyExtractor={this.getItemKey}
                 renderItem={this.onRenderItem}
+                style={styles.list}
                 contentContainerStyle={styles.listContent}
                 ListFooterComponent={loader}
                 onEndReachedThreshold={0.5}
@@ -151,6 +153,9 @@ const styles = StyleSheet.create({
     itemUserName: {
         flex: 1,
         lineHeight: AvatarStyle.medium.height,
+    },
+    list: {
+        backgroundColor: CardStyle.backgroundColor,
     },
     listContent: {
         ...UserListContentStyle,

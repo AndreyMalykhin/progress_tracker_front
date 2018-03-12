@@ -1,6 +1,7 @@
 import Avatar from "components/avatar";
 import {
     AvatarStyle,
+    CardStyle,
     Color,
     FontWeightStyle,
     Gap,
@@ -65,6 +66,7 @@ class LeaderList extends React.Component<ILeaderListProps> {
                 data={items}
                 keyExtractor={this.getItemKey}
                 renderItem={this.onRenderItem}
+                style={styles.list}
                 contentContainerStyle={styles.listContent}
                 ListFooterComponent={loader}
                 onEndReachedThreshold={0.5}
@@ -152,6 +154,9 @@ const styles = StyleSheet.create({
         color: Color.grayDark,
         lineHeight: itemHeight,
         marginLeft: Gap.single,
+    },
+    list: {
+        backgroundColor: CardStyle.backgroundColor,
     },
     listContent: {
         ...UserListContentStyle,

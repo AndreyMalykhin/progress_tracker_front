@@ -9,6 +9,8 @@ import {
     LayoutRectangle,
     StyleProp,
     StyleSheet,
+    TextStyle,
+    View,
     ViewStyle,
 } from "react-native";
 
@@ -28,13 +30,16 @@ interface ICounterProps {
     commands?: ICommandBarItem[];
     statusDuration?: number;
     style?: StyleProp<ViewStyle>;
-    iconName: string;
+    cardHeaderStyle?: StyleProp<ViewStyle>;
+    cardHeaderTitleStyle?: StyleProp<TextStyle>;
+    iconName?: string;
     title: string;
     progress: number;
     onSelectChange?: (id: string, isSelected: boolean) => void;
     onLongPress?: (id: string, parentId?: string) => void;
     onPressOut?: (id: string) => void;
     onLayout?: (id: string, layout?: LayoutRectangle) => void;
+    onGetLayoutRef?: () => View | undefined;
 }
 
 class Counter extends React.PureComponent<ICounterProps> {

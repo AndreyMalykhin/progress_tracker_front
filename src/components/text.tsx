@@ -16,6 +16,7 @@ interface ITextProps extends TextProperties {
     active?: boolean;
     activeStyle?: StyleProp<TextStyle>;
     disabled?: boolean;
+    disabledStyle?: StyleProp<TextStyle>;
     dangerous?: boolean;
     dangerousStyle?: StyleProp<TextStyle>;
 }
@@ -27,6 +28,7 @@ class Text extends React.Component<ITextProps> {
             active,
             activeStyle,
             disabled,
+            disabledStyle,
             dangerous,
             dangerousStyle,
             ...restProps,
@@ -38,6 +40,7 @@ class Text extends React.Component<ITextProps> {
             dangerous && styles.textDangerous,
             dangerous && dangerousStyle,
             disabled && styles.textDisabled,
+            disabled && disabledStyle,
         ];
         return <TextImpl style={newStyle as any} {...restProps} />;
     }

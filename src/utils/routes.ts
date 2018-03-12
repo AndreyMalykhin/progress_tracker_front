@@ -35,12 +35,12 @@ export default {
         exact: true,
         path: `/profile/edit`,
     },
+    trackableAdd: {
+        exact: true,
+        path: "/goal/new/:type",
+    },
     trackableEdit: {
         exact: true,
         path: "/goal/:id/edit",
-    },
-    trackableNew: {
-        exact: true,
-        path: "/goal/new/:type",
     },
 };

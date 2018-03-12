@@ -15,9 +15,11 @@ import {
 import FormSlider from "components/form-slider";
 import FormSwitch from "components/form-switch";
 import FormTextInput from "components/form-text-input";
+import PrimitiveTrackableForm, {
+    IPrimitiveTrackableFormProps,
+} from "components/primitive-trackable-form";
 import Text from "components/text";
 import TextInput from "components/text-input";
-import TrackableForm, { ITrackableFormProps } from "components/trackable-form";
 import { BodyText, CalloutText, Caption1Text } from "components/typography";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
@@ -29,7 +31,7 @@ import {
     View,
 } from "react-native";
 
-interface IGoalFormProps extends ITrackableFormProps {
+interface IGoalFormProps extends IPrimitiveTrackableFormProps {
     difficulty: Difficulty;
     deadlineDate?: Date;
     minDeadlineDate: Date;
@@ -50,7 +52,7 @@ class GoalForm extends
     public render() {
         const { onRenderChildren, ...restProps } = this.props;
         return (
-            <TrackableForm
+            <PrimitiveTrackableForm
                 onRenderChildren={this.onRenderChildren}
                 {...restProps}
             />

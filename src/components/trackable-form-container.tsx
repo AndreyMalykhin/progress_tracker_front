@@ -1,60 +1,38 @@
-import { share } from "actions/share-action";
 import { addGenericErrorToast } from "actions/toast-helpers";
 import { isApolloError } from "apollo-client/errors/ApolloError";
-import { IHeaderState } from "components/header";
 import { ITrackableFormProps } from "components/trackable-form";
 import { IWithDIContainerProps } from "components/with-di-container";
 import { IWithHeaderProps } from "components/with-header";
-import { debounce, throttle } from "lodash";
+import { debounce } from "lodash";
 import TrackableType from "models/trackable-type";
 import * as React from "react";
-import { withApollo } from "react-apollo";
-import { FormattedMessage, InjectedIntlProps } from "react-intl";
+import { InjectedIntlProps } from "react-intl";
 import { RouteComponentProps } from "react-router";
 import { IWithApolloProps } from "utils/interfaces";
-import Sound from "utils/sound";
 
 interface ITrackable {
     id: string;
     title: string;
-    iconName: string;
-    isPublic: boolean;
 }
 
 interface IEditTrackableFragment {
     id: string;
     title?: string;
-    iconName?: string;
 }
 
-interface ITrackableFormContainerProps<T extends ITrackable> extends
-    RouteComponentProps<{}>,
+interface ITrackableFormContainerProps<T extends ITrackable>
+    extends RouteComponentProps<{}>,
     IWithHeaderProps,
     IWithApolloProps,
     IWithDIContainerProps,
     InjectedIntlProps {
     trackable?: T;
-    isUserLoggedIn: boolean;
-    isOnline?: boolean;
 }
 
 interface ITrackableFormContainerState {
     title?: string;
     titleError?: string|null;
-    iconName: string;
-    isPublic: boolean;
-    isIconPickerOpen?: boolean;
-    share?: boolean;
 }
-
-// TODO
-const icons = [
-    "access-point", "access-point-network", "account", "account-alert",
-    "account-box", "account-box-outline", "account-card-details",
-    "account-check", "account-circle", "account-convert", "account-edit",
-    "account-key", "account-location", "account-minus", "account-multiple",
-    "account-multiple-minus",
-];
 
 abstract class TrackableFormContainer<
     TTrackable extends ITrackable,
@@ -93,32 +71,16 @@ abstract class TrackableFormContainer<
     protected abstract getInitialStateForAdd(): TState;
     protected abstract getInitialStateForEdit(): TState;
     protected abstract getTrackableType(): TrackableType;
+    protected abstract afterAddTrackable(): Promise<any>;
 
     protected getFormBaseProps() {
         const {
             title,
             titleError,
-            iconName,
-            isPublic,
-            isIconPickerOpen,
-            share: shareWithFriends,
         } = this.state;
-        const { isUserLoggedIn, isOnline } = this.props;
         const isNew = this.isNew();
         return {
-            availableIconNames: icons,
-            iconName,
-            isIconPickerOpen,
-            isPublic,
-            isPublicDisabled: this.isPublicDisabled(isNew, isUserLoggedIn),
-            isShareDisabled: !isUserLoggedIn || !isOnline,
-            isShareable: isNew,
-            onChangeIcon: this.onChangeIcon,
-            onChangePublic: this.onChangePublic,
-            onChangeShare: this.onChangeShare,
             onChangeTitle: this.onChangeTitle,
-            onOpenIconPicker: this.onToggleIconPicker,
-            share: shareWithFriends,
             title,
             titleError,
         } as ITrackableFormProps;
@@ -126,10 +88,6 @@ abstract class TrackableFormContainer<
 
     protected goBack() {
         this.props.history.goBack();
-    }
-
-    protected isPublicDisabled(isNew: boolean, isUserLoggedIn: boolean) {
-        return !isNew || !isUserLoggedIn;
     }
 
     protected isValid(state: TState) {
@@ -149,39 +107,6 @@ abstract class TrackableFormContainer<
         this.saveTitle(title);
     }
 
-    protected onChangeIcon = (iconName: string) => {
-        this.setState({ iconName, isIconPickerOpen: false });
-        this.props.header.pop();
-
-        if (this.isNew()) {
-            return;
-        }
-
-        this.editTrackable({ iconName } as TEditTrackableFragment);
-    }
-
-    protected onToggleIconPicker = () => {
-        this.setState((prevState) => {
-            const isIconPickerOpen = !prevState.isIconPickerOpen;
-
-            if (isIconPickerOpen) {
-                const title = this.props.intl.formatMessage(
-                    { id: "trackableForm.iconLabel" });
-                this.props.header.push({
-                    onBack: this.onCloseIconPicker,
-                    rightCommands: [],
-                    title,
-                });
-            }
-
-            return { isIconPickerOpen };
-        });
-    }
-
-    protected onChangePublic = (isPublic: boolean) => {
-        this.setState({ isPublic });
-    }
-
     protected editTrackable(fragment: Partial<TEditTrackableFragment>) {
         this.transaction(() => {
             const data =
@@ -198,11 +123,10 @@ abstract class TrackableFormContainer<
         }
     }
 
-    protected onChangeShare = (value: boolean) =>
-        this.setState({ share: value })
-
     private saveTitle = (title: string) => {
         const titleError = !title ? "errors.emptyValue" : null;
+
+        // TODO fix unmounted component scenario
         this.setState({ titleError });
 
         if (titleError || this.isNew()) {
@@ -217,26 +141,13 @@ abstract class TrackableFormContainer<
         const isNew = this.isNew();
 
         if (isNew) {
-            const { isUserLoggedIn, isOnline } = this.props;
-            state = Object.assign({
-                isPublic: isUserLoggedIn,
-                share: isUserLoggedIn && isOnline,
-            }, this.getInitialStateForAdd());
+            state = this.getInitialStateForAdd();
         } else {
-            const { iconName, isPublic, title } = this.props.trackable!;
-            state = Object.assign({
-                iconName,
-                isPublic,
-                title,
-            }, this.getInitialStateForEdit());
+            const { title } = this.props.trackable!;
+            state = Object.assign({ title }, this.getInitialStateForEdit());
         }
 
         this.setState(state, onDone);
-    }
-
-    private onCloseIconPicker = () => {
-        this.props.header.pop();
-        this.onToggleIconPicker();
     }
 
     private updateHeader(isValid: boolean) {
@@ -259,10 +170,6 @@ abstract class TrackableFormContainer<
         if (this.isNew()) {
             try {
                 await this.addTrackable();
-
-                if (this.state.share) {
-                    await this.shareTrackable();
-                }
             } catch (e) {
                 if (!isApolloError(e)) {
                     addGenericErrorToast(this.props.client);
@@ -270,14 +177,11 @@ abstract class TrackableFormContainer<
 
                 return;
             }
+
+            await this.afterAddTrackable();
         }
 
         this.goBack();
-    }
-
-    private shareTrackable() {
-        return share("share.newTrackable", this.props.intl,
-            { type: this.getTrackableType(), title: this.state.title! });
     }
 }
 

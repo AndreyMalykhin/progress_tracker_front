@@ -6,6 +6,8 @@ import {
     Gap,
     TypographyStyle,
 } from "components/common-styles";
+import Counter from "components/counter";
+import NumericalGoal from "components/numerical-goal";
 import ProgressBar from "components/progress-bar";
 import Trackable, { trackableMargin } from "components/trackable";
 import ProgressDisplayMode from "models/progress-display-mode";
@@ -20,9 +22,10 @@ import {
     ViewStyle,
 } from "react-native";
 
-type IAggregateProps = InjectedIntlProps & {
+interface IAggregateProps {
     index?: number;
     id: string;
+    title: string;
     status: TrackableStatus;
     isBatchEditMode?: boolean;
     isSelected?: boolean;
@@ -44,69 +47,69 @@ type IAggregateProps = InjectedIntlProps & {
     onLongPress?: (id: string, parentId?: string) => void;
     onPressOut?: (id: string) => void;
     onLayout?: (id: string, layout?: LayoutRectangle) => void;
-};
+}
 
-class Aggregate extends React.Component<IAggregateProps> {
+class Aggregate extends React.Component<IAggregateProps & InjectedIntlProps> {
     private layoutContainer?: View;
 
     public render() {
         const {
-            id,
-            intl,
             children,
-            progress,
-            maxProgress,
             isDragged,
-            isAfterAggregate,
-            isBeforeAggregate,
             isFirst,
-            isLast,
             ...restProps,
         } = this.props;
-        let progressBar;
-        let progressValue;
-
-        if (maxProgress == null) {
-            progressValue = progress;
-        } else {
-            progressBar = (
-                <ProgressBar
-                    maxValue={maxProgress}
-                    value={progress}
-                    mode={ProgressDisplayMode.Percentage}
-                    style={styles.progressBar}
-                />
-            );
-        }
-
         const style = [
             styles.container,
             isFirst && styles.containerFirst,
             isDragged && styles.containerDragged,
         ];
-        const title = intl.formatMessage({ id: "aggregate.total" },
-            { progress: progressValue });
         return (
             <View style={style as any}>
                 <View
                     style={styles.content}
                     ref={this.onLayoutContainerRef as any}
                 >
-                    <Trackable
-                        id={id}
-                        isNested={true}
-                        isDragged={isDragged}
-                        title={title}
-                        cardHeaderStyle={styles.cardHeader}
-                        cardHeaderTitleStyle={styles.cardHeaderTitle}
-                        onGetLayoutRef={this.onGetLayoutRef}
-                        {...restProps}
-                    >
-                        {progressBar}
-                    </Trackable>
+                    {this.renderTrackable()}
                     {children}
                 </View>
             </View>
+        );
+    }
+
+    private renderTrackable() {
+        const {
+            maxProgress,
+            isFirst,
+            isLast,
+            title,
+            ...restProps,
+        } = this.props;
+
+        if (maxProgress == null) {
+            return (
+                <Counter
+                    title={title}
+                    isNested={true}
+                    cardHeaderStyle={styles.cardHeader}
+                    cardHeaderTitleStyle={styles.cardHeaderTitle}
+                    onGetLayoutRef={this.onGetLayoutRef}
+                    {...restProps}
+                />
+            );
+        }
+
+        return (
+            <NumericalGoal
+                title={title}
+                progressDisplayMode={ProgressDisplayMode.Percentage}
+                maxProgress={maxProgress}
+                isNested={true}
+                cardHeaderStyle={styles.cardHeader}
+                cardHeaderTitleStyle={styles.cardHeaderTitle}
+                onGetLayoutRef={this.onGetLayoutRef}
+                {...restProps}
+            />
         );
     }
 
@@ -116,11 +119,9 @@ class Aggregate extends React.Component<IAggregateProps> {
 }
 
 const styles = StyleSheet.create({
-    cardHeader: {
-        paddingBottom: 0,
-    },
+    cardHeader: {},
     cardHeaderTitle: {
-        ...TypographyStyle.footnote,
+        ...TypographyStyle.title2,
     },
     container: {
         marginBottom: trackableMargin,
@@ -133,9 +134,6 @@ const styles = StyleSheet.create({
     },
     content: {
         backgroundColor: CardStyle.backgroundColor,
-    },
-    progressBar: {
-        marginTop: 0,
     },
 });
 

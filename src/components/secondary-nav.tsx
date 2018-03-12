@@ -1,8 +1,8 @@
 import {
-    BorderColor,
     BorderRadius,
     Color,
     Gap,
+    ShadeColor,
     StateColor,
     TouchableStyle,
     TypographyStyle,
@@ -65,7 +65,7 @@ class SecondaryNav extends React.Component<ISecondaryNavProps> {
 const styles = StyleSheet.create({
     container: {
         borderBottomWidth: 1,
-        borderColor: BorderColor.light,
+        borderColor: ShadeColor.light2,
     },
     item: {
         paddingBottom: Gap.single,

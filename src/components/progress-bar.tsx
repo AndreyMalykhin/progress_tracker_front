@@ -4,6 +4,7 @@ import {
     Color,
     Gap,
     ProgressBarStyle,
+    ShadeColor,
     TypographyStyle,
 } from "components/common-styles";
 import Text from "components/text";
@@ -92,7 +93,7 @@ class ProgressBar extends
 }
 
 const height = TypographyStyle.calloutLight.lineHeight!;
-const backgroundColor = BrandColor.primary;
+const backgroundColor = ShadeColor.dark;
 const borderRadius = BorderRadius.double;
 
 const styles = StyleSheet.create({

@@ -257,6 +257,7 @@ class ActivityList extends React.PureComponent<IActivityListProps> {
                 renderItem={this.onRenderItem}
                 renderSectionHeader={this.onRenderSectionHeader}
                 sections={sections}
+                style={styles.list}
                 contentContainerStyle={styles.listContent}
                 ListFooterComponent={loader}
                 onEndReachedThreshold={0.5}
@@ -793,6 +794,9 @@ class Activity extends React.Component<IActivityProps> {
     private onPressUser = () => this.props.onPressUser(this.props.userId!);
 }
 
+const approveColor = Color.green;
+const rejectColor = Color.black;
+
 const styles = StyleSheet.create({
     activity: {
         alignItems: "flex-start",
@@ -824,25 +828,28 @@ const styles = StyleSheet.create({
         color: ProgressBarStyle.color,
     },
     externalGoalReviewedIconApproved: {
-        color: Color.orange,
+        color: approveColor,
     },
     externalGoalReviewedIconRejected: {
-        color: Color.red,
+        color: rejectColor,
     },
     goalAchievedIcon: {
-        color: Color.green,
+        color: ProgressBarStyle.color,
     },
     goalApprovedIcon: {
-        color: Color.orange,
+        color: approveColor,
     },
     goalExpiredIcon: {
         color: Color.grayDark,
     },
     goalRejectedIcon: {
-        color: Color.red,
+        color: rejectColor,
     },
     gymExerciseEntryAddedIcon: {
         color: ProgressBarStyle.color,
+    },
+    list: {
+        backgroundColor: CardStyle.backgroundColor,
     },
     listContent: {
         paddingLeft: Gap.single,

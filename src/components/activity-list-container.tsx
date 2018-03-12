@@ -83,9 +83,7 @@ query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
                 ... on ITrackableActivity {
                     trackable {
                         id
-                        ... on IPrimitiveTrackable {
-                            title
-                        }
+                        title
                     }
                 }
                 ... on CounterProgressChangedActivity {

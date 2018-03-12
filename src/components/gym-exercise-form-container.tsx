@@ -13,11 +13,11 @@ import {
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
 import GymExerciseForm from "components/gym-exercise-form";
-import TrackableFormContainer, {
-    ITrackable,
-    ITrackableFormContainerProps,
-    ITrackableFormContainerState,
-} from "components/trackable-form-container";
+import PrimitiveTrackableFormContainer, {
+    IPrimitiveTrackable,
+    IPrimitiveTrackableFormContainerProps,
+    IPrimitiveTrackableFormContainerState,
+} from "components/primitive-trackable-form-container";
 import withDIContainer from "components/with-di-container";
 import withHeader from "components/with-header";
 import withNetworkStatus from "components/with-network-status";
@@ -30,15 +30,15 @@ import { injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
 
-type IGymExercise = ITrackable;
+type IGymExercise = IPrimitiveTrackable;
 
 interface IGymExerciseFormContainerProps extends
-    ITrackableFormContainerProps<IGymExercise> {
+    IPrimitiveTrackableFormContainerProps<IGymExercise> {
     onAddGymExercise: (GymExercise: IAddGymExerciseFragment) => Promise<any>;
     onEditGymExercise: (GymExercise: IEditGymExerciseFragment) => Promise<any>;
 }
 
-type IGymExerciseFormContainerState = ITrackableFormContainerState;
+type IGymExerciseFormContainerState = IPrimitiveTrackableFormContainerState;
 
 type IOwnProps = RouteComponentProps<{}> & {
     client: ApolloClient<NormalizedCacheObject>;
@@ -76,7 +76,7 @@ const withEditGymExercise = graphql<
     },
 );
 
-class GymExerciseFormContainer extends TrackableFormContainer<
+class GymExerciseFormContainer extends PrimitiveTrackableFormContainer<
     IGymExercise,
     IEditGymExerciseFragment,
     IGymExerciseFormContainerProps,
@@ -114,12 +114,9 @@ class GymExerciseFormContainer extends TrackableFormContainer<
 
     protected getInitialStateForAdd() {
         return {
+            ...super.getInitialStateForAdd(),
             iconName: IconName.GymExercise as string,
         } as IGymExerciseFormContainerState;
-    }
-
-    protected getInitialStateForEdit() {
-        return {} as IGymExerciseFormContainerState;
     }
 }
 

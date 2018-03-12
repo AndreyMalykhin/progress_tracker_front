@@ -39,11 +39,7 @@ fragment UpdateProgressAggregateFragment on Aggregate {
         ... on Counter {
             progress
         }
-        ... on TaskGoal {
-            progress
-            maxProgress
-        }
-        ... on NumericalGoal {
+        ... on IGoal {
             progress
             maxProgress
         }
@@ -60,11 +56,7 @@ fragment RemoveChildAggregateFragment on Aggregate {
         ... on Counter {
             progress
         }
-        ... on TaskGoal {
-            progress
-            maxProgress
-        }
-        ... on NumericalGoal {
+        ... on IGoal {
             progress
             maxProgress
         }

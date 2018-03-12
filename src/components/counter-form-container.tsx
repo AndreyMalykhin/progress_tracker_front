@@ -13,11 +13,11 @@ import {
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client/ApolloClient";
 import CounterForm from "components/counter-form";
-import TrackableFormContainer, {
-    ITrackable,
-    ITrackableFormContainerProps,
-    ITrackableFormContainerState,
-} from "components/trackable-form-container";
+import PrimitiveTrackableFormContainer, {
+    IPrimitiveTrackable,
+    IPrimitiveTrackableFormContainerProps,
+    IPrimitiveTrackableFormContainerState,
+} from "components/primitive-trackable-form-container";
 import withDIContainer from "components/with-di-container";
 import withHeader from "components/with-header";
 import withNetworkStatus from "components/with-network-status";
@@ -30,15 +30,15 @@ import { injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
 
-type ICounter = ITrackable;
+type ICounter = IPrimitiveTrackable;
 
 interface ICounterFormContainerProps extends
-    ITrackableFormContainerProps<ICounter> {
+    IPrimitiveTrackableFormContainerProps<ICounter> {
     onAddCounter: (counter: IAddCounterFragment) => Promise<any>;
     onEditCounter: (counter: IEditCounterFragment) => Promise<any>;
 }
 
-type ICounterFormContainerState = ITrackableFormContainerState;
+type ICounterFormContainerState = IPrimitiveTrackableFormContainerState;
 
 type IOwnProps = RouteComponentProps<{}> & {
     client: ApolloClient<NormalizedCacheObject>;
@@ -76,7 +76,7 @@ const withEditCounter = graphql<
     },
 );
 
-class CounterFormContainer extends TrackableFormContainer<
+class CounterFormContainer extends PrimitiveTrackableFormContainer<
     ICounter,
     IEditCounterFragment,
     ICounterFormContainerProps,
@@ -114,12 +114,9 @@ class CounterFormContainer extends TrackableFormContainer<
 
     protected getInitialStateForAdd() {
         return {
+            ...super.getInitialStateForAdd(),
             iconName: IconName.Counter as string,
         } as ICounterFormContainerState;
-    }
-
-    protected getInitialStateForEdit() {
-        return {} as ICounterFormContainerState;
     }
 }
 

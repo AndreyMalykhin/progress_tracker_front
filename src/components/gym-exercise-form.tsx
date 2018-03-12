@@ -1,4 +1,4 @@
-import TrackableForm from "components/trackable-form";
+import PrimitiveTrackableForm from "components/primitive-trackable-form";
 import Type from "models/type";
 import * as React from "react";
 
@@ -23,7 +23,7 @@ interface IGymExerciseFormProps {
 class GymExerciseForm extends React.Component<IGymExerciseFormProps> {
     public render() {
         return (
-            <TrackableForm
+            <PrimitiveTrackableForm
                 titleLabelMsgId="gymExerciseForm.titleLabel"
                 titlePlaceholderMsgId="gymExerciseForm.titlePlaceholder"
                 {...this.props}

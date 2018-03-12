@@ -1,9 +1,9 @@
 import Button, { ButtonIcon } from "components/button";
 import {
-    BorderColor,
     Gap,
     rem,
     SeverityColor,
+    ShadeColor,
     StateColor,
     TouchableStyle,
     TypographyStyle,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     container: {
         alignItems: "center",
         borderBottomWidth: 1,
-        borderColor: BorderColor.dark,
+        borderColor: ShadeColor.dark,
         flexDirection: "row",
     },
     containerBorderless: {

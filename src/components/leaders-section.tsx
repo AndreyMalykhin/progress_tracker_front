@@ -1,3 +1,4 @@
+import { ListStyle } from "components/common-styles";
 import LeaderListContainer from "components/leader-list-container";
 import { INavBarItem } from "components/nav-bar";
 import SecondaryNav from "components/secondary-nav";
@@ -29,6 +30,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     content: {
+        backgroundColor: ListStyle.backgroundColor,
         flex: 1,
     },
 });

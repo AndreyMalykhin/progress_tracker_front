@@ -1,10 +1,10 @@
 import Aggregate from "components/aggregate";
 import { ICommandBarItem } from "components/command-bar";
 import {
-    BorderColor,
     CardStyle,
     Color,
     Gap,
+    ShadeColor,
     StateColor,
 } from "components/common-styles";
 import Counter from "components/counter";
@@ -55,6 +55,7 @@ interface IVisibleItemsChangeInfo {
 interface IBaseNode {
     __typename: Type;
     id: string;
+    title: string;
     order: number;
     status: TrackableStatus;
     isPublic: boolean;
@@ -66,7 +67,6 @@ interface IBaseNode {
 
 interface IPrimitiveNode extends IBaseNode {
     iconName: string;
-    title: string;
 }
 
 interface ICounter extends IPrimitiveNode {
@@ -483,7 +483,7 @@ class ActiveTrackableList extends
                 isBatchEditMode={isAggregationMode}
                 isReorderMode={isReorderMode && !isAggregated}
                 isProveable={onIsItemProveable(status)}
-                isProveDisabled={!isOnline}
+                isProveDisabled={isAggregationMode}
                 isProving={isProving}
                 isLast={isLast}
                 isFirst={isFirst}
@@ -553,7 +553,7 @@ class ActiveTrackableList extends
                 visibleTaskCount={visibleTaskCount}
                 progressDisplayMode={progressDisplayMode}
                 isProveable={onIsItemProveable(status)}
-                isProveDisabled={!isOnline}
+                isProveDisabled={isAggregationMode}
                 isProving={isProving}
                 isDragged={dragStatus != null}
                 isSelected={isSelected}
@@ -581,7 +581,8 @@ class ActiveTrackableList extends
     private renderAggregate(
         item: IAggregate, index: number, isFirst: boolean, isLast: boolean,
     ): JSX.Element {
-        const { id, progress, maxTotalProgress, children, status } = item;
+        const { id, progress, maxTotalProgress, children, status, title } =
+            item;
         const {
             items,
             isAggregationMode,
@@ -604,6 +605,7 @@ class ActiveTrackableList extends
                 key={id}
                 id={id}
                 index={index}
+                title={title}
                 status={status}
                 progress={progress}
                 maxProgress={maxTotalProgress}
@@ -637,10 +639,8 @@ const styles = StyleSheet.create({
     list: {},
     listContent: {},
     reorderablePlaceholder: {
-        backgroundColor: Color.grayLight2,
-        borderColor: BorderColor.normal,
-        borderWidth: 1,
-        opacity: 0.75,
+        backgroundColor: Color.white,
+        opacity: 0.5,
     },
 });
 

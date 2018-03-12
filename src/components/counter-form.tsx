@@ -1,4 +1,4 @@
-import TrackableForm from "components/trackable-form";
+import PrimitiveTrackableForm from "components/primitive-trackable-form";
 import Type from "models/type";
 import * as React from "react";
 
@@ -23,7 +23,7 @@ interface ICounterFormProps {
 class CounterForm extends React.Component<ICounterFormProps> {
     public render() {
         return (
-            <TrackableForm
+            <PrimitiveTrackableForm
                 titleLabelMsgId="counterForm.titleLabel"
                 titlePlaceholderMsgId="counterForm.titlePlaceholder"
                 {...this.props}

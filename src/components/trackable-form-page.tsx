@@ -1,3 +1,6 @@
+import AggregateFormContainer, {
+    IAggregate,
+} from "components/aggregate-form-container";
 import CounterFormContainer, {
     ICounter,
 } from "components/counter-form-container";
@@ -19,7 +22,13 @@ import {
     KeyboardAwareScrollView,
 } from "react-native-keyboard-aware-scroll-view";
 
-type ITrackable = (ITaskGoal | INumericalGoal | ICounter | IGymExercise) & {
+type ITrackable = (
+    ITaskGoal
+    | INumericalGoal
+    | ICounter
+    | IGymExercise
+    | IAggregate
+) & {
     __typename: TrackableType;
 };
 
@@ -68,6 +77,12 @@ class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
                 <GymExerciseFormContainer
                     isUserLoggedIn={isUserLoggedIn}
                     trackable={trackable as IGymExercise}
+                />
+            );
+            case TrackableType.Aggregate:
+            return (
+                <AggregateFormContainer
+                    trackable={trackable as IAggregate}
                 />
             );
         }

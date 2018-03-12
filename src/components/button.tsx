@@ -65,8 +65,12 @@ class Button extends React.Component<IButtonProps> {
             content = <View style={contentStyle}>{children}</View>;
         }
 
-        const newStyle =
-            [styles.container, raised && styles.containerRaised, style];
+        const newStyle = [
+            styles.container,
+            raised && styles.containerRaised,
+            style,
+            disabled && raised && styles.containerRaisedDisabled,
+        ];
         return (
             <TouchableWithFeedback
                 disabled={disabled}
@@ -94,6 +98,7 @@ class ButtonTitle extends React.PureComponent<IButtonTitleProps> {
                 active={true}
                 activeStyle={raised && styles.titleRaised}
                 disabled={disabled}
+                disabledStyle={raised && styles.titleRaisedDisabled}
                 dangerous={dangerous}
                 style={newStyle as any}
             >
@@ -133,6 +138,9 @@ const styles = StyleSheet.create({
         paddingLeft: Gap.double,
         paddingRight: Gap.double,
     },
+    containerRaisedDisabled: {
+        backgroundColor: StateColor.disabled,
+    },
     content: {
         alignItems: "center",
         flexDirection: "row",
@@ -155,6 +163,9 @@ const styles = StyleSheet.create({
         ...FontWeightStyle.bold,
     },
     titleRaised: {
+        color: Color.white,
+    },
+    titleRaisedDisabled: {
         color: Color.white,
     },
 });

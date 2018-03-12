@@ -1,7 +1,7 @@
 import {
-    BorderColor,
     Color,
     Gap,
+    ShadeColor,
     StateColor,
     TypographyStyle,
 } from "components/common-styles";
@@ -67,7 +67,7 @@ class ProfileNav extends React.Component<IProfileNavProps> {
 const styles = StyleSheet.create({
     container: {
         borderBottomWidth: 1,
-        borderColor: BorderColor.light,
+        borderColor: ShadeColor.light2,
         paddingBottom: Gap.single,
         paddingTop: Gap.single,
     },

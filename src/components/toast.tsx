@@ -1,10 +1,10 @@
 import {
-    BorderColor,
     BorderRadius,
     Color,
     Gap,
     rem,
     SeverityColor,
+    ShadeColor,
     TouchableStyle,
 } from "components/common-styles";
 import Text from "components/text";
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         paddingTop: Gap.double,
     },
     containerDangerous: {
-        backgroundColor: SeverityColor.dangerDark,
+        backgroundColor: SeverityColor.danger2,
     },
     containerInformational: {
         backgroundColor: SeverityColor.info,

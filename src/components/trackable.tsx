@@ -10,12 +10,12 @@ import Card, {
 import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
 import {
-    BorderColor,
     CardStyle,
     Color,
     Gap,
     IconStyle,
     rem,
+    ShadeColor,
     TouchableStyle,
     TypographyStyle,
 } from "components/common-styles";
@@ -76,7 +76,7 @@ interface ITrackableProps {
     userName?: string;
     onExpandChange?: (id: string, isExpanded: boolean) => void;
     onProve?: (id: string) => void;
-    onGetLayoutRef?: () => View|undefined;
+    onGetLayoutRef?: () => View | undefined;
     onSelectChange?: (id: string, isSelected: boolean) => void;
     onLongPress?: (id: string, parentId?: string) => void;
     onPressOut?: (id: string) => void;
@@ -504,12 +504,11 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     cardBodyLast: {
-        borderBottomWidth: 1,
-        borderColor: BorderColor.light,
+        borderBottomWidth: 0,
     },
     cardBodyNested: {
         borderBottomWidth: 1,
-        borderColor: BorderColor.light,
+        borderColor: ShadeColor.light2,
         marginLeft: Gap.single,
         marginRight: Gap.single,
         paddingLeft: 0,
@@ -522,9 +521,6 @@ const styles = StyleSheet.create({
     },
     container: {
         backgroundColor: CardStyle.backgroundColor,
-        borderBottomWidth: 1,
-        borderColor: BorderColor.light,
-        borderTopWidth: 1,
         flexDirection: "row",
         marginBottom: trackableMargin,
     },
@@ -532,16 +528,12 @@ const styles = StyleSheet.create({
         opacity: 0,
     },
     containerFirst: {
-        borderTopWidth: 1,
         marginTop: trackableMargin,
     },
     containerLast: {
-        borderBottomWidth: 1,
         marginBottom: trackableMargin,
     },
     containerNested: {
-        borderBottomWidth: 0,
-        borderTopWidth: 0,
         marginBottom: 0,
         marginTop: 0,
     },
@@ -549,7 +541,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
     },
     proofPhoto: {
-        height: rem(25.6),
+        height: 256,
         marginBottom: Gap.single,
     },
     proveBtn: {

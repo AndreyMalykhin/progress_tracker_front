@@ -1,7 +1,7 @@
 import { addGenericErrorToast } from "actions/toast-helpers";
 import Avatar from "components/avatar";
 import Button, { ButtonTitle } from "components/button";
-import { BorderColor, CardStyle, Color, Gap } from "components/common-styles";
+import { CardStyle, Color, Gap, ShadeColor } from "components/common-styles";
 import { FormGroup } from "components/form";
 import Image from "components/image";
 import Loader from "components/loader";
@@ -94,9 +94,7 @@ const styles = StyleSheet.create({
     },
     container: {
         alignItems: "center",
-        backgroundColor: Color.grayLight,
-        borderBottomWidth: 1,
-        borderColor: BorderColor.light,
+        backgroundColor: ShadeColor.light2,
     },
     loader: {
         marginTop: Gap.single,

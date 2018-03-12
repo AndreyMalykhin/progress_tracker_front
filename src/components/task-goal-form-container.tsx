@@ -211,6 +211,7 @@ class TaskGoalFormContainer extends GoalFormContainer<
 
     protected getInitialStateForAdd() {
         return {
+            ...super.getInitialStateForAdd(),
             iconName: IconName.TaskGoal as string,
         } as ITaskGoalFormContainerState;
     }
@@ -223,6 +224,7 @@ class TaskGoalFormContainer extends GoalFormContainer<
             tasks,
         } = this.props.trackable!;
         return {
+            ...super.getInitialStateForEdit(),
             deadlineDate: deadlineDate ? new Date(deadlineDate) : undefined,
             difficulty,
             progressDisplayMode,

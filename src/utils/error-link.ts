@@ -13,8 +13,6 @@ const log = makeLog("error-link");
 
 function makeErrorLink() {
     return onError((error) => {
-        // TODO send to analytics
-
         log.error("error=%o", error);
         const { cache, isOfflineOperation } =
             error.operation.getContext() as IContext;

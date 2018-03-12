@@ -155,6 +155,7 @@ class NumericalGoalFormContainer extends GoalFormContainer<
 
     protected getInitialStateForAdd() {
         return {
+            ...super.getInitialStateForAdd(),
             iconName: IconName.NumericalGoal as string,
         } as INumericalGoalFormContainerState;
     }
@@ -167,6 +168,7 @@ class NumericalGoalFormContainer extends GoalFormContainer<
             maxProgress,
         } = this.props.trackable!;
         return {
+            ...super.getInitialStateForEdit(),
             deadlineDate: deadlineDate ? new Date(deadlineDate) : undefined,
             difficulty,
             maxProgress: String(maxProgress),

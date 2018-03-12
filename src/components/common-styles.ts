@@ -3,31 +3,40 @@ import { human, systemWeights } from "react-native-typography";
 const Color = {
     black: "#212121",
     blue: "#2196f3",
-    blueGray: "#607d8b",
-    blueGrayDark: "#37474f",
-    blueGrayLight: "#eceff1",
+    blueGray: "#78909c", // 400
+    blueGrayDark: "#546e7a", // 600
+    blueGrayLight: "#eceff1", // 50
+    blueGrayLight2: "#cfd8dc", // 100
     brown: "#795548",
     brownDark: "#4e342e",
     brownLight: "#d7ccc8",
     cyan: "#00bcd4",
     cyanDark: "#006064",
-    gray: "#bdbdbd",
-    grayDark: "#757575",
-    grayDark2: "#424242",
-    grayLight: "#fafafa",
-    grayLight2: "#f5f5f5",
-    green: "#4caf50",
-    greenDark: "#2e7d32",
+    gray: "#bdbdbd", // 400
+    grayDark: "#757575", // 600
+    grayDark2: "#424242", // 800
+    grayLight: "#fafafa", // 50
+    grayLight2: "#F5F5F5", // 100
+    green: "#66bb6a", // 400
+    greenDark: "#2e7d32", // 800
     orange: "#ff9800",
     orangeDeep: "#ff5722",
     pink: "#e91e63",
     purple: "#9c27b0",
     purpleDark: "#6a1b9a",
-    red: "#f44336",
+    red: "#ef5350", // 400
     teal: "#009688",
     tealDark: "#004d40",
     white: "#ffffff",
     yellow: "#ffeb3b",
+};
+
+const ShadeColor = {
+    dark: Color.grayDark,
+    dark2: Color.grayDark2,
+    light: Color.grayLight,
+    light2: Color.grayLight2,
+    normal: Color.gray,
 };
 
 const BrandColor = {
@@ -36,20 +45,14 @@ const BrandColor = {
 
 const SeverityColor = {
     danger: Color.red,
-    dangerDark: Color.black,
+    danger2: Color.black,
     info: Color.blue,
 };
 
 const StateColor = {
     active: BrandColor.primary,
     disabled: Color.gray,
-    temporary: Color.gray,
-};
-
-const BorderColor = {
-    dark: Color.grayDark,
-    light: Color.grayLight2,
-    normal: Color.gray,
+    temporary: ShadeColor.normal,
 };
 
 const baseBorderRadius = rem(0.8);
@@ -98,7 +101,11 @@ const TypographyStyle = {
 };
 
 const ListStyle = {
-    backgroundColor: Color.grayLight,
+    backgroundColor: ShadeColor.light2,
+};
+
+const CardStyle = {
+    backgroundColor: Color.white,
 };
 
 const UserListContentStyle = {
@@ -111,10 +118,6 @@ const UserListItemStyle = {
     paddingBottom: Gap.quadruple,
 };
 
-const CardStyle = {
-    backgroundColor: Color.white,
-};
-
 const TouchableStyle = {
     color: StateColor.active,
     minHeight: rem(4.8),
@@ -122,10 +125,10 @@ const TouchableStyle = {
 };
 
 const IconStyle = {
-    color: Color.grayDark2,
+    color: ShadeColor.dark2,
 };
 
-const smallAvatarSize = rem(3.2);
+const smallAvatarSize = 32;
 const mediumAvatarSize = smallAvatarSize * 1.5;
 const largeAvatarSize = smallAvatarSize * 8;
 const AvatarStyle = {
@@ -147,11 +150,12 @@ const AvatarStyle = {
 };
 
 const ProgressBarStyle = {
-    color: Color.green,
+    color: StateColor.active,
 };
 
 const HeaderStyle = {
-    backgroundColor: Color.grayLight2,
+    backgroundColor: ShadeColor.light,
+    borderColor: ShadeColor.normal,
 };
 
 function rem(value: number) {
@@ -163,7 +167,7 @@ export {
     FontWeightStyle,
     BorderRadius,
     TypographyStyle,
-    BorderColor,
+    ShadeColor,
     BrandColor,
     Color,
     SeverityColor,

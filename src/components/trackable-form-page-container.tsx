@@ -44,8 +44,8 @@ query GetData($trackableId: ID!) {
     getTrackable(id: $trackableId) {
         id
         isPublic
+        title
         ... on IPrimitiveTrackable {
-            title
             iconName
         }
         ... on IGoal {

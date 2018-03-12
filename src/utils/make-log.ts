@@ -12,7 +12,7 @@ class Log {
     }
 
     public error(formatter: any, ...args: any[]) {
-        // TODO
+        // TODO send to analytics
         this.trace(formatter, ...args);
     }
 }

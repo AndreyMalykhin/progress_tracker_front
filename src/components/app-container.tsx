@@ -72,6 +72,7 @@ const withData = graphql<IGetDataResponse, IOwnProps, IAppProps>(
     {
         options: ({ locale }) => {
             return {
+                fetchPolicy: "cache-and-network",
                 notifyOnNetworkStatusChange: true,
                 variables: { locale },
             };
@@ -103,7 +104,7 @@ class AppContainer extends React.Component<IAppContainerProps> {
     }
 
     public componentWillReceiveProps(nextProps: IAppContainerProps) {
-        if (this.props.locale !== nextProps.locale) {
+        if (this.props.data.getMessages !== nextProps.data.getMessages) {
             this.initMessages(nextProps);
         }
     }

@@ -14,10 +14,10 @@ import {
     IAddNumericalGoalProgressResponse,
 } from "actions/add-numerical-goal-progress-action";
 import {
-    aggregateTrackables,
-    aggregateTrackablesQuery,
-    IAggregateTrackablesResponse,
-} from "actions/aggregate-trackables-action";
+    addToAggregate,
+    addToAggregateQuery,
+    IAddToAggregateResponse,
+} from "actions/add-to-aggregate-action";
 import {
     breakAggregate,
     breakAggregateQuery,
@@ -104,9 +104,10 @@ import gql from "graphql-tag";
 import { debounce, memoize, throttle } from "lodash";
 import { recentDayCount } from "models/gym-exercise";
 import TrackableStatus from "models/trackable-status";
+import TrackableType from "models/trackable-type";
 import Type from "models/type";
-import { ReactNode } from "react";
 import * as React from "react";
+import { ReactNode } from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -132,8 +133,8 @@ import { IWithApolloProps } from "utils/interfaces";
 import isMyId from "utils/is-my-id";
 import makeLog from "utils/make-log";
 import openImgPicker from "utils/open-img-picker";
-import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
+import { isLoading } from "utils/query-status";
 import routes from "utils/routes";
 import Sound from "utils/sound";
 
@@ -159,7 +160,8 @@ interface IActiveTrackableListContainerProps extends
         id: string,
         entry: IGymExerciseEntryPopupResult,
     ) => Promise<IAddGymExerciseEntryResponse>;
-    onCommitAggregateItems: (ids: string[]) => Promise<any>;
+    onAddItemsToAggregate: (ids: string[], aggregateId: string) => Promise<any>;
+    onAddAggregate: (childIds: string[]) => Promise<any>;
     onCommitAddCounterProgress: (id: string, amount: number) => Promise<any>;
     onReorderItem: (sourceId: string, destinationId: string) =>
         Promise<any>;
@@ -310,18 +312,22 @@ const withNewGymExerciseEntry =
         },
     );
 
-const withAggregate =
-    graphql<IAggregateTrackablesResponse, IOwnProps, IActiveTrackableListContainerProps>(
-        aggregateTrackablesQuery,
-        {
-            props: ({ ownProps, mutate }) => {
-                return {
-                    onCommitAggregateItems: (ids: string[]) =>
-                        aggregateTrackables(ids, mutate!, ownProps.client),
-                } as Partial<IActiveTrackableListContainerProps>;
-            },
+const withAddToAggregate = graphql<
+    IAddToAggregateResponse, IOwnProps, IActiveTrackableListContainerProps
+>(
+    addToAggregateQuery,
+    {
+        props: ({ ownProps, mutate }) => {
+            return {
+                onAddItemsToAggregate: (
+                    ids: string[], aggregateId: string,
+                ) =>
+                    addToAggregate(
+                        ids, aggregateId, mutate!, ownProps.client),
+            } as Partial<IActiveTrackableListContainerProps>;
         },
-    );
+    },
+);
 
 const withUnaggregate =
     graphql<IUnaggregateTrackableResponse, IOwnProps, IActiveTrackableListContainerProps>(
@@ -352,9 +358,7 @@ const withBreak =
 const shareProvedGoalFragment = gql`
 fragment ShareProvedGoalFragment on ITrackable {
     id
-    ... on IPrimitiveTrackable {
-        title
-    }
+    title
 }`;
 
 const getDataQuery = gql`
@@ -365,6 +369,7 @@ fragment ActiveTrackableListTrackableFragment on ITrackable {
     statusChangeDate
     creationDate
     isPublic
+    title
 }
 
 fragment ActiveTrackableListCounterFragment on Counter {
@@ -372,13 +377,11 @@ fragment ActiveTrackableListCounterFragment on Counter {
         id
     }
     iconName
-    title
     progress
 }
 
 fragment ActiveTrackableListGymExerciseFragment on GymExercise {
     iconName
-    title
     recentEntries {
         id
         date
@@ -393,7 +396,6 @@ fragment ActiveTrackableListTaskGoalFragment on TaskGoal {
         id
     }
     iconName
-    title
     progress
     maxProgress
     progressDisplayMode
@@ -415,7 +417,6 @@ fragment ActiveTrackableListNumericalGoalFragment on NumericalGoal {
         id
     }
     iconName
-    title
     progress
     maxProgress
     progressDisplayMode
@@ -762,14 +763,12 @@ class ActiveTrackableListContainer extends React.Component<
 
         return [
             {
+                msgId: "commands.edit",
+                run: () => this.onEditItem(id),
+            },
+            {
                 msgId: "commands.break",
-                run: async () => {
-                    try {
-                        await this.props.onBreakItem(id);
-                    } catch (e) {
-                        // already reported
-                    }
-                },
+                run: () => this.onBreakItem(id),
             },
         ] as ICommandBarItem[];
     }
@@ -862,17 +861,17 @@ class ActiveTrackableListContainer extends React.Component<
         };
     }
 
-    private getSelectedItemIds() {
-        const itemIds = [];
+    private getSelectedItems() {
+        const selectedItems = [];
         const { itemsMeta } = this.state;
 
-        for (const itemId in itemsMeta) {
-            if (itemsMeta[itemId].isSelected) {
-                itemIds.push(itemId);
+        for (const item of this.props.data.getActiveTrackables.edges) {
+            if (itemsMeta[item.node.id].isSelected) {
+                selectedItems.push(item.node);
             }
         }
 
-        return itemIds;
+        return selectedItems;
     }
 
     private canAggregate(
@@ -1046,7 +1045,7 @@ class ActiveTrackableListContainer extends React.Component<
                 hideBackCommand: true,
                 leftCommand: {
                     msgId: "common.cancel",
-                    onRun: this.onCancelAggregateItem,
+                    onRun: () => this.onCancelAggregateItem(),
                 },
                 rightCommands: [
                     {
@@ -1061,27 +1060,52 @@ class ActiveTrackableListContainer extends React.Component<
         });
     }
 
-    private onCancelAggregateItem = () => {
+    private onCancelAggregateItem = (onDone?: () => void) => {
+        this.props.header.pop();
+        setContextMode(false, this.props.client);
         this.setState((prevState) => {
             const itemsMeta = this.unselectAndEnableItems(prevState.itemsMeta);
-            this.props.header.pop();
-            setContextMode(false, this.props.client);
             return { isAggregationMode: false, itemsMeta };
-        });
+        }, onDone);
     }
 
     private onCommitAggregateItem = async () => {
-        const selectedItemIds = this.getSelectedItemIds();
+        const selectedItems = this.getSelectedItems();
 
-        if (selectedItemIds.length > 1) {
-            try {
-                await this.props.onCommitAggregateItems(selectedItemIds);
-            } catch (e) {
-                return;
+        if (selectedItems.length < 2) {
+            this.onCancelAggregateItem();
+            return;
+        }
+
+        let aggregateId;
+        const childIds: string[] = [];
+
+        for (const selectedItem of selectedItems) {
+            if (selectedItem.__typename === Type.Aggregate) {
+                aggregateId = selectedItem.id;
+            } else {
+                childIds.push(selectedItem.id);
             }
         }
 
-        this.onCancelAggregateItem();
+        if (aggregateId) {
+            try {
+                await this.props.onAddItemsToAggregate(
+                    childIds, aggregateId);
+            } catch (e) {
+                // already reported
+            }
+
+            this.onCancelAggregateItem();
+            return;
+        }
+
+        this.onCancelAggregateItem(() => {
+            const pathname = routes.trackableAdd.path.replace(
+                ":type", TrackableType.Aggregate.toString());
+            this.props.history.push(
+                { pathname, state: { trackableIds: childIds } });
+        });
     }
 
     private onStartRemoveItem = (id: string) => {
@@ -1418,6 +1442,14 @@ class ActiveTrackableListContainer extends React.Component<
             // already reported
         }
     }
+
+    private onBreakItem = async (id: string) => {
+        try {
+            await this.props.onBreakItem(id);
+        } catch (e) {
+            // already reported
+        }
+    }
 }
 
 export default compose(
@@ -1456,7 +1488,7 @@ export default compose(
     withNewGymExerciseEntry,
     withUnaggregate,
     withBreak,
-    withAggregate,
+    withAddToAggregate,
     withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>({
         dataField: "getActiveTrackables",
         getQuery: (props) => props.data,

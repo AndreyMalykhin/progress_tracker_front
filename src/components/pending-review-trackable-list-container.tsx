@@ -146,13 +146,13 @@ query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
                 id
                 status
                 creationDate
+                title
                 user @skip(if: $skipUser) {
                     id
                     name
                     avatarUrlSmall
                 }
                 ... on IPrimitiveTrackable {
-                    title
                     iconName
                 }
                 ... on IGoal {

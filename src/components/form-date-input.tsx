@@ -1,8 +1,13 @@
 import FormTextInput from "components/form-text-input";
+import withDIContainer, {
+    IWithDIContainerProps,
+} from "components/with-di-container";
 import * as React from "react";
+import { compose } from "react-apollo";
 import { InjectedIntlProps, injectIntl } from "react-intl";
 import { TouchableWithoutFeedback, View } from "react-native";
 import DateTimePicker from "react-native-modal-datetime-picker";
+import Sound from "utils/sound";
 
 interface IFormDateInputProps {
     labelMsgId?: string;
@@ -17,7 +22,8 @@ interface IFormDateInputState {
 }
 
 class FormDateInput extends React.Component<
-    IFormDateInputProps & InjectedIntlProps, IFormDateInputState
+    IFormDateInputProps & InjectedIntlProps & IWithDIContainerProps,
+    IFormDateInputState
 > {
     public state: IFormDateInputState = {};
 
@@ -67,8 +73,9 @@ class FormDateInput extends React.Component<
     }
 
     private onConfirm = (value?: Date) => {
-        this.props.onValueChange(value);
+        this.props.diContainer.audioManager.play(Sound.Click);
         this.onCancel();
+        this.props.onValueChange(value);
     }
 
     private onClear = () => {
@@ -76,4 +83,4 @@ class FormDateInput extends React.Component<
     }
 }
 
-export default injectIntl(FormDateInput);
+export default compose(withDIContainer, injectIntl)(FormDateInput);

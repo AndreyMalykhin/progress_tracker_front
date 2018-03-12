@@ -26,8 +26,8 @@ class Layout extends React.Component<ILayoutProps & IWithSessionProps> {
                 {statusBar}
                 <StackingSwitch>
                     <Route
-                        exact={routes.trackableNew.exact}
-                        path={routes.trackableNew.path}
+                        exact={routes.trackableAdd.exact}
+                        path={routes.trackableAdd.path}
                         component={TrackableFormPageContainer}
                     />
                     <Route

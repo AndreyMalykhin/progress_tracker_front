@@ -78,8 +78,8 @@ query GetData(
                 status
                 statusChangeDate
                 creationDate
+                title
                 ... on IPrimitiveTrackable {
-                    title
                     iconName
                 }
                 ... on IGoal {
