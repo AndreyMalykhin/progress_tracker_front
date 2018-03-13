@@ -39,6 +39,7 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
     public state: IBootstrapState = {};
     private diContainer?: DIContainer;
     private apollo?: ApolloClient<NormalizedCacheObject>;
+    private messages: { [locale: string]: { [id: string]: string } } = {};
 
     public constructor(props: {}, context: any) {
         super(props, context);
@@ -53,6 +54,7 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
             <DIContainerProvider container={this.diContainer!}>
                 <ApolloProvider client={this.diContainer!.apollo}>
                     <AppContainer
+                        messages={this.messages}
                         history={this.diContainer!.history}
                     />
                 </ApolloProvider>
@@ -68,7 +70,7 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
             Reactotron.configure().useReactNative().connect();
         }
 
-        addLocaleData(en);
+        this.initLocalization();
         const cache = this.diContainer.cache;
         const stateResolver = this.diContainer.stateResolver;
         const envConfig = this.diContainer.envConfig;
@@ -97,6 +99,11 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
         }
 
         this.setState({ isDone: true });
+    }
+
+    private initLocalization() {
+        addLocaleData(enLocaleData);
+        this.messages = { en };
     }
 }
 

@@ -44,9 +44,10 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "test": "node node_modules/jest/bin/jest.js --watch",
-    "dev": "yarn extract-fragment-types && tsc --watch",
+    "dev": "yarn extract-fragment-types && yarn copy-resources && tsc --watch",
     "lint": "tslint -p . --fix",
     "precommit": "lint-staged",
+    "copy-resources": "cp -r ./src/images ./build/",
     "extract-fragment-types": "node src/scripts/extract-fragment-types.js"
   },
   "lint-staged": {

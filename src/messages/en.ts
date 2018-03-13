@@ -103,7 +103,7 @@ export default {
     "leadersNavigation.global": "Global",
     "login.skip": "Skip",
     "login.skipMsg":
-        "Note that many features are not available if you are not logged in",
+        "Many features are not available without login",
     "logout.synchronizationInProgressTitle": "You have data that is not " +
         "synchronized with a server yet, if you logout then this data will be" +
         " lost!",

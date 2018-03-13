@@ -1,6 +1,7 @@
 import { rem } from "components/common-styles";
 import Toast, { ToastSeverity } from "components/toast";
 import * as React from "react";
+import { FormattedMessage, MessageValue } from "react-intl";
 import { StyleSheet, View } from "react-native";
 
 interface IToastListProps {
@@ -10,7 +11,8 @@ interface IToastListProps {
 }
 
 interface IToastListItem {
-    msg: string;
+    msgId: string;
+    msgValues: { [key: string]: MessageValue } | null;
     severity: ToastSeverity;
 }
 
@@ -33,7 +35,10 @@ class ToastList extends React.PureComponent<IToastListProps> {
                     onClose={this.onCloseToast}
                     onOpen={this.onOpenToast}
                 >
-                    {item.msg}
+                    <FormattedMessage
+                        id={item.msgId}
+                        values={item.msgValues || undefined}
+                    />
                 </Toast>
             </View>
         );

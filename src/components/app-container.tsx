@@ -11,26 +11,17 @@ import { compose, QueryProps } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { MessageValue } from "react-intl";
 import SplashScreen from "react-native-splash-screen";
-import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import makeLog from "utils/make-log";
 import { isLoading } from "utils/query-status";
 import QueryStatus from "utils/query-status";
 
 interface IAppContainerProps extends IOwnProps {
-    data: QueryProps & IGetDataResponse;
-    history: History;
-}
-
-interface IOwnProps {
     locale: string;
 }
 
-interface IGetDataResponse {
-    getMessages: Array<{
-        id: string;
-        key: string;
-        text: string;
-    }>;
+interface IOwnProps {
+    history: History;
+    messages: { [locale: string]: { [id: string]: string } };
 }
 
 interface IGetSettingsResponse {
@@ -48,16 +39,9 @@ query GetSettings {
     }
 }`;
 
-const getDataQuery = gql`
-query GetData($locale: String!) {
-    getMessages(locale: $locale) @client {
-        id
-        key
-        text
-    }
-}`;
-
-const withSettings = graphql<IGetSettingsResponse, IOwnProps, IAppProps>(
+const withSettings = graphql<
+    IGetSettingsResponse, IOwnProps, IAppContainerProps
+>(
     getSettingsQuery,
     {
         options: { fetchPolicy: "cache-only" },
@@ -67,63 +51,27 @@ const withSettings = graphql<IGetSettingsResponse, IOwnProps, IAppProps>(
     },
 );
 
-const withData = graphql<IGetDataResponse, IOwnProps, IAppProps>(
-    getDataQuery,
-    {
-        options: ({ locale }) => {
-            return {
-                fetchPolicy: "cache-and-network",
-                notifyOnNetworkStatusChange: true,
-                variables: { locale },
-            };
-        },
-    },
-);
-
 class AppContainer extends React.Component<IAppContainerProps> {
     private messages: { [id: string]: string } = {};
 
     public render() {
-        const { locale, history } = this.props;
+        const { locale, history, messages } = this.props;
         return (
             <App
                 history={history}
                 locale={locale}
-                messages={this.messages}
+                messages={messages[locale]}
             />
         );
     }
 
     public componentWillMount() {
         log.trace("componentWillMount()");
-        this.initMessages(this.props);
     }
 
     public componentDidMount() {
         SplashScreen.hide();
     }
-
-    public componentWillReceiveProps(nextProps: IAppContainerProps) {
-        if (this.props.data.getMessages !== nextProps.data.getMessages) {
-            this.initMessages(nextProps);
-        }
-    }
-
-    private initMessages(props: IAppContainerProps) {
-        this.messages = {};
-
-        for (const message of props.data.getMessages) {
-            this.messages[message.key] = message.text;
-        }
-    }
 }
 
-export default compose(
-    withSettings,
-    withData,
-    withLoader<IAppContainerProps, IGetDataResponse>(Loader, {
-        dataField: "getMessages",
-        getQuery: (props) => props.data,
-        showIfNoQuery: false,
-    }),
-)(AppContainer);
+export default withSettings(AppContainer);

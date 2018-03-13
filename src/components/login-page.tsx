@@ -1,5 +1,5 @@
 import Button, { ButtonTitle } from "components/button";
-import { Gap, rem } from "components/common-styles";
+import { Color, Gap, rem } from "components/common-styles";
 import Image from "components/image";
 import LoginContainer from "components/login-container";
 import { BodyText, FootnoteText } from "components/typography";
@@ -26,11 +26,11 @@ class LoginPage extends React.Component<ILoginPageProps> {
             <View style={styles.container}>
                 <View style={styles.topContent}>
                     <Image
-                        source={{ uri: "https://loremflickr.com/512/512/cat" }}
+                        source={require("images/logo.png")}
                         style={styles.logo}
                     />
-                    <LoginContainer isNoFillParent={true} />
                 </View>
+                <LoginContainer isNoFillParent={true} />
                 <Button style={styles.skipBtn} onPress={this.props.onSkip}>
                     <ButtonTitle msgId="login.skip" />
                 </Button>
@@ -48,11 +48,10 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     logo: {
-        height: 128,
-        marginBottom: rem(6.4),
-        width: 128,
+        backgroundColor: Color.white,
     },
     skipBtn: {
+        marginBottom: Gap.double,
         marginTop: Gap.double,
     },
     skipMsg: {

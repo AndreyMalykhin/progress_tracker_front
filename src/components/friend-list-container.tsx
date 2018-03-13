@@ -31,7 +31,6 @@ import { compose, QueryProps } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
-import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";

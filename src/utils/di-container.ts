@@ -2,6 +2,7 @@ import { CacheResolverMap, NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client";
 import { ApolloLink } from "apollo-link";
 import * as Bottle from "bottlejs";
+import { History } from "history";
 import DeadlineTracker from "models/deadline-tracker";
 import { makeCacheResolver } from "resolvers/cache-resolver";
 import makeStateResolver from "resolvers/make-state-resolver";

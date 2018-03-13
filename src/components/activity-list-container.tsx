@@ -36,7 +36,6 @@ import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
 import defaultId from "utils/default-id";
-import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 

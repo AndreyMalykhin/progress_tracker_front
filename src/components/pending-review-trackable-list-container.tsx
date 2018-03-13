@@ -56,12 +56,11 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { withApollo } from "react-apollo/withApollo";
-import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
+import { FormattedMessage, InjectedIntlProps, injectIntl, MessageValue } from "react-intl";
 import { Alert, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
 import defaultId from "utils/default-id";
-import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
@@ -250,13 +249,14 @@ class PendingReviewTrackableListContainer extends React.Component<
 
     private showToast(
        msgId: string,
-       msgValues?: { [key: string]: string|number },
+       msgValues?: { [key: string]: MessageValue },
        sound?: Sound,
     ) {
         const toast = {
-            msg: this.props.intl.formatMessage({ id: msgId }, msgValues),
+            msgId,
+            msgValues,
             severity: ToastSeverity.Info,
-            sound: sound || null,
+            sound,
         };
         addToast(toast, this.props.client);
     }

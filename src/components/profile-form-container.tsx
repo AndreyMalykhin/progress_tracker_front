@@ -46,7 +46,6 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { Alert } from "react-native";
 import { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
-import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
@@ -134,7 +133,9 @@ const withData =
                     notifyOnNetworkStatusChange: true,
                 };
             },
-            skip: (ownProps: IOwnProps) => !ownProps.session.userId,
+            skip: (ownProps: IOwnProps) => {
+                return !ownProps.session.userId;
+            },
         },
     );
 
@@ -274,15 +275,12 @@ class ProfileFormContainer extends
         }
 
         try {
-            await logout(this.props.client);
+            await logout(this.props.history, this.props.client);
         } catch (e) {
-            return;
+            if (!isApolloError(e)) {
+                addGenericErrorToast(this.props.client);
+            }
         }
-
-        this.props.history.replace({
-            pathname: routes.index.path,
-            state: { resetHistory: true },
-        });
     }
 
     private confirmLogout() {

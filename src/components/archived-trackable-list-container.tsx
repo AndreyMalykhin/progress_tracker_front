@@ -34,7 +34,6 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { IConnection } from "utils/connection";
 import defaultId from "utils/default-id";
-import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import isMyId from "utils/is-my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
 

@@ -46,7 +46,6 @@ import { QueryProps } from "react-apollo/types";
 import { InjectedIntlProps, injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import defaultId from "utils/default-id";
-import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import IconName from "utils/icon-name";
 import { IWithApolloProps } from "utils/interfaces";
 import isMyId from "utils/is-my-id";
@@ -165,7 +164,9 @@ const withRemoteData =
             props: ({ data }) => {
                 return { remoteData: data};
             },
-            skip: (ownProps: IOwnProps) => !ownProps.session.userId,
+            skip: (ownProps: IOwnProps) => {
+                return !ownProps.session.userId;
+            },
         },
     );
 
@@ -344,9 +345,12 @@ class ProfileSectionContainer
             return;
         }
 
-        const msg = intl.formatMessage({ id: "notifications.userReported" });
-        addToast(
-            { severity: ToastSeverity.Info, msg, sound: Sound.Reject }, client);
+        const toast = {
+            msgId: "notifications.userReported",
+            severity: ToastSeverity.Info,
+            sound: Sound.Reject,
+        };
+        addToast(toast, client);
     }
 
     private onStartNewTrackable = () => {

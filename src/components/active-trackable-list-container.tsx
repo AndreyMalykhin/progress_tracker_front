@@ -127,7 +127,6 @@ import { IConnection } from "utils/connection";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
 import DragStatus from "utils/drag-status";
-import getDataOrQueryStatus from "utils/get-data-or-query-status";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
 import isMyId from "utils/is-my-id";
@@ -1408,7 +1407,7 @@ class ActiveTrackableListContainer extends React.Component<
 
     private showToast(msgId: string, sound: Sound) {
         const toast = {
-            msg: this.props.intl.formatMessage({ id: msgId }),
+            msgId,
             severity: ToastSeverity.Info,
             sound,
         };

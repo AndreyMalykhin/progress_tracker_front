@@ -27,7 +27,8 @@ const getDataQuery = gql`
 query GetData {
     ui @client {
         toasts {
-            msg
+            msgId
+            msgValues
             severity
             sound
         }

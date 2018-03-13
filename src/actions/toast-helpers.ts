@@ -2,6 +2,7 @@ import { DataProxy } from "apollo-cache";
 import { ToastSeverity } from "components/toast";
 import gql from "graphql-tag";
 import Type from "models/type";
+import { MessageValue } from "react-intl";
 import AudioManager from "utils/audio-manager";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
@@ -9,14 +10,16 @@ import makeLog from "utils/make-log";
 import Sound from "utils/sound";
 
 interface IAddToastFragment {
-    msg: string;
+    msgId: string;
+    msgValues?: { [key: string]: MessageValue };
     severity: ToastSeverity;
-    sound: Sound|null;
+    sound?: Sound;
 }
 
 interface IToastFragment {
     __typename: Type;
-    msg: string;
+    msgId: string;
+    msgValues: { [key: string]: MessageValue } | null;
     severity: ToastSeverity;
     sound: Sound|null;
 }
@@ -26,30 +29,13 @@ interface IUIFragment {
     toasts: IToastFragment[];
 }
 
-interface IMessageFragment {
-    text: string;
-}
-
-interface ISettingsFragment {
-    locale: string;
-}
-
 const log = makeLog("toast-helpers");
-
-const msgFragment = gql`
-fragment AddGenericErrorToastMessageFragment on Message {
-    text
-}`;
-
-const settingsFragment = gql`
-fragment AddGenericErrorToastSettingsFragment on Settings {
-    locale
-}`;
 
 const uiFragment = gql`
 fragment AddToastUIFragment on UI {
     toasts {
-        msg
+        msgId
+        msgValues
         severity
         sound
     }
@@ -60,20 +46,22 @@ const fragmentId = dataIdFromObject({ __typename: Type.UI, id: defaultId })!;
 function addToast(toast: IAddToastFragment, apollo: DataProxy) {
     log.trace("addToast(); toast=%o", toast);
     const ui = getToasts(apollo);
-    ui.toasts.push({ __typename: Type.Toast, ...toast });
+    ui.toasts.push({
+        __typename: Type.Toast,
+        msgId: toast.msgId,
+        msgValues: toast.msgValues || null,
+        severity: toast.severity,
+        sound: toast.sound || null,
+    });
     setToasts(ui, apollo);
 }
 
 function addGenericErrorToast(apollo: DataProxy) {
-    const settingsFragmentId = dataIdFromObject(
-        { __typename: Type.Settings, id: defaultId })!;
-    const locale = apollo.readFragment<ISettingsFragment>(
-        { fragment: settingsFragment, id: settingsFragmentId })!.locale;
-    const msgFragmentId = dataIdFromObject(
-        { __typename: Type.Message, id: `${locale}_errors.unexpected` })!;
-    const msg = apollo.readFragment<IMessageFragment>(
-        { id: msgFragmentId, fragment: msgFragment })!.text;
-    const toast = { msg, severity: ToastSeverity.Danger, sound: Sound.Error };
+    const toast = {
+        msgId: "errors.unexpected",
+        severity: ToastSeverity.Danger,
+        sound: Sound.Error,
+    };
     addToast(toast, apollo);
 }
 
