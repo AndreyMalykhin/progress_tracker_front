@@ -17,7 +17,7 @@ import GoalFormContainer, {
     IGoalFormContainerProps,
     IGoalFormContainerState,
 } from "components/goal-form-container";
-import { IHeaderState } from "components/header";
+import { IHeaderShape } from "components/header";
 import NumericalGoalForm from "components/numerical-goal-form";
 import withDIContainer from "components/with-di-container";
 import withHeader from "components/with-header";

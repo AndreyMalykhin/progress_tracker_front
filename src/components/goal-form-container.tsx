@@ -9,6 +9,8 @@ import { debounce, throttle } from "lodash";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
+import { LayoutAnimation } from "react-native";
+import formSaveDelay from "utils/form-save-delay";
 
 interface IGoal extends IPrimitiveTrackable {
     difficulty: Difficulty;
@@ -59,12 +61,15 @@ abstract class GoalFormContainer<
     TEditGoalFragment extends IEditGoalFragment,
     TProps extends IGoalFormContainerProps<TGoal>,
     TState extends IGoalFormContainerState
-> extends PrimitiveTrackableFormContainer<TGoal, TEditGoalFragment, TProps, TState> {
+> extends PrimitiveTrackableFormContainer<
+    TGoal, TEditGoalFragment, TProps, TState
+> {
     protected minDeadlineDate: Date;
 
     public constructor(props: TProps, context: any) {
         super(props, context);
-        this.onChangeDifficulty = throttle(this.onChangeDifficulty, 256);
+        this.onChangeDifficulty =
+            throttle(this.onChangeDifficulty, formSaveDelay);
         this.saveDifficulty = debounce(this.saveDifficulty, this.saveDelay);
         this.minDeadlineDate = new Date();
         this.minDeadlineDate.setDate(this.minDeadlineDate.getDate() + 1);
@@ -99,6 +104,7 @@ abstract class GoalFormContainer<
     }
 
     protected onChangeExpanded = (isExpanded: boolean) => {
+        LayoutAnimation.easeInEaseOut();
         this.setState({ isExpanded });
     }
 

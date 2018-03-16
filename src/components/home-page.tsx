@@ -1,4 +1,5 @@
 import ActivitiesSectionContainer from "components/activities-section-container";
+import { Color } from "components/common-styles";
 import FriendsSectionContainer from "components/friends-section-container";
 import GlobalNav from "components/global-nav";
 import Header from "components/header";
@@ -114,6 +115,7 @@ class HomePage extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: Color.white,
         flex: 1,
     },
     content: {

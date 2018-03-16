@@ -1,3 +1,4 @@
+import AnimatableView from "components/animatable-view";
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import Card, {
     CardAvatar,
@@ -27,8 +28,14 @@ import { CalloutText, FootnoteText } from "components/typography";
 import ReviewStatus from "models/review-status";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
-import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import {
+    FormattedMessage,
+    FormattedNumber,
+    InjectedIntlProps,
+    injectIntl,
+} from "react-intl";
+import {
+    LayoutAnimation,
     LayoutRectangle,
     PanResponderGestureState,
     StyleProp,
@@ -38,6 +45,8 @@ import {
     View,
     ViewStyle,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
+import { NumberFormat } from "utils/formats";
 import IconName from "utils/icon-name";
 
 interface ITrackableProps {
@@ -76,7 +85,7 @@ interface ITrackableProps {
     userName?: string;
     onExpandChange?: (id: string, isExpanded: boolean) => void;
     onProve?: (id: string) => void;
-    onGetLayoutRef?: () => View | undefined;
+    onGetLayoutRef?: () => Animatable.View | View | undefined;
     onSelectChange?: (id: string, isSelected: boolean) => void;
     onLongPress?: (id: string, parentId?: string) => void;
     onPressOut?: (id: string) => void;
@@ -116,6 +125,7 @@ const millisecondsInDay = 86400 * 1000;
 
 class Trackable extends React.Component<ITrackableProps> {
     private card?: View;
+    private containerRef?: Animatable.View;
 
     public render() {
         const {
@@ -124,7 +134,6 @@ class Trackable extends React.Component<ITrackableProps> {
             status,
             iconName,
             isBatchEditMode,
-            isDragged,
             isExpandable,
             commands,
             style,
@@ -153,14 +162,16 @@ class Trackable extends React.Component<ITrackableProps> {
             isFirst && styles.containerFirst,
             isLast && styles.containerLast,
             isNested && styles.containerNested,
-            isDragged && styles.containerDragged,
         ];
         const cardBodyStyle = [
             isNested && styles.cardBodyNested,
             isLast && styles.cardBodyLast,
         ];
         return (
-            <View style={newContainerStyle as any}>
+            <AnimatableView
+                style={newContainerStyle as any}
+                onRef={this.onContainerRef as any}
+            >
                 {isBatchEditMode && this.renderCheckBox()}
                 <Card
                     onRef={this.onCardRef}
@@ -184,8 +195,18 @@ class Trackable extends React.Component<ITrackableProps> {
                         {statusElement}
                     </CardBody>
                 </Card>
-            </View>
+            </AnimatableView>
         );
+    }
+
+    public componentWillReceiveProps(nextProps: ITrackableProps) {
+        if (this.containerRef) {
+            if (!this.props.isDragged && nextProps.isDragged) {
+                this.containerRef.fadeOut!();
+            } else if (this.props.isDragged && !nextProps.isDragged) {
+                this.containerRef.fadeIn!();
+            }
+        }
     }
 
     public componentDidUpdate(prevProps: ITrackableProps) {
@@ -198,6 +219,8 @@ class Trackable extends React.Component<ITrackableProps> {
             this.calculateLayout();
         }
     }
+
+    private onContainerRef = (ref?: Animatable.View) => this.containerRef = ref;
 
     private renderUser() {
         const { userName, userAvatarUrl } = this.props;
@@ -307,6 +330,7 @@ class Trackable extends React.Component<ITrackableProps> {
     private onPressOut = () => this.props.onPressOut!(this.props.id);
 
     private onExpandChange = () => {
+        LayoutAnimation.easeInEaseOut();
         const { onExpandChange, id, isExpanded } = this.props;
         onExpandChange!(id, !isExpanded);
     }
@@ -396,7 +420,10 @@ class AchievementDetails extends React.PureComponent<IAchievementDetailsProps> {
                     />
                 </Button>
                 <CalloutText style={styles.achievementDetailsItemValue}>
-                    {value}
+                    <FormattedNumber
+                        value={value}
+                        format={NumberFormat.Absolute}
+                    />
                 </CalloutText>
             </View>
         );
@@ -523,9 +550,6 @@ const styles = StyleSheet.create({
         backgroundColor: CardStyle.backgroundColor,
         flexDirection: "row",
         marginBottom: trackableMargin,
-    },
-    containerDragged: {
-        opacity: 0,
     },
     containerFirst: {
         marginTop: trackableMargin,

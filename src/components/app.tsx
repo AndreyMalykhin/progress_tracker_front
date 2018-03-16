@@ -5,6 +5,7 @@ import { History } from "history";
 import * as React from "react";
 import { IntlProvider } from "react-intl";
 import { Router } from "react-router";
+import formats from "utils/formats";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
@@ -25,6 +26,7 @@ class App extends React.PureComponent<IAppProps> {
                 locale={locale}
                 textComponent={Text}
                 messages={messages}
+                formats={formats}
             >
                 <Router history={this.props.history}>
                     <LayoutContainer />

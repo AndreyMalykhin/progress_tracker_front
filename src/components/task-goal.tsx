@@ -15,7 +15,7 @@ import { BodyText } from "components/typography";
 import { memoize } from "lodash";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
-import { StyleSheet, View } from "react-native";
+import { LayoutAnimation, StyleSheet, View } from "react-native";
 import Sound from "utils/sound";
 
 interface ITask {
@@ -39,6 +39,10 @@ interface ITaskProps {
     isDone?: boolean;
     isDisabled?: boolean;
     onSetDone?: (id: string, isDone: boolean) => void;
+}
+
+interface ITaskState {
+    tempIsDone?: boolean;
 }
 
 class TaskGoal extends React.PureComponent<ITaskGoalProps> {
@@ -97,16 +101,20 @@ class TaskGoal extends React.PureComponent<ITaskGoalProps> {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class Task extends React.PureComponent<ITaskProps> {
+class Task extends React.PureComponent<ITaskProps, ITaskState> {
+    public state: ITaskState = {};
+    private mounted = false;
+
     public render() {
         const { isDone, title, isDisabled, onSetDone } = this.props;
+        const { tempIsDone } = this.state;
         const titleStyle = isDone ? taskTitleDoneStyle : styles.taskTitle;
         return (
             <View style={styles.task}>
                 <CheckBox
                     isAnimationDisabled={true}
                     isDisabled={isDisabled}
-                    isChecked={isDone}
+                    isChecked={tempIsDone == null ? isDone : tempIsDone}
                     sound={Sound.ProgressChange}
                     iconCheckedStyle={styles.taskCheckBoxChecked}
                     onPress={onSetDone && this.onPress}
@@ -119,9 +127,26 @@ class Task extends React.PureComponent<ITaskProps> {
         );
     }
 
+    public componentDidMount() {
+        this.mounted = true;
+    }
+
+    public componentWillUnmount() {
+        this.mounted = false;
+    }
+
     private onPress = (isChecked: boolean) => {
-        const { onSetDone, id } = this.props;
-        onSetDone!(id, isChecked);
+        this.setState({ tempIsDone: isChecked }, () => {
+            requestAnimationFrame(() => {
+                LayoutAnimation.easeInEaseOut(() => {
+                    if (this.mounted) {
+                        this.setState({ tempIsDone: undefined });
+                    }
+                });
+                const { onSetDone, id } = this.props;
+                onSetDone!(id, isChecked);
+            });
+        });
     }
 }
 

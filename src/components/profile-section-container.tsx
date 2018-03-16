@@ -9,14 +9,19 @@ import ActiveTrackableListContainer from "components/active-trackable-list-conta
 import ArchiveSectionContainer from "components/archive-section-container";
 import Error from "components/error";
 import {
+    HeaderAnimation,
     IHeaderCmd,
-    IHeaderState,
+    IHeaderShape,
 } from "components/header";
 import Loader from "components/loader";
 import Offline from "components/offline";
 import ProfileSection, {
     IProfileSectionNavItem, IProfileSectionProps,
 } from "components/profile-section";
+import {
+    IStackingSwitchHistoryState,
+    StackingSwitchAnimation,
+} from "components/stacking-switch";
 import { ToastSeverity } from "components/toast";
 import withDIContainer, {
     IWithDIContainerProps,
@@ -46,6 +51,7 @@ import { QueryProps } from "react-apollo/types";
 import { InjectedIntlProps, injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import defaultId from "utils/default-id";
+import { NumberFormat } from "utils/formats";
 import IconName from "utils/icon-name";
 import { IWithApolloProps } from "utils/interfaces";
 import isMyId from "utils/is-my-id";
@@ -282,7 +288,7 @@ class ProfileSectionContainer
     }
 
     private updateHeader(props: IProfileSectionContainerProps) {
-        const { remoteData, header, session, match } = props;
+        const { remoteData, header, session, match, intl } = props;
         const user = remoteData.getUser;
         const isMe = !match.params.id
             || match.params.id === defaultId
@@ -310,17 +316,27 @@ class ProfileSectionContainer
             msgId: isMe ? "commands.edit" : "commands.profile",
             onRun: isMe ? this.onEditProfile : undefined,
         };
+        const subtitleText = user && intl.formatNumber(
+            user.rating, { format: NumberFormat.Absolute });
         header.replace({
+            animation: HeaderAnimation.FadeInRight,
+            key: "profileSectionContainer.index",
             leftCommand,
             rightCommands,
             subtitleIcon: user && "star-circle",
-            subtitleText: user && user.rating,
+            subtitleText,
             title: user && user.name,
         });
     }
 
-    private onEditProfile = () =>
-        this.props.history.push(routes.profileEdit.path)
+    private onEditProfile = () => {
+        const historyState: IStackingSwitchHistoryState = {
+            stackingSwitch: {
+                animation: StackingSwitchAnimation.SlideInUp,
+            },
+        };
+        this.props.history.push(routes.profileEdit.path, historyState);
+    }
 
     private onStartReportUser = () => {
         ActionSheet.open({
@@ -367,8 +383,14 @@ class ProfileSectionContainer
             return;
         }
 
-        this.props.history.push(routes.trackableAdd.path.replace(
-            ":type", type.toString()));
+        const historyState: IStackingSwitchHistoryState = {
+            stackingSwitch: {
+                animation: StackingSwitchAnimation.SlideInUp,
+            },
+        };
+        const route =
+            routes.trackableAdd.path.replace(":type", type.toString());
+        this.props.history.push(route, historyState);
     }
 }
 

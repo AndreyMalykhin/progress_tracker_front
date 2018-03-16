@@ -19,6 +19,10 @@ import Offline from "components/offline";
 import PendingReviewTrackableList, {
     IPendingReviewTrackableListItemNode,
 } from "components/pending-review-trackable-list";
+import {
+    IStackingSwitchHistoryState,
+    StackingSwitchAnimation,
+} from "components/stacking-switch";
 import { ToastSeverity } from "components/toast";
 import withDIContainer, {
     IWithDIContainerProps,
@@ -56,7 +60,12 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { withApollo } from "react-apollo/withApollo";
-import { FormattedMessage, InjectedIntlProps, injectIntl, MessageValue } from "react-intl";
+import {
+    FormattedMessage,
+    InjectedIntlProps,
+    injectIntl,
+    MessageValue,
+} from "react-intl";
 import { Alert, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
@@ -334,8 +343,13 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private onPressUser = (id: string) => {
-        this.props.history.push(
-            routes.profileActiveTrackables.path.replace(":id", id));
+        const historyState: IStackingSwitchHistoryState = {
+            stackingSwitch: {
+                animation: StackingSwitchAnimation.SlideInRight,
+            },
+        };
+        const route = routes.profileActiveTrackables.path.replace(":id", id);
+        this.props.history.push(route, historyState);
     }
 }
 

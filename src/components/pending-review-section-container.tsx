@@ -1,3 +1,4 @@
+import { HeaderAnimation } from "components/header";
 import { INavBarItem } from "components/nav-bar";
 import PendingReviewSection from "components/pending-review-section";
 import withHeader, { IWithHeaderProps } from "components/with-header";
@@ -55,21 +56,25 @@ class PendingReviewSectionContainer extends
     }
 
     public componentWillMount() {
-        this.updateHeader();
+        this.updateHeader(this.props);
     }
 
     public componentWillReceiveProps(
         nextProps: IPendingReviewSectionContainerProps,
     ) {
         if (nextProps.header.isEmpty()) {
-            this.updateHeader();
+            this.updateHeader(nextProps);
         }
     }
 
-    private updateHeader() {
-        const title = this.props.intl.formatMessage(
+    private updateHeader(props: IPendingReviewSectionContainerProps) {
+        const title = props.intl.formatMessage(
             { id: "globalNavigation.pendingReview" });
-        this.props.header.replace({ title });
+        props.header.replace({
+            animation: HeaderAnimation.FadeInRight,
+            key: "pendingReviewSectionContainer.index",
+            title,
+        });
     }
 }
 

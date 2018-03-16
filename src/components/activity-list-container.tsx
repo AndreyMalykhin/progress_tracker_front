@@ -6,6 +6,10 @@ import EmptyList from "components/empty-list";
 import Error from "components/error";
 import Loader from "components/loader";
 import Offline from "components/offline";
+import {
+    IStackingSwitchHistoryState,
+    StackingSwitchAnimation,
+} from "components/stacking-switch";
 import withDIContainer, {
     IWithDIContainerProps,
 } from "components/with-di-container";
@@ -204,8 +208,13 @@ class ActivityListContainer extends
     }
 
     private onPressUser = (id: string) => {
-        this.props.history.push(
-            routes.profileActiveTrackables.path.replace(":id", id));
+        const historyState: IStackingSwitchHistoryState = {
+            stackingSwitch: {
+                animation: StackingSwitchAnimation.SlideInRight,
+            },
+        };
+        const route = routes.profileActiveTrackables.path.replace(":id", id);
+        this.props.history.push(route, historyState);
     }
 }
 

@@ -1,3 +1,4 @@
+import AnimatableView from "components/animatable-view";
 import { ICommandBarItem } from "components/command-bar";
 import {
     CardStyle,
@@ -9,7 +10,9 @@ import {
 import Counter from "components/counter";
 import NumericalGoal from "components/numerical-goal";
 import ProgressBar from "components/progress-bar";
-import Trackable, { trackableMargin } from "components/trackable";
+import Trackable, {
+    trackableMargin,
+} from "components/trackable";
 import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
@@ -21,6 +24,7 @@ import {
     View,
     ViewStyle,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 
 interface IAggregateProps {
     index?: number;
@@ -50,7 +54,8 @@ interface IAggregateProps {
 }
 
 class Aggregate extends React.Component<IAggregateProps & InjectedIntlProps> {
-    private layoutContainer?: View;
+    private layoutContainerRef?: View;
+    private containerRef?: Animatable.View;
 
     public render() {
         const {
@@ -62,10 +67,12 @@ class Aggregate extends React.Component<IAggregateProps & InjectedIntlProps> {
         const style = [
             styles.container,
             isFirst && styles.containerFirst,
-            isDragged && styles.containerDragged,
         ];
         return (
-            <View style={style as any}>
+            <AnimatableView
+                style={style as any}
+                onRef={this.onContainerRef as any}
+            >
                 <View
                     style={styles.content}
                     ref={this.onLayoutContainerRef as any}
@@ -73,8 +80,18 @@ class Aggregate extends React.Component<IAggregateProps & InjectedIntlProps> {
                     {this.renderTrackable()}
                     {children}
                 </View>
-            </View>
+            </AnimatableView>
         );
+    }
+
+    public componentWillReceiveProps(nextProps: IAggregateProps) {
+        if (this.containerRef) {
+            if (!this.props.isDragged && nextProps.isDragged) {
+                this.containerRef.fadeOut!();
+            } else if (this.props.isDragged && !nextProps.isDragged) {
+                this.containerRef.fadeIn!();
+            }
+        }
     }
 
     private renderTrackable() {
@@ -113,9 +130,12 @@ class Aggregate extends React.Component<IAggregateProps & InjectedIntlProps> {
         );
     }
 
-    private onLayoutContainerRef = (ref?: View) => this.layoutContainer = ref;
+    private onLayoutContainerRef = (ref?: View) =>
+        this.layoutContainerRef = ref
 
-    private onGetLayoutRef = () => this.layoutContainer;
+    private onGetLayoutRef = () => this.layoutContainerRef;
+
+    private onContainerRef = (ref?: Animatable.View) => this.containerRef = ref;
 }
 
 const styles = StyleSheet.create({
@@ -125,9 +145,6 @@ const styles = StyleSheet.create({
     },
     container: {
         marginBottom: trackableMargin,
-    },
-    containerDragged: {
-        opacity: 0,
     },
     containerFirst: {
         marginTop: trackableMargin,

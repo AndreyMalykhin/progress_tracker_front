@@ -33,7 +33,13 @@ class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
         let buttons;
 
         if (changing) {
-            buttons = <Loader style={styles.loader} isNoFillParent={true} />;
+            buttons = (
+                <Loader
+                    style={styles.loader}
+                    isNoFillParent={true}
+                    size="small"
+                />
+            );
         } else {
             buttons = (
                 <View style={styles.buttonsContainer}>

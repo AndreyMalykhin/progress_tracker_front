@@ -1,3 +1,4 @@
+import { Color } from "components/common-styles";
 import Header from "components/header";
 import ProfileFormContainer from "components/profile-form-container";
 import * as React from "react";
@@ -16,6 +17,7 @@ class ProfileFormPage extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: Color.white,
         flex: 1,
     },
 });

@@ -2,6 +2,7 @@ import TabBar, { ITabBarProps } from "components/tab-bar";
 import * as React from "react";
 import { StyleProp, ViewStyle } from "react-native";
 import { matchPath, RouteComponentProps, withRouter } from "react-router";
+import { IMultiStackHistoryState } from "utils/multi-stack-history";
 
 type INavBarItemRenderer = (
     path: string,
@@ -9,9 +10,11 @@ type INavBarItemRenderer = (
     onSelect: (path: string) => void,
     titleMsgId?: string,
     iconName?: string,
-) => JSX.Element;
+    isDisabled?: boolean,
+) => React.ReactNode;
 
 interface INavBarProps extends RouteComponentProps<{}> {
+    isDisabled?: boolean;
     items: INavBarItem[];
     resetHistory?: boolean;
     renderItem: INavBarItemRenderer;
@@ -28,7 +31,7 @@ interface INavBarItem {
 
 class NavBar extends React.PureComponent<INavBarProps> {
     public render() {
-        const { location, renderItem, style, items } = this.props;
+        const { location, renderItem, style, items, isDisabled } = this.props;
         const tabs = items.map((item) => {
             const {
                 matchPath: pathToMatch,
@@ -41,16 +44,30 @@ class NavBar extends React.PureComponent<INavBarProps> {
                 { path: pathToMatch, exact: matchExact });
             const isActive = match != null;
             return renderItem(
-                navigateToPath, isActive, this.onSelect, titleMsgId, iconName);
+                navigateToPath,
+                isActive,
+                this.onSelect,
+                titleMsgId,
+                iconName,
+                isDisabled,
+            );
         });
         return <TabBar style={style}>{tabs}</TabBar>;
     }
 
     private onSelect = (path: string) => {
         const { history, location, resetHistory } = this.props;
-        const newLocation = resetHistory ?
-            { pathname: path, state: { resetHistory: true } } :
-            { ...location, pathname: path };
+        let newLocation;
+
+        if (resetHistory) {
+            const state: IMultiStackHistoryState = {
+                multiStackHistory: { reset: true },
+            };
+            newLocation = { pathname: path, state };
+        } else {
+            newLocation = { ...location, pathname: path };
+        }
+
         history.replace(newLocation);
     }
 }

@@ -1,11 +1,11 @@
-import { IHeaderState } from "components/header";
+import { IHeaderHistoryState, IHeaderShape } from "components/header";
 import * as React from "react";
 import { RouteComponentProps } from "react-router";
 
 interface IWithHeaderProps {
     header: {
-        push: (state: IHeaderState) => void;
-        replace: (state: IHeaderState|null) => void;
+        push: (shape: IHeaderShape) => void;
+        replace: (shape: IHeaderShape|null) => void;
         pop: () => void;
         isEmpty(): boolean;
     };
@@ -25,20 +25,20 @@ function withHeader<T extends IWithHeaderProps>(
             return !locationState || !locationState.header;
         }
 
-        public replace(state: IHeaderState|null) {
+        public replace(shape: IHeaderShape|null) {
             const { history, location } = this.props;
-            history.replace({
-                ...location as object,
-                state: { ...location.state, header: state },
-            });
+            const historyState: IHeaderHistoryState = {
+                ...location.state, header: shape,
+            };
+            history.replace({ ...location as object, state: historyState });
         }
 
-        public push(state: IHeaderState) {
+        public push(shape: IHeaderShape) {
             const { history, location } = this.props;
-            history.push({
-                ...location as object,
-                state: { ...location.state, header: state },
-            });
+            const historyState: IHeaderHistoryState = {
+                ...location.state, header: shape,
+            };
+            history.push({ ...location as object, state: historyState });
         }
 
         public pop() {

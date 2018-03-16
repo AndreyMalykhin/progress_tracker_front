@@ -1,5 +1,6 @@
 import { addGenericErrorToast } from "actions/toast-helpers";
 import { isApolloError } from "apollo-client/errors/ApolloError";
+import { HeaderAnimation } from "components/header";
 import { ITrackableFormProps } from "components/trackable-form";
 import { IWithDIContainerProps } from "components/with-di-container";
 import { IWithHeaderProps } from "components/with-header";
@@ -7,7 +8,9 @@ import { debounce } from "lodash";
 import TrackableType from "models/trackable-type";
 import * as React from "react";
 import { InjectedIntlProps } from "react-intl";
+import { LayoutAnimation } from "react-native";
 import { RouteComponentProps } from "react-router";
+import formSaveDelay from "utils/form-save-delay";
 import { IWithApolloProps } from "utils/interfaces";
 
 interface ITrackable {
@@ -41,7 +44,7 @@ abstract class TrackableFormContainer<
     TState extends ITrackableFormContainerState
 > extends React.Component<TProps, TState> {
     public state = {} as TState;
-    protected saveDelay = 512;
+    protected saveDelay = formSaveDelay;
 
     public constructor(props: TProps, context: any) {
         super(props, context);
@@ -50,6 +53,7 @@ abstract class TrackableFormContainer<
 
     public componentWillMount() {
         this.init(this.props, () => {
+            const isInitial = true;
             this.updateHeader(this.isValid(this.state));
         });
     }
@@ -153,11 +157,19 @@ abstract class TrackableFormContainer<
     private updateHeader(isValid: boolean) {
         const title = this.props.intl.formatMessage(
             { id: this.getTitleMsgId() });
+        const leftCommand = this.isNew() ? {
+            msgId: "common.cancel",
+            onRun: this.onCancel,
+        } : undefined;
         this.props.header.replace({
-            hideBackCommand: !this.isNew(),
+            animation: HeaderAnimation.FadeInRight,
+            hideBackCommand: true,
+            key: "trackableFormContainer.index",
+            leftCommand,
             rightCommands: [
                 {
                     isDisabled: !isValid,
+                    isPrimary: true,
                     msgId: "common.done",
                     onRun: this.onDone,
                 },
@@ -166,8 +178,12 @@ abstract class TrackableFormContainer<
         });
     }
 
+    private onCancel = () => this.goBack();
+
     private onDone = async () => {
         if (this.isNew()) {
+            LayoutAnimation.easeInEaseOut();
+
             try {
                 await this.addTrackable();
             } catch (e) {

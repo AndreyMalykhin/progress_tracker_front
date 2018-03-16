@@ -14,4 +14,8 @@ function push<T>(item: T, array: T[]) {
     return array.concat(item);
 }
 
-export { removeIndex, push };
+function pop<T>(array: T[]) {
+    return array.slice(0, -1);
+}
+
+export { removeIndex, push, pop };

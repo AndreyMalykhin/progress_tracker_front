@@ -1,4 +1,5 @@
 import EmptyList from "components/empty-list";
+import FadeIn from "components/fade-in";
 import Loader from "components/loader";
 import Trackable, { ITrackableProps } from "components/trackable";
 import { IWithRefreshProps } from "components/with-refresh";
@@ -14,6 +15,7 @@ import {
     StyleSheet,
     View,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
@@ -89,7 +91,7 @@ class PendingReviewTrackableList extends
         } = this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
-            <View style={styles.container}>
+            <FadeIn style={styles.container}>
                 <FlatList
                     windowSize={4}
                     initialNumToRender={2}
@@ -105,7 +107,7 @@ class PendingReviewTrackableList extends
                     onScroll={onScroll}
                     onRefresh={onRefresh}
                 />
-            </View>
+            </FadeIn>
         );
     }
 

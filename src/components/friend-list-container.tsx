@@ -8,6 +8,10 @@ import Error from "components/error";
 import FriendList, { IFriendListItemNode } from "components/friend-list";
 import Loader from "components/loader";
 import Offline from "components/offline";
+import {
+    IStackingSwitchHistoryState,
+    StackingSwitchAnimation,
+} from "components/stacking-switch";
 import withDIContainer from "components/with-di-container";
 import withEmptyList from "components/with-empty-list";
 import withError from "components/with-error";
@@ -128,8 +132,13 @@ class FriendListContainer extends React.Component<IFriendListContainerProps> {
     }
 
     private onPressItem = (id: string) => {
-        this.props.history.push(
-            routes.profileActiveTrackables.path.replace(":id", id));
+        const historyState: IStackingSwitchHistoryState = {
+            stackingSwitch: {
+                animation: StackingSwitchAnimation.SlideInRight,
+            },
+        };
+        const route = routes.profileActiveTrackables.path.replace(":id", id);
+        this.props.history.push(route, historyState);
     }
 }
 

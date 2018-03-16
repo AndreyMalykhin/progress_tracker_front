@@ -10,6 +10,7 @@ class Modal extends React.Component<IModalProps> {
         const { children, ...restProps } = this.props;
         return (
             <ModalImpl
+                useNativeDriver={true}
                 style={styles.container}
                 avoidKeyboard={true}
                 {...restProps}

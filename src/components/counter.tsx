@@ -1,3 +1,4 @@
+import AnimatedNumber from "components/animated-number";
 import { ICommandBarItem } from "components/command-bar";
 import { Gap, TouchableStyle } from "components/common-styles";
 import Text from "components/text";
@@ -6,6 +7,8 @@ import { BodyText, CalloutText } from "components/typography";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import {
+    Animated,
+    Easing,
     LayoutRectangle,
     StyleProp,
     StyleSheet,
@@ -13,6 +16,7 @@ import {
     View,
     ViewStyle,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 
 interface ICounterProps {
     index?: number;
@@ -47,9 +51,16 @@ class Counter extends React.PureComponent<ICounterProps> {
         const { progress, ...restProps } = this.props;
         return (
             <Trackable {...restProps}>
-                <CalloutText style={styles.progress}>{progress}</CalloutText>
+                <AnimatedNumber
+                    value={progress}
+                    onRender={this.onRenderNumber}
+                />
             </Trackable>
         );
+    }
+
+    private onRenderNumber = (value: string) => {
+        return <CalloutText style={styles.progress}>{value}</CalloutText>;
     }
 }
 

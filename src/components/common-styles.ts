@@ -129,8 +129,8 @@ const IconStyle = {
 };
 
 const smallAvatarSize = 32;
-const mediumAvatarSize = smallAvatarSize * 1.5;
-const largeAvatarSize = smallAvatarSize * 8;
+const mediumAvatarSize = 48;
+const largeAvatarSize = 256;
 const AvatarStyle = {
     large: {
         borderRadius: largeAvatarSize / 2,

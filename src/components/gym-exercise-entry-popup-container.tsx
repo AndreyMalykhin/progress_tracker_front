@@ -3,6 +3,7 @@ import GymExerciseEntryPopup, {
 } from "components/gym-exercise-entry-popup";
 import { debounce } from "lodash";
 import * as React from "react";
+import formSaveDelay from "utils/form-save-delay";
 
 interface IGymExerciseEntryPopupContainerProps {
     onClose: (result?: IGymExerciseEntryPopupResult) => void;
@@ -17,8 +18,6 @@ interface IGymExerciseEntryPopupContainerState {
     weightError?: string|null;
 }
 
-const validationDelay = 512;
-
 class GymExerciseEntryPopupContainer extends React.Component<
     IGymExerciseEntryPopupContainerProps, IGymExerciseEntryPopupContainerState
 > {
@@ -29,10 +28,10 @@ class GymExerciseEntryPopupContainer extends React.Component<
     ) {
         super(props, context);
         this.validateRepetitionCount =
-            debounce(this.validateRepetitionCount, validationDelay);
+            debounce(this.validateRepetitionCount, formSaveDelay);
         this.validateSetCount =
-            debounce(this.validateSetCount, validationDelay);
-        this.validateWeight = debounce(this.validateWeight, validationDelay);
+            debounce(this.validateSetCount, formSaveDelay);
+        this.validateWeight = debounce(this.validateWeight, formSaveDelay);
     }
 
     public render() {

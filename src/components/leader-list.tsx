@@ -9,6 +9,7 @@ import {
     UserListContentStyle,
     UserListItemStyle,
 } from "components/common-styles";
+import FadeIn from "components/fade-in";
 import Loader from "components/loader";
 import Text from "components/text";
 import TouchableWithFeedback from "components/touchable-with-feedback";
@@ -22,12 +23,15 @@ import {
 } from "components/typography";
 import { IWithRefreshProps } from "components/with-refresh";
 import * as React from "react";
+import { FormattedNumber } from "react-intl";
 import {
     FlatList,
     ListRenderItemInfo,
     StyleSheet,
     View,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
+import { NumberFormat } from "utils/formats";
 import QueryStatus from "utils/query-status";
 
 interface ILeaderListProps extends IWithRefreshProps {
@@ -59,20 +63,22 @@ class LeaderList extends React.Component<ILeaderListProps> {
             this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
-            <FlatList
-                windowSize={12}
-                initialNumToRender={8}
-                refreshing={isRefreshing}
-                data={items}
-                keyExtractor={this.getItemKey}
-                renderItem={this.onRenderItem}
-                style={styles.list}
-                contentContainerStyle={styles.listContent}
-                ListFooterComponent={loader}
-                onEndReachedThreshold={0.5}
-                onEndReached={onEndReached}
-                onRefresh={onRefresh}
-            />
+            <FadeIn>
+                <FlatList
+                    windowSize={12}
+                    initialNumToRender={8}
+                    refreshing={isRefreshing}
+                    data={items}
+                    keyExtractor={this.getItemKey}
+                    renderItem={this.onRenderItem}
+                    style={styles.list}
+                    contentContainerStyle={styles.listContent}
+                    ListFooterComponent={loader}
+                    onEndReachedThreshold={0.5}
+                    onEndReached={onEndReached}
+                    onRefresh={onRefresh}
+                />
+            </FadeIn>
         );
     }
 
@@ -116,7 +122,10 @@ class Item extends React.PureComponent<IItemProps> {
                         {name}
                     </BodyText>
                     <Caption1Text style={styles.itemUserRating}>
-                        {rating}
+                        <FormattedNumber
+                            value={rating}
+                            format={NumberFormat.Absolute}
+                        />
                     </Caption1Text>
                 </View>
             </TouchableWithFeedback>

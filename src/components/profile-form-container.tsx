@@ -15,6 +15,7 @@ import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import { isApolloError } from "apollo-client/errors/ApolloError";
 import Error from "components/error";
+import { HeaderAnimation } from "components/header";
 import Loader from "components/loader";
 import Offline from "components/offline";
 import ProfileForm from "components/profile-form";
@@ -207,9 +208,11 @@ class ProfileFormContainer extends
             this.props.intl.formatMessage({ id: "profileForm.title" });
         this.props.header.replace({
             hideBackCommand: true,
+            key: "profileFormContainer.index",
             rightCommands: [
                 {
                     isDisabled: !isValid,
+                    isPrimary: true,
                     msgId: "common.done",
                     onRun: this.onDone,
                 },

@@ -8,6 +8,7 @@ import {
     rem,
     TouchableStyle,
 } from "components/common-styles";
+import FadeIn from "components/fade-in";
 import Icon from "components/icon";
 import Loader from "components/loader";
 import Text from "components/text";
@@ -23,7 +24,12 @@ import Audience from "models/audience";
 import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
-import { FormattedDate, FormattedMessage, MessageValue } from "react-intl";
+import {
+    FormattedDate,
+    FormattedMessage,
+    FormattedNumber,
+    MessageValue,
+} from "react-intl";
 import {
     ListRenderItem,
     SectionList,
@@ -34,6 +40,8 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
+import { NumberFormat } from "utils/formats";
 import IconName from "utils/icon-name";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
@@ -249,21 +257,23 @@ class ActivityList extends React.PureComponent<IActivityListProps> {
             this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
-            <SectionList
-                windowSize={12}
-                initialNumToRender={10}
-                refreshing={isRefreshing}
-                keyExtractor={this.getItemKey}
-                renderItem={this.onRenderItem}
-                renderSectionHeader={this.onRenderSectionHeader}
-                sections={sections}
-                style={styles.list}
-                contentContainerStyle={styles.listContent}
-                ListFooterComponent={loader}
-                onEndReachedThreshold={0.5}
-                onEndReached={onEndReached}
-                onRefresh={onRefresh}
-            />
+            <FadeIn>
+                <SectionList
+                    windowSize={12}
+                    initialNumToRender={10}
+                    refreshing={isRefreshing}
+                    keyExtractor={this.getItemKey}
+                    renderItem={this.onRenderItem}
+                    renderSectionHeader={this.onRenderSectionHeader}
+                    sections={sections}
+                    style={styles.list}
+                    contentContainerStyle={styles.listContent}
+                    ListFooterComponent={loader}
+                    onEndReachedThreshold={0.5}
+                    onEndReached={onEndReached}
+                    onRefresh={onRefresh}
+                />
+            </FadeIn>
         );
     }
 
@@ -484,7 +494,18 @@ class TrackableTitle extends React.PureComponent<ITrackableTitleProps> {
 // tslint:disable-next-line:max-classes-per-file
 class Number extends React.PureComponent<INumberProps> {
     public render() {
-        return <BodyText style={styles.number}>{this.props.value}</BodyText>;
+        return (
+            <FormattedNumber
+                value={this.props.value}
+                format={NumberFormat.Absolute}
+            >
+                {this.renderValue}
+            </FormattedNumber>
+        );
+    }
+
+    private renderValue = (value: string) => {
+        return <BodyText style={styles.number}>{value}</BodyText>;
     }
 }
 

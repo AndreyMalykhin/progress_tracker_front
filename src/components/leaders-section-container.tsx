@@ -1,3 +1,4 @@
+import { HeaderAnimation } from "components/header";
 import LeadersSection from "components/leaders-section";
 import { INavBarItem } from "components/nav-bar";
 import withHeader, { IWithHeaderProps } from "components/with-header";
@@ -46,21 +47,25 @@ class LeadersSectionContainer extends
     }
 
     public componentWillMount() {
-        this.updateHeader();
+        this.updateHeader(this.props);
     }
 
     public componentWillReceiveProps(
         nextProps: ILeadersSectionContainerProps,
     ) {
         if (nextProps.header.isEmpty()) {
-            this.updateHeader();
+            this.updateHeader(nextProps);
         }
     }
 
-    private updateHeader() {
-        const title = this.props.intl.formatMessage(
+    private updateHeader(props: ILeadersSectionContainerProps) {
+        const title = props.intl.formatMessage(
             { id: "globalNavigation.leaders" });
-        this.props.header.replace({ title });
+        props.header.replace({
+            animation: HeaderAnimation.FadeInRight,
+            key: "leadersSectionContainer.index",
+            title,
+        });
     }
 }
 

@@ -3,6 +3,10 @@ import Error from "components/error";
 import LeaderList, { ILeaderListItemNode } from "components/leader-list";
 import Loader from "components/loader";
 import Offline from "components/offline";
+import {
+    IStackingSwitchHistoryState,
+    StackingSwitchAnimation,
+} from "components/stacking-switch";
 import withDIContainer, {
     IWithDIContainerProps,
 } from "components/with-di-container";
@@ -105,8 +109,13 @@ class LeaderListContainer extends React.Component<ILeaderListContainerProps> {
     }
 
     private onPressItem = (id: string) => {
-        this.props.history.push(
-            routes.profileActiveTrackables.path.replace(":id", id));
+        const historyState: IStackingSwitchHistoryState = {
+            stackingSwitch: {
+                animation: StackingSwitchAnimation.SlideInRight,
+            },
+        };
+        const route = routes.profileActiveTrackables.path.replace(":id", id);
+        this.props.history.push(route, historyState);
     }
 }
 

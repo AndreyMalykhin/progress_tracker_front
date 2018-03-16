@@ -167,9 +167,9 @@ class Table extends React.PureComponent<ITableProps> {
     ) {
         const values = {
             hasSetCount: setCount != null,
-            repetitionCount: repetitionCount.toFixed(1),
+            repetitionCount,
             setCount,
-            weight: weight.toFixed(1),
+            weight,
         };
         const msgId = this.props.isExpanded ? "gymExercise.entry" :
             "gymExercise.entryAveraged";

@@ -9,6 +9,12 @@ import {
 } from "history";
 import makeLog from "utils/make-log";
 
+interface IMultiStackHistoryState {
+    multiStackHistory: {
+        reset?: boolean;
+    };
+}
+
 type IChange = () => void;
 
 const log = makeLog("multi-stack-history");
@@ -53,15 +59,19 @@ class MultiStackHistory implements History {
         pathOrLocation: LocationDescriptorObject | Path, state?: LocationState,
     ) {
         log.trace("replace(); location=%o", pathOrLocation);
-        state = state || (pathOrLocation as LocationDescriptorObject).state;
+        const newState: IMultiStackHistoryState =
+            state || (pathOrLocation as LocationDescriptorObject).state;
 
-        if (state && state.resetHistory) {
-            state.resetHistory = undefined;
+        if (newState
+            && newState.multiStackHistory
+            && newState.multiStackHistory.reset
+        ) {
+            newState.multiStackHistory.reset = undefined;
             this.queueChange(() => this.size = 1);
         }
 
         return typeof pathOrLocation === "string" ?
-            this.impl.replace(pathOrLocation, state) :
+            this.impl.replace(pathOrLocation, newState) :
             this.impl.replace(pathOrLocation);
     }
 
@@ -110,4 +120,5 @@ class MultiStackHistory implements History {
     }
 }
 
+export { IMultiStackHistoryState };
 export default MultiStackHistory;

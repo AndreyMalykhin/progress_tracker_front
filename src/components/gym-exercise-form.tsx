@@ -1,6 +1,7 @@
 import PrimitiveTrackableForm from "components/primitive-trackable-form";
 import Type from "models/type";
 import * as React from "react";
+import * as Animatable from "react-native-animatable";
 
 interface IGymExerciseFormProps {
     title?: string;
@@ -17,6 +18,7 @@ interface IGymExerciseFormProps {
     onOpenIconPicker: () => void;
     onChangeTitle: (value: string) => void;
     onChangePublic: (value: boolean) => void;
+    onIconPickerRef: (ref?: Animatable.View) => void;
     onChangeIcon: (name: string) => void;
 }
 

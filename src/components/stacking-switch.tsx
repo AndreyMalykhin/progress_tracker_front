@@ -1,7 +1,10 @@
-import { Location } from "history";
+import AnimatableView from "components/animatable-view";
+import { Color } from "components/common-styles";
+import { History, Location } from "history";
 import * as PropTypes from "prop-types";
 import * as React from "react";
-import { StyleSheet, View } from "react-native";
+import { LayoutAnimation, StyleSheet, View } from "react-native";
+import * as Animatable from "react-native-animatable";
 import {
     match as Match,
     matchPath,
@@ -10,41 +13,71 @@ import {
     Switch,
     withRouter,
 } from "react-router";
+import { pop, push } from "utils/immutable-utils";
 import makeLog from "utils/make-log";
-
-const log = makeLog("stacking-switch");
 
 interface IStackingSwitchProps extends RouteComponentProps<{}> {
     children: IChildren;
 }
 
-interface IStackEntryProps extends IStackEntry {
+interface IStackingSwitchState {
+    stack: IStackEntry[];
+}
+
+interface IStackingSwitchHistoryState {
+    stackingSwitch: {
+        animation?: StackingSwitchAnimation;
+    };
+}
+
+interface IStackEntryProps {
     isHidden?: boolean;
+    onRef?: (ref?: Animatable.View) => void;
+    children: IChildren;
+    location: Location;
 }
 
 type IChildren = Array< React.ReactElement<RouteProps> >;
 
 interface IStackEntry {
+    enterAnimation?: Animatable.Animation;
+    exitAnimation?: Animatable.Animation;
+    ref?: Animatable.View;
     children: IChildren;
     location: Location;
+    onRef?: (ref?: Animatable.View) => void;
 }
 
 interface IStackingSwitchContext {
     isInBackground: () => boolean;
 }
 
-class StackingSwitch extends React.Component<IStackingSwitchProps> {
-    private stack: IStackEntry[] = [];
+enum StackingSwitchAnimation {
+    SlideInRight = "SlideInRight",
+    SlideInUp = "SlideInUp",
+    FadeIn = "FadeIn",
+}
+
+const log = makeLog("stacking-switch");
+
+const stackingSwitchAnimationDuration = 256;
+
+class StackingSwitch extends
+    React.Component<IStackingSwitchProps, IStackingSwitchState> {
+    public state: IStackingSwitchState = { stack: [] };
     private shouldPop: boolean[] = [];
+    private transition?: Promise<any>;
 
     public render() {
-        const lastEntryIndex = this.stack.length - 1;
-        const stackElements = this.stack.map((entry, i) => {
+        const { stack } = this.state;
+        const lastEntryIndex = stack.length - 1;
+        const stackElements = stack.map((entry, i) => {
             return (
                 <StackEntry
                     key={i}
                     isHidden={i !== lastEntryIndex}
                     location={entry.location}
+                    onRef={entry.onRef}
                 >
                     {entry.children}
                 </StackEntry>
@@ -55,8 +88,9 @@ class StackingSwitch extends React.Component<IStackingSwitchProps> {
 
     public componentWillMount() {
         const { location, children } = this.props;
-        this.stack.push({ location, children });
         this.shouldPop.push(true);
+        const stack = [{ children, location }];
+        this.setState({ stack });
     }
 
     public componentWillReceiveProps(nextProps: IStackingSwitchProps) {
@@ -73,57 +107,127 @@ class StackingSwitch extends React.Component<IStackingSwitchProps> {
             return;
         }
 
-        this.updateStack(nextProps);
+        this.updateStack(nextProps, this.props);
     }
 
-    private updateStack(props: IStackingSwitchProps) {
-        const { children, location, history, match } = props;
+    private updateStack(
+        nextProps: IStackingSwitchProps, prevProps: IStackingSwitchProps,
+    ) {
+        const { children, location, history, match } = nextProps;
         const { action } = history;
+        const { stack } = this.state;
+        let newStack;
 
         switch (action) {
             case "PUSH":
-            if (this.isLocationPathChanged(this.props.location, location)
-                && this.isSomeChildMatches(children, location)
-            ) {
-                this.stack.push({ children, location });
-                this.shouldPop.push(true);
-                log.trace("updateStack(); push; stackSize=%o",
-                    this.stack.length);
-            } else {
-                this.replaceTop(children, location);
-                this.shouldPop.push(false);
-            }
-
+            newStack = this.pushLocation(
+                location, prevProps.location, stack, children);
             break;
             case "POP":
-            if (location.pathname !== "/" && this.shouldPop.pop()) {
-                this.stack.pop();
-                log.trace("updateStack(); pop; stackSize=%o",
-                    this.stack.length);
-            } else {
-                this.replaceTop(children, location);
-            }
-
+            newStack = this.popLocation(location, stack, children);
             break;
             case "REPLACE":
-            if (history.length === 1) {
-                this.stack.length = 1;
-                this.shouldPop.length = 1;
-            }
-
-            this.replaceTop(children, location);
+            newStack = this.replaceLocation(location, stack, children, history);
             break;
             default:
             throw new Error("Unexpected action: " + action);
         }
+
+        if (newStack) {
+            this.setState({ stack: newStack });
+        }
     }
 
-    private replaceTop(children: IChildren, location: Location) {
-        log.trace("replaceTop(); stackSize=%o; location=%o", this.stack.length,
+    private replaceLocation(
+        location: Location,
+        stack: IStackEntry[],
+        children: IChildren,
+        history: History,
+    ) {
+        let newStack = stack;
+
+        if (history.length === 1) {
+            newStack = stack.slice(0, 1);
+            this.shouldPop.length = 1;
+        }
+
+        return this.replaceTop(newStack, children, location);
+    }
+
+    private popLocation(
+        location: Location, stack: IStackEntry[], children: IChildren,
+    ) {
+        let newStack;
+
+        if (location.pathname !== "/" && this.shouldPop.pop()) {
+            const entry = stack[stack.length - 1];
+            const entryRef = entry.ref;
+
+            if (entryRef) {
+                this.transition = entryRef[entry.exitAnimation!]!().then(() => {
+                    this.transition = undefined;
+                    this.setState((prevState) => {
+                        return { stack: pop(prevState.stack) };
+                    });
+                });
+                return newStack;
+            } else {
+                newStack = pop(stack);
+            }
+
+            log.trace("popLocation(); stackSize=%o", newStack.length);
+            return newStack;
+        }
+
+        return this.replaceTop(stack, children, location);
+    }
+
+    private pushLocation(
+        nextLocation: Location,
+        prevLocation: Location,
+        stack: IStackEntry[],
+        children: IChildren,
+    ) {
+        let newStack;
+
+        if (this.isLocationPathChanged(prevLocation, nextLocation)
+            && this.isSomeChildMatches(children, nextLocation)
+        ) {
+            this.shouldPop.push(true);
+            const newEntryIndex = stack.length;
+            const { animation } =
+                (nextLocation.state as IStackingSwitchHistoryState)
+                .stackingSwitch;
+            const { enterAnimation, exitAnimation } =
+                this.mapAnimation(animation);
+            const newEntry: IStackEntry = {
+                children,
+                enterAnimation,
+                exitAnimation,
+                location: nextLocation,
+                onRef: (ref) => this.onNewEntryRef(
+                    newEntry, enterAnimation, ref),
+            };
+            newStack = push(newEntry, stack);
+            log.trace("pushLocation(); stackSize=%o", newStack.length);
+        } else {
+            this.shouldPop.push(false);
+            newStack = this.replaceTop(stack, children, nextLocation);
+        }
+
+        return newStack;
+    }
+
+    private replaceTop(
+        stack: IStackEntry[], children: IChildren, location: Location,
+    ) {
+        const stackSize = stack.length;
+        log.trace("replaceTop(); stackSize=%o; location=%o", stackSize,
             location);
-        const topEntry = this.stack[this.stack.length - 1];
-        topEntry.children = children;
-        topEntry.location = location;
+        const newStack = stack.slice();
+        const topEntry = stack[stackSize - 1];
+        newStack[stackSize - 1] = { ...topEntry, children, location };
+        return newStack;
     }
 
     private isSomeChildMatches(children: IChildren, location: Location) {
@@ -147,6 +251,42 @@ class StackingSwitch extends React.Component<IStackingSwitchProps> {
             || prevLocation.hash !== nextLocation.hash
             || prevLocation.search !== nextLocation.search;
     }
+
+    private onNewEntryRef = async (
+        entry: IStackEntry,
+        animation?: Animatable.Animation,
+        ref?: Animatable.View,
+    ) => {
+        entry.ref = ref;
+
+        if (ref && animation) {
+            this.transition = ref[animation]!();
+            await this.transition;
+            this.transition = undefined;
+        }
+    }
+
+    private mapAnimation(animation?: StackingSwitchAnimation) {
+        let enterAnimation: Animatable.Animation | undefined;
+        let exitAnimation: Animatable.Animation | undefined;
+
+        switch (animation) {
+            case StackingSwitchAnimation.SlideInRight:
+            enterAnimation = "slideInRight";
+            exitAnimation = "slideOutRight";
+            break;
+            case StackingSwitchAnimation.FadeIn:
+            enterAnimation = "fadeIn";
+            exitAnimation = "fadeOut";
+            break;
+            case StackingSwitchAnimation.SlideInUp:
+            enterAnimation = "slideInUp";
+            exitAnimation = "slideOutDown";
+            break;
+        }
+
+        return { enterAnimation, exitAnimation };
+    }
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -159,12 +299,15 @@ class StackEntry extends React.Component<IStackEntryProps> {
     };
 
     public render() {
-        const { isHidden, children, location } = this.props;
-        const style = isHidden ? styles.stackEntryHidden : styles.stackEntry;
+        const { children, location, onRef } = this.props;
         return (
-            <View style={style}>
+            <AnimatableView
+                onRef={onRef as any}
+                style={styles.stackEntry}
+                duration={stackingSwitchAnimationDuration}
+            >
                 <Switch location={location}>{children}</Switch>
-            </View>
+            </AnimatableView>
         );
     }
 
@@ -190,14 +333,14 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     stackEntry: {
-        flex: 1,
-    },
-    stackEntryHidden: {
-        display: "none",
+        ...StyleSheet.absoluteFillObject,
     },
 });
 
-const childHiddenStyle = [styles.stackEntry, styles.stackEntryHidden];
-
-export { IStackingSwitchContext };
+export {
+    IStackingSwitchContext,
+    IStackingSwitchHistoryState,
+    StackingSwitchAnimation,
+    stackingSwitchAnimationDuration,
+};
 export default withRouter(StackingSwitch);

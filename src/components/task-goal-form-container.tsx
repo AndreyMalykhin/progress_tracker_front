@@ -22,7 +22,7 @@ import GoalFormContainer, {
     IGoalFormContainerProps,
     IGoalFormContainerState,
 } from "components/goal-form-container";
-import { IHeaderState } from "components/header";
+import { IHeaderShape } from "components/header";
 import TaskGoalForm, { ITask } from "components/task-goal-form";
 import withDIContainer from "components/with-di-container";
 import withHeader from "components/with-header";
@@ -37,6 +37,7 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { withApollo } from "react-apollo/withApollo";
 import { FormattedMessage, injectIntl } from "react-intl";
+import { LayoutAnimation } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
 import { push } from "utils/immutable-utils";
@@ -241,6 +242,7 @@ class TaskGoalFormContainer extends GoalFormContainer<
     }
 
     private addTask = (title: string) => {
+        LayoutAnimation.easeInEaseOut();
         this.setState((prevState) => {
             const id = uuid();
             const task = { id, title, isDone: false };
@@ -282,6 +284,7 @@ class TaskGoalFormContainer extends GoalFormContainer<
     }
 
     private onRemoveTask = (id: string) => {
+        LayoutAnimation.easeInEaseOut();
         this.setState((prevState) => {
             let focusedTaskId;
             const tasks = prevState.tasks.filter((task, i) => {

@@ -1,3 +1,5 @@
+import AnimatableView, { IAnimatableViewProps } from "components/animatable-view";
+import Avatar from "components/avatar";
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import {
     AvatarStyle,
@@ -12,6 +14,7 @@ import {
 } from "components/common-styles";
 import Icon from "components/icon";
 import Image from "components/image";
+import { stackingSwitchAnimationDuration } from "components/stacking-switch";
 import Text from "components/text";
 import {
     BodyText,
@@ -20,12 +23,25 @@ import {
     SubheadText,
     Title3Text,
 } from "components/typography";
-import * as React from "react";
 import { ReactNode } from "react";
+import * as React from "react";
 import { FormattedMessage } from "react-intl";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import * as Animatable from "react-native-animatable";
 import { RouteComponentProps, withRouter } from "react-router";
 import IconName from "utils/icon-name";
+import makeLog from "utils/make-log";
+
+type IHeaderProps = RouteComponentProps<{}>;
+
+interface IHeaderState {
+    tempShape?: IHeaderShape;
+    tempHistorySize?: number;
+}
+
+interface IHeaderHistoryState {
+    header: IHeaderShape;
+}
 
 interface IHeaderCmd {
     iconName?: string;
@@ -40,13 +56,15 @@ interface ICmdProps extends IHeaderCmd {
     style?: StyleProp<ViewStyle>;
 }
 
-interface IHeaderState {
+interface IHeaderShape {
+    key: string;
     title?: string;
     subtitleIcon?: string;
     subtitleText?: string|number;
     leftCommand?: IHeaderCmd;
     rightCommands?: IHeaderCmd[];
     hideBackCommand?: boolean;
+    animation?: HeaderAnimation;
     onBack?: () => void;
 }
 
@@ -59,27 +77,50 @@ interface ISubtitleProps {
     iconName?: string;
 }
 
-type IHeaderProps = RouteComponentProps<{}>;
+enum HeaderAnimation {
+    FadeInLeft = "FadeInLeft",
+    FadeInRight = "FadeInRight",
+    FadeInDown = "FadeInDown",
+    FadeIn = "FadeIn",
+}
 
-class Header extends React.Component<IHeaderProps> {
+const log = makeLog("header");
+
+class Header extends React.Component<IHeaderProps, IHeaderState> {
+    public state: IHeaderState = {};
+    private ref?: Animatable.View;
+    private isAnimating = false;
+    private prevHistorySize?: number;
+    private pendingAnimations: Array<{
+        prevShape?: IHeaderShape;
+        nextShape?: IHeaderShape;
+        prevHistorySize?: number;
+    }> = [];
+
     public render() {
-        const locationState = this.props.location.state;
+        log.trace("render()");
+        const { tempShape, tempHistorySize } = this.state;
+        const shape = tempShape || this.getShape(this.props);
 
-        if (!locationState || !locationState.header) {
-            return <View style={styles.container} />;
+        if (!shape) {
+            return (
+                <View style={styles.container}>
+                    <AnimatableView {...this.getAnimatableProps()} />
+                </View>
+            );
         }
 
         let cmdIndex = 0;
         let backCmd;
-        const headerState = locationState.header;
+        const historySize = tempHistorySize || this.props.history.length;
 
-        if (!headerState.hideBackCommand && this.props.history.length > 1) {
-            backCmd = this.renderBackCmd(cmdIndex, headerState.onBack);
+        if (!shape.hideBackCommand && historySize > 1) {
+            backCmd = this.renderBackCmd(cmdIndex, shape.onBack);
             ++cmdIndex;
         }
 
         const { leftCommand, rightCommands, title, subtitleIcon, subtitleText }
-            = headerState as IHeaderState;
+            = shape;
         let leftCmdElement;
 
         if (leftCommand) {
@@ -93,24 +134,130 @@ class Header extends React.Component<IHeaderProps> {
             <Subtitle text={subtitleText} iconName={subtitleIcon} /> : null;
         return (
             <View style={styles.container}>
-                <View style={styles.leftSection}>
-                    {backCmd}{leftCmdElement}
-                </View>
-                <View style={styles.middleSection}>
-                    {title && <Title text={title} />}
-                    {subtitle}
-                </View>
-                <View style={styles.rightSection}>{rightCommandElements}</View>
+                <AnimatableView {...this.getAnimatableProps()}>
+                    <View style={styles.leftSection}>
+                        {backCmd}{leftCmdElement}
+                    </View>
+                    <View style={styles.middleSection}>
+                        {title && <Title text={title} />}
+                        {subtitle}
+                    </View>
+                    <View style={styles.rightSection}>
+                        {rightCommandElements}
+                    </View>
+                </AnimatableView>
             </View>
         );
     }
 
-    public shouldComponentUpdate(nextProps: IHeaderProps) {
-        const prevLocationState = this.props.location.state;
-        const nextLocationState = nextProps.location.state;
-        return !(!prevLocationState && !nextLocationState
-            || (prevLocationState && nextLocationState
-            && prevLocationState.header === nextLocationState.header));
+    public componentWillReceiveProps(nextProps: IHeaderProps) {
+        const nextShape = this.getShape(nextProps);
+        const prevShape = this.getShape(this.props);
+
+        if (prevShape !== nextShape
+            && ((prevShape && prevShape.key) !== (nextShape && nextShape.key))
+            && ((prevShape && prevShape.animation)
+                || (nextShape && nextShape.animation))
+        ) {
+            this.pendingAnimations.push({
+                nextShape,
+                prevHistorySize: this.prevHistorySize,
+                prevShape,
+            });
+            this.animate();
+        }
+    }
+
+    public shouldComponentUpdate(
+        nextProps: IHeaderProps, nextState: IHeaderState,
+    ) {
+        return this.getShape(this.props) !== this.getShape(nextProps)
+            || this.state.tempShape !== nextState.tempShape;
+    }
+
+    public componentDidUpdate() {
+        this.prevHistorySize = this.props.history.length;
+    }
+
+    private getAnimatableProps() {
+        return {
+            duration: stackingSwitchAnimationDuration / 2,
+            onRef: this.onRef,
+            style: styles.content,
+        } as IAnimatableViewProps;
+    }
+
+    private async animate() {
+        log.trace("animate(); isAnimating=%o; pendingAnimationCount=%o",
+            this.isAnimating, this.pendingAnimations.length);
+
+        if (this.isAnimating || !this.pendingAnimations.length) {
+            return;
+        }
+
+        this.isAnimating = true;
+        const { nextShape, prevShape, prevHistorySize } =
+            this.pendingAnimations.shift()!;
+
+        if (this.ref && prevShape) {
+            const { exitAnimation } = this.mapAnimation(prevShape.animation);
+
+            if (exitAnimation) {
+                this.setState(
+                    { tempShape: prevShape, tempHistorySize: prevHistorySize });
+                log.trace("animate(); exit start");
+                await this.ref[exitAnimation]!();
+                log.trace("animate(); exit end");
+                this.setState(
+                    { tempShape: undefined, tempHistorySize: undefined });
+            }
+        }
+
+        if (this.ref && nextShape) {
+            const { enterAnimation } = this.mapAnimation(nextShape.animation);
+
+            if (enterAnimation) {
+                log.trace("animate(); enter start");
+                await this.ref[enterAnimation]!();
+                log.trace("animate(); enter end");
+            } else {
+                this.ref.stopAnimation();
+            }
+        }
+
+        this.isAnimating = false;
+        await this.animate();
+    }
+
+    private mapAnimation(animation?: HeaderAnimation) {
+        let enterAnimation: Animatable.Animation | undefined;
+        let exitAnimation: Animatable.Animation | undefined;
+
+        switch (animation) {
+            case HeaderAnimation.FadeInDown:
+            enterAnimation = "fadeInDown";
+            exitAnimation = "fadeOutUp";
+            break;
+            case HeaderAnimation.FadeInRight:
+            enterAnimation = "fadeInRight";
+            exitAnimation = "fadeOutLeft";
+            break;
+            case HeaderAnimation.FadeInLeft:
+            enterAnimation = "fadeInLeft";
+            exitAnimation = "fadeOutRight";
+            break;
+            case HeaderAnimation.FadeIn:
+            enterAnimation = "fadeIn";
+            exitAnimation = "fadeOut";
+            break;
+        }
+
+        return { enterAnimation, exitAnimation };
+    }
+
+    private getShape(props: IHeaderProps) {
+        const historyState: IHeaderHistoryState = props.location.state;
+        return historyState && historyState.header;
     }
 
     private renderBackCmd(index: number, onRun?: () => void) {
@@ -126,6 +273,8 @@ class Header extends React.Component<IHeaderProps> {
     }
 
     private onBackPress = () => this.props.history.goBack();
+
+    private onRef = (ref?: Animatable.View) => this.ref = ref;
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -143,14 +292,8 @@ class Cmd extends React.PureComponent<ICmdProps> {
                     name={iconName}
                 />
             );
-        } else if (imgUrl) {
-            content = (
-                <Image
-                    resizeMode="cover"
-                    style={styles.cmdImg}
-                    source={{ uri: imgUrl }}
-                />
-            );
+        } else if (imgUrl != null) {
+            content = <Avatar size="small" uri={imgUrl} />;
         } else {
             content = (
                 <ButtonTitle
@@ -207,15 +350,15 @@ const subtitleColor = Color.grayDark;
 
 const styles = StyleSheet.create({
     cmdBack: {},
-    cmdImg: {
-        ...AvatarStyle.small,
-    },
     cmdTitle: {},
     container: {
         ...HeaderStyle,
         borderBottomWidth: 1,
-        flexDirection: "row",
         height: TouchableStyle.minHeight,
+    },
+    content: {
+        flex: 1,
+        flexDirection: "row",
     },
     leftSection: {
         alignItems: "center",
@@ -250,5 +393,5 @@ const styles = StyleSheet.create({
     },
 });
 
-export { IHeaderState, IHeaderCmd };
+export { IHeaderShape, IHeaderHistoryState, IHeaderCmd, HeaderAnimation };
 export default withRouter(Header);

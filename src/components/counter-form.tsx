@@ -1,6 +1,7 @@
 import PrimitiveTrackableForm from "components/primitive-trackable-form";
 import Type from "models/type";
 import * as React from "react";
+import * as Animatable from "react-native-animatable";
 
 interface ICounterFormProps {
     title?: string;
@@ -18,6 +19,7 @@ interface ICounterFormProps {
     onChangeTitle: (value: string) => void;
     onChangePublic: (value: boolean) => void;
     onChangeIcon: (name: string) => void;
+    onIconPickerRef: (ref?: Animatable.View) => void;
 }
 
 class CounterForm extends React.Component<ICounterFormProps> {

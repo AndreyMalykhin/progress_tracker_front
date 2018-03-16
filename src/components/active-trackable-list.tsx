@@ -9,6 +9,7 @@ import {
 } from "components/common-styles";
 import Counter from "components/counter";
 import EmptyList from "components/empty-list";
+import FadeIn from "components/fade-in";
 import GymExercise, {
     IGymExerciseEntry,
     IGymExerciseItem,
@@ -43,6 +44,7 @@ import {
     View,
     ViewToken,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import DragStatus from "utils/drag-status";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
@@ -221,7 +223,7 @@ class ActiveTrackableList extends
             />
         );
         return (
-            <View style={styles.container}>
+            <FadeIn style={styles.container}>
                 <Reorderable
                     isActive={isReorderMode}
                     placeholderStyle={styles.reorderablePlaceholder}
@@ -252,16 +254,8 @@ class ActiveTrackableList extends
                 </Reorderable>
                 {numericalEntryPopup}
                 {gymExerciseEntryPopup}
-            </View>
+            </FadeIn>
         );
-    }
-
-    public componentWillUpdate(nextProps: IActiveTrackableListProps) {
-        if (this.props.isReorderMode && this.props.items !== nextProps.items
-            || this.props.isAggregationMode !== nextProps.isAggregationMode
-        ) {
-            LayoutAnimation.easeInEaseOut();
-        }
     }
 
     public componentWillReceiveProps(nextProps: IActiveTrackableListProps) {

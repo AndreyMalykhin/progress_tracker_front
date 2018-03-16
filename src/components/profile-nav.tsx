@@ -28,6 +28,7 @@ class ProfileNav extends React.Component<IProfileNavProps> {
     public render() {
         return (
             <NavBar
+                isDisabled={this.props.isDisabled}
                 renderItem={this.renderItem}
                 items={this.props.items}
                 style={styles.container}
@@ -36,9 +37,8 @@ class ProfileNav extends React.Component<IProfileNavProps> {
     }
 
     private renderItem: INavBarItemRenderer = (
-        path, isActive, onSelect, titleMsgId, iconName,
+        path, isActive, onSelect, titleMsgId, iconName, isDisabled,
     ) => {
-        const { isDisabled } = this.props;
         return (
             <TabBarItem
                 key={path}

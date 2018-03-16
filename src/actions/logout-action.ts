@@ -4,6 +4,7 @@ import ApolloClient from "apollo-client";
 import { History } from "history";
 import { LoginManager } from "react-native-fbsdk";
 import makeLog from "utils/make-log";
+import { IMultiStackHistoryState } from "utils/multi-stack-history";
 import routes from "utils/routes";
 
 const log = makeLog("logout-action");
@@ -16,10 +17,10 @@ async function logout(
     const userId = null;
     const accessToken = null;
     setSession(userId, accessToken, apollo);
-    history.replace({
-        pathname: routes.index.path,
-        state: { resetHistory: true },
-    });
+    const state: IMultiStackHistoryState = {
+        multiStackHistory: { reset: true },
+    };
+    history.replace({ pathname: routes.index.path, state });
 
     try {
         await apollo.resetStore();

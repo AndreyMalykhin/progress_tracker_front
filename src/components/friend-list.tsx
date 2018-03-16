@@ -10,6 +10,7 @@ import {
     UserListContentStyle,
     UserListItemStyle,
 } from "components/common-styles";
+import FadeIn from "components/fade-in";
 import Icon from "components/icon";
 import Loader from "components/loader";
 import Text from "components/text";
@@ -23,6 +24,7 @@ import {
     StyleSheet,
     View,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import IconName from "utils/icon-name";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
@@ -60,20 +62,22 @@ class FriendList extends React.PureComponent<IFriendListProps> {
             this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
-            <FlatList
-                windowSize={12}
-                initialNumToRender={8}
-                refreshing={isRefreshing}
-                data={items}
-                keyExtractor={this.getItemKey}
-                renderItem={this.onRenderItem}
-                style={styles.list}
-                contentContainerStyle={styles.listContent}
-                ListFooterComponent={loader}
-                onEndReachedThreshold={0.5}
-                onEndReached={onEndReached}
-                onRefresh={onRefresh}
-            />
+            <FadeIn>
+                <FlatList
+                    windowSize={12}
+                    initialNumToRender={8}
+                    refreshing={isRefreshing}
+                    data={items}
+                    keyExtractor={this.getItemKey}
+                    renderItem={this.onRenderItem}
+                    style={styles.list}
+                    contentContainerStyle={styles.listContent}
+                    ListFooterComponent={loader}
+                    onEndReachedThreshold={0.5}
+                    onEndReached={onEndReached}
+                    onRefresh={onRefresh}
+                />
+            </FadeIn>
         );
     }
 

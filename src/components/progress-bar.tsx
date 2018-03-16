@@ -1,3 +1,6 @@
+import AnimatedNumber, {
+    numberAnimationDuration,
+} from "components/animated-number";
 import {
     BorderRadius,
     BrandColor,
@@ -11,7 +14,7 @@ import Text from "components/text";
 import { CalloutText } from "components/typography";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
-import { FormattedNumber } from "react-intl";
+import { InjectedIntlProps, injectIntl } from "react-intl";
 import {
     Animated,
     Easing,
@@ -21,6 +24,7 @@ import {
     View,
     ViewStyle,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import ProgressBarImpl from "react-native-progress/Bar";
 
 interface IProgressBarProps {
@@ -36,40 +40,37 @@ interface IProgressBarState {
 }
 
 const animationConfig = {
-    duration: 1024,
-    easing: Easing.out(Easing.sin),
+    duration: numberAnimationDuration,
+    easing: Easing.inOut(Easing.sin),
+    isInteraction: false,
 } as Animated.TimingAnimationConfig;
 
-class ProgressBar extends
-    React.PureComponent<IProgressBarProps, IProgressBarState> {
+class ProgressBar extends React.PureComponent<
+    IProgressBarProps & InjectedIntlProps, IProgressBarState
+> {
     public state: IProgressBarState = { isInitialRender: true, width: 0 };
 
     public render() {
-        const { maxValue, mode, style } = this.props;
-        let value = 0;
+        const { value, maxValue, mode, style } = this.props;
+        const { width, isInitialRender } = this.state;
+        let displayValue = isInitialRender ? 0 : value;
+        const normalizedValue = displayValue / maxValue;
 
-        if (!this.state.isInitialRender) {
-            value = this.props.value;
+        if (mode === ProgressDisplayMode.Percentage) {
+            displayValue = normalizedValue;
         }
 
-        const normalizedValue = value / maxValue;
-        const formattedValue = mode === ProgressDisplayMode.Percentage ? (
-            <FormattedNumber
-                value={normalizedValue}
-                minimumFractionDigits={2}
-                maximumFractionDigits={2}
-                useGrouping={false}
-                style="percent"
-            />
-        ) : value;
         return (
-            <View style={[styles.container, style]} onLayout={this.onLayout}>
+            <View
+                style={[styles.container, style]}
+                onLayout={this.onLayout}
+            >
                 <ProgressBarImpl
                     animated={true}
                     animationType="timing"
                     animationConfig={animationConfig}
                     progress={normalizedValue}
-                    width={this.state.width}
+                    width={width}
                     height={height}
                     color={ProgressBarStyle.color}
                     unfilledColor={backgroundColor}
@@ -77,15 +78,25 @@ class ProgressBar extends
                     borderWidth={0}
                     useNativeDriver={true}
                 />
-                <CalloutText style={styles.value} light={true}>
-                    {formattedValue}
-                </CalloutText>
+                <View style={styles.valueContainer}>
+                    <AnimatedNumber
+                        isPercentage={mode === ProgressDisplayMode.Percentage}
+                        value={displayValue}
+                        onRender={this.onRenderNumber}
+                    />
+                </View>
             </View>
         );
     }
 
     public componentDidMount() {
         this.setState({ isInitialRender: false });
+    }
+
+    private onRenderNumber = (value: string) => {
+        return (
+            <CalloutText style={styles.value} light={true}>{value}</CalloutText>
+        );
     }
 
     private onLayout = (evt: LayoutChangeEvent) =>
@@ -103,12 +114,14 @@ const styles = StyleSheet.create({
         marginBottom: Gap.single,
     },
     value: {
-        ...StyleSheet.absoluteFillObject,
         backgroundColor: "transparent",
         lineHeight: height,
         textAlign: "center",
     },
+    valueContainer: {
+        ...StyleSheet.absoluteFillObject,
+    },
 });
 
 export { IProgressBarProps };
-export default ProgressBar;
+export default injectIntl(ProgressBar);

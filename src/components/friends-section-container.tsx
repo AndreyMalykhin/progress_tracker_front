@@ -1,6 +1,8 @@
 import { share } from "actions/share-action";
 import { addGenericErrorToast } from "actions/toast-helpers";
+import { isApolloError } from "apollo-client/errors/ApolloError";
 import FriendsSection from "components/friends-section";
+import { HeaderAnimation } from "components/header";
 import withDIContainer, {
     IWithDIContainerProps,
 } from "components/with-di-container";
@@ -39,9 +41,11 @@ class FriendsSectionContainer extends
     }
 
     private updateHeader(props: IFriendsSectionContainerProps) {
-        const title = this.props.intl.formatMessage(
+        const title = props.intl.formatMessage(
             { id: "globalNavigation.friends" });
         props.header.replace({
+            animation: HeaderAnimation.FadeInRight,
+            key: "friendsSectionContainer.index",
             rightCommands: [
                 {
                     iconName: IconName.Add,
@@ -60,7 +64,9 @@ class FriendsSectionContainer extends
         try {
             await share("share.app", intl);
         } catch (e) {
-            addGenericErrorToast(client);
+            if (!isApolloError(e)) {
+                addGenericErrorToast(client);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 import ActivitiesSection from "components/activities-section";
+import { HeaderAnimation } from "components/header";
 import { INavBarItem } from "components/nav-bar";
 import Text from "components/text";
 import withHeader, { IWithHeaderProps } from "components/with-header";
@@ -47,21 +48,25 @@ class ActivitiesSectionContainer extends
     }
 
     public componentWillMount() {
-        this.updateHeader();
+        this.updateHeader(this.props);
     }
 
     public componentWillReceiveProps(
         nextProps: IActivitiesSectionContainerProps,
     ) {
         if (nextProps.header.isEmpty()) {
-            this.updateHeader();
+            this.updateHeader(nextProps);
         }
     }
 
-    private updateHeader() {
-        const title = this.props.intl.formatMessage(
+    private updateHeader(props: IActivitiesSectionContainerProps) {
+        const title = props.intl.formatMessage(
             { id: "globalNavigation.activities" });
-        this.props.header.replace({ title });
+        props.header.replace({
+            animation: HeaderAnimation.FadeInRight,
+            key: "activitiesSectionContainer.index",
+            title,
+        });
     }
 }
 

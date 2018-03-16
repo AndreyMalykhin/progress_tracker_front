@@ -1,3 +1,4 @@
+import AnimatableView from "components/animatable-view";
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import {
     FormBody,
@@ -12,6 +13,7 @@ import {
 } from "components/form-icon-picker";
 import FormSwitch from "components/form-switch";
 import FormTextInput from "components/form-text-input";
+import { stackingSwitchAnimationDuration } from "components/stacking-switch";
 import TrackableForm, { ITrackableFormProps } from "components/trackable-form";
 import * as React from "react";
 import {
@@ -20,6 +22,7 @@ import {
     TextInput as NativeTextInput,
     View,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import {
     KeyboardAwareScrollView,
 } from "react-native-keyboard-aware-scroll-view";
@@ -37,12 +40,39 @@ interface IPrimitiveTrackableFormProps extends ITrackableFormProps {
     onChangePublic: (value: boolean) => void;
     onChangeIcon: (name: string) => void;
     onChangeShare: (share: boolean) => void;
+    onIconPickerRef: (ref?: Animatable.View) => void;
 }
 
 class PrimitiveTrackableForm extends
     React.Component<IPrimitiveTrackableFormProps> {
+    private iconPickerRef?: Animatable.View;
+
     public render() {
-        const { onRenderChildren, ...restProps } = this.props;
+        const {
+            iconName,
+            availableIconNames,
+            isIconPickerOpen,
+            onRenderChildren,
+            onChangeIcon,
+            onIconPickerRef,
+            ...restProps,
+        } = this.props;
+
+        if (isIconPickerOpen) {
+            return (
+                <AnimatableView
+                    onRef={onIconPickerRef as any}
+                    duration={stackingSwitchAnimationDuration}
+                >
+                    <FormIconPickerExpanded
+                        availableIconNames={availableIconNames}
+                        iconName={iconName}
+                        onSelect={onChangeIcon}
+                    />
+                </AnimatableView>
+            );
+        }
+
         return (
             <TrackableForm
                 onRenderChildren={this.onRenderChildren}
@@ -53,31 +83,17 @@ class PrimitiveTrackableForm extends
 
     private onRenderChildren = () => {
         const {
-            isIconPickerOpen,
             iconName,
             isPublic,
             isPublicDisabled,
             isShareable,
             isShareDisabled,
             share,
-            availableIconNames,
             onRenderChildren,
-            onChangeIcon,
             onOpenIconPicker,
             onChangePublic,
             onChangeShare,
         } = this.props;
-
-        if (isIconPickerOpen) {
-            return (
-                <FormIconPickerExpanded
-                    availableIconNames={availableIconNames}
-                    iconName={iconName}
-                    onSelect={onChangeIcon}
-                />
-            );
-        }
-
         const shareSwitch = isShareable && (
             <FormSwitch
                 labelMsgId="trackableForm.shareLabel"

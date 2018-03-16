@@ -1,7 +1,7 @@
 import { share } from "actions/share-action";
 import { addGenericErrorToast } from "actions/toast-helpers";
 import { isApolloError } from "apollo-client/errors/ApolloError";
-import { IHeaderState } from "components/header";
+import { HeaderAnimation, IHeaderShape } from "components/header";
 import {
     IPrimitiveTrackableFormProps,
 } from "components/primitive-trackable-form";
@@ -18,6 +18,7 @@ import TrackableType from "models/trackable-type";
 import * as React from "react";
 import { withApollo } from "react-apollo";
 import { FormattedMessage, InjectedIntlProps } from "react-intl";
+import * as Animatable from "react-native-animatable";
 import { RouteComponentProps } from "react-router";
 import { IWithApolloProps } from "utils/interfaces";
 import Sound from "utils/sound";
@@ -65,6 +66,8 @@ abstract class PrimitiveTrackableFormContainer<
     TProps,
     TState
 > {
+    private iconPickerRef?: Animatable.View;
+
     protected getFormBaseProps() {
         const {
             iconName,
@@ -86,7 +89,8 @@ abstract class PrimitiveTrackableFormContainer<
             onChangeIcon: this.onChangeIcon,
             onChangePublic: this.onChangePublic,
             onChangeShare: this.onChangeShare,
-            onOpenIconPicker: this.onToggleIconPicker,
+            onIconPickerRef: this.onIconPickerRef,
+            onOpenIconPicker: this.onOpenIconPicker,
             share: shareWithFriends,
         } as IPrimitiveTrackableFormProps;
     }
@@ -123,9 +127,9 @@ abstract class PrimitiveTrackableFormContainer<
         return !isNew || !isUserLoggedIn;
     }
 
-    protected onChangeIcon = (iconName: string) => {
-        this.setState({ iconName, isIconPickerOpen: false });
-        this.props.header.pop();
+    protected onChangeIcon = async (iconName: string) => {
+        await this.onCloseIconPicker();
+        this.setState({ iconName });
 
         if (this.isNew()) {
             return;
@@ -134,22 +138,17 @@ abstract class PrimitiveTrackableFormContainer<
         this.editTrackable({ iconName } as TEditTrackableFragment);
     }
 
-    protected onToggleIconPicker = () => {
-        this.setState((prevState) => {
-            const isIconPickerOpen = !prevState.isIconPickerOpen;
-
-            if (isIconPickerOpen) {
-                const title = this.props.intl.formatMessage(
-                    { id: "trackableForm.iconLabel" });
-                this.props.header.push({
-                    onBack: this.onCloseIconPicker,
-                    rightCommands: [],
-                    title,
-                });
-            }
-
-            return { isIconPickerOpen };
+    protected onOpenIconPicker = () => {
+        const title = this.props.intl.formatMessage(
+            { id: "trackableForm.iconLabel" });
+        this.props.header.push({
+            animation: HeaderAnimation.FadeInRight,
+            key: "primitiveTrackableFormContainer.iconPicker",
+            onBack: this.onCloseIconPicker,
+            rightCommands: [],
+            title,
         });
+        this.setState({ isIconPickerOpen: true });
     }
 
     protected onChangePublic = (isPublic: boolean) => {
@@ -159,14 +158,23 @@ abstract class PrimitiveTrackableFormContainer<
     protected onChangeShare = (value: boolean) =>
         this.setState({ share: value })
 
-    private onCloseIconPicker = () => {
+    private onCloseIconPicker = async () => {
         this.props.header.pop();
-        this.onToggleIconPicker();
+        await this.iconPickerRef!.fadeOut!();
+        this.setState({ isIconPickerOpen: false });
     }
 
     private shareTrackable() {
         return share("share.newTrackable", this.props.intl,
             { type: this.getTrackableType(), title: this.state.title! });
+    }
+
+    private onIconPickerRef = (ref?: Animatable.View) => {
+        this.iconPickerRef = ref;
+
+        if (ref) {
+            ref.fadeIn!();
+        }
     }
 }
 

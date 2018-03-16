@@ -58,7 +58,7 @@ class Button extends React.Component<IButtonProps> {
         let content;
 
         if (loading) {
-            content = <Loader isNoFillParent={true} />;
+            content = <Loader isNoFillParent={true} size="small" />;
         } else {
             const contentStyle =
                 vertical ? contentVerticalStyle : styles.content;

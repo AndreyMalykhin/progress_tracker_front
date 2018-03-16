@@ -1,6 +1,7 @@
 import AggregateFormContainer, {
     IAggregate,
 } from "components/aggregate-form-container";
+import { Color } from "components/common-styles";
 import CounterFormContainer, {
     ICounter,
 } from "components/counter-form-container";
@@ -93,6 +94,7 @@ class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: Color.white,
         flex: 1,
     },
 });

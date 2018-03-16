@@ -13,7 +13,6 @@ import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import { Image } from "react-native-image-crop-picker";
 import dataIdFromObject from "utils/data-id-from-object";
-import defaultAvatar from "utils/default-avatar";
 import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
 import uploadFile from "utils/upload-file";
@@ -84,8 +83,8 @@ function getOptimisticResponse(
         { __typename: Type.User, id: getSession(apollo).userId })!;
     const user = apollo.readFragment<ISetUserAvatarFragment>(
         { id: fragmentId, fragment: setUserAvatarFragment })!;
-    user.avatarUrlSmall = imgUrlSmall || defaultAvatar.urlSmall;
-    user.avatarUrlMedium = imgUrlMedium || defaultAvatar.urlMedium;
+    user.avatarUrlSmall = imgUrlSmall || "";
+    user.avatarUrlMedium = imgUrlMedium || "";
     return {
         __typename: Type.Mutation,
         setUserAvatar: {

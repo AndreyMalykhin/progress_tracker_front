@@ -17,7 +17,7 @@ class Avatar extends React.PureComponent<IAvatarProps> {
             <Image
                 resizeMode="cover"
                 style={newStyle as any}
-                source={{ uri }}
+                source={uri ? { uri } : sizeToDefaultImgMap[size]}
             />
         );
     }
@@ -40,6 +40,12 @@ const sizeToStyleMap = {
     large: styles.imgLarge,
     medium: styles.imgMedium,
     small: styles.imgSmall,
+};
+
+const sizeToDefaultImgMap = {
+    large: require("images/default-avatar-medium.png"),
+    medium: require("images/default-avatar-small.png"),
+    small: require("images/default-avatar-small.png"),
 };
 
 export default Avatar;

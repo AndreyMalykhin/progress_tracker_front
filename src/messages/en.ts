@@ -89,10 +89,11 @@ export default {
     "goalForm.titleLabel": "I must",
     "goalForm.titlePlaceholder": "Do something big",
     "gymExercise.entry": `{hasSetCount, select,
-        true {{setCount}x}
+        true {{setCount, number, absolute}x}
         false {}
-    }{repetitionCount}x{weight}`,
-    "gymExercise.entryAveraged": `{setCount}x{repetitionCount}x{weight}`,
+    }{repetitionCount, number, absolute}x{weight, number, absolute}`,
+    "gymExercise.entryAveraged": "{setCount, number, absolute}x" +
+        "{repetitionCount, number, absolute}x{weight, number, absolute}",
     "gymExerciseEntryForm.repetitionCountPlaceholder": "Repetition count",
     "gymExerciseEntryForm.setCountPlaceholder": "Set count",
     "gymExerciseEntryForm.weightPlaceholder": "Weight",

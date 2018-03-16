@@ -64,6 +64,9 @@ import ActiveTrackableList, {
     IAggregate,
     IVisibleItemsChangeInfo,
 } from "components/active-trackable-list";
+import {
+    IAggregateFormContainerHistoryState,
+} from "components/aggregate-form-container";
 import { ICommandBarItem } from "components/command-bar";
 import EmptyList from "components/empty-list";
 import Error from "components/error";
@@ -71,9 +74,13 @@ import { IGymExerciseEntry, IGymExerciseItem } from "components/gym-exercise";
 import {
     IGymExerciseEntryPopupResult,
 } from "components/gym-exercise-entry-popup";
-import { IHeaderState } from "components/header";
+import { IHeaderShape } from "components/header";
 import Loader from "components/loader";
 import Offline from "components/offline";
+import {
+    IStackingSwitchHistoryState,
+    StackingSwitchAnimation,
+} from "components/stacking-switch";
 import Toast, { ToastSeverity } from "components/toast";
 import withDIContainer, {
     IWithDIContainerProps,
@@ -106,8 +113,8 @@ import { recentDayCount } from "models/gym-exercise";
 import TrackableStatus from "models/trackable-status";
 import TrackableType from "models/trackable-type";
 import Type from "models/type";
-import * as React from "react";
 import { ReactNode } from "react";
+import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -115,6 +122,7 @@ import { withApollo } from "react-apollo/withApollo";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import {
     Alert,
+    LayoutAnimation,
     LayoutRectangle,
     NativeScrollEvent,
     NativeSyntheticEvent,
@@ -127,6 +135,7 @@ import { IConnection } from "utils/connection";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
 import DragStatus from "utils/drag-status";
+import IHsitoryState from "utils/history-state";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
 import isMyId from "utils/is-my-id";
@@ -1036,30 +1045,33 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onStartAggregateItem = (id: string) => {
+        LayoutAnimation.easeInEaseOut();
+        this.props.header.push({
+            hideBackCommand: true,
+            key: "activeTrackableListContainer.aggregate",
+            leftCommand: {
+                msgId: "common.cancel",
+                onRun: () => this.onCancelAggregateItem(),
+            },
+            rightCommands: [
+                {
+                    isPrimary: true,
+                    msgId: "common.done",
+                    onRun: this.onCommitAggregateItem,
+                },
+            ],
+        });
+        setContextMode(true, this.props.client);
         this.setState((prevState) => {
             const itemsMeta = this.updateItemMeta(
                 id, { isSelected: true }, prevState.itemsMeta);
             this.updateAggregationTargets(itemsMeta);
-            this.props.header.push({
-                hideBackCommand: true,
-                leftCommand: {
-                    msgId: "common.cancel",
-                    onRun: () => this.onCancelAggregateItem(),
-                },
-                rightCommands: [
-                    {
-                        isPrimary: true,
-                        msgId: "common.done",
-                        onRun: this.onCommitAggregateItem,
-                    },
-                ],
-            });
-            setContextMode(true, this.props.client);
             return { isAggregationMode: true, itemsMeta };
         });
     }
 
     private onCancelAggregateItem = (onDone?: () => void) => {
+        LayoutAnimation.easeInEaseOut();
         this.props.header.pop();
         setContextMode(false, this.props.client);
         this.setState((prevState) => {
@@ -1088,6 +1100,8 @@ class ActiveTrackableListContainer extends React.Component<
         }
 
         if (aggregateId) {
+            LayoutAnimation.easeInEaseOut();
+
             try {
                 await this.props.onAddItemsToAggregate(
                     childIds, aggregateId);
@@ -1100,10 +1114,15 @@ class ActiveTrackableListContainer extends React.Component<
         }
 
         this.onCancelAggregateItem(() => {
-            const pathname = routes.trackableAdd.path.replace(
+            const route = routes.trackableAdd.path.replace(
                 ":type", TrackableType.Aggregate.toString());
-            this.props.history.push(
-                { pathname, state: { trackableIds: childIds } });
+            const historyState: IHsitoryState = {
+                aggregateFormContainer: { trackableIds: childIds },
+                stackingSwitch: {
+                    animation: StackingSwitchAnimation.SlideInRight,
+                },
+            };
+            this.props.history.push(route, historyState);
         });
     }
 
@@ -1123,6 +1142,7 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private async onCommitRemoveItem(id: string) {
+        LayoutAnimation.easeInEaseOut();
         this.props.diContainer.audioManager.play(Sound.Remove);
 
         try {
@@ -1289,13 +1309,20 @@ class ActiveTrackableListContainer extends React.Component<
         try {
             await share("share.provedGoal", intl, { title });
         } catch (e) {
-            addGenericErrorToast(client);
+            if (!isApolloError(e)) {
+                addGenericErrorToast(client);
+            }
         }
     }
 
     private onEditItem = (id: string) => {
+        const historyState: IStackingSwitchHistoryState = {
+            stackingSwitch: {
+                animation: StackingSwitchAnimation.SlideInUp,
+            },
+        };
         this.props.history.push(
-            routes.trackableEdit.path.replace(":id", id));
+            routes.trackableEdit.path.replace(":id", id), historyState);
     }
 
     private onIsTaskGoalExpandable = (taskCount: number) => {
@@ -1377,6 +1404,8 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onCommitReorderItem = async (srcId: string, destId: string) => {
+        LayoutAnimation.easeInEaseOut();
+
         try {
             await this.props.onReorderItem(srcId, destId);
         } catch (e) {

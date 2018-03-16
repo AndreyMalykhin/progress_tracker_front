@@ -3,6 +3,7 @@ import GoalForm from "components/goal-form";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
+import * as Animatable from "react-native-animatable";
 
 interface INumericalGoalFormProps {
     availableIconNames: string[];
@@ -36,6 +37,7 @@ interface INumericalGoalFormProps {
     onDifficultyToNumber: (difficulty: Difficulty) => number;
     onGetDifficultyTitleMsgId: (difficulty: Difficulty) => string;
     onOpenIconPicker: () => void;
+    onIconPickerRef: (ref?: Animatable.View) => void;
 }
 
 class NumericalGoalForm extends React.Component<INumericalGoalFormProps> {

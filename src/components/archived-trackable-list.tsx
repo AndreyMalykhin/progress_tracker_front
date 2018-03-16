@@ -1,4 +1,5 @@
 import EmptyList from "components/empty-list";
+import FadeIn from "components/fade-in";
 import Loader from "components/loader";
 import ProgressBar from "components/progress-bar";
 import Trackable, { ITrackableProps } from "components/trackable";
@@ -7,6 +8,7 @@ import ProgressDisplayMode from "models/progress-display-mode";
 import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { FlatList, ListRenderItemInfo, StyleSheet, Text } from "react-native";
+import * as Animatable from "react-native-animatable";
 import QueryStatus from "utils/query-status";
 
 interface IItemProps extends IArchivedTrackableListItemNode {
@@ -58,20 +60,22 @@ class ArchivedTrackableList extends
             this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
-            <FlatList
-                windowSize={4}
-                initialNumToRender={4}
-                refreshing={isRefreshing}
-                contentContainerStyle={styles.listContent}
-                style={styles.list}
-                data={items}
-                keyExtractor={this.getItemKey}
-                renderItem={this.onRenderItem}
-                ListFooterComponent={loader}
-                onEndReachedThreshold={0.5}
-                onEndReached={onEndReached}
-                onRefresh={onRefresh}
-            />
+            <FadeIn>
+                <FlatList
+                    windowSize={4}
+                    initialNumToRender={4}
+                    refreshing={isRefreshing}
+                    contentContainerStyle={styles.listContent}
+                    style={styles.list}
+                    data={items}
+                    keyExtractor={this.getItemKey}
+                    renderItem={this.onRenderItem}
+                    ListFooterComponent={loader}
+                    onEndReachedThreshold={0.5}
+                    onEndReached={onEndReached}
+                    onRefresh={onRefresh}
+                />
+            </FadeIn>
         );
     }
 

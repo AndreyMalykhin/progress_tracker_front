@@ -1,3 +1,4 @@
+import AnimatableView from "components/animatable-view";
 import {
     BorderRadius,
     Color,
@@ -11,6 +12,7 @@ import Text from "components/text";
 import { BodyText } from "components/typography";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
+import * as Animatable from "react-native-animatable";
 
 interface IToastProps {
     severity: ToastSeverity;
@@ -24,32 +26,55 @@ enum ToastSeverity {
     Danger = "Danger",
 }
 
+Animatable.initializeRegistryWithDefinitions({
+    toastSlideInUp: {
+        from: { translateY: 128 },
+        to: { translateY: 0 },
+    },
+    toastSlideOutDown: {
+        from: { translateY: 0 },
+        to: { translateY: 128 },
+    },
+});
+
 class Toast extends React.Component<IToastProps> {
     public static defaultProps = { duration: 8000 } as IToastProps;
     private timeoutId?: number;
+    private ref?: Animatable.View;
 
     public render() {
         const { children, severity } = this.props;
         const style = [styles.container, severityToStyleMap[severity]];
         return (
-            <View style={style}>
+            <AnimatableView
+                onRef={this.onRef as any}
+                style={style}
+            >
                 <BodyText light={true} style={styles.msg}>{children}</BodyText>
-            </View>
+            </AnimatableView>
         );
     }
 
-    public componentWillMount() {
-        this.props.onOpen();
-    }
-
     public componentDidMount() {
-        const { duration, onClose } = this.props;
-        this.timeoutId = setTimeout(onClose, duration);
+        (this.ref as any).toastSlideInUp();
+        const { duration, onClose, onOpen } = this.props;
+
+        this.timeoutId = setTimeout(async () => {
+            if (this.ref) {
+                await (this.ref as any).toastSlideOutDown!();
+            }
+
+            onClose();
+        }, duration);
+
+        onOpen();
     }
 
     public componentWillUnmount() {
         clearTimeout(this.timeoutId!);
     }
+
+    private onRef = (ref?: Animatable.View) => this.ref = ref;
 }
 
 const styles = StyleSheet.create({
