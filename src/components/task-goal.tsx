@@ -1,11 +1,11 @@
 import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
 import {
-    Color,
-    Gap,
-    ProgressBarStyle,
+    color,
+    gap,
+    progressBarStyle,
     rem,
-    TouchableStyle,
+    touchableStyle,
 } from "components/common-styles";
 import IGoalProps from "components/goal-props";
 import ProgressBar from "components/progress-bar";
@@ -152,16 +152,16 @@ class Task extends React.PureComponent<ITaskProps, ITaskState> {
 
 const styles = StyleSheet.create({
     task: {
-        paddingBottom: Gap.single,
+        paddingBottom: gap.single,
     },
     taskCheckBoxChecked: {
-        color: ProgressBarStyle.color,
+        color: progressBarStyle.color,
     },
     taskTitle: {
         alignSelf: "flex-start",
         flex: 1,
         flexWrap: "wrap",
-        paddingLeft: Gap.single,
+        paddingLeft: gap.single,
         paddingTop: rem(1.2),
     },
     taskTitleDone: {

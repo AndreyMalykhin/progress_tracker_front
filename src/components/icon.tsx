@@ -1,9 +1,9 @@
 import {
-    IconStyle,
+    iconStyle,
     rem,
-    SeverityColor,
-    StateColor,
-    TouchableStyle,
+    severityColor,
+    stateColor,
+    touchableStyle,
 } from "components/common-styles";
 import * as React from "react";
 import { StyleProp, StyleSheet, TextStyle } from "react-native";
@@ -54,17 +54,17 @@ class Icon extends React.Component<IIconProps> {
 
 const styles = StyleSheet.create({
     icon: {
-        ...IconStyle,
+        ...iconStyle,
         backgroundColor: "transparent",
     },
     iconActive: {
-        color: StateColor.active,
+        color: stateColor.active,
     },
     iconDangerous: {
-        color: SeverityColor.danger,
+        color: severityColor.danger,
     },
     iconDisabled: {
-        color: StateColor.disabled,
+        color: stateColor.disabled,
     },
 });
 

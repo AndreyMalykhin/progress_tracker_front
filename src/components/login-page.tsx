@@ -1,5 +1,5 @@
 import Button, { ButtonTitle } from "components/button";
-import { Color, Gap, rem } from "components/common-styles";
+import { color, gap, rem } from "components/common-styles";
 import Image from "components/image";
 import LoginContainer from "components/login-container";
 import { BodyText, FootnoteText } from "components/typography";
@@ -48,16 +48,16 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     logo: {
-        backgroundColor: Color.white,
+        backgroundColor: color.white,
     },
     skipBtn: {
-        marginBottom: Gap.double,
-        marginTop: Gap.double,
+        marginBottom: gap.double,
+        marginTop: gap.double,
     },
     skipMsg: {
-        paddingBottom: Gap.quadruple,
-        paddingLeft: Gap.quadruple,
-        paddingRight: Gap.quadruple,
+        paddingBottom: gap.quadruple,
+        paddingLeft: gap.quadruple,
+        paddingRight: gap.quadruple,
         textAlign: "center",
     },
     topContent: {

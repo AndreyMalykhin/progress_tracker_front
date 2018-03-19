@@ -52,7 +52,7 @@ class ProfileForm extends React.Component<IProfileFormProps> {
             );
         } else {
             authGroup = (
-                <LoginContainer msgId="profileForm.loginMessage" />
+                <LoginContainer msgId="profileForm.loginMsg" />
             );
         }
 

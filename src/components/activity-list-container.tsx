@@ -39,6 +39,7 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
@@ -142,6 +143,7 @@ const withData = graphql<
         options: (ownProps) => {
             const { audience, session, fetchPolicy } = ownProps;
             return {
+                errorPolicy: defaultErrorPolicy,
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: { audience, skipUser: audience === Audience.Me },
@@ -254,7 +256,7 @@ export default compose(
         isReadonlyData: (props) => false,
     }),
     withEmptyList<IActivityListContainerProps>(
-        EmptyList, (props) => props.data.getActivities.edges),
+        EmptyList, (props) => props.data.getActivities),
     withLoadMore<IActivityListContainerProps, IGetDataResponse>({
         dataField: "getActivities",
         getQuery: (props) => props.data,

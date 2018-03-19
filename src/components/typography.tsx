@@ -1,4 +1,4 @@
-import { TypographyStyle } from "components/common-styles";
+import { typographyStyle } from "components/common-styles";
 import Text, { ITextProps } from "components/text";
 import * as React from "react";
 import { StyleSheet, TextStyle } from "react-native";
@@ -8,28 +8,28 @@ interface ITypographyProps extends ITextProps {
 }
 
 const styles = StyleSheet.create({
-    body: TypographyStyle.body,
-    bodyLight: TypographyStyle.bodyLight,
-    callout: TypographyStyle.callout,
-    calloutLight: TypographyStyle.calloutLight,
-    caption1: TypographyStyle.caption1,
-    caption1Light: TypographyStyle.caption1Light,
-    caption2: TypographyStyle.caption2,
-    caption2Light: TypographyStyle.caption2Light,
-    footnote: TypographyStyle.footnote,
-    footnoteLight: TypographyStyle.footnoteLight,
-    headline: TypographyStyle.headline,
-    headlineLight: TypographyStyle.headlineLight,
-    largeTitle: TypographyStyle.largeTitle,
-    largeTitleLight: TypographyStyle.largeTitleLight,
-    subhead: TypographyStyle.subhead,
-    subheadLight: TypographyStyle.subheadLight,
-    title1: TypographyStyle.title1,
-    title1Light: TypographyStyle.title1Light,
-    title2: TypographyStyle.title2,
-    title2Light: TypographyStyle.title2Light,
-    title3: TypographyStyle.title3,
-    title3Light: TypographyStyle.title3Light,
+    body: typographyStyle.body,
+    bodyLight: typographyStyle.bodyLight,
+    callout: typographyStyle.callout,
+    calloutLight: typographyStyle.calloutLight,
+    caption1: typographyStyle.caption1,
+    caption1Light: typographyStyle.caption1Light,
+    caption2: typographyStyle.caption2,
+    caption2Light: typographyStyle.caption2Light,
+    footnote: typographyStyle.footnote,
+    footnoteLight: typographyStyle.footnoteLight,
+    headline: typographyStyle.headline,
+    headlineLight: typographyStyle.headlineLight,
+    largeTitle: typographyStyle.largeTitle,
+    largeTitleLight: typographyStyle.largeTitleLight,
+    subhead: typographyStyle.subhead,
+    subheadLight: typographyStyle.subheadLight,
+    title1: typographyStyle.title1,
+    title1Light: typographyStyle.title1Light,
+    title2: typographyStyle.title2,
+    title2Light: typographyStyle.title2Light,
+    title3: typographyStyle.title3,
+    title3Light: typographyStyle.title3Light,
 });
 
 function makeTypography(darkStyle: TextStyle, lightStyle: TextStyle) {

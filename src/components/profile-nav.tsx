@@ -1,9 +1,9 @@
 import {
-    Color,
-    Gap,
-    ShadeColor,
-    StateColor,
-    TypographyStyle,
+    color,
+    gap,
+    shadeColor,
+    stateColor,
+    typographyStyle,
 } from "components/common-styles";
 import Icon from "components/icon";
 import NavBar, {
@@ -67,12 +67,12 @@ class ProfileNav extends React.Component<IProfileNavProps> {
 const styles = StyleSheet.create({
     container: {
         borderBottomWidth: 1,
-        borderColor: ShadeColor.light2,
-        paddingBottom: Gap.single,
-        paddingTop: Gap.single,
+        borderColor: shadeColor.light2,
+        paddingBottom: gap.single,
+        paddingTop: gap.single,
     },
     itemTitle: {
-        ...TypographyStyle.caption1,
+        ...typographyStyle.caption1,
     },
 });
 

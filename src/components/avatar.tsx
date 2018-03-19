@@ -1,4 +1,4 @@
-import { AvatarStyle, rem } from "components/common-styles";
+import { avatarStyle, rem } from "components/common-styles";
 import Image from "components/image";
 import * as React from "react";
 import { ImageStyle, StyleProp, StyleSheet } from "react-native";
@@ -26,13 +26,13 @@ class Avatar extends React.PureComponent<IAvatarProps> {
 const styles = StyleSheet.create({
     img: {},
     imgLarge: {
-        ...AvatarStyle.large,
+        ...avatarStyle.large,
     },
     imgMedium: {
-        ...AvatarStyle.medium,
+        ...avatarStyle.medium,
     },
     imgSmall: {
-        ...AvatarStyle.small,
+        ...avatarStyle.small,
     },
 });
 

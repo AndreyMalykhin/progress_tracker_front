@@ -35,6 +35,7 @@ import { compose, QueryProps } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import defaultErrorPolicy from "utils/default-error-policy";
 import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
@@ -99,6 +100,7 @@ const withData = graphql<
     {
         options: (ownProps) => {
             return {
+                errorPolicy: defaultErrorPolicy,
                 fetchPolicy: ownProps.fetchPolicy,
                 notifyOnNetworkStatusChange: true,
             };
@@ -174,7 +176,7 @@ export default compose(
         isReadonlyData: () => false,
     }),
     withEmptyList<IFriendListContainerProps>(
-        EmptyList, (props) => props.data.getFriends.edges),
+        EmptyList, (props) => props.data.getFriends),
     withLoadMore<IFriendListContainerProps, IGetDataResponse>({
         dataField: "getFriends",
         getQuery: (props) => props.data,

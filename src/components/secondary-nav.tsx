@@ -1,11 +1,11 @@
 import {
-    BorderRadius,
-    Color,
-    Gap,
-    ShadeColor,
-    StateColor,
-    TouchableStyle,
-    TypographyStyle,
+    borderRadius,
+    color,
+    gap,
+    shadeColor,
+    stateColor,
+    touchableStyle,
+    typographyStyle,
 } from "components/common-styles";
 import NavBar, {
     INavBarItem,
@@ -65,28 +65,28 @@ class SecondaryNav extends React.Component<ISecondaryNavProps> {
 const styles = StyleSheet.create({
     container: {
         borderBottomWidth: 1,
-        borderColor: ShadeColor.light2,
+        borderColor: shadeColor.light2,
     },
     item: {
-        paddingBottom: Gap.single,
-        paddingLeft: Gap.single,
-        paddingRight: Gap.single,
-        paddingTop: Gap.single,
+        paddingBottom: gap.single,
+        paddingLeft: gap.single,
+        paddingRight: gap.single,
+        paddingTop: gap.single,
     },
     itemActive: {},
     itemContent: {
         alignItems: "center",
         alignSelf: "stretch",
-        borderRadius: BorderRadius.double,
+        borderRadius: borderRadius.double,
         flex: 1,
         justifyContent: "center",
     },
     itemContentActive: {
-        backgroundColor: StateColor.active,
+        backgroundColor: stateColor.active,
     },
     itemTitle: {},
     itemTitleActive: {
-        color: Color.white,
+        color: color.white,
     },
 });
 

@@ -133,6 +133,7 @@ import ImagePicker, { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
 import dataIdFromObject from "utils/data-id-from-object";
+import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import DragStatus from "utils/drag-status";
 import IHsitoryState from "utils/history-state";
@@ -479,6 +480,7 @@ const withData =
                 }
 
                 return {
+                    errorPolicy: defaultErrorPolicy,
                     fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                     variables: { userId },
@@ -499,6 +501,7 @@ class ActiveTrackableListContainer extends React.Component<
         itemsMeta: {},
         numericalEntryPopup: { onClose: () => null },
     };
+    private mounted = false;
     private itemLayouts: { [id: string]: LayoutRectangle|undefined } = {};
     private draggedItemId?: string;
     private visibleItemIds: string[] = [];
@@ -587,6 +590,10 @@ class ActiveTrackableListContainer extends React.Component<
         log.trace("componentWillMount()");
     }
 
+    public componentDidMount() {
+        this.mounted = true;
+    }
+
     public componentWillReceiveProps(
         nextProps: IActiveTrackableListContainerProps,
     ) {
@@ -608,6 +615,8 @@ class ActiveTrackableListContainer extends React.Component<
         if (this.state.isAggregationMode) {
             setContextMode(false, this.props.client);
         }
+
+        this.mounted = false;
     }
 
     private initItemsMeta(items: IActiveTrackableListItem[]) {
@@ -1151,6 +1160,10 @@ class ActiveTrackableListContainer extends React.Component<
             return;
         }
 
+        if (!this.mounted) {
+            return;
+        }
+
         this.setState((prevState) => {
             const itemsMeta = { ...prevState.itemsMeta, [id]: {} };
             return { itemsMeta };
@@ -1204,7 +1217,8 @@ class ActiveTrackableListContainer extends React.Component<
             return;
         }
 
-        this.showToast("notifications.goalAchieved", Sound.GoalAchieve);
+        this.showToast("notifications.goalAchieved", Sound.GoalAchieve,
+            ToastSeverity.Success);
     }
 
     private onStartNewGymExerciseEntry = (id: string) => {
@@ -1267,6 +1281,10 @@ class ActiveTrackableListContainer extends React.Component<
     private setItemProving(
         id: string, isProving: boolean, onDone?: () => void,
     ) {
+        if (!this.mounted) {
+            return;
+        }
+
         this.setState((prevState) => {
             const itemsMeta = this.updateItemMeta(
                 id, { isProving }, prevState.itemsMeta);
@@ -1434,13 +1452,10 @@ class ActiveTrackableListContainer extends React.Component<
             (item) => (item.item as IActiveTrackableListItem).node.id);
     }
 
-    private showToast(msgId: string, sound: Sound) {
-        const toast = {
-            msgId,
-            severity: ToastSeverity.Info,
-            sound,
-        };
-        addToast(toast, this.props.client);
+    private showToast(
+        msgId: string, sound: Sound, severity = ToastSeverity.Info,
+    ) {
+        addToast({ msgId, severity, sound }, this.props.client);
     }
 
     private onSetTaskDone = async (taskId: string, isDone: boolean) => {
@@ -1464,6 +1479,8 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onUnaggregateItem = async (id: string) => {
+        LayoutAnimation.easeInEaseOut();
+
         try {
             await this.props.onUnaggregateItem(id);
         } catch (e) {
@@ -1472,6 +1489,8 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onBreakItem = async (id: string) => {
+        LayoutAnimation.easeInEaseOut();
+
         try {
             await this.props.onBreakItem(id);
         } catch (e) {
@@ -1507,6 +1526,15 @@ export default compose(
         getQuery: (props) => props.data,
     }),
     withApollo,
+    injectIntl,
+    withRefresh<IActiveTrackableListContainerProps, IGetDataResponse>({
+        dataField: "getActiveTrackables",
+        getQuery: (props) => props.data,
+        isMyData: (props) => isMyId(props.match.params.id, props.session),
+        isReadonlyData: (props) => false,
+    }),
+    withEmptyList<IActiveTrackableListContainerProps>(
+        EmptyList, (props) => props.data.getActiveTrackables),
     withReorder,
     withSetTaskDone,
     withProve,
@@ -1520,13 +1548,6 @@ export default compose(
     withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>({
         dataField: "getActiveTrackables",
         getQuery: (props) => props.data,
-    }),
-    injectIntl,
-    withRefresh<IActiveTrackableListContainerProps, IGetDataResponse>({
-        dataField: "getActiveTrackables",
-        getQuery: (props) => props.data,
-        isMyData: (props) => isMyId(props.match.params.id, props.session),
-        isReadonlyData: (props) => false,
     }),
     withLoginAction,
     withEnsureUserLoggedIn,

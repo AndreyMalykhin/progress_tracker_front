@@ -1,5 +1,5 @@
 import Button, { ButtonIcon } from "components/button";
-import { IconStyle, TouchableStyle } from "components/common-styles";
+import { iconStyle, touchableStyle } from "components/common-styles";
 import Icon from "components/icon";
 import * as React from "react";
 import { StyleProp, StyleSheet, Text, ViewStyle } from "react-native";
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         paddingTop: 0,
     },
     icon: {
-        ...IconStyle,
+        ...iconStyle,
         alignSelf: "flex-start",
     },
 });

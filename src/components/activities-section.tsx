@@ -1,5 +1,5 @@
 import ActivityListContainer from "components/activity-list-container";
-import { ListStyle } from "components/common-styles";
+import { listStyle } from "components/common-styles";
 import { INavBarItem } from "components/nav-bar";
 import SecondaryNav from "components/secondary-nav";
 import Audience from "models/audience";
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     content: {
-        backgroundColor: ListStyle.backgroundColor,
+        backgroundColor: listStyle.backgroundColor,
         flex: 1,
     },
 });

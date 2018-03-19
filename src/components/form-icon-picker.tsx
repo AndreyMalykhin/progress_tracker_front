@@ -1,5 +1,5 @@
 import Button, { ButtonIcon } from "components/button";
-import { Gap, TouchableStyle } from "components/common-styles";
+import { gap, touchableStyle } from "components/common-styles";
 import { FormGroup, FormLabel } from "components/form";
 import Icon from "components/icon";
 import withDIContainer, {
@@ -112,8 +112,8 @@ class FormIconPickerCollapsed extends
     }
 }
 
-const expandedListItemIconSize = TouchableStyle.minHeight;
-const expandedListItemIconPadding = Gap.double;
+const expandedListItemIconSize = touchableStyle.minHeight;
+const expandedListItemIconPadding = gap.double;
 
 const styles = StyleSheet.create({
     collapsedContainer: {},

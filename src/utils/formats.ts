@@ -6,7 +6,7 @@ enum NumberFormat {
 const formats = {
     number: {
         [NumberFormat.Absolute]: {
-            maximumFractionDigits: 2,
+            maximumFractionDigits: 1,
             minimumFractionDigits: 0,
             useGrouping: true,
         },

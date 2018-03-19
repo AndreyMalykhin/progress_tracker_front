@@ -2,15 +2,15 @@ import AnimatableView, { IAnimatableViewProps } from "components/animatable-view
 import Avatar from "components/avatar";
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import {
-    AvatarStyle,
-    Color,
-    FontWeightStyle,
-    Gap,
-    HeaderStyle,
-    IconStyle,
-    ShadeColor,
-    TouchableStyle,
-    TypographyStyle,
+    avatarStyle,
+    color,
+    fontWeightStyle,
+    gap,
+    headerStyle,
+    iconStyle,
+    shadeColor,
+    touchableStyle,
+    typographyStyle,
 } from "components/common-styles";
 import Icon from "components/icon";
 import Image from "components/image";
@@ -332,7 +332,7 @@ class Subtitle extends React.PureComponent<ISubtitleProps> {
             <Icon
                 style={styles.subtitleIcon}
                 name={iconName}
-                size={TypographyStyle.caption2.lineHeight}
+                size={typographyStyle.caption2.lineHeight}
             />
         );
         return (
@@ -346,15 +346,15 @@ class Subtitle extends React.PureComponent<ISubtitleProps> {
     }
 }
 
-const subtitleColor = Color.grayDark;
+const subtitleColor = color.grayDark;
 
 const styles = StyleSheet.create({
     cmdBack: {},
     cmdTitle: {},
     container: {
-        ...HeaderStyle,
+        ...headerStyle,
         borderBottomWidth: 1,
-        height: TouchableStyle.minHeight,
+        height: touchableStyle.minHeight,
     },
     content: {
         flex: 1,
@@ -382,14 +382,14 @@ const styles = StyleSheet.create({
     },
     subtitleIcon: {
         color: subtitleColor,
-        marginLeft: Gap.half,
-        marginRight: Gap.half,
+        marginLeft: gap.half,
+        marginRight: gap.half,
     },
     subtitleText: {
         color: subtitleColor,
     },
     title: {
-        ...FontWeightStyle.bold,
+        ...fontWeightStyle.bold,
     },
 });
 

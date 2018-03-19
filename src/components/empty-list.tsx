@@ -1,5 +1,5 @@
 import Button, { ButtonTitle } from "components/button";
-import { Gap } from "components/common-styles";
+import { gap } from "components/common-styles";
 import Text from "components/text";
 import { BodyText } from "components/typography";
 import { IWithRefreshProps } from "components/with-refresh";
@@ -35,8 +35,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     msg: {
-        paddingBottom: Gap.single,
-        paddingTop: Gap.single,
+        paddingBottom: gap.single,
+        paddingTop: gap.single,
     },
 });
 

@@ -47,6 +47,7 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { Alert } from "react-native";
 import { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
+import defaultErrorPolicy from "utils/default-error-policy";
 import { IWithApolloProps } from "utils/interfaces";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
@@ -130,6 +131,7 @@ const withData =
         {
             options: (ownProps) => {
                 return {
+                    errorPolicy: defaultErrorPolicy,
                     fetchPolicy: ownProps.fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                 };

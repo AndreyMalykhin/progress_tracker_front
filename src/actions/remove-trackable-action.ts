@@ -52,8 +52,10 @@ ${removeChildFragment}
 query GetTrackableById($id: ID!) {
     getTrackable(id: $id) {
         id
-        parent {
-            ...RemoveChildAggregateFragment
+        ... on IAggregatable {
+            parent {
+                ...RemoveChildAggregateFragment
+            }
         }
     }
 }`;
@@ -91,7 +93,7 @@ function getOptimisticResponse(
 ) {
     const trackableByIdResponse = apollo.readQuery<IGetTrackableByIdResponse>(
         { query: getTrackableQuery, variables: { id: trackableId } })!;
-    const { parent } = trackableByIdResponse.getTrackable;
+    const parent = trackableByIdResponse.getTrackable.parent || null;
     const removedAggregateId =
         parent && removeChild(trackableId, parent) ? parent.id : null;
     return {

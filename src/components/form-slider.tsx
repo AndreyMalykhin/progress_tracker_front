@@ -1,4 +1,4 @@
-import { Color, Gap, StateColor } from "components/common-styles";
+import { color, gap, stateColor } from "components/common-styles";
 import { FormGroup, FormLabel } from "components/form";
 import * as React from "react";
 import { Slider, SliderProperties, StyleSheet, View } from "react-native";
@@ -22,7 +22,7 @@ class FormSlider extends React.PureComponent<IFormSliderProps> {
             <FormGroup disabled={disabled} labelMsgId={labelMsgId}>
                 <View style={styles.controlContainer}>
                     <Slider
-                        minimumTrackTintColor={StateColor.active}
+                        minimumTrackTintColor={stateColor.active}
                         value={value}
                         disabled={disabled}
                         style={[styles.control, style]}
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     controlContainer: {
         alignItems: "center",
         flexDirection: "row",
-        paddingTop: Gap.double,
+        paddingTop: gap.double,
     },
 });
 

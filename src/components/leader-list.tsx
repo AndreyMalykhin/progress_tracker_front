@@ -1,13 +1,13 @@
 import Avatar from "components/avatar";
 import {
-    AvatarStyle,
-    CardStyle,
-    Color,
-    FontWeightStyle,
-    Gap,
+    avatarStyle,
+    cardStyle,
+    color,
+    fontWeightStyle,
+    gap,
     rem,
-    UserListContentStyle,
-    UserListItemStyle,
+    userListContentStyle,
+    userListItemStyle,
 } from "components/common-styles";
 import FadeIn from "components/fade-in";
 import Loader from "components/loader";
@@ -63,7 +63,7 @@ class LeaderList extends React.Component<ILeaderListProps> {
             this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
-            <FadeIn>
+            <FadeIn style={styles.container}>
                 <FlatList
                     windowSize={12}
                     initialNumToRender={8}
@@ -135,22 +135,25 @@ class Item extends React.PureComponent<IItemProps> {
     private onPress = () => this.props.onPress(this.props.id);
 }
 
-const itemHeight = AvatarStyle.medium.height;
+const itemHeight = avatarStyle.medium.height;
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     item: {
-        ...UserListItemStyle,
+        ...userListItemStyle,
     },
     itemUser: {
         alignItems: "center",
         flexDirection: "row",
     },
     itemUserAvatar: {
-        marginLeft: Gap.single,
-        marginRight: Gap.single,
+        marginLeft: gap.single,
+        marginRight: gap.single,
     },
     itemUserIndex: {
-        ...FontWeightStyle.bold,
+        ...fontWeightStyle.bold,
         lineHeight: itemHeight,
         textAlign: "center",
         width: rem(4.8),
@@ -160,15 +163,16 @@ const styles = StyleSheet.create({
         lineHeight: itemHeight,
     },
     itemUserRating: {
-        color: Color.grayDark,
+        color: color.grayDark,
         lineHeight: itemHeight,
-        marginLeft: Gap.single,
+        marginLeft: gap.single,
     },
     list: {
-        backgroundColor: CardStyle.backgroundColor,
+        backgroundColor: cardStyle.backgroundColor,
+        flex: 1,
     },
     listContent: {
-        ...UserListContentStyle,
+        ...userListContentStyle,
     },
 });
 

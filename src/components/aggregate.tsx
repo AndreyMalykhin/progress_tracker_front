@@ -1,11 +1,11 @@
 import AnimatableView from "components/animatable-view";
 import { ICommandBarItem } from "components/command-bar";
 import {
-    CardStyle,
-    Color,
-    FontWeightStyle,
-    Gap,
-    TypographyStyle,
+    cardStyle,
+    color,
+    fontWeightStyle,
+    gap,
+    typographyStyle,
 } from "components/common-styles";
 import Counter from "components/counter";
 import NumericalGoal from "components/numerical-goal";
@@ -141,7 +141,7 @@ class Aggregate extends React.Component<IAggregateProps & InjectedIntlProps> {
 const styles = StyleSheet.create({
     cardHeader: {},
     cardHeaderTitle: {
-        ...TypographyStyle.title2,
+        ...typographyStyle.title2,
     },
     container: {
         marginBottom: trackableMargin,
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
         marginTop: trackableMargin,
     },
     content: {
-        backgroundColor: CardStyle.backgroundColor,
+        backgroundColor: cardStyle.backgroundColor,
     },
 });
 

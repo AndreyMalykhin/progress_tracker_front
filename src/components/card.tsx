@@ -1,15 +1,15 @@
 import Avatar from "components/avatar";
 import CommandBar, { ICommandBarProps } from "components/command-bar";
 import {
-    CardStyle,
-    Color,
-    FontWeightStyle,
-    Gap,
-    IconStyle,
+    cardStyle,
+    color,
+    fontWeightStyle,
+    gap,
+    iconStyle,
     rem,
-    ShadeColor,
-    TouchableStyle,
-    TypographyStyle,
+    shadeColor,
+    touchableStyle,
+    typographyStyle,
 } from "components/common-styles";
 import Image from "components/image";
 import Text from "components/text";
@@ -162,38 +162,38 @@ class CardCommandBar extends React.PureComponent<ICardCommandBarProps> {
 
 const styles = StyleSheet.create({
     avatar: {
-        marginRight: Gap.single,
+        marginRight: gap.single,
     },
     body: {
-        paddingBottom: Gap.single,
-        paddingLeft: Gap.single,
-        paddingRight: Gap.single,
+        paddingBottom: gap.single,
+        paddingLeft: gap.single,
+        paddingRight: gap.single,
     },
     commandBar: {
-        paddingLeft: Gap.single,
+        paddingLeft: gap.single,
     },
     container: {
-        ...CardStyle,
+        ...cardStyle,
     },
     header: {
         alignItems: "center",
         flexDirection: "row",
-        minHeight: TouchableStyle.minHeight,
-        paddingBottom: Gap.single,
-        paddingLeft: Gap.single,
-        paddingRight: Gap.single,
-        paddingTop: Gap.single,
+        minHeight: touchableStyle.minHeight,
+        paddingBottom: gap.single,
+        paddingLeft: gap.single,
+        paddingRight: gap.single,
+        paddingTop: gap.single,
     },
     headerPrimary: {
         borderBottomWidth: 1,
-        borderColor: ShadeColor.light2,
-        marginLeft: Gap.single,
-        marginRight: Gap.single,
+        borderColor: shadeColor.light2,
+        marginLeft: gap.single,
+        marginRight: gap.single,
         paddingLeft: 0,
         paddingRight: 0,
     },
     icon: {
-        paddingRight: Gap.single,
+        paddingRight: gap.single,
     },
     title: {
         flex: 1,

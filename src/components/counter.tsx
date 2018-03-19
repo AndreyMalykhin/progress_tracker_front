@@ -1,6 +1,6 @@
 import AnimatedNumber from "components/animated-number";
 import { ICommandBarItem } from "components/command-bar";
-import { Gap, TouchableStyle } from "components/common-styles";
+import { gap, touchableStyle } from "components/common-styles";
 import Text from "components/text";
 import Trackable from "components/trackable";
 import { BodyText, CalloutText } from "components/typography";
@@ -66,7 +66,7 @@ class Counter extends React.PureComponent<ICounterProps> {
 
 const styles = StyleSheet.create({
     progress: {
-        paddingBottom: Gap.single,
+        paddingBottom: gap.single,
         textAlign: "center",
     },
 });

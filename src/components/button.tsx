@@ -1,11 +1,11 @@
 import {
-    BorderRadius,
-    Color,
-    FontWeightStyle,
-    Gap,
-    SeverityColor,
-    StateColor,
-    TouchableStyle,
+    borderRadius,
+    color,
+    fontWeightStyle,
+    gap,
+    severityColor,
+    stateColor,
+    touchableStyle,
 } from "components/common-styles";
 import { IIconProps } from "components/icon";
 import Loader from "components/loader";
@@ -124,22 +124,22 @@ class ButtonIcon extends React.PureComponent<IButtonIconProps> {
     }
 }
 
-const minHeight = TouchableStyle.minHeight;
+const minHeight = touchableStyle.minHeight;
 const styles = StyleSheet.create({
     container: {
         alignItems: "center",
         justifyContent: "center",
         minHeight,
-        minWidth: TouchableStyle.minWidth,
+        minWidth: touchableStyle.minWidth,
     },
     containerRaised: {
-        backgroundColor: TouchableStyle.color,
+        backgroundColor: touchableStyle.color,
         borderRadius: minHeight / 2,
-        paddingLeft: Gap.double,
-        paddingRight: Gap.double,
+        paddingLeft: gap.double,
+        paddingRight: gap.double,
     },
     containerRaisedDisabled: {
-        backgroundColor: StateColor.disabled,
+        backgroundColor: stateColor.disabled,
     },
     content: {
         alignItems: "center",
@@ -149,24 +149,24 @@ const styles = StyleSheet.create({
         lineHeight: minHeight,
     },
     iconRaised: {
-        color: Color.white,
+        color: color.white,
     },
     textContainerVertical: {
         flexDirection: "column",
     },
     title: {
         lineHeight: minHeight,
-        paddingLeft: Gap.single,
-        paddingRight: Gap.single,
+        paddingLeft: gap.single,
+        paddingRight: gap.single,
     },
     titlePrimary: {
-        ...FontWeightStyle.bold,
+        ...fontWeightStyle.bold,
     },
     titleRaised: {
-        color: Color.white,
+        color: color.white,
     },
     titleRaisedDisabled: {
-        color: Color.white,
+        color: color.white,
     },
 });
 

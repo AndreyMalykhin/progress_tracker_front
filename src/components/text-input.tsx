@@ -1,12 +1,12 @@
 import Button, { ButtonIcon } from "components/button";
 import {
-    Gap,
+    gap,
     rem,
-    SeverityColor,
-    ShadeColor,
-    StateColor,
-    TouchableStyle,
-    TypographyStyle,
+    severityColor,
+    shadeColor,
+    stateColor,
+    touchableStyle,
+    typographyStyle,
 } from "components/common-styles";
 import Icon from "components/icon";
 import * as React from "react";
@@ -85,27 +85,27 @@ const styles = StyleSheet.create({
     container: {
         alignItems: "center",
         borderBottomWidth: 1,
-        borderColor: ShadeColor.dark,
+        borderColor: shadeColor.dark,
         flexDirection: "row",
     },
     containerBorderless: {
         borderColor: "transparent",
     },
     containerDisabled: {
-        borderColor: StateColor.disabled,
+        borderColor: stateColor.disabled,
     },
     containerInvalid: {
-        borderColor: SeverityColor.danger,
+        borderColor: severityColor.danger,
     },
     control: {
-        ...TypographyStyle.body,
+        ...typographyStyle.body,
         borderBottomWidth: 0,
         flex: 1,
-        height: TouchableStyle.minHeight,
+        height: touchableStyle.minHeight,
         marginTop: rem(0.4),
     },
     controlDisabled: {
-        color: StateColor.disabled,
+        color: stateColor.disabled,
     },
 });
 

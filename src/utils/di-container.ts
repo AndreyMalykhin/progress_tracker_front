@@ -9,7 +9,7 @@ import makeStateResolver from "resolvers/make-state-resolver";
 import IStateResolver from "resolvers/state-resolver";
 import AudioManager from "utils/audio-manager";
 import { IEnvConfig, makeEnvConfig } from "utils/env-config";
-import { makeErrorLink } from "utils/error-link";
+import ErrorLink from "utils/error-link";
 import InMemoryCache from "utils/in-memory-cache";
 import makeApollo from "utils/make-apollo";
 import makeCache from "utils/make-cache";
@@ -60,7 +60,7 @@ class DIContainer {
         return this.impl.audioManager;
     }
 
-    public get errorLink(): ApolloLink {
+    public get errorLink(): ErrorLink {
         return this.impl.errorLink;
     }
 
@@ -76,12 +76,12 @@ function makeDIContainer() {
     di.service("networkTracker", NetworkTracker, "apollo", "envConfig");
     di.service("history", MultiStackHistory);
     di.service("uploadLink", UploadLink, "envConfig");
+    di.service("errorLink", ErrorLink);
     di.factory("envConfig", makeEnvConfig);
     di.factory("stateResolver", makeStateResolver);
     di.factory("cacheResolver", (container) => {
         return makeCacheResolver(() => container.apollo);
     });
-    di.serviceFactory("errorLink", makeErrorLink);
     di.serviceFactory("cache", makeCache, "stateResolver", "cacheResolver");
     di.serviceFactory(
         "apollo",

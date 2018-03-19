@@ -1,6 +1,6 @@
 import { human, systemWeights } from "react-native-typography";
 
-const Color = {
+const color = {
     black: "#212121",
     blue: "#2196f3",
     blueGray: "#78909c", // 400
@@ -31,38 +31,39 @@ const Color = {
     yellow: "#ffeb3b",
 };
 
-const ShadeColor = {
-    dark: Color.grayDark,
-    dark2: Color.grayDark2,
-    light: Color.grayLight,
-    light2: Color.grayLight2,
-    normal: Color.gray,
+const shadeColor = {
+    dark: color.grayDark,
+    dark2: color.grayDark2,
+    light: color.grayLight,
+    light2: color.grayLight2,
+    normal: color.gray,
 };
 
-const BrandColor = {
-    primary: Color.red,
+const brandColor = {
+    primary: color.red,
 };
 
-const SeverityColor = {
-    danger: Color.red,
-    danger2: Color.black,
-    info: Color.blue,
+const severityColor = {
+    danger: color.red,
+    danger2: color.black,
+    info: color.blue,
+    success: color.green,
 };
 
-const StateColor = {
-    active: BrandColor.primary,
-    disabled: Color.gray,
-    temporary: ShadeColor.normal,
+const stateColor = {
+    active: brandColor.primary,
+    disabled: color.gray,
+    temporary: shadeColor.normal,
 };
 
 const baseBorderRadius = rem(0.8);
-const BorderRadius = {
+const borderRadius = {
     double: baseBorderRadius * 2,
     single: baseBorderRadius,
 };
 
 const baseGap = rem(0.8);
-const Gap = {
+const gap = {
     double: baseGap * 2,
     half: baseGap / 2,
     quadruple: baseGap * 4,
@@ -70,68 +71,68 @@ const Gap = {
     triple: baseGap * 3,
 };
 
-const FontWeightStyle = {
+const fontWeightStyle = {
     bold: systemWeights.bold,
     regular: systemWeights.regular,
 };
 
-const TypographyStyle = {
-    body: { ...human.bodyObject, color: Color.black },
+const typographyStyle = {
+    body: { ...human.bodyObject, color: color.black },
     bodyLight: human.bodyWhiteObject,
-    callout: { ...human.calloutObject, color: Color.black },
+    callout: { ...human.calloutObject, color: color.black },
     calloutLight: human.calloutWhiteObject,
-    caption1: { ...human.caption1Object, color: Color.black },
+    caption1: { ...human.caption1Object, color: color.black },
     caption1Light: human.caption1WhiteObject,
-    caption2: { ...human.caption2Object, color: Color.black },
+    caption2: { ...human.caption2Object, color: color.black },
     caption2Light: human.caption2WhiteObject,
-    footnote: { ...human.footnoteObject, color: Color.black },
+    footnote: { ...human.footnoteObject, color: color.black },
     footnoteLight: human.footnoteWhiteObject,
-    headline: { ...human.headlineObject, color: Color.black },
+    headline: { ...human.headlineObject, color: color.black },
     headlineLight: human.headlineWhiteObject,
-    largeTitle: { ...human.largeTitleObject, color: Color.black },
+    largeTitle: { ...human.largeTitleObject, color: color.black },
     largeTitleLight: human.largeTitleWhiteObject,
-    subhead: { ...human.subheadObject, color: Color.black },
+    subhead: { ...human.subheadObject, color: color.black },
     subheadLight: human.subheadWhiteObject,
-    title1: { ...human.title1Object, color: Color.black },
+    title1: { ...human.title1Object, color: color.black },
     title1Light: human.title1WhiteObject,
-    title2: { ...human.title2Object, color: Color.black },
+    title2: { ...human.title2Object, color: color.black },
     title2Light: human.title2WhiteObject,
-    title3: { ...human.title3Object, color: Color.black },
+    title3: { ...human.title3Object, color: color.black },
     title3Light: human.title3WhiteObject,
 };
 
-const ListStyle = {
-    backgroundColor: ShadeColor.light2,
+const listStyle = {
+    backgroundColor: shadeColor.light2,
 };
 
-const CardStyle = {
-    backgroundColor: Color.white,
+const cardStyle = {
+    backgroundColor: color.white,
 };
 
-const UserListContentStyle = {
-    paddingLeft: Gap.single,
-    paddingRight: Gap.single,
-    paddingTop: Gap.single,
+const userListContentStyle = {
+    paddingLeft: gap.single,
+    paddingRight: gap.single,
+    paddingTop: gap.single,
 };
 
-const UserListItemStyle = {
-    paddingBottom: Gap.quadruple,
+const userListItemStyle = {
+    paddingBottom: gap.quadruple,
 };
 
-const TouchableStyle = {
-    color: StateColor.active,
+const touchableStyle = {
+    color: stateColor.active,
     minHeight: rem(4.8),
     minWidth: rem(4.8),
 };
 
-const IconStyle = {
-    color: ShadeColor.dark2,
+const iconStyle = {
+    color: shadeColor.dark2,
 };
 
 const smallAvatarSize = 32;
 const mediumAvatarSize = 48;
 const largeAvatarSize = 256;
-const AvatarStyle = {
+const avatarStyle = {
     large: {
         borderRadius: largeAvatarSize / 2,
         height: largeAvatarSize,
@@ -149,13 +150,13 @@ const AvatarStyle = {
     },
 };
 
-const ProgressBarStyle = {
-    color: StateColor.active,
+const progressBarStyle = {
+    color: stateColor.active,
 };
 
-const HeaderStyle = {
-    backgroundColor: ShadeColor.light,
-    borderColor: ShadeColor.normal,
+const headerStyle = {
+    backgroundColor: shadeColor.light,
+    borderColor: shadeColor.normal,
 };
 
 function rem(value: number) {
@@ -164,22 +165,22 @@ function rem(value: number) {
 
 export {
     rem,
-    FontWeightStyle,
-    BorderRadius,
-    TypographyStyle,
-    ShadeColor,
-    BrandColor,
-    Color,
-    SeverityColor,
-    StateColor,
-    Gap,
-    TouchableStyle,
-    IconStyle,
-    AvatarStyle,
-    CardStyle,
-    ListStyle,
-    UserListContentStyle,
-    UserListItemStyle,
-    ProgressBarStyle,
-    HeaderStyle,
+    fontWeightStyle,
+    borderRadius,
+    typographyStyle,
+    shadeColor,
+    brandColor,
+    color,
+    severityColor,
+    stateColor,
+    gap,
+    touchableStyle,
+    iconStyle,
+    avatarStyle,
+    cardStyle,
+    listStyle,
+    userListContentStyle,
+    userListItemStyle,
+    progressBarStyle,
+    headerStyle,
 };

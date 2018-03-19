@@ -25,6 +25,7 @@ enum Type {
     EditTaskResponse = "EditTaskResponse",
     EditUserResponse = "EditUserResponse",
     ExternalGoalReviewedActivity = "ExternalGoalReviewedActivity",
+    FriendConnection = "FriendConnection",
     GoalAchievedActivity = "GoalAchievedActivity",
     GoalApprovedActivity = "GoalApprovedActivity",
     GoalExpiredActivity = "GoalExpiredActivity",

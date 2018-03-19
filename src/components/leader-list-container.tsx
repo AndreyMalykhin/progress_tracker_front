@@ -35,6 +35,7 @@ import { compose, QueryProps } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import defaultErrorPolicy from "utils/default-error-policy";
 import routes from "utils/routes";
 
 interface ILeaderListContainerProps extends
@@ -85,6 +86,7 @@ const withData = graphql<
     {
         options: (ownProps) => {
             return {
+                errorPolicy: defaultErrorPolicy,
                 fetchPolicy: ownProps.fetchPolicy,
                 notifyOnNetworkStatusChange: true,
             };
@@ -153,7 +155,7 @@ export default compose(
         isReadonlyData: () => true,
     }),
     withEmptyList<ILeaderListContainerProps>(
-        EmptyList, (props) => props.data.getLeaders.edges),
+        EmptyList, (props) => props.data.getLeaders),
     withLoadMore<ILeaderListContainerProps, IGetDataResponse>({
         dataField: "getLeaders",
         getQuery: (props) => props.data,

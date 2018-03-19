@@ -1,13 +1,16 @@
 import * as React from "react";
+import { IConnection } from "utils/connection";
 
 function withEmptyList<P>(
-    emptyList: React.ComponentType, getList: (props: P) => any[],
+    emptyList: React.ComponentType,
+    getList: (props: P) => IConnection<any, any>,
 ) {
     return (component: React.ComponentType<P>) => {
         class WithEmptyList extends React.Component<P> {
             public render() {
-                const Component =
-                    getList(this.props).length ? component : emptyList;
+                const connection = getList(this.props);
+                const Component = connection && connection.edges.length ?
+                    component : emptyList;
                 return <Component {...this.props} />;
             }
         }

@@ -11,10 +11,10 @@ import defaultId from "utils/default-id";
 import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
 
-interface IContext {
+interface IOfflineLinkOperationContext {
+    enqueue?: boolean;
     isOfflineOperation?: boolean;
     optimisticResponse?: object;
-    cache: DataProxy;
 }
 
 interface IOfflineOperation {
@@ -90,15 +90,16 @@ class OfflineLink extends ApolloLink {
     }
 
     public request(operation: Operation, forward?: NextLink) {
-        const { optimisticResponse, cache, isOfflineOperation } =
-            operation.getContext() as IContext;
+        const { optimisticResponse, isOfflineOperation, enqueue } =
+            operation.getContext() as IOfflineLinkOperationContext;
 
-        if (!isOfflineOperation
-            && optimisticResponse
-            && this.apollo
-            && (this.isOnline === false
-                || this.isDraining
-                || isAnonymous(this.session))
+        if (enqueue
+            || (!isOfflineOperation
+                && optimisticResponse
+                && this.apollo
+                && (this.isOnline === false
+                    || this.isDraining
+                    || isAnonymous(this.session)))
         ) {
             InteractionManager.runAfterInteractions(
                 () => this.enqueue(operation));
@@ -108,7 +109,7 @@ class OfflineLink extends ApolloLink {
         return forward!(operation);
     }
 
-    public setApollo(apollo: ApolloClient<NormalizedCacheObject>) {
+    public start(apollo: ApolloClient<NormalizedCacheObject>) {
         this.apollo = apollo;
         this.listenNetworkAndSession();
     }
@@ -215,7 +216,7 @@ class OfflineLink extends ApolloLink {
 
             const apolloError: ApolloError = e;
             const networkError: any = apolloError.networkError;
-            const status = networkError
+            const status: number | undefined = networkError
                 && networkError.response
                 && networkError.response.status;
 
@@ -259,4 +260,5 @@ class OfflineLink extends ApolloLink {
     }
 }
 
+export { IOfflineLinkOperationContext };
 export default OfflineLink;

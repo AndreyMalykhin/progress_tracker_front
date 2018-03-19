@@ -36,6 +36,7 @@ class NetworkTracker {
     private isOnline?: boolean;
     private isPinging = false;
     private envConfig: IEnvConfig;
+    private timerId?: NodeJS.Timer;
 
     public constructor(
         apollo: ApolloClient<NormalizedCacheObject>, envConfig: IEnvConfig,
@@ -45,28 +46,32 @@ class NetworkTracker {
     }
 
     public async start() {
-        this.isOnline = false;
-
-        try {
-            this.isOnline = await isConnected();
-        } catch (e) {
-            log.trace("start(); error=%o", e);
-        }
-
+        this.isOnline = true;
         this.ensureCorrectStatusInStore();
-        setInterval(this.ping, this.envConfig.pingPeriod);
-        /* NetInfo.isConnected.addEventListener(
-            "connectionChange", this.onConnectionChange); */
     }
 
-    /* private onConnectionChange = (isOnline: boolean) => {
+    public setOnline(isOnline: boolean) {
         if (this.isOnline === isOnline) {
             return;
         }
 
         this.isOnline = isOnline;
         this.saveStatus();
-    } */
+
+        if (isOnline) {
+            this.stopPinging();
+        } else {
+            this.startPinging();
+        }
+    }
+
+    private startPinging() {
+        this.timerId = setInterval(this.ping, this.envConfig.pingPeriod);
+    }
+
+    private stopPinging() {
+        clearInterval(this.timerId!);
+    }
 
     private ensureCorrectStatusInStore() {
         this.apollo.watchQuery<IGetOfflineStatusResponse>({
@@ -79,8 +84,8 @@ class NetworkTracker {
     }
 
     private saveStatus() {
+        log.trace("saveStatus(); isOnline=%o", this.isOnline);
         InteractionManager.runAfterInteractions(() => {
-            log.trace("saveStatus(); isOnline=%o", this.isOnline);
             this.apollo.writeFragment({
                 data: { __typename: Type.Offline, isOnline: this.isOnline },
                 fragment: offlineFragment,
@@ -95,14 +100,21 @@ class NetworkTracker {
         }
 
         this.isPinging = true;
-        const isOnline = await ping();
-
-        if (this.isOnline !== isOnline) {
-            this.isOnline = isOnline;
-            this.saveStatus();
-        }
-
+        const isOnline = await this.doPing();
+        this.setOnline(isOnline);
         this.isPinging = false;
+    }
+
+    private async doPing() {
+        try {
+            const response = await fetch(this.envConfig.serverUrl,
+                { method: "HEAD", cache: "no-cache" });
+            log.trace("doPing(); status=%o", response.status);
+            return true;
+        } catch (e) {
+            log.trace("doPing(); error=%o", e.message);
+            return false;
+        }
     }
 }
 
@@ -120,18 +132,6 @@ function isConnected(): Promise<boolean> {
     }
 
     return NetInfo.isConnected.fetch();
-}
-
-async function ping() {
-    try {
-        const response = await fetch(
-            "https://google.com", { method: "HEAD", cache: "no-cache" });
-        log.trace("ping(); status=%o", response.status);
-        return true;
-    } catch (e) {
-        log.trace("ping(); error=%o", e.message);
-        return false;
-    }
 }
 
 export default NetworkTracker;

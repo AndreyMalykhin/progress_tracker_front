@@ -1,11 +1,11 @@
 import Aggregate from "components/aggregate";
 import { ICommandBarItem } from "components/command-bar";
 import {
-    CardStyle,
-    Color,
-    Gap,
-    ShadeColor,
-    StateColor,
+    cardStyle,
+    color,
+    gap,
+    shadeColor,
+    stateColor,
 } from "components/common-styles";
 import Counter from "components/counter";
 import EmptyList from "components/empty-list";
@@ -205,12 +205,6 @@ class ActiveTrackableList extends
             onGetDraggedItemId,
             onRefresh,
         } = this.props;
-        if (!items.length) {
-            return (
-                <EmptyList isRefreshing={isRefreshing} onRefresh={onRefresh} />
-            );
-        }
-
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         const numericalEntryPopup = isNumericalEntryPopupOpen && (
             <NumericalEntryPopupContainer
@@ -633,7 +627,7 @@ const styles = StyleSheet.create({
     list: {},
     listContent: {},
     reorderablePlaceholder: {
-        backgroundColor: Color.white,
+        backgroundColor: color.white,
         opacity: 0.5,
     },
 });

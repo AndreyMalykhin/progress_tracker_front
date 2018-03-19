@@ -1,10 +1,10 @@
-import { Color, StateColor } from "components/common-styles";
+import { color, stateColor } from "components/common-styles";
 import Loader, { ILoaderProps } from "components/loader";
 import * as React from "react";
 import { StyleSheet } from "react-native";
 import ImageImpl, { IImageProps } from "react-native-image-progress";
 
-const indicatorProps: ILoaderProps = { size: "small", color: Color.white };
+const indicatorProps: ILoaderProps = { size: "small", color: color.white };
 
 class Image extends React.Component<IImageProps> {
     public render() {
@@ -22,7 +22,7 @@ class Image extends React.Component<IImageProps> {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: StateColor.temporary,
+        backgroundColor: stateColor.temporary,
         overflow: "hidden",
     },
 });

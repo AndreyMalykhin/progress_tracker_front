@@ -1,4 +1,4 @@
-import { Color, ListStyle } from "components/common-styles";
+import { color, listStyle } from "components/common-styles";
 import { INavBarItem } from "components/nav-bar";
 import ProfileNav from "components/profile-nav";
 import StackingSwitch from "components/stacking-switch";
@@ -45,11 +45,11 @@ class ProfileSection extends React.Component<IProfileSectionProps> {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: Color.white,
+        backgroundColor: color.white,
         flex: 1,
     },
     content: {
-        backgroundColor: ListStyle.backgroundColor,
+        backgroundColor: listStyle.backgroundColor,
         flex: 1,
     },
 });

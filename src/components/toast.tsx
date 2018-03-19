@@ -1,12 +1,12 @@
 import AnimatableView from "components/animatable-view";
 import {
-    BorderRadius,
-    Color,
-    Gap,
+    borderRadius,
+    color,
+    gap,
     rem,
-    SeverityColor,
-    ShadeColor,
-    TouchableStyle,
+    severityColor,
+    shadeColor,
+    touchableStyle,
 } from "components/common-styles";
 import Text from "components/text";
 import { BodyText } from "components/typography";
@@ -24,6 +24,7 @@ interface IToastProps {
 enum ToastSeverity {
     Info = "Info",
     Danger = "Danger",
+    Success = "Success",
 }
 
 Animatable.initializeRegistryWithDefinitions({
@@ -80,22 +81,25 @@ class Toast extends React.Component<IToastProps> {
 const styles = StyleSheet.create({
     container: {
         alignItems: "center",
-        borderRadius: BorderRadius.single,
-        marginBottom: Gap.single,
-        marginLeft: Gap.single,
-        marginRight: Gap.single,
-        marginTop: Gap.single,
+        borderRadius: borderRadius.single,
+        marginBottom: gap.single,
+        marginLeft: gap.single,
+        marginRight: gap.single,
+        marginTop: gap.single,
         minWidth: rem(25.6),
-        paddingBottom: Gap.double,
-        paddingLeft: Gap.double,
-        paddingRight: Gap.double,
-        paddingTop: Gap.double,
+        paddingBottom: gap.double,
+        paddingLeft: gap.double,
+        paddingRight: gap.double,
+        paddingTop: gap.double,
     },
     containerDangerous: {
-        backgroundColor: SeverityColor.danger2,
+        backgroundColor: severityColor.danger2,
     },
     containerInformational: {
-        backgroundColor: SeverityColor.info,
+        backgroundColor: severityColor.info,
+    },
+    containerSuccessful: {
+        backgroundColor: severityColor.success,
     },
     msg: {},
 });
@@ -103,6 +107,7 @@ const styles = StyleSheet.create({
 const severityToStyleMap = {
     [ToastSeverity.Danger]: styles.containerDangerous,
     [ToastSeverity.Info]: styles.containerInformational,
+    [ToastSeverity.Success]: styles.containerSuccessful,
 };
 
 export { ToastSeverity };

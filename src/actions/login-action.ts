@@ -39,8 +39,8 @@ mutation LoginMutation($facebookAccessToken: String!) {
 }`;
 
 async function login(
-    mutate: MutationFunc<ILoginResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
+    isRefreshingAccessToken?: boolean,
 ) {
     let result: LoginResult;
     LoginManager.logOut();
@@ -58,12 +58,14 @@ async function login(
     }
 
     const facebookAccessToken = await AccessToken.getCurrentAccessToken();
-    const response = await mutate({
+    const response = await apollo.mutate({
+        fetchPolicy: "no-cache",
+        mutation: loginQuery,
         variables: { facebookAccessToken: facebookAccessToken!.accessToken },
     });
-    const { user, accessToken, isNewUser } = response.data.login;
+    const { user, accessToken, isNewUser } = response!.data!.login;
 
-    if (!isNewUser) {
+    if (!isNewUser && !isRefreshingAccessToken) {
         try {
             await apollo.resetStore();
         } catch (e) {

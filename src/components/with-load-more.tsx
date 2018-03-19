@@ -3,6 +3,7 @@ import { throttle } from "lodash";
 import * as React from "react";
 import { QueryProps } from "react-apollo/types";
 import { IConnection } from "utils/connection";
+import makeLog from "utils/make-log";
 import { isLoading } from "utils/query-status";
 
 interface IWithLoadMoreProps {
@@ -18,6 +19,8 @@ interface IOptions<TProps, TData> {
     getQuery: (props: TProps) => QueryProps & TData;
 }
 
+const log = makeLog("with-load-more");
+
 function withLoadMore<
     TProps extends IWithLoadMoreProps & IWithNetworkStatusProps,
     TData extends IData
@@ -30,7 +33,8 @@ function withLoadMore<
         class WithLoadMore extends React.Component<TProps> {
             public constructor(props: TProps, context: any) {
                 super(props, context);
-                this.onLoadMore = throttle(this.onLoadMore, 1024);
+                this.onLoadMore =
+                    throttle(this.onLoadMore, 1024, { trailing: false });
             }
 
             public render() {
@@ -62,7 +66,14 @@ function withLoadMore<
             }
 
             private updateQuery(previousResult: TData, updateOptions: any) {
-                const fetchMoreResult: TData = updateOptions.fetchMoreResult;
+                const fetchMoreResult: TData | undefined =
+                    updateOptions.fetchMoreResult;
+
+                if (!fetchMoreResult) {
+                    log.trace("updateQuery(); no result");
+                    return previousResult;
+                }
+
                 const { edges, pageInfo } =
                     fetchMoreResult![dataField] as IConnection<any, any>;
 

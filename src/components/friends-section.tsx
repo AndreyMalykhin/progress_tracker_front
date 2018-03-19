@@ -1,4 +1,4 @@
-import { ListStyle } from "components/common-styles";
+import { listStyle } from "components/common-styles";
 import FriendListContainer from "components/friend-list-container";
 import * as React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -15,7 +15,7 @@ class FriendsSection extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: ListStyle.backgroundColor,
+        backgroundColor: listStyle.backgroundColor,
         flex: 1,
     },
 });

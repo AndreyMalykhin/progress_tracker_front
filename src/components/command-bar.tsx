@@ -1,6 +1,6 @@
 import ActionSheet from "components/action-sheet";
 import Button, { ButtonIcon } from "components/button";
-import { IconStyle } from "components/common-styles";
+import { iconStyle } from "components/common-styles";
 import Icon from "components/icon";
 import * as React from "react";
 import { InjectedIntlProps, injectIntl } from "react-intl";

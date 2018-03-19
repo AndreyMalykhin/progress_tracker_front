@@ -2,13 +2,13 @@ import AnimatedNumber, {
     numberAnimationDuration,
 } from "components/animated-number";
 import {
-    BorderRadius,
-    BrandColor,
-    Color,
-    Gap,
-    ProgressBarStyle,
-    ShadeColor,
-    TypographyStyle,
+    borderRadius,
+    brandColor,
+    color,
+    gap,
+    progressBarStyle,
+    shadeColor,
+    typographyStyle,
 } from "components/common-styles";
 import Text from "components/text";
 import { CalloutText } from "components/typography";
@@ -72,9 +72,9 @@ class ProgressBar extends React.PureComponent<
                     progress={normalizedValue}
                     width={width}
                     height={height}
-                    color={ProgressBarStyle.color}
+                    color={progressBarStyle.color}
                     unfilledColor={backgroundColor}
-                    borderRadius={borderRadius}
+                    borderRadius={barBorderRadius}
                     borderWidth={0}
                     useNativeDriver={true}
                 />
@@ -103,15 +103,15 @@ class ProgressBar extends React.PureComponent<
         this.setState({ width: evt.nativeEvent.layout.width })
 }
 
-const height = TypographyStyle.calloutLight.lineHeight!;
-const backgroundColor = ShadeColor.dark;
-const borderRadius = BorderRadius.double;
+const height = typographyStyle.calloutLight.lineHeight!;
+const backgroundColor = shadeColor.dark;
+const barBorderRadius = borderRadius.double;
 
 const styles = StyleSheet.create({
     container: {
         backgroundColor,
-        borderRadius,
-        marginBottom: Gap.single,
+        borderRadius: barBorderRadius,
+        marginBottom: gap.single,
     },
     value: {
         backgroundColor: "transparent",

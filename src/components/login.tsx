@@ -1,5 +1,5 @@
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
-import { Color, Gap } from "components/common-styles";
+import { color, gap } from "components/common-styles";
 import Icon from "components/icon";
 import Text from "components/text";
 import { BodyText, FootnoteText } from "components/typography";
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         flex: 0,
     },
     msg: {
-        paddingBottom: Gap.double,
+        paddingBottom: gap.double,
     },
 });
 

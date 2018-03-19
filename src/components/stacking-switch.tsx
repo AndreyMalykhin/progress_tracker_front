@@ -1,5 +1,5 @@
 import AnimatableView from "components/animatable-view";
-import { Color } from "components/common-styles";
+import { color } from "components/common-styles";
 import { History, Location } from "history";
 import * as PropTypes from "prop-types";
 import * as React from "react";

@@ -11,14 +11,14 @@ import Card, {
 import CheckBox from "components/check-box";
 import { ICommandBarItem } from "components/command-bar";
 import {
-    CardStyle,
-    Color,
-    Gap,
-    IconStyle,
+    cardStyle,
+    color,
+    gap,
+    iconStyle,
     rem,
-    ShadeColor,
-    TouchableStyle,
-    TypographyStyle,
+    shadeColor,
+    touchableStyle,
+    typographyStyle,
 } from "components/common-styles";
 import Icon from "components/icon";
 import Image from "components/image";
@@ -400,7 +400,7 @@ class AchievementDetails extends React.PureComponent<IAchievementDetailsProps> {
 
     private renderItem(
         iconName: IconName,
-        iconStyle: TextStyle,
+        icoStyle: TextStyle,
         value?: number,
         onPress?: () => void,
         isActive?: boolean,
@@ -415,7 +415,7 @@ class AchievementDetails extends React.PureComponent<IAchievementDetailsProps> {
                     <ButtonIcon
                         active={isActive}
                         component={Icon}
-                        style={[styles.achievementDetailsItemIcon, iconStyle]}
+                        style={[styles.achievementDetailsItemIcon, icoStyle]}
                         name={iconName}
                     />
                 </Button>
@@ -497,7 +497,7 @@ class Status extends React.PureComponent<IStatusProps> {
                 <Icon
                     style={styles.statusIcon}
                     name={IconName.Date}
-                    size={TypographyStyle.footnote.lineHeight}
+                    size={typographyStyle.footnote.lineHeight}
                 />
                 <FootnoteText style={styles.statusMsg}>
                     <FormattedMessage id={msgId} values={{ period }} />
@@ -507,7 +507,7 @@ class Status extends React.PureComponent<IStatusProps> {
     }
 }
 
-const trackableMargin = Gap.double;
+const trackableMargin = gap.double;
 
 const styles = StyleSheet.create({
     achievementDetails: {
@@ -519,13 +519,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     achievementDetailsItemIcon: {
-        color: IconStyle.color,
+        color: iconStyle.color,
     },
     achievementDetailsItemIconApproves: {},
     achievementDetailsItemIconRating: {},
     achievementDetailsItemIconRejects: {},
     achievementDetailsItemValue: {
-        lineHeight: TouchableStyle.minHeight,
+        lineHeight: touchableStyle.minHeight,
     },
     card: {
         flex: 1,
@@ -535,19 +535,19 @@ const styles = StyleSheet.create({
     },
     cardBodyNested: {
         borderBottomWidth: 1,
-        borderColor: ShadeColor.light2,
-        marginLeft: Gap.single,
-        marginRight: Gap.single,
+        borderColor: shadeColor.light2,
+        marginLeft: gap.single,
+        marginRight: gap.single,
         paddingLeft: 0,
         paddingRight: 0,
     },
     checkBox: {
         alignSelf: "flex-start",
-        paddingLeft: Gap.single,
-        paddingTop: Gap.single,
+        paddingLeft: gap.single,
+        paddingTop: gap.single,
     },
     container: {
-        backgroundColor: CardStyle.backgroundColor,
+        backgroundColor: cardStyle.backgroundColor,
         flexDirection: "row",
         marginBottom: trackableMargin,
     },
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     },
     proofPhoto: {
         height: 256,
-        marginBottom: Gap.single,
+        marginBottom: gap.single,
     },
     proveBtn: {
         alignSelf: "center",
@@ -574,14 +574,14 @@ const styles = StyleSheet.create({
     status: {
         alignItems: "flex-start",
         flexDirection: "row",
-        paddingTop: Gap.single,
+        paddingTop: gap.single,
     },
     statusIcon: {
-        color: Color.grayDark,
-        marginRight: Gap.single,
+        color: color.grayDark,
+        marginRight: gap.single,
     },
     statusMsg: {
-        color: Color.grayDark,
+        color: color.grayDark,
     },
 });
 

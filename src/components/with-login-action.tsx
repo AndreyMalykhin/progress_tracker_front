@@ -22,12 +22,12 @@ function withLoginAction<P>(
     >(
         loginQuery,
         {
-            props: ({ ownProps, mutate }) => {
+            props: ({ ownProps }) => {
                 const { client, diContainer } = ownProps;
                 return {
                     onLogin: async () => {
                         try {
-                            return await login(mutate!, client);
+                            return await login(client);
                         } catch (e) {
                             if (!isApolloError(e)) {
                                 addGenericErrorToast(client);

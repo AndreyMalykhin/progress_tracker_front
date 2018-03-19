@@ -1,12 +1,12 @@
 import Avatar from "components/avatar";
 import {
-    CardStyle,
-    Color,
-    FontWeightStyle,
-    Gap,
-    ProgressBarStyle,
+    cardStyle,
+    color,
+    fontWeightStyle,
+    gap,
+    progressBarStyle,
     rem,
-    TouchableStyle,
+    touchableStyle,
 } from "components/common-styles";
 import FadeIn from "components/fade-in";
 import Icon from "components/icon";
@@ -257,7 +257,7 @@ class ActivityList extends React.PureComponent<IActivityListProps> {
             this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
-            <FadeIn>
+            <FadeIn style={styles.container}>
                 <SectionList
                     windowSize={12}
                     initialNumToRender={10}
@@ -815,23 +815,23 @@ class Activity extends React.Component<IActivityProps> {
     private onPressUser = () => this.props.onPressUser(this.props.userId!);
 }
 
-const approveColor = Color.green;
-const rejectColor = Color.black;
+const approveColor = color.green;
+const rejectColor = color.black;
 
 const styles = StyleSheet.create({
     activity: {
         alignItems: "flex-start",
         flexDirection: "row",
-        paddingBottom: Gap.double,
-        paddingTop: Gap.double,
+        paddingBottom: gap.double,
+        paddingTop: gap.double,
     },
     activityAvatar: {
-        marginRight: Gap.single,
+        marginRight: gap.single,
     },
     activityFirst: {},
     activityIcon: {
-        color: Color.orange,
-        marginLeft: Gap.single,
+        color: color.orange,
+        marginLeft: gap.single,
     },
     activityMsg: {
         flex: 1,
@@ -842,11 +842,14 @@ const styles = StyleSheet.create({
         paddingTop: rem(0.4),
     },
     activityUserless: {
-        paddingBottom: Gap.single,
-        paddingTop: Gap.single,
+        paddingBottom: gap.single,
+        paddingTop: gap.single,
+    },
+    container: {
+        flex: 1,
     },
     counterProgressChangedIcon: {
-        color: ProgressBarStyle.color,
+        color: progressBarStyle.color,
     },
     externalGoalReviewedIconApproved: {
         color: approveColor,
@@ -855,56 +858,57 @@ const styles = StyleSheet.create({
         color: rejectColor,
     },
     goalAchievedIcon: {
-        color: ProgressBarStyle.color,
+        color: progressBarStyle.color,
     },
     goalApprovedIcon: {
         color: approveColor,
     },
     goalExpiredIcon: {
-        color: Color.grayDark,
+        color: color.grayDark,
     },
     goalRejectedIcon: {
         color: rejectColor,
     },
     gymExerciseEntryAddedIcon: {
-        color: ProgressBarStyle.color,
+        color: progressBarStyle.color,
     },
     list: {
-        backgroundColor: CardStyle.backgroundColor,
+        backgroundColor: cardStyle.backgroundColor,
+        flex: 1,
     },
     listContent: {
-        paddingLeft: Gap.single,
-        paddingRight: Gap.single,
-        paddingTop: Gap.single,
+        paddingLeft: gap.single,
+        paddingRight: gap.single,
+        paddingTop: gap.single,
     },
     number: {
-        ...FontWeightStyle.bold,
+        ...fontWeightStyle.bold,
     },
     numericalGoalProgressChangedIcon: {
-        color: ProgressBarStyle.color,
+        color: progressBarStyle.color,
     },
     sectionHeader: {
-        backgroundColor: CardStyle.backgroundColor,
-        color: Color.gray,
-        paddingBottom: Gap.single,
-        paddingTop: Gap.single,
+        backgroundColor: cardStyle.backgroundColor,
+        color: color.gray,
+        paddingBottom: gap.single,
+        paddingTop: gap.single,
         textAlign: "center",
     },
     taskGoalProgressChangedIcon: {
-        color: ProgressBarStyle.color,
+        color: progressBarStyle.color,
     },
     taskTitle: {
-        ...FontWeightStyle.bold,
+        ...fontWeightStyle.bold,
         textDecorationLine: "line-through",
     },
     trackableAddedIcon: {
-        color: Color.blue,
+        color: color.blue,
     },
     trackableTitle: {
-        ...FontWeightStyle.bold,
+        ...fontWeightStyle.bold,
     },
     userName: {
-        color: Color.grayDark,
+        color: color.grayDark,
     },
 });
 

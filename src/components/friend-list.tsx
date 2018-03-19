@@ -1,14 +1,14 @@
 import Avatar from "components/avatar";
 import Button, { ButtonIcon, ButtonTitle } from "components/button";
 import {
-    AvatarStyle,
-    CardStyle,
-    Gap,
-    IconStyle,
-    SeverityColor,
-    StateColor,
-    UserListContentStyle,
-    UserListItemStyle,
+    avatarStyle,
+    cardStyle,
+    gap,
+    iconStyle,
+    severityColor,
+    stateColor,
+    userListContentStyle,
+    userListItemStyle,
 } from "components/common-styles";
 import FadeIn from "components/fade-in";
 import Icon from "components/icon";
@@ -62,7 +62,7 @@ class FriendList extends React.PureComponent<IFriendListProps> {
             this.props;
         const loader = queryStatus === QueryStatus.LoadingMore ? Loader : null;
         return (
-            <FadeIn>
+            <FadeIn style={styles.container}>
                 <FlatList
                     windowSize={12}
                     initialNumToRender={8}
@@ -139,30 +139,34 @@ class Item extends React.PureComponent<IItemProps> {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     item: {
-        ...UserListItemStyle,
+        ...userListItemStyle,
         alignItems: "center",
         flexDirection: "row",
     },
     itemMuteBtn: {
-        paddingLeft: Gap.single,
+        paddingLeft: gap.single,
     },
     itemUser: {
         flex: 1,
         flexDirection: "row",
     },
     itemUserAvatar: {
-        marginRight: Gap.single,
+        marginRight: gap.single,
     },
     itemUserName: {
         flex: 1,
-        lineHeight: AvatarStyle.medium.height,
+        lineHeight: avatarStyle.medium.height,
     },
     list: {
-        backgroundColor: CardStyle.backgroundColor,
+        backgroundColor: cardStyle.backgroundColor,
+        flex: 1,
     },
     listContent: {
-        ...UserListContentStyle,
+        ...userListContentStyle,
     },
 });
 

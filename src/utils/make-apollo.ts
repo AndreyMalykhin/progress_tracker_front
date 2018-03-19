@@ -14,6 +14,7 @@ import { AsyncStorage } from "react-native";
 import IStateResolver from "resolvers/state-resolver";
 import authLink from "utils/auth-link";
 import { IEnvConfig } from "utils/env-config";
+import ErrorLink from "utils/error-link";
 import InMemoryCache from "utils/in-memory-cache";
 import makeLog from "utils/make-log";
 import OfflineLink from "utils/offline-link";
@@ -25,7 +26,7 @@ function makeApollo(
     cache: ApolloCache<any>,
     stateResolver: IStateResolver,
     envConfig: IEnvConfig,
-    errorLink: ApolloLink,
+    errorLink: ErrorLink,
     uploadLink: UploadLink,
 ) {
     const offlineLink = new OfflineLink(envConfig);
@@ -46,7 +47,7 @@ function makeApollo(
 
     const apollo = new ApolloClient<NormalizedCacheObject>(
         { cache, link: ApolloLink.from(links) });
-    offlineLink.setApollo(apollo);
+    offlineLink.start(apollo);
     return apollo;
 }
 

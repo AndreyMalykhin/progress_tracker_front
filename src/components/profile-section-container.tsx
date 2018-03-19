@@ -50,6 +50,7 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { InjectedIntlProps, injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
+import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import { NumberFormat } from "utils/formats";
 import IconName from "utils/icon-name";
@@ -162,6 +163,7 @@ const withRemoteData =
                 }
 
                 return {
+                    errorPolicy: defaultErrorPolicy,
                     fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                     variables: { userId },

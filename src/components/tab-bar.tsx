@@ -1,8 +1,8 @@
 import {
-    Color,
-    Gap,
-    StateColor,
-    TouchableStyle,
+    color,
+    gap,
+    stateColor,
+    touchableStyle,
 } from "components/common-styles";
 import { IIconProps } from "components/icon";
 import Text from "components/text";
@@ -113,13 +113,13 @@ class TabBarItemIcon extends React.PureComponent<ITabBarItemIconProps> {
 const styles = StyleSheet.create({
     container: {
         alignItems: "center",
-        backgroundColor: Color.white,
+        backgroundColor: color.white,
         flexDirection: "row",
         justifyContent: "space-around",
     },
     item: {
         flex: 1,
-        minHeight: TouchableStyle.minHeight,
+        minHeight: touchableStyle.minHeight,
     },
     itemContent: {
         alignItems: "center",

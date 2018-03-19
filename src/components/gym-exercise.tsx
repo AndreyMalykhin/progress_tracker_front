@@ -1,8 +1,8 @@
 import { ICommandBarItem } from "components/command-bar";
 import {
-    FontWeightStyle,
-    Gap,
-    TypographyStyle,
+    fontWeightStyle,
+    gap,
+    typographyStyle,
 } from "components/common-styles";
 import Text from "components/text";
 import Trackable from "components/trackable";
@@ -179,15 +179,15 @@ class Table extends React.PureComponent<ITableProps> {
 
 const styles = StyleSheet.create({
     table: {
-        paddingBottom: Gap.single,
-        paddingTop: Gap.single,
+        paddingBottom: gap.single,
+        paddingTop: gap.single,
     },
     tableBody: {
         flexDirection: "row",
     },
     tableCell: {
-        paddingLeft: Gap.half,
-        paddingRight: Gap.half,
+        paddingLeft: gap.half,
+        paddingRight: gap.half,
         textAlign: "center",
     },
     tableCellHeader: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     },
     tableHeader: {
         flexDirection: "row",
-        paddingBottom: Gap.single,
+        paddingBottom: gap.single,
     },
 });
 

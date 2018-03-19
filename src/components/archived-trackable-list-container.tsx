@@ -33,6 +33,7 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { IConnection } from "utils/connection";
+import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import isMyId from "utils/is-my-id";
 import QueryStatus, { isLoading } from "utils/query-status";
@@ -112,6 +113,7 @@ const withData = graphql<
             }
 
             return {
+                errorPolicy: defaultErrorPolicy,
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: {
@@ -186,7 +188,7 @@ export default compose(
         isReadonlyData: (props) => false,
     }),
     withEmptyList<IArchivedTrackableListContainerProps>(
-        EmptyList, (props) => props.data.getArchivedTrackables.edges),
+        EmptyList, (props) => props.data.getArchivedTrackables),
     withLoadMore<IArchivedTrackableListContainerProps, IGetDataResponse>({
         dataField: "getArchivedTrackables",
         getQuery: (props) => props.data,

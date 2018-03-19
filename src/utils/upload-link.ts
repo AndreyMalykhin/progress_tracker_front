@@ -4,6 +4,7 @@ import { uploadAvatarOperationName } from "actions/upload-avatar-action";
 import { DataProxy } from "apollo-cache";
 import { ApolloError } from "apollo-client";
 import { ApolloLink, NextLink, Observable, Operation } from "apollo-link";
+import { parseAndCheckHttpResponse } from "apollo-link-http-common";
 import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
 
@@ -23,17 +24,23 @@ class UploadLink extends ApolloLink {
 
         if (operationName === uploadAssetOperationName) {
             const { filePath, mimeType } = operation.variables;
-            return this.uploadFile(filePath, mimeType, "/assets", apollo);
+            return this.uploadFile(
+                filePath, mimeType, "/assets", operation, apollo);
         } else if (operation.operationName === uploadAvatarOperationName) {
             const { filePath, mimeType } = operation.variables;
-            return this.uploadFile(filePath, mimeType, "/avatars", apollo);
+            return this.uploadFile(
+                filePath, mimeType, "/avatars", operation, apollo);
         }
 
         return forward!(operation);
     }
 
     private uploadFile(
-        filePath: string, mimeType: string, endpoint: string, apollo: DataProxy,
+        filePath: string,
+        mimeType: string,
+        endpoint: string,
+        operation: Operation,
+        apollo: DataProxy,
     ) {
         return new Observable((observer) => {
             const body = new FormData();
@@ -43,32 +50,29 @@ class UploadLink extends ApolloLink {
                 uri: filePath,
             } as any);
             const { accessToken } = getSession(apollo);
-            let response: Response;
-
             fetch(this.envConfig.serverUrl + endpoint, {
                 body,
                 headers: { Authorization: "Bearer " + accessToken },
                 method: "POST",
-            }).then((res) => {
-                response = res;
-                return response.json();
             })
+            .then((res) => {
+                operation.setContext({ res });
+                return res;
+            })
+            .then(parseAndCheckHttpResponse(operation))
             .then((responseData) => {
-                if (!response.ok) {
-                    const networkError: any =
-                        new Error("Bad http status: " + response.status);
-                    networkError.response = response;
-                    observer.error(new ApolloError(
-                        { networkError, graphQLErrors: responseData.errors }));
-                    return;
-                }
-
                 observer.next(responseData);
                 observer.complete();
+                return responseData;
             })
-            .catch((networkError) => {
-                networkError.response = response;
-                observer.error(new ApolloError({ networkError }));
+            .catch((error) => {
+                const { result } = error;
+
+                if (result && result.errors && result.data) {
+                    observer.next(result);
+                }
+
+                observer.error(error);
             });
         });
     }

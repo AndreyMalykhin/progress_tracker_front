@@ -1,4 +1,4 @@
-import { Gap, TouchableStyle } from "components/common-styles";
+import { gap, touchableStyle } from "components/common-styles";
 import * as React from "react";
 import {
     ActivityIndicator,

@@ -1,4 +1,4 @@
-import { HeaderStyle, ShadeColor } from "components/common-styles";
+import { headerStyle, shadeColor } from "components/common-styles";
 import Icon from "components/icon";
 import NavBar, { INavBarItem, INavBarItemRenderer } from "components/nav-bar";
 import TabBar, {
@@ -47,8 +47,8 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: HeaderStyle.backgroundColor,
-        borderColor: HeaderStyle.borderColor,
+        backgroundColor: headerStyle.backgroundColor,
+        borderColor: headerStyle.borderColor,
         borderTopWidth: 1,
     },
 });

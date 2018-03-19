@@ -104,7 +104,7 @@ export default {
     "leadersNavigation.global": "Global",
     "login.skip": "Skip",
     "login.skipMsg":
-        "Many features are not available without login",
+        "To experience social and cloud features you should be logged in",
     "logout.synchronizationInProgressTitle": "You have data that is not " +
         "synchronized with a server yet, if you logout then this data will be" +
         " lost!",
@@ -121,13 +121,15 @@ export default {
         "Please login to see your friends data",
     "profile.activeTrackables": "In Progress",
     "profile.archive": "Archive",
-    "profileForm.loginMessage": "Please login to edit your profile",
+    "profileForm.loginMsg": "Please login to edit your profile",
     "profileForm.namePlaceholder": "Name",
     "profileForm.title": "Profile",
     "reasons.abuse": "Abuse",
     "reasons.cheating": "Cheating",
     "reasons.other": "Other",
     "reasons.spam": "Spam",
+    "refreshSession.msg":
+        "Your session has expired, please login again to continue.",
     "rejectTrackable.title": "Please select a reason",
     "reportUser.title": "Report user for",
     "reviewsNavigation.friendsTrackables": "Friends",

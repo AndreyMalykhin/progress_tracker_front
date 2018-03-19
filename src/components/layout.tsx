@@ -1,4 +1,4 @@
-import { Color, HeaderStyle } from "components/common-styles";
+import { color, headerStyle } from "components/common-styles";
 import HomePage from "components/home-page";
 import LoginPageContainer from "components/login-page-container";
 import ProfileFormPage from "components/profile-form-page";
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     statusBar: {
-        backgroundColor: HeaderStyle.backgroundColor,
+        backgroundColor: headerStyle.backgroundColor,
         height: Platform.OS === "ios" ? 20 : StatusBar.currentHeight,
     },
 });

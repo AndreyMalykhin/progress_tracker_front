@@ -1,9 +1,11 @@
+import ErrorHandler from "components/error-handler";
 import LayoutContainer from "components/layout-container";
 import Loader from "components/loader";
 import Text from "components/text";
 import { History } from "history";
 import * as React from "react";
 import { IntlProvider } from "react-intl";
+import { StyleSheet, View } from "react-native";
 import { Router } from "react-router";
 import formats from "utils/formats";
 import makeLog from "utils/make-log";
@@ -29,12 +31,21 @@ class App extends React.PureComponent<IAppProps> {
                 formats={formats}
             >
                 <Router history={this.props.history}>
-                    <LayoutContainer />
+                    <View style={styles.content}>
+                        <LayoutContainer />
+                        <ErrorHandler />
+                    </View>
                 </Router>
             </IntlProvider>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    content: {
+        flex: 1,
+    },
+});
 
 export { IAppProps };
 export default App;

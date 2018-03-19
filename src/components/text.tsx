@@ -1,7 +1,7 @@
 import {
-    SeverityColor,
-    StateColor,
-    TypographyStyle,
+    severityColor,
+    stateColor,
+    typographyStyle,
 } from "components/common-styles";
 import * as React from "react";
 import {
@@ -48,13 +48,13 @@ class Text extends React.Component<ITextProps> {
 
 const styles = StyleSheet.create({
     textActive: {
-        color: StateColor.active,
+        color: stateColor.active,
     },
     textDangerous: {
-        color: SeverityColor.danger,
+        color: severityColor.danger,
     },
     textDisabled: {
-        color: StateColor.disabled,
+        color: stateColor.disabled,
     },
 });
 

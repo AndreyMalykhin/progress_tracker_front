@@ -97,7 +97,7 @@ async function addGymExerciseEntry(
     mutate: MutationFunc<IAddGymExerciseEntryResponse>,
 ) {
     const optimisticResponse = getOptimisticResponse(
-        trackableId, repetitionCount, setCount, weight);
+        trackableId, setCount, repetitionCount, weight);
     const result = await mutate({
         optimisticResponse,
         update: (proxy, response) => {

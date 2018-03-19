@@ -4,11 +4,11 @@ import Button, {
     IButtonProps,
 } from "components/button";
 import {
-    FontWeightStyle,
-    Gap,
-    SeverityColor,
-    StateColor,
-    TouchableStyle,
+    fontWeightStyle,
+    gap,
+    severityColor,
+    stateColor,
+    touchableStyle,
 } from "components/common-styles";
 import Icon from "components/icon";
 import Text from "components/text";
@@ -248,22 +248,22 @@ class FormButtonCancel extends React.PureComponent<IFormButtonCancelProps> {
 const styles = StyleSheet.create({
     body: {},
     error: {
-        marginTop: Gap.single,
+        marginTop: gap.single,
     },
     footer: {
         alignItems: "center",
         flexDirection: "row",
         justifyContent: "space-around",
-        paddingBottom: Gap.single,
-        paddingLeft: Gap.single,
-        paddingRight: Gap.single,
-        paddingTop: Gap.single,
+        paddingBottom: gap.single,
+        paddingLeft: gap.single,
+        paddingRight: gap.single,
+        paddingTop: gap.single,
     },
     group: {
-        paddingBottom: Gap.double,
-        paddingLeft: Gap.double,
-        paddingRight: Gap.double,
-        paddingTop: Gap.double,
+        paddingBottom: gap.double,
+        paddingLeft: gap.double,
+        paddingRight: gap.double,
+        paddingTop: gap.double,
     },
     groupContent: {},
     groupContentHorizontal: {
@@ -272,14 +272,14 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     hint: {
-        paddingTop: Gap.single,
+        paddingTop: gap.single,
     },
     label: {
-        ...FontWeightStyle.bold,
+        ...fontWeightStyle.bold,
     },
     sectionTitle: {
-        ...FontWeightStyle.regular,
-        color: TouchableStyle.color,
+        ...fontWeightStyle.regular,
+        color: touchableStyle.color,
     },
 });
 

@@ -47,7 +47,7 @@ class Reorderable extends React.Component<IReorderableProps> {
             onPanResponderRelease: this.onPanResponderRelease,
             onPanResponderTerminate: this.onPanResponderTerminate,
         });
-        this.tryReorder = throttle(this.tryReorder, 256);
+        this.tryReorder = throttle(this.tryReorder, 128, { trailing: false });
     }
 
     public render() {

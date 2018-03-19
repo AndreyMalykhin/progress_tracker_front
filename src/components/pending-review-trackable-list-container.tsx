@@ -69,6 +69,7 @@ import {
 import { Alert, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
 import { IConnection } from "utils/connection";
+import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
@@ -189,6 +190,7 @@ const withData = graphql<
         options: (ownProps) => {
             const { audience, fetchPolicy } = ownProps;
             return {
+                errorPolicy: defaultErrorPolicy,
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: { audience, skipUser: audience === Audience.Me },
@@ -400,7 +402,7 @@ export default compose(
     }),
     withEmptyList<IPendingReviewTrackableListContainerProps>(
         EmptyList,
-        (props) => props.data.getPendingReviewTrackables.edges,
+        (props) => props.data.getPendingReviewTrackables,
     ),
     withApprove,
     withReject,
