@@ -66,7 +66,7 @@ class AppContainer extends React.Component<IAppContainerProps> {
     }
 
     public componentWillMount() {
-        log.trace("componentWillMount()");
+        log.trace("componentWillMount");
     }
 
     public componentDidMount() {

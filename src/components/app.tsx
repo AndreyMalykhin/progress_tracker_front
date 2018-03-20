@@ -21,7 +21,7 @@ const log = makeLog("app");
 
 class App extends React.PureComponent<IAppProps> {
     public render() {
-        log.trace("render()");
+        log.trace("render");
         const { locale, messages } = this.props;
         return (
             <IntlProvider

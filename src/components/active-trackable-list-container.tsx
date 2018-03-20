@@ -587,7 +587,7 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     public componentWillMount() {
-        log.trace("componentWillMount()");
+        log.trace("componentWillMount");
     }
 
     public componentDidMount() {

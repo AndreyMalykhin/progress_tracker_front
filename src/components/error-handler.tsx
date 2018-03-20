@@ -41,7 +41,12 @@ class ErrorHandler extends React.PureComponent<IErrorHandlerProps> {
     }
 
     private onError: ApolloErrorHandler = (error) => {
-        log.error("onError(); error=%o", error);
+        const queryLoc = error.operation.query.loc;
+        log.error(
+            "onError",
+            `Operation failed: ${queryLoc && queryLoc.source.body}`,
+            error,
+        );
         const { networkError, operation, response } = error;
         const { isOfflineOperation, response: httpResponse } =
             operation.getContext() as IOperationContext;
@@ -83,7 +88,7 @@ class ErrorHandler extends React.PureComponent<IErrorHandlerProps> {
     private doRefreshAccessToken =
         async (apollo: ApolloClient<NormalizedCacheObject>,
     ) => {
-        log.trace("refreshAccessToken()");
+        log.trace("doRefreshAccessToken");
         const { formatMessage } = this.props.intl;
         const title = formatMessage({ id: "refreshSession.msg" });
         const msg = undefined;

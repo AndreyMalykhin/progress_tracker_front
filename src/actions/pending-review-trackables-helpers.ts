@@ -94,7 +94,7 @@ function getPendingReviewTrackables(audience: Audience, apollo: DataProxy) {
             variables: { audience },
         })!;
     } catch (e) {
-        log.trace("getPendingReviewTrackables(); no data");
+        log.trace("getPendingReviewTrackables", "no data");
         return null;
     }
 }

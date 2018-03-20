@@ -109,7 +109,7 @@ function updateActivities(response: ISetUserMutedResponse, apollo: DataProxy) {
                     variables: { audience: Audience.Friends },
                 });
         } catch (e) {
-            log.trace("updateActivities(); no friends activities");
+            log.trace("updateActivities", "no friends activities");
             return;
         }
 
@@ -138,7 +138,7 @@ function updateActivities(response: ISetUserMutedResponse, apollo: DataProxy) {
                     variables: { userId },
                 });
         } catch (e) {
-            log.trace("updateActivities(); no muted activities");
+            log.trace("updateActivities", "no muted activities");
             return;
         }
 

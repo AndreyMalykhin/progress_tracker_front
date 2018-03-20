@@ -15,7 +15,6 @@ import { Image } from "react-native-image-crop-picker";
 import dataIdFromObject from "utils/data-id-from-object";
 import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
-import uploadFile from "utils/upload-file";
 
 interface ISetUserAvatarResponse {
     setUserAvatar: {

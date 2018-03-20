@@ -98,7 +98,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
     }> = [];
 
     public render() {
-        log.trace("render()");
+        log.trace("render");
         const { tempShape, tempHistorySize } = this.state;
         const shape = tempShape || this.getShape(this.props);
 
@@ -188,7 +188,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
     }
 
     private async animate() {
-        log.trace("animate(); isAnimating=%o; pendingAnimationCount=%o",
+        log.trace("animate", "isAnimating=%o; pendingAnimationCount=%o",
             this.isAnimating, this.pendingAnimations.length);
 
         if (this.isAnimating || !this.pendingAnimations.length) {
@@ -205,9 +205,9 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
             if (exitAnimation) {
                 this.setState(
                     { tempShape: prevShape, tempHistorySize: prevHistorySize });
-                log.trace("animate(); exit start");
+                log.trace("animate", "exit start");
                 await this.ref[exitAnimation]!();
-                log.trace("animate(); exit end");
+                log.trace("animate", "exit end");
                 this.setState(
                     { tempShape: undefined, tempHistorySize: undefined });
             }
@@ -217,9 +217,9 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
             const { enterAnimation } = this.mapAnimation(nextShape.animation);
 
             if (enterAnimation) {
-                log.trace("animate(); enter start");
+                log.trace("animate", "enter start");
                 await this.ref[enterAnimation]!();
-                log.trace("animate(); enter end");
+                log.trace("animate", "enter end");
             } else {
                 this.ref.stopAnimation();
             }

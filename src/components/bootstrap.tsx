@@ -3,6 +3,7 @@ import en from "messages/en";
 import { addLocaleData } from "react-intl";
 import * as enLocaleData from "react-intl/locale-data/en";
 
+import { getSession } from "actions/session-helpers";
 import { addGenericErrorToast } from "actions/toast-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
@@ -16,7 +17,8 @@ import { merge } from "lodash";
 import DeadlineTracker from "models/deadline-tracker";
 import Type from "models/type";
 import * as React from "react";
-import { getDeviceLocale } from "react-native-device-info";
+import { getBuildNumber, getReadableVersion } from "react-native-device-info";
+import { Sentry } from "react-native-sentry";
 import Reactotron from "reactotron-react-native";
 import IStateResolver from "resolvers/state-resolver";
 import dataIdFromObject from "utils/data-id-from-object";
@@ -41,10 +43,6 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
     private apollo?: ApolloClient<NormalizedCacheObject>;
     private messages: { [locale: string]: { [id: string]: string } } = {};
 
-    public constructor(props: {}, context: any) {
-        super(props, context);
-    }
-
     public render() {
         if (!this.state.isDone) {
             return null;
@@ -64,28 +62,51 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
 
     public async componentWillMount() {
         this.diContainer = makeDIContainer();
-
-        if (this.diContainer.envConfig.isDevEnv) {
-            console.ignoredYellowBox = ["Remote debugger is in"];
-            Reactotron.configure().useReactNative().connect();
-        }
-
+        this.initErrorReporting();
+        this.initDebugging();
         this.initLocalization();
-        const cache = this.diContainer.cache;
-        const stateResolver = this.diContainer.stateResolver;
-        const envConfig = this.diContainer.envConfig;
 
         try {
-            await loadCache(cache, stateResolver, envConfig);
+            await this.initStorage();
         } catch (e) {
             return;
         }
 
+        Sentry.setUserContext(
+            { id: getSession(this.diContainer.apollo).userId });
+        await this.initAudio();
         await this.diContainer.networkTracker.start();
-        this.diContainer.deadlineTracker.start();
+        await this.diContainer.deadlineTracker.start();
+        this.setState({ isDone: true });
+    }
 
+    private initLocalization() {
+        addLocaleData(enLocaleData);
+        this.messages = { en };
+    }
+
+    private initDebugging() {
+        if (this.diContainer!.envConfig.isDevEnv) {
+            console.ignoredYellowBox = ["Remote debugger is in"];
+            Reactotron.configure().useReactNative().connect();
+        }
+    }
+
+    private initErrorReporting() {
+        if (!this.diContainer!.envConfig.sentryDsn) {
+            return;
+        }
+
+        Sentry.config(this.diContainer!.envConfig.sentryDsn).install();
+        Sentry.setRelease(`${getReadableVersion()} / ${getBuildNumber()}`);
+        Sentry.setTagsContext({
+            environment: this.diContainer!.envConfig.env,
+        });
+    }
+
+    private initAudio() {
         try {
-            await this.diContainer.audioManager.loadAll([
+            return this.diContainer!.audioManager.loadAll([
                 Sound.Click,
                 Sound.GoalAchieve,
                 Sound.ProgressChange,
@@ -97,13 +118,13 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
         } catch (e) {
             // no op
         }
-
-        this.setState({ isDone: true });
     }
 
-    private initLocalization() {
-        addLocaleData(enLocaleData);
-        this.messages = { en };
+    private initStorage() {
+        const cache = this.diContainer!.cache;
+        const stateResolver = this.diContainer!.stateResolver;
+        const envConfig = this.diContainer!.envConfig;
+        return loadCache(cache, stateResolver, envConfig);
     }
 }
 

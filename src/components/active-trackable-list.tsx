@@ -184,7 +184,7 @@ class ActiveTrackableList extends
     }
 
     public render() {
-        log.trace("render()");
+        log.trace("render");
         const {
             isNumericalEntryPopupOpen,
             isGymExerciseEntryPopupOpen,

@@ -13,12 +13,11 @@ async function share(
     const shareContent: ShareLinkContent = {
         commonParameters: { hashtag },
         contentType: "link",
-        // TODO
-        contentUrl: "https://itunes.apple.com/us/app/imovie/id377298193?mt=8",
+        contentUrl: "https://completoo.com",
         quote: translator.formatMessage({ id: msgId }, msgValues),
     };
     const canShow = await ShareDialog.canShow(shareContent);
-    log.trace("share(); canShow=%o", canShow);
+    log.trace("share", "canShow=%o", canShow);
 
     if (!canShow) {
         return false;
@@ -29,7 +28,7 @@ async function share(
     try {
         result = await ShareDialog.show(shareContent);
     } catch (e) {
-        log.error("share(); error=%o", e);
+        log.error("share", e);
         throw e;
     }
 

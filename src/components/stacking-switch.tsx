@@ -175,7 +175,7 @@ class StackingSwitch extends
                 newStack = pop(stack);
             }
 
-            log.trace("popLocation(); stackSize=%o", newStack.length);
+            log.trace("popLocation", "stackSize=%o", newStack.length);
             return newStack;
         }
 
@@ -209,7 +209,7 @@ class StackingSwitch extends
                     newEntry, enterAnimation, ref),
             };
             newStack = push(newEntry, stack);
-            log.trace("pushLocation(); stackSize=%o", newStack.length);
+            log.trace("pushLocation", "stackSize=%o", newStack.length);
         } else {
             this.shouldPop.push(false);
             newStack = this.replaceTop(stack, children, nextLocation);
@@ -222,7 +222,7 @@ class StackingSwitch extends
         stack: IStackEntry[], children: IChildren, location: Location,
     ) {
         const stackSize = stack.length;
-        log.trace("replaceTop(); stackSize=%o; location=%o", stackSize,
+        log.trace("replaceTop", "stackSize=%o; location=%o", stackSize,
             location);
         const newStack = stack.slice();
         const topEntry = stack[stackSize - 1];

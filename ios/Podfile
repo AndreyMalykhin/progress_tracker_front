@@ -8,6 +8,8 @@ target 'progress_tracker' do
   pod 'RSKImageCropper'
   pod 'QBImagePickerController'
 
+  pod 'SentryReactNative', :path => '../node_modules/react-native-sentry'
+
   target 'progress_trackerTests' do
     inherit! :search_paths
     # Pods for testing

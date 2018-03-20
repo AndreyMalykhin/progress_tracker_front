@@ -90,7 +90,7 @@ class DeadlineTracker {
     }
 
     private tick() {
-        log.trace("tick()");
+        log.trace("tick");
 
         if (!getSession(this.apollo).userId) {
             return;
@@ -132,7 +132,7 @@ class DeadlineTracker {
             this.addExpirationActivity(expiredTrackable);
         }
 
-        // TODO add toast
+        // TODO toast
     }
 
     private getActiveTrackables() {
@@ -141,13 +141,13 @@ class DeadlineTracker {
                 query: getActiveTrackablesQuery,
             });
         } catch (e) {
-            log.trace("getActiveTrackables(); no data");
+            log.trace("getActiveTrackables", "no data");
             return null;
         }
     }
 
     private expire(trackable: IActiveTrackableFragment) {
-        log.trace("expire(); trackable=%o", trackable);
+        log.trace("expire", "trackable=%o", trackable);
         trackable.status = TrackableStatus.Expired;
         trackable.statusChangeDate = Date.now();
         this.apollo.writeFragment({

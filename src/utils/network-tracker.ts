@@ -84,7 +84,7 @@ class NetworkTracker {
     }
 
     private saveStatus() {
-        log.trace("saveStatus(); isOnline=%o", this.isOnline);
+        log.trace("saveStatus", "isOnline=%o", this.isOnline);
         InteractionManager.runAfterInteractions(() => {
             this.apollo.writeFragment({
                 data: { __typename: Type.Offline, isOnline: this.isOnline },
@@ -109,10 +109,10 @@ class NetworkTracker {
         try {
             const response = await fetch(this.envConfig.serverUrl,
                 { method: "HEAD", cache: "no-cache" });
-            log.trace("doPing(); status=%o", response.status);
+            log.trace("doPing", "status=%o", response.status);
             return true;
         } catch (e) {
-            log.trace("doPing(); error=%o", e.message);
+            log.trace("doPing", "error=%o", e.message);
             return false;
         }
     }

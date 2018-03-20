@@ -80,7 +80,7 @@ const log = makeLog("pending-review-trackable-list");
 class PendingReviewTrackableList extends
     React.PureComponent<IPendingReviewTrackableListProps> {
     public render() {
-        log.trace("render()");
+        log.trace("render");
         const {
             items,
             queryStatus,

@@ -120,7 +120,7 @@ function getActiveTrackables(apollo: DataProxy) {
             query: getActiveTrackablesQuery,
         });
     } catch (e) {
-        log.trace("getActiveTrackables(); no data");
+        log.trace("getActiveTrackables", "no data");
         return null;
     }
 }

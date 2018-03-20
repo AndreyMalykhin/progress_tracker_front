@@ -30,7 +30,7 @@ function getSession(apollo: DataProxy) {
 function setSession(
     userId: string|null, accessToken: string|null, apollo: DataProxy,
 ) {
-    log.trace("setSession(); userId=%o", userId);
+    log.trace("setSession", "userId=%o", userId);
     const session = {
         __typename: Type.Session,
         accessToken,

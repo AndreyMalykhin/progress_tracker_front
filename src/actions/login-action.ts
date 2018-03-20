@@ -6,6 +6,7 @@ import gql from "graphql-tag";
 import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import { AccessToken, LoginManager, LoginResult } from "react-native-fbsdk";
+import { Sentry } from "react-native-sentry";
 import dataIdFromObject from "utils/data-id-from-object";
 import makeLog from "utils/make-log";
 
@@ -49,7 +50,7 @@ async function login(
         result = await LoginManager.logInWithReadPermissions(
             ["public_profile"]);
     } catch (e) {
-        log.error("login(); facebook error=%o", e);
+        log.error("login", e);
         throw e;
     }
 
@@ -64,12 +65,13 @@ async function login(
         variables: { facebookAccessToken: facebookAccessToken!.accessToken },
     });
     const { user, accessToken, isNewUser } = response!.data!.login;
+    Sentry.setUserContext({ id: user.id });
 
     if (!isNewUser && !isRefreshingAccessToken) {
         try {
             await apollo.resetStore();
         } catch (e) {
-            log.error("login(); reset store error=%o", e);
+            log.error("login", e);
             throw e;
         }
     }

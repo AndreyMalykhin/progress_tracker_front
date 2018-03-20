@@ -3,6 +3,7 @@ import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client";
 import { History } from "history";
 import { LoginManager } from "react-native-fbsdk";
+import { Sentry } from "react-native-sentry";
 import makeLog from "utils/make-log";
 import { IMultiStackHistoryState } from "utils/multi-stack-history";
 import routes from "utils/routes";
@@ -12,7 +13,8 @@ const log = makeLog("logout-action");
 async function logout(
     history: History, apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    log.trace("logout()");
+    log.trace("logout");
+    Sentry.setUserContext({ id: undefined });
     LoginManager.logOut();
     const userId = null;
     const accessToken = null;
@@ -25,7 +27,7 @@ async function logout(
     try {
         await apollo.resetStore();
     } catch (e) {
-        log.error("logout(); reset store error=%o", e);
+        log.error("logout", e);
         throw e;
     }
 }

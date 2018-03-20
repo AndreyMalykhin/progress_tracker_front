@@ -50,7 +50,7 @@ function withFetchPolicy<P extends IOwnProps>(options: IOptions<P>) {
             }
 
             public componentWillMount() {
-                log.trace("componentWillMount()");
+                log.trace("componentWillMount");
                 this.init(this.props);
             }
 
@@ -66,7 +66,7 @@ function withFetchPolicy<P extends IOwnProps>(options: IOptions<P>) {
             }
 
             public componentWillUnmount() {
-                log.trace("componentWillUnmount()");
+                log.trace("componentWillUnmount");
             }
 
             private initFetchPolicy(props: P) {
@@ -100,7 +100,7 @@ function withFetchPolicy<P extends IOwnProps>(options: IOptions<P>) {
                     lastRefreshDate[this.namespace] = Date.now();
                 }
 
-                log.trace("init(); fetchPolicy=%o; namespace=%o",
+                log.trace("init", "fetchPolicy=%o; namespace=%o",
                     this.fetchPolicy, this.namespace);
             }
 

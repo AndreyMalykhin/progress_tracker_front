@@ -15,7 +15,7 @@ class AudioManager {
     }
 
     public play(fileName: string) {
-        log.trace("play(); fileName=%o", fileName);
+        log.trace("play", "fileName=%o", fileName);
         this.sounds[fileName].play();
     }
 
@@ -26,7 +26,7 @@ class AudioManager {
                 Sound.MAIN_BUNDLE,
                 (error) => {
                     if (error) {
-                        log.error("load(); error=%o", error);
+                        log.error("load", error);
                         reject(error);
                         return;
                     }

@@ -24,7 +24,7 @@ async function openImgPicker(audioManager: AudioManager) {
             return null;
         }
 
-        log.error("openImgPicker(); error=%o", e);
+        log.error("openImgPicker", e);
         throw e;
     } finally {
         audioManager.play(Sound.Click);
@@ -36,7 +36,7 @@ async function openImgPicker(audioManager: AudioManager) {
     try {
         await moveFile(img.path, newFilePath);
     } catch (e) {
-        log.error("openImgPicker(); move file error=%o", e);
+        log.error("openImgPicker", e);
         throw e;
     }
 

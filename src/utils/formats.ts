@@ -12,7 +12,7 @@ const formats = {
         },
         [NumberFormat.Percentage]: {
             maximumFractionDigits: 2,
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             style: "percent",
             useGrouping: true,
         },

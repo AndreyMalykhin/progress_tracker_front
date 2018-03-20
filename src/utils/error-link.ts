@@ -20,7 +20,7 @@ class ErrorLink extends ErrorLinkImpl {
     public request(operation: Operation, forward: NextLink) {
         return new Observable((subscriber) => {
             const onRetry = () => {
-                log.trace("request(); retry");
+                log.trace("request", "retry");
                 const context = operation.getContext() as
                     IOfflineLinkOperationContext;
                 context.enqueue = true;

@@ -12,7 +12,7 @@ const log = makeLog("write-defaults");
 function writeDefaults(
     persistentData: any, nonPersistentData: any, cache: DataProxy,
 ) {
-    log.trace("writeDefaults()");
+    log.trace("writeDefaults");
 
     if (persistentData) {
         cache.writeData({ data: persistentData });
@@ -26,7 +26,7 @@ function writeDefaults(
 }
 
 function writeNonPersistentDefaults(data: any, cache: DataProxy) {
-    log.trace("writeNonPersistentDefaults()");
+    log.trace("writeNonPersistentDefaults");
 
     if (data) {
         cache.writeData({ data });

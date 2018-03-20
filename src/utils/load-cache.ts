@@ -26,7 +26,7 @@ async function loadCache(
         /* await cachePersistor.purge(); */
         await cachePersistor.restore();
     } catch (e) {
-        log.error("makeCache(); error=%o", e);
+        log.error("loadCache", e);
         throw e;
     }
 

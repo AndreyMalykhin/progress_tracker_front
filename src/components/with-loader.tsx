@@ -35,7 +35,7 @@ function withLoader<TProps extends {}, TData extends {}>(
             private timeoutId?: NodeJS.Timer;
 
             public render() {
-                log.trace("render(); isVisible=%o", this.state.isVisible);
+                log.trace("render", "isVisible=%o", this.state.isVisible);
                 return this.state.isVisible ? React.createElement(loader) :
                     <Component {...this.props} />;
             }

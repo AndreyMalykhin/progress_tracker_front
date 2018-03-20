@@ -70,7 +70,7 @@ function withLoadMore<
                     updateOptions.fetchMoreResult;
 
                 if (!fetchMoreResult) {
-                    log.trace("updateQuery(); no result");
+                    log.trace("updateQuery", "no result");
                     return previousResult;
                 }
 

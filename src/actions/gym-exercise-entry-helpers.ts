@@ -90,7 +90,7 @@ function getGymExerciseEntries(exerciseId: string, apollo: DataProxy) {
             query: getGymExerciseEntriesQuery, variables: { exerciseId },
         });
     } catch (e) {
-        log.trace("getGymExerciseEntries(); no data");
+        log.trace("getGymExerciseEntries", "no data");
         return null;
     }
 }

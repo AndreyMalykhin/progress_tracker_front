@@ -236,7 +236,7 @@ class ProfileSectionContainer
     }
 
     public componentWillMount() {
-        log.trace("componentWillMount()");
+        log.trace("componentWillMount");
     }
 
     public componentWillReceiveProps(nextProps: IProfileSectionContainerProps) {
@@ -262,7 +262,7 @@ class ProfileSectionContainer
     }
 
     public componentWillUnmount() {
-        log.trace("componentWillUnmount()");
+        log.trace("componentWillUnmount");
     }
 
     private initNavItems(userId?: string) {

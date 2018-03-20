@@ -44,7 +44,7 @@ fragment AddToastUIFragment on UI {
 const fragmentId = dataIdFromObject({ __typename: Type.UI, id: defaultId })!;
 
 function addToast(toast: IAddToastFragment, apollo: DataProxy) {
-    log.trace("addToast(); toast=%o", toast);
+    log.trace("addToast", "toast=%o", toast);
     const ui = getToasts(apollo);
     ui.toasts.push({
         __typename: Type.Toast,
@@ -66,7 +66,7 @@ function addGenericErrorToast(apollo: DataProxy) {
 }
 
 function removeToast(index: number, apollo: DataProxy) {
-    log.trace("removeToast(); index=%o", index);
+    log.trace("removeToast", "index=%o", index);
     const ui = getToasts(apollo);
     ui.toasts.splice(index, 1);
     setToasts(ui, apollo);

@@ -160,7 +160,7 @@ function getActivities(audience: Audience, apollo: DataProxy) {
         return apollo.readQuery<IGetActivitiesResponse>(
             { query: getActivitiesQuery, variables: { audience }})!;
     } catch (e) {
-        log.trace("getActivities(); no data");
+        log.trace("getActivities", "no data");
         return null;
     }
 }

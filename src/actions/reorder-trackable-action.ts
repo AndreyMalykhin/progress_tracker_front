@@ -47,8 +47,8 @@ async function reorderTrackable(
     mutate: MutationFunc<IReorderTrackableResponse>,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
-    log.trace("reorderTrackable(); sourceId=%o; destId=%o", sourceId,
-        destinationId);
+    log.trace("reorderTrackable", "sourceId=%o; destId=%o",
+        sourceId, destinationId);
     const result = await mutate({
         optimisticResponse: getOptimisticResponse(
             sourceId, destinationId, apollo),

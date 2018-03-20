@@ -69,6 +69,7 @@
 		C57C0387804649B2B28F7F9B /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BA98DDDA7A67440D9CE5BD29 /* Ionicons.ttf */; };
 		E2F3B069688A481E90B2C5AE /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 54B3DB3A92FA4DF9B81DA901 /* EvilIcons.ttf */; };
 		E47BCE45163F4864BF5A72F7 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 03E7597F6A05407E9D20B843 /* Octicons.ttf */; };
+		EF95426194BE4BA6B1764F9F /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34551B6E952444768732D460 /* libz.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -468,6 +469,7 @@
 		E9E0BAF49FBE3ACD00EB5A47 /* Pods-progress_tracker-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-progress_tracker-tvOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-progress_tracker-tvOSTests/Pods-progress_tracker-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EEEA1B02EDCF48809CCAF3AB /* Pods-progress_trackerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-progress_trackerTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-progress_trackerTests/Pods-progress_trackerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EF22DE44A6CA49D690509974 /* imageCropPicker.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = imageCropPicker.xcodeproj; path = "../node_modules/react-native-image-crop-picker/ios/imageCropPicker.xcodeproj"; sourceTree = "<group>"; };
+		34551B6E952444768732D460 /* libz.tbd */ = {isa = PBXFileReference; name = "libz.tbd"; path = "usr/lib/libz.tbd"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = sourcecode.text-based-dylib-definition; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -509,6 +511,7 @@
 				5151183A1BF648429680E149 /* libRNVectorIcons.a in Frameworks */,
 				60E187CD18E64205BD0A4754 /* libimageCropPicker.a in Frameworks */,
 				B358077875C99E0BE408EF27 /* libPods-progress_tracker.a in Frameworks */,
+				EF95426194BE4BA6B1764F9F /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -711,6 +714,7 @@
 				C9038B1F2C65A6C06E8B7980 /* libPods-progress_tracker-tvOS.a */,
 				2C6C946D950A569BDAB15067 /* libPods-progress_tracker-tvOSTests.a */,
 				DFAC0C80DEF34A31ACB1F99C /* libPods-progress_trackerTests.a */,
+				34551B6E952444768732D460 /* libz.tbd */,
 			);
 			path = Frameworks;
 			sourceTree = "<group>";
@@ -868,6 +872,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		8EACBDFEF3FB40BAB68D3AF0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			path = Application;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -903,6 +915,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				1FB4C4871E47A7AB3796C75A /* [CP] Embed Pods Frameworks */,
 				A4AF3941E30E7D480D521A8B /* [CP] Copy Pods Resources */,
+				0C0C174513CE4D3098ACC78E /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -1454,7 +1467,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
 		18EF309A7BDAE76E9401AE7C /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1498,7 +1511,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
 		4CBA704772C56E7209767D14 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1665,6 +1678,20 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-progress_tracker-tvOSTests/Pods-progress_tracker-tvOSTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		0C0C174513CE4D3098ACC78E /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			name = "Upload Debug Symbols to Sentry";
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			shellPath = /bin/sh;
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym";
 		};
 /* End PBXShellScriptBuildPhase section */
 

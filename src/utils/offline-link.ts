@@ -138,8 +138,8 @@ class OfflineLink extends ApolloLink {
     }
 
     private enqueue(operation: Operation) {
-        log.trace("queue(); operation=%o", operation);
-        const fragment = this.getFragment();
+        log.trace("enqueue", "operation=%o", operation);
+        const fragment = this.loadFragment();
         const variables = [];
 
         if (operation.variables) {
@@ -160,13 +160,13 @@ class OfflineLink extends ApolloLink {
             name: operation.operationName,
             variables,
         });
-        this.setFragment(fragment);
+        this.saveFragment(fragment);
     }
 
     private async drainQueue() {
-        let fragment = this.getFragment();
+        let fragment = this.loadFragment();
         const operation = fragment.operations[0];
-        log.trace("drainQueue(); operation=%o", operation);
+        log.trace("drainQueue", "operation=%o", operation);
 
         if (!operation) {
             return;
@@ -193,9 +193,9 @@ class OfflineLink extends ApolloLink {
 
         // get fragment again because it could be modified (e.g. by enqueue)
         // when mutation was executing
-        fragment = this.getFragment();
+        fragment = this.loadFragment();
         fragment.operations.shift();
-        this.setFragment(fragment);
+        this.saveFragment(fragment);
         this.isDraining = false;
         this.tryDrainQueue();
     }
@@ -210,7 +210,7 @@ class OfflineLink extends ApolloLink {
             await this.apollo!.mutate(options);
         } catch (e) {
             if (!this.isOnline || !this.session.accessToken) {
-                log.trace("runOperation(); stop");
+                log.trace("runOperation", "stop");
                 return false;
             }
 
@@ -226,7 +226,7 @@ class OfflineLink extends ApolloLink {
                 && status < 500
                 && startDate + this.envConfig.syncRetryTimeout <= Date.now()
             ) {
-                log.error("runOperation(); retry timeout");
+                log.error("runOperation", "Retry timeout");
                 return true;
             }
 
@@ -239,18 +239,18 @@ class OfflineLink extends ApolloLink {
     }
 
     private wait(duration: number) {
-        log.trace("wait(); duration=%o", duration);
+        log.trace("wait", "duration=%o", duration);
         return new Promise((resolve) => setTimeout(resolve, duration));
     }
 
-    private getFragment() {
+    private loadFragment() {
         return this.apollo!.readFragment<IOfflineOperationsFragment>(
             { fragment: offlineOperationsFragment, id: offlineFragmentId })!;
     }
 
-    private setFragment(fragment: IOfflineOperationsFragment) {
+    private saveFragment(fragment: IOfflineOperationsFragment) {
         const operationCount = fragment.operations.length;
-        log.trace("setFragment(); operationCount=%o", operationCount);
+        log.trace("saveFragment", "operationCount=%o", operationCount);
         fragment.hasOperations = operationCount > 0;
         this.apollo!.writeFragment({
             data: fragment,
