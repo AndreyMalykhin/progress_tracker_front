@@ -18,10 +18,11 @@ import TabBar, {
     TabBarItemTitle,
 } from "components/tab-bar";
 import * as React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 
 interface ISecondaryNavProps {
     items: INavBarItem[];
+    style?: StyleProp<ViewStyle>;
 }
 
 class SecondaryNav extends React.Component<ISecondaryNavProps> {
@@ -30,7 +31,7 @@ class SecondaryNav extends React.Component<ISecondaryNavProps> {
             <NavBar
                 renderItem={this.renderItem}
                 items={this.props.items}
-                style={styles.container}
+                style={[styles.container, this.props.style]}
             />
         );
     }
@@ -65,7 +66,7 @@ class SecondaryNav extends React.Component<ISecondaryNavProps> {
 const styles = StyleSheet.create({
     container: {
         borderBottomWidth: 1,
-        borderColor: shadeColor.light2,
+        borderColor: shadeColor.light3,
     },
     item: {
         paddingBottom: gap.single,

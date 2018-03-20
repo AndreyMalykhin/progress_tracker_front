@@ -61,6 +61,7 @@ class PrimitiveTrackableForm extends
         if (isIconPickerOpen) {
             return (
                 <AnimatableView
+                    style={styles.iconPickerExpanded}
                     onRef={onIconPickerRef as any}
                     duration={stackingSwitchAnimationDuration}
                 >
@@ -121,6 +122,12 @@ class PrimitiveTrackableForm extends
         );
     }
 }
+
+const styles = StyleSheet.create({
+    iconPickerExpanded: {
+        flex: 1,
+    },
+});
 
 export { IPrimitiveTrackableFormProps };
 export default PrimitiveTrackableForm;

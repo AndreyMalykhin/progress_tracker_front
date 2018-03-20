@@ -1,4 +1,4 @@
-import { listStyle } from "components/common-styles";
+import { listStyle, shadeColor } from "components/common-styles";
 import LeaderListContainer from "components/leader-list-container";
 import { INavBarItem } from "components/nav-bar";
 import SecondaryNav from "components/secondary-nav";
@@ -16,7 +16,7 @@ class LeadersSection extends React.Component<IActivitiesSectionProps> {
         const { audience, navItems } = this.props;
         return (
             <View style={styles.container}>
-                <SecondaryNav items={navItems} />
+                <SecondaryNav items={navItems} style={styles.nav} />
                 <View style={styles.content}>
                     <LeaderListContainer key={audience} audience={audience} />
                 </View>
@@ -32,6 +32,9 @@ const styles = StyleSheet.create({
     content: {
         backgroundColor: listStyle.backgroundColor,
         flex: 1,
+    },
+    nav: {
+        backgroundColor: shadeColor.light2,
     },
 });
 

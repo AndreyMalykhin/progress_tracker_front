@@ -46,7 +46,8 @@ class FormIconPickerExpanded extends
                 data={this.props.availableIconNames}
                 renderItem={this.renderItem}
                 keyExtractor={this.getItemKey}
-                contentContainerStyle={styles.expandedList}
+                style={styles.expandedList}
+                contentContainerStyle={styles.expandedListContent}
             />
         );
     }
@@ -117,7 +118,8 @@ const expandedListItemIconPadding = gap.double;
 
 const styles = StyleSheet.create({
     collapsedContainer: {},
-    expandedList: {
+    expandedList: {},
+    expandedListContent: {
         alignSelf: "center",
     },
     expandedListItem: {},

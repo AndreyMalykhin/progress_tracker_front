@@ -1,5 +1,5 @@
 import ActivityListContainer from "components/activity-list-container";
-import { listStyle } from "components/common-styles";
+import { listStyle, shadeColor } from "components/common-styles";
 import { INavBarItem } from "components/nav-bar";
 import SecondaryNav from "components/secondary-nav";
 import Audience from "models/audience";
@@ -16,7 +16,7 @@ class ActivitiesSection extends React.Component<IActivitiesSectionProps> {
         const { audience, navItems } = this.props;
         return (
             <View style={styles.container}>
-                <SecondaryNav items={navItems} />
+                <SecondaryNav items={navItems} style={styles.nav} />
                 <View style={styles.content}>
                     <ActivityListContainer key={audience} audience={audience} />
                 </View>
@@ -32,6 +32,9 @@ const styles = StyleSheet.create({
     content: {
         backgroundColor: listStyle.backgroundColor,
         flex: 1,
+    },
+    nav: {
+        backgroundColor: shadeColor.light2,
     },
 });
 

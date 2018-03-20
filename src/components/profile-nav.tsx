@@ -67,7 +67,7 @@ class ProfileNav extends React.Component<IProfileNavProps> {
 const styles = StyleSheet.create({
     container: {
         borderBottomWidth: 1,
-        borderColor: shadeColor.light2,
+        borderColor: shadeColor.light3,
         paddingBottom: gap.single,
         paddingTop: gap.single,
     },

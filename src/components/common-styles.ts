@@ -16,7 +16,8 @@ const color = {
     grayDark: "#757575", // 600
     grayDark2: "#424242", // 800
     grayLight: "#fafafa", // 50
-    grayLight2: "#F5F5F5", // 100
+    grayLight2: "#f5f5f5", // 100
+    grayLight3: "#eeeeee", // 200
     green: "#66bb6a", // 400
     greenDark: "#2e7d32", // 800
     orange: "#ff9800",
@@ -36,6 +37,7 @@ const shadeColor = {
     dark2: color.grayDark2,
     light: color.grayLight,
     light2: color.grayLight2,
+    light3: color.grayLight3,
     normal: color.gray,
 };
 
