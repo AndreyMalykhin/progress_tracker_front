@@ -7,6 +7,7 @@ import Type from "models/type";
 import { MutationFunc } from "react-apollo/types";
 import { AccessToken, LoginManager, LoginResult } from "react-native-fbsdk";
 import { Sentry } from "react-native-sentry";
+import AnalyticsEvent from "utils/analytics-event";
 import dataIdFromObject from "utils/data-id-from-object";
 import makeLog from "utils/make-log";
 

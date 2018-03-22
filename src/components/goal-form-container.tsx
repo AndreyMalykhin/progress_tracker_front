@@ -10,7 +10,11 @@ import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
 import { LayoutAnimation } from "react-native";
+import Analytics from "utils/analytics";
+import AnalyticsEvent from "utils/analytics-event";
+import { dateRangeToAnalyticsRange } from "utils/analytics-utils";
 import formSaveDelay from "utils/form-save-delay";
+import makeLog from "utils/make-log";
 
 interface IGoal extends IPrimitiveTrackable {
     difficulty: Difficulty;
@@ -34,6 +38,8 @@ interface IGoalFormContainerState extends
     progressDisplayMode: ProgressDisplayMode;
     isExpanded?: boolean;
 }
+
+const log = makeLog("goal-form-container");
 
 const difficultyToNumber: { [difficulty: string]: number } = {
     [Difficulty.Easy]: 0,
@@ -103,8 +109,21 @@ abstract class GoalFormContainer<
         } as IGoalFormProps;
     }
 
+    protected getAnalyticsParamsForAdd() {
+        const { difficulty, deadlineDate, progressDisplayMode } = this.state;
+        const deadlinePeriod = deadlineDate ? dateRangeToAnalyticsRange(
+            Date.now(), deadlineDate.getTime()) : "";
+        return {
+            ...super.getAnalyticsParamsForAdd(),
+            deadlinePeriod,
+            difficulty,
+            progressDisplayMode,
+        };
+    }
+
     protected onChangeExpanded = (isExpanded: boolean) => {
         LayoutAnimation.easeInEaseOut();
+        Analytics.log(AnalyticsEvent.TrackableFormToggleAdvanced);
         this.setState({ isExpanded });
     }
 

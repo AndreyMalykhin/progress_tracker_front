@@ -6,11 +6,17 @@ import withDIContainer, {
 } from "components/with-di-container";
 import { compose, withApollo } from "react-apollo";
 import graphql from "react-apollo/graphql";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import { IWithApolloProps } from "utils/interfaces";
+import makeLog from "utils/make-log";
 
 interface IWithLoginActionProps {
-    onLogin: () => Promise<boolean>;
+    onLogin: (analyticsContext: AnalyticsContext) => Promise<boolean>;
 }
+
+const log = makeLog("with-login-action");
 
 function withLoginAction<P>(
     component: React.ComponentType<P & IWithLoginActionProps>,
@@ -25,9 +31,13 @@ function withLoginAction<P>(
             props: ({ ownProps }) => {
                 const { client, diContainer } = ownProps;
                 return {
-                    onLogin: async () => {
+                    onLogin: async (analyticsContext: string) => {
+                        Analytics.log(AnalyticsEvent.LoginBtnClick,
+                            { context: analyticsContext });
+                        let isCancelled;
+
                         try {
-                            return await login(client);
+                            isCancelled = !await login(client);
                         } catch (e) {
                             if (!isApolloError(e)) {
                                 addGenericErrorToast(client);
@@ -35,6 +45,11 @@ function withLoginAction<P>(
 
                             return false;
                         }
+
+                        const event = isCancelled ?
+                            AnalyticsEvent.FacebookLoginPageCancel :
+                            AnalyticsEvent.FacebookLoginPageSubmit;
+                        Analytics.log(event);
                     },
                 };
             },

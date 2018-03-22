@@ -55,6 +55,7 @@ import gql from "graphql-tag";
 import Audience from "models/audience";
 import Difficulty from "models/difficulty";
 import RejectReason from "models/reject-reason";
+import ReviewStatus from "models/review-status";
 import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
@@ -68,11 +69,15 @@ import {
 } from "react-intl";
 import { Alert, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { RouteComponentProps, withRouter } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
 import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 import Sound from "utils/sound";
@@ -109,6 +114,8 @@ interface IGetDataResponse {
     getPendingReviewTrackables:
         IConnection<IPendingReviewTrackableListItemNode, number>;
 }
+
+const log = makeLog("pending-review-trackable-list-container");
 
 const withApprove = graphql<
     IApproveTrackableResponse,
@@ -253,7 +260,7 @@ class PendingReviewTrackableListContainer extends React.Component<
                 onEndReached={onLoadMore}
                 onPressUser={this.onPressUser}
                 onRejectItem={this.onStartRejectItem}
-                onRefresh={onRefresh}
+                onRefresh={onRefresh && this.onRefresh}
             />
         );
     }
@@ -273,24 +280,33 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private onStartApproveItem = (id: string) => {
-        if (!this.props.onEnsureUserLoggedIn()) {
+        Analytics.log(AnalyticsEvent.TrackableReview, {
+            context: AnalyticsContext.PendingReviewPage,
+            status: ReviewStatus.Approved,
+        });
+        const isUserLoggedIn =
+            this.props.onEnsureUserLoggedIn(AnalyticsContext.PendingReviewPage);
+
+        if (!isUserLoggedIn) {
             return;
         }
 
         const { intl } = this.props;
         ActionSheet.open({
-            onClose: (difficulty) => {
-                if (difficulty) {
-                    this.commitApproveItem(id, difficulty);
-                }
-            },
+            onClose: (difficulty) => this.onCommitApproveItem(id, difficulty),
             options: difficulties,
             titleMsgId: "approveTrackable.title",
             translator: intl,
         });
     }
 
-    private async commitApproveItem(id: string, difficulty: Difficulty) {
+    private async onCommitApproveItem(id: string, difficulty?: Difficulty) {
+        if (!difficulty) {
+            Analytics.log(AnalyticsEvent.ApproveDifficultyPickerCancel);
+            return;
+        }
+
+        Analytics.log(AnalyticsEvent.ApproveDifficultyPickerSubmit, { difficulty });
         this.props.diContainer.audioManager.play(Sound.Approve);
         let response;
 
@@ -305,24 +321,34 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private onStartRejectItem = (id: string) => {
-        if (!this.props.onEnsureUserLoggedIn()) {
+        Analytics.log(AnalyticsEvent.TrackableReview, {
+            context: AnalyticsContext.PendingReviewPage,
+            status: ReviewStatus.Rejected,
+        });
+        const isUserLoggedIn =
+            this.props.onEnsureUserLoggedIn(AnalyticsContext.PendingReviewPage);
+
+        if (!isUserLoggedIn) {
             return;
         }
 
         const { intl } = this.props;
         ActionSheet.open({
-            onClose: (rejectReason) => {
-                if (rejectReason) {
-                    this.commitRejectItem(id, rejectReason);
-                }
-            },
+            onClose: (rejectReason) =>
+                this.onCommitRejectItem(id, rejectReason),
             options: rejectReasons,
             titleMsgId: "rejectTrackable.title",
             translator: intl,
         });
     }
 
-    private async commitRejectItem(id: string, reason: RejectReason) {
+    private async onCommitRejectItem(id: string, reason?: RejectReason) {
+        if (!reason) {
+            Analytics.log(AnalyticsEvent.RejectReasonPickerCancel);
+            return;
+        }
+
+        Analytics.log(AnalyticsEvent.RejectReasonPickerSubmit, { reason });
         this.props.diContainer.audioManager.play(Sound.Reject);
         let response;
 
@@ -345,6 +371,7 @@ class PendingReviewTrackableListContainer extends React.Component<
     }
 
     private onPressUser = (id: string) => {
+        Analytics.log(AnalyticsEvent.PendingReviewPageOpenUser);
         const historyState: IStackingSwitchHistoryState = {
             stackingSwitch: {
                 animation: StackingSwitchAnimation.SlideInRight,
@@ -352,6 +379,12 @@ class PendingReviewTrackableListContainer extends React.Component<
         };
         const route = routes.profileActiveTrackables.path.replace(":id", id);
         this.props.history.push(route, historyState);
+    }
+
+    private onRefresh = () => {
+        Analytics.log(AnalyticsEvent.ListRefresh,
+            { context: AnalyticsContext.PendingReviewPage });
+        this.props.onRefresh!();
     }
 }
 
@@ -361,6 +394,7 @@ export default compose(
     withSession,
     withLogin<IPendingReviewTrackableListContainerProps>(
         "pendingReviewList.loginToSeeFriends",
+        AnalyticsContext.PendingReviewPage,
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
@@ -406,11 +440,12 @@ export default compose(
     ),
     withApprove,
     withReject,
-    withLoginAction,
     withLoadMore<IPendingReviewTrackableListContainerProps, IGetDataResponse>({
+        analyticsContext: AnalyticsContext.PendingReviewPage,
         dataField: "getPendingReviewTrackables",
         getQuery: (props) => props.data,
     }),
     injectIntl,
-    withEnsureUserLoggedIn,
+    withLoginAction,
+    withEnsureUserLoggedIn(),
 )(PendingReviewTrackableListContainer);

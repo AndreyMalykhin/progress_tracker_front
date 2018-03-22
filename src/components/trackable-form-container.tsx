@@ -10,8 +10,11 @@ import * as React from "react";
 import { InjectedIntlProps } from "react-intl";
 import { LayoutAnimation } from "react-native";
 import { RouteComponentProps } from "react-router";
+import Analytics, { IAnalyticsParams } from "utils/analytics";
+import AnalyticsEvent from "utils/analytics-event";
 import formSaveDelay from "utils/form-save-delay";
 import { IWithApolloProps } from "utils/interfaces";
+import makeLog from "utils/make-log";
 
 interface ITrackable {
     id: string;
@@ -36,6 +39,8 @@ interface ITrackableFormContainerState {
     title?: string;
     titleError?: string|null;
 }
+
+const log = makeLog("trackable-form-container");
 
 abstract class TrackableFormContainer<
     TTrackable extends ITrackable,
@@ -76,6 +81,7 @@ abstract class TrackableFormContainer<
     protected abstract getInitialStateForEdit(): TState;
     protected abstract getTrackableType(): TrackableType;
     protected abstract afterAddTrackable(): Promise<any>;
+    protected abstract getAnalyticsParamsForAdd(): IAnalyticsParams;
 
     protected getFormBaseProps() {
         const {
@@ -178,10 +184,17 @@ abstract class TrackableFormContainer<
         });
     }
 
-    private onCancel = () => this.goBack();
+    private onCancel = () => {
+        this.logCloseEvent(this.isNew());
+        this.goBack();
+    }
 
     private onDone = async () => {
         if (this.isNew()) {
+            Analytics.log(AnalyticsEvent.TrackableFormSubmit, {
+                type: this.getTrackableType(),
+                ...this.getAnalyticsParamsForAdd(),
+            });
             LayoutAnimation.easeInEaseOut();
 
             try {
@@ -195,9 +208,16 @@ abstract class TrackableFormContainer<
             }
 
             await this.afterAddTrackable();
+        } else {
+            this.logCloseEvent();
         }
 
         this.goBack();
+    }
+
+    private logCloseEvent(isNewTrackable?: boolean) {
+        Analytics.log(AnalyticsEvent.TrackableFormClose,
+            { isNew: isNewTrackable ? 1 : 0 });
     }
 }
 

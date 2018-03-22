@@ -10,6 +10,7 @@ import { Image } from "react-native-image-crop-picker";
 import {
     KeyboardAwareScrollView,
 } from "react-native-keyboard-aware-scroll-view";
+import AnalyticsContext from "utils/analytics-context";
 
 interface IProfileFormProps {
     isNameDisabled?: boolean;
@@ -52,7 +53,10 @@ class ProfileForm extends React.Component<IProfileFormProps> {
             );
         } else {
             authGroup = (
-                <LoginContainer msgId="profileForm.loginMsg" />
+                <LoginContainer
+                    msgId="profileForm.loginMsg"
+                    analyticsContext={AnalyticsContext.ProfileForm}
+                />
             );
         }
 

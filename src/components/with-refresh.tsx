@@ -4,6 +4,8 @@ import { IWithSessionProps } from "components/with-session";
 import { IWithSyncStatusProps } from "components/with-sync-status";
 import * as React from "react";
 import { QueryProps } from "react-apollo";
+import AnalyticsEvent from "utils/analytics-event";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 
 interface IWithRefreshProps {
@@ -24,6 +26,8 @@ interface IOptions<TProps, TData> {
     isReadonlyData: (props: TProps) => boolean;
     getQuery: (props: TProps) => QueryProps & TData;
 }
+
+const log = makeLog("with-refresh");
 
 function withRefresh<TProps extends IOwnProps, TData extends {}>(
     options: IOptions<TProps, TData>,

@@ -233,6 +233,13 @@ class TaskGoalFormContainer extends GoalFormContainer<
         } as ITaskGoalFormContainerState;
     }
 
+    protected getAnalyticsParamsForAdd() {
+        return {
+            ...super.getAnalyticsParamsForAdd(),
+            taskCount: this.state.tasks.length,
+        };
+    }
+
     private onChangeNewTaskTitle = (title: string) => {
         this.setState({ newTaskTitle: title });
 

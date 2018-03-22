@@ -15,6 +15,7 @@ import {
     View,
 } from "react-native";
 import { withRouter } from "react-router";
+import AnalyticsContext from "utils/analytics-context";
 
 interface ILoginPageProps {
     onSkip: () => void;
@@ -30,7 +31,10 @@ class LoginPage extends React.Component<ILoginPageProps> {
                         style={styles.logo}
                     />
                 </View>
-                <LoginContainer isNoFillParent={true} />
+                <LoginContainer
+                    isNoFillParent={true}
+                    analyticsContext={AnalyticsContext.LoginPage}
+                />
                 <Button style={styles.skipBtn} onPress={this.props.onSkip}>
                     <ButtonTitle msgId="login.skip" />
                 </Button>

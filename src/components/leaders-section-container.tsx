@@ -7,6 +7,9 @@ import * as React from "react";
 import { compose } from "react-apollo";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { RouteComponentProps } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsEvent from "utils/analytics-event";
+import makeLog from "utils/make-log";
 import routes from "utils/routes";
 
 interface IRouteParams {
@@ -15,6 +18,8 @@ interface IRouteParams {
 
 interface ILeadersSectionContainerProps extends
     IWithHeaderProps, RouteComponentProps<IRouteParams>, InjectedIntlProps {}
+
+const log = makeLog("leaders-section-container");
 
 const friendsAudienceRoute =
     routes.leaders.path.replace(":audience", Audience.Friends);
@@ -25,12 +30,16 @@ const navItems: INavBarItem[] = [
         matchExact: routes.leaders.exact,
         matchPath: globalAudienceRoute,
         navigateToPath: globalAudienceRoute,
+        onPreSelect: () => Analytics.log(
+            AnalyticsEvent.LeadersPageOpenGlobalChart),
         titleMsgId: "leadersNavigation.global",
     },
     {
         matchExact: routes.leaders.exact,
         matchPath: friendsAudienceRoute,
         navigateToPath: friendsAudienceRoute,
+        onPreSelect: () => Analytics.log(
+            AnalyticsEvent.LeadersPageOpenFriendsChart),
         titleMsgId: "leadersNavigation.friends",
     },
 ];

@@ -50,6 +50,9 @@ import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { InjectedIntlProps, injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import { NumberFormat } from "utils/formats";
@@ -274,6 +277,8 @@ class ProfileSectionContainer
                 matchPath: routes.profileActiveTrackables.path,
                 navigateToPath: routes.profileActiveTrackables.path.replace(
                     ":id", userId || defaultId),
+                onPreSelect: () => Analytics.log(
+                    AnalyticsEvent.ProfilePageOpenActiveTrackables),
                 titleMsgId: "profile.activeTrackables",
             },
             {
@@ -284,6 +289,8 @@ class ProfileSectionContainer
                 navigateToPath: routes.profileArchive.path
                     .replace(":id", userId || defaultId)
                     .replace(":trackableStatus", TrackableStatus.Approved),
+                onPreSelect: () =>
+                    Analytics.log(AnalyticsEvent.ProfilePageOpenArchive),
                 titleMsgId: "profile.archive",
             },
         ];
@@ -332,6 +339,7 @@ class ProfileSectionContainer
     }
 
     private onEditProfile = () => {
+        Analytics.log(AnalyticsEvent.ProfilePageEditProfile);
         const historyState: IStackingSwitchHistoryState = {
             stackingSwitch: {
                 animation: StackingSwitchAnimation.SlideInUp,
@@ -341,6 +349,7 @@ class ProfileSectionContainer
     }
 
     private onStartReportUser = () => {
+        Analytics.log(AnalyticsEvent.ProfilePageReportUser);
         ActionSheet.open({
             onClose: this.onCommitReportUser,
             options: reportReasons,
@@ -351,9 +360,12 @@ class ProfileSectionContainer
 
     private onCommitReportUser = async (reportReason?: ReportReason) => {
         if (reportReason == null) {
+            Analytics.log(AnalyticsEvent.ReportReasonPickerCancel);
             return;
         }
 
+        Analytics.log(
+            AnalyticsEvent.ReportReasonPickerSubmit, { reason: reportReason });
         const { onCommitReportUser, remoteData, intl, diContainer, client } =
             this.props;
 
@@ -372,6 +384,7 @@ class ProfileSectionContainer
     }
 
     private onStartNewTrackable = () => {
+        Analytics.log(AnalyticsEvent.ProfilePageAddTrackable);
         ActionSheet.open({
             onClose: this.onCommitNewTrackable,
             options: trackableTypes,
@@ -382,9 +395,11 @@ class ProfileSectionContainer
 
     private onCommitNewTrackable = (type?: Type) => {
         if (type == null) {
+            Analytics.log(AnalyticsEvent.NewTrackablePickerCancel);
             return;
         }
 
+        Analytics.log(AnalyticsEvent.NewTrackablePickerSubmit, { type });
         const historyState: IStackingSwitchHistoryState = {
             stackingSwitch: {
                 animation: StackingSwitchAnimation.SlideInUp,

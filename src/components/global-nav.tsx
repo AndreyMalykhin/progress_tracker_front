@@ -26,7 +26,7 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
     }
 
     private renderItem: INavBarItemRenderer = (
-        path, isActive, onSelect, titleMsgId, iconName,
+        path, isActive, onSelect, titleMsgId, iconName, isDisabled, onPreSelect,
     ) => {
         return (
             <TabBarItem
@@ -34,6 +34,7 @@ class GlobalNav extends React.Component<IGlobalNavProps> {
                 id={path}
                 active={isActive}
                 onSelect={onSelect}
+                onPreSelect={onPreSelect}
             >
                 <TabBarItemIcon
                     active={isActive}

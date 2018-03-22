@@ -20,7 +20,11 @@ import { withApollo } from "react-apollo";
 import { FormattedMessage, InjectedIntlProps } from "react-intl";
 import * as Animatable from "react-native-animatable";
 import { RouteComponentProps } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import { IWithApolloProps } from "utils/interfaces";
+import makeLog from "utils/make-log";
 import Sound from "utils/sound";
 
 interface IPrimitiveTrackable extends ITrackable {
@@ -45,6 +49,8 @@ interface IPrimitiveTrackableFormContainerState extends
     isIconPickerOpen?: boolean;
     share?: boolean;
 }
+
+const log = makeLog("primitive-trackable-form-container");
 
 const icons = [
     "account-card-details",
@@ -234,6 +240,15 @@ abstract class PrimitiveTrackableFormContainer<
         } as TState;
     }
 
+    protected getAnalyticsParamsForAdd() {
+        const { iconName, isPublic, share: shareWithFriends } = this.state;
+        return {
+            icon: iconName,
+            isPublic: isPublic ? 1 : 0,
+            share: shareWithFriends ? 1 : 0,
+        };
+    }
+
     protected async afterAddTrackable() {
         if (!this.state.share) {
             return;
@@ -287,9 +302,17 @@ abstract class PrimitiveTrackableFormContainer<
         this.setState({ isIconPickerOpen: false });
     }
 
-    private shareTrackable() {
-        return share("share.newTrackable", this.props.intl,
-            { type: this.getTrackableType(), title: this.state.title! });
+    private async shareTrackable() {
+        const trackableType = this.getTrackableType();
+        const isCancelled = !await share("share.newTrackable", this.props.intl,
+            { type: trackableType, title: this.state.title! });
+
+        if (isCancelled) {
+            Analytics.log(AnalyticsEvent.FacebookShareTrackablePageCancel);
+        } else {
+            Analytics.log(AnalyticsEvent.FacebookShareTrackablePageSubmit,
+                { context: AnalyticsContext.TrackableForm, trackableType });
+        }
     }
 
     private onIconPickerRef = (ref?: Animatable.View) => {

@@ -12,6 +12,9 @@ import Audience from "models/audience";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Redirect, Route, Switch } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import defaultId from "utils/default-id";
 import IconName from "utils/icon-name";
 import makeLog from "utils/make-log";
@@ -32,6 +35,7 @@ const navItems: INavItem[] = [
         matchExact: routes.profile.exact,
         matchPath: routes.profile.path.replace(":id", defaultId),
         navigateToPath: myActiveTrackablesRoute,
+        onPreSelect: () => Analytics.log(AnalyticsEvent.GlobalNavOpenProfile),
         titleMsgId: "globalNavigation.profile",
     },
     {
@@ -41,6 +45,8 @@ const navItems: INavItem[] = [
         matchPath: routes.pendingReview.path,
         navigateToPath:
             routes.pendingReview.path.replace(":audience", Audience.Global),
+        onPreSelect: () => Analytics.log(
+            AnalyticsEvent.GlobalNavOpenPendingReview),
         titleMsgId: "globalNavigation.pendingReview",
     },
     {
@@ -50,6 +56,7 @@ const navItems: INavItem[] = [
         matchPath: routes.leaders.path,
         navigateToPath: routes.leaders.path.replace(
             ":audience", Audience.Global),
+        onPreSelect: () => Analytics.log(AnalyticsEvent.GlobalNavOpenLeaders),
         titleMsgId: "globalNavigation.leaders",
     },
     {
@@ -59,6 +66,7 @@ const navItems: INavItem[] = [
         matchPath: routes.activities.path,
         navigateToPath: routes.activities.path.replace(
             ":audience", Audience.Me),
+        onPreSelect: () => Analytics.log(AnalyticsEvent.GlobalNavOpenActivities),
         titleMsgId: "globalNavigation.activities",
     },
     {
@@ -67,6 +75,7 @@ const navItems: INavItem[] = [
         matchExact: routes.friends.exact,
         matchPath: routes.friends.path,
         navigateToPath: routes.friends.path,
+        onPreSelect: () => Analytics.log(AnalyticsEvent.GlobalNavOpenFriends),
         titleMsgId: "globalNavigation.friends",
     },
 ];

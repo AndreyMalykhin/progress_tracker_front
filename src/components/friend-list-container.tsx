@@ -34,9 +34,13 @@ import * as React from "react";
 import { compose, QueryProps } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { RouteComponentProps, withRouter } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
 import defaultErrorPolicy from "utils/default-error-policy";
 import { IWithApolloProps } from "utils/interfaces";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
@@ -55,6 +59,8 @@ interface IOwnProps extends
 interface IGetDataResponse {
     getFriends: IConnection<IFriendListItemNode, number>;
 }
+
+const log = makeLog("friend-list-container");
 
 const withSetMuted = graphql<
     ISetUserMutedResponse,
@@ -120,12 +126,15 @@ class FriendListContainer extends React.Component<IFriendListContainerProps> {
                 onEndReached={onLoadMore}
                 onSetItemMuted={this.onSetItemMuted}
                 onPressItem={this.onPressItem}
-                onRefresh={onRefresh}
+                onRefresh={onRefresh && this.onRefresh}
             />
         );
     }
 
     private onSetItemMuted = async (id: string, isMuted: boolean) => {
+        Analytics.log(AnalyticsEvent.FriendsPageSetMuted,
+            { isMuted: isMuted ? 1 : 0 });
+
         try {
             await this.props.onSetItemMuted(id, isMuted);
         } catch (e) {
@@ -134,6 +143,7 @@ class FriendListContainer extends React.Component<IFriendListContainerProps> {
     }
 
     private onPressItem = (id: string) => {
+        Analytics.log(AnalyticsEvent.FriendsPageOpenUser);
         const historyState: IStackingSwitchHistoryState = {
             stackingSwitch: {
                 animation: StackingSwitchAnimation.SlideInRight,
@@ -142,12 +152,18 @@ class FriendListContainer extends React.Component<IFriendListContainerProps> {
         const route = routes.profileActiveTrackables.path.replace(":id", id);
         this.props.history.push(route, historyState);
     }
+
+    private onRefresh = () => {
+        Analytics.log(AnalyticsEvent.ListRefresh,
+            { context: AnalyticsContext.FriendsPage });
+        this.props.onRefresh!();
+    }
 }
 
 export default compose(
     withDIContainer,
     withSession,
-    withLogin("friends.loginToSee"),
+    withLogin("friends.loginToSee", AnalyticsContext.FriendsPage),
     withRouter,
     withNetworkStatus,
     withSyncStatus,
@@ -178,6 +194,7 @@ export default compose(
     withEmptyList<IFriendListContainerProps>(
         EmptyList, (props) => props.data.getFriends),
     withLoadMore<IFriendListContainerProps, IGetDataResponse>({
+        analyticsContext: AnalyticsContext.FriendsPage,
         dataField: "getFriends",
         getQuery: (props) => props.data,
     }),

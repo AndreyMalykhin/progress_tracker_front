@@ -37,7 +37,7 @@ class SecondaryNav extends React.Component<ISecondaryNavProps> {
     }
 
     private renderItem: INavBarItemRenderer = (
-        path, isActive, onSelect, titleMsgId, iconName,
+        path, isActive, onSelect, titleMsgId, iconName, isDisabled, onPreSelect,
     ) => {
         const contentStyle =
             [styles.itemContent, isActive && styles.itemContentActive];
@@ -46,12 +46,15 @@ class SecondaryNav extends React.Component<ISecondaryNavProps> {
                 key={path}
                 id={path}
                 active={isActive}
+                disabled={isDisabled}
                 style={styles.item}
                 activeStyle={styles.itemActive}
                 onSelect={onSelect}
+                onPreSelect={onPreSelect}
             >
                 <View style={contentStyle as any}>
                     <TabBarItemTitle
+                        disabled={isDisabled}
                         active={isActive}
                         msgId={titleMsgId!}
                         style={styles.itemTitle}

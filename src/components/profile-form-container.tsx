@@ -47,10 +47,15 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { Alert } from "react-native";
 import { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsEvent from "utils/analytics-event";
 import defaultErrorPolicy from "utils/default-error-policy";
 import { IWithApolloProps } from "utils/interfaces";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
+
+const log = makeLog("profile-form-container");
 
 interface IProfileFormContainerProps extends
     IWithHeaderProps,
@@ -236,7 +241,10 @@ class ProfileFormContainer extends
 
     private onChangeAvatar = async (img: Image|null) => {
         if (img) {
+            Analytics.log(AnalyticsEvent.ProfileFormSetAvatar);
             this.setState({ isAvatarChanging: true });
+        } else {
+            Analytics.log(AnalyticsEvent.ProfileFormRemoveAvatar);
         }
 
         await this.transaction(() => this.props.onSetAvatar(img));
@@ -256,11 +264,15 @@ class ProfileFormContainer extends
         this.setState({ nameError });
 
         if (!nameError) {
+            Analytics.log(AnalyticsEvent.ProfileFormSetName);
             this.transaction(() => this.props.onEditUser({ name }));
         }
     }
 
-    private onDone = () => this.props.history.goBack();
+    private onDone = () => {
+        Analytics.log(AnalyticsEvent.ProfileFormClose);
+        this.props.history.goBack();
+    }
 
     private async transaction(action: () => Promise<any>) {
         try {
@@ -278,6 +290,8 @@ class ProfileFormContainer extends
         if (this.props.isSyncing && !await this.confirmLogout()) {
             return;
         }
+
+        Analytics.log(AnalyticsEvent.ProfileFormLogout);
 
         try {
             await logout(this.props.history, this.props.client);

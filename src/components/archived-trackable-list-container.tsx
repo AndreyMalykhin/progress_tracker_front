@@ -32,10 +32,14 @@ import * as React from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
 import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import isMyId from "utils/is-my-id";
+import makeLog from "utils/make-log";
 import QueryStatus, { isLoading } from "utils/query-status";
 
 interface IArchivedTrackableListContainerProps extends
@@ -56,6 +60,8 @@ interface IOwnProps extends
     userId: string;
     trackableStatus: TrackableStatus;
 }
+
+const log = makeLog("archived-trackable-list-container");
 
 const getDataQuery = gql`
 query GetData(
@@ -140,7 +146,7 @@ class ArchivedTrackableListContainer extends
                 items={data.getArchivedTrackables.edges}
                 queryStatus={data.networkStatus}
                 onEndReached={onLoadMore}
-                onRefresh={onRefresh}
+                onRefresh={onRefresh && this.onRefresh}
                 onGetStatusDuration={this.onGetStatusDuration}
             />
         );
@@ -151,6 +157,12 @@ class ArchivedTrackableListContainer extends
     ) => {
         return status === TrackableStatus.Expired ?
             statusChangeDate - creationDate : achievementDate! - creationDate;
+    }
+
+    private onRefresh = () => {
+        Analytics.log(AnalyticsEvent.ListRefresh,
+            { context: AnalyticsContext.ArchivePage });
+        this.props.onRefresh!();
     }
 }
 
@@ -190,6 +202,7 @@ export default compose(
     withEmptyList<IArchivedTrackableListContainerProps>(
         EmptyList, (props) => props.data.getArchivedTrackables),
     withLoadMore<IArchivedTrackableListContainerProps, IGetDataResponse>({
+        analyticsContext: AnalyticsContext.ArchivePage,
         dataField: "getArchivedTrackables",
         getQuery: (props) => props.data,
     }),

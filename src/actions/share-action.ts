@@ -16,11 +16,11 @@ async function share(
         contentUrl: "https://completoo.com",
         quote: translator.formatMessage({ id: msgId }, msgValues),
     };
-    const canShow = await ShareDialog.canShow(shareContent);
-    log.trace("share", "canShow=%o", canShow);
 
-    if (!canShow) {
-        return false;
+    if (!await ShareDialog.canShow(shareContent)) {
+        const error = new Error("Can't show share dialog");
+        log.error("share", error);
+        throw error;
     }
 
     let result;
@@ -32,7 +32,7 @@ async function share(
         throw e;
     }
 
-    return true;
+    return !result.isCancelled;
 }
 
 export { share };

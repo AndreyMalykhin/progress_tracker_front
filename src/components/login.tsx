@@ -12,9 +12,10 @@ import IconName from "utils/icon-name";
 interface ILoginProps {
     isNoFillParent?: boolean;
     msgId?: string;
+    onLogin: () => void;
 }
 
-class Login extends React.Component<ILoginProps & IWithLoginActionProps> {
+class Login extends React.Component<ILoginProps> {
     public render() {
         const { msgId, isNoFillParent, onLogin } = this.props;
         const msg = msgId && (

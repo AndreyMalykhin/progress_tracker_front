@@ -11,6 +11,7 @@ type INavBarItemRenderer = (
     titleMsgId?: string,
     iconName?: string,
     isDisabled?: boolean,
+    onPreSelect?: (path: string) => void,
 ) => React.ReactNode;
 
 interface INavBarProps extends RouteComponentProps<{}> {
@@ -27,6 +28,7 @@ interface INavBarItem {
     navigateToPath: string;
     titleMsgId?: string;
     iconName?: string;
+    onPreSelect?: (path: string) => void;
 }
 
 class NavBar extends React.PureComponent<INavBarProps> {
@@ -39,6 +41,7 @@ class NavBar extends React.PureComponent<INavBarProps> {
                 matchExact,
                 titleMsgId,
                 iconName,
+                onPreSelect,
             } = item;
             const match = matchPath(location.pathname,
                 { path: pathToMatch, exact: matchExact });
@@ -50,6 +53,7 @@ class NavBar extends React.PureComponent<INavBarProps> {
                 titleMsgId,
                 iconName,
                 isDisabled,
+                onPreSelect,
             );
         });
         return <TabBar style={style}>{tabs}</TabBar>;

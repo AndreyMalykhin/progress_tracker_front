@@ -130,6 +130,10 @@ class AggregateFormContainer extends TrackableFormContainer<
     protected getInitialStateForEdit() {
         return {} as IAggregateFormContainerState;
     }
+
+    protected getAnalyticsParamsForAdd() {
+        return {};
+    }
 }
 
 export { IAggregate, IAggregateFormContainerHistoryState };

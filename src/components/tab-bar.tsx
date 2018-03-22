@@ -35,6 +35,7 @@ interface ITabBarItemProps extends ITouchableWithFeedbackProps {
     activeStyle?: StyleProp<ViewStyle>;
     id: string;
     onSelect: (id: string) => void;
+    onPreSelect?: (id: string) => void;
 }
 
 type ITabBarProps = ViewProperties;
@@ -80,7 +81,15 @@ class TabBarItem extends React.Component<ITabBarItemProps> {
         );
     }
 
-    private onPress = () => this.props.onSelect!(this.props.id);
+    private onPress = () => {
+        const { id, onSelect, onPreSelect } = this.props;
+
+        if (onPreSelect) {
+            onPreSelect(id);
+        }
+
+        onSelect!(id);
+    }
 }
 
 // tslint:disable-next-line:max-classes-per-file

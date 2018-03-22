@@ -37,7 +37,7 @@ class ProfileNav extends React.Component<IProfileNavProps> {
     }
 
     private renderItem: INavBarItemRenderer = (
-        path, isActive, onSelect, titleMsgId, iconName, isDisabled,
+        path, isActive, onSelect, titleMsgId, iconName, isDisabled, onPreSelect,
     ) => {
         return (
             <TabBarItem
@@ -46,6 +46,7 @@ class ProfileNav extends React.Component<IProfileNavProps> {
                 active={isActive}
                 disabled={isDisabled}
                 onSelect={onSelect}
+                onPreSelect={onPreSelect}
             >
                 <TabBarItemIcon
                     active={isActive}

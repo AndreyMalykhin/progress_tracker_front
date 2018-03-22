@@ -21,6 +21,7 @@ import { getBuildNumber, getReadableVersion } from "react-native-device-info";
 import { Sentry } from "react-native-sentry";
 import Reactotron from "reactotron-react-native";
 import IStateResolver from "resolvers/state-resolver";
+import Analytics from "utils/analytics";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
 import DIContainer, { makeDIContainer } from "utils/di-container";
@@ -63,6 +64,7 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
     public async componentWillMount() {
         this.diContainer = makeDIContainer();
         this.initErrorReporting();
+        this.initAnalytics();
         this.initDebugging();
         this.initLocalization();
 
@@ -125,6 +127,10 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
         const stateResolver = this.diContainer!.stateResolver;
         const envConfig = this.diContainer!.envConfig;
         return loadCache(cache, stateResolver, envConfig);
+    }
+
+    private initAnalytics() {
+        Analytics.setEnabled(!this.diContainer!.envConfig.isAnalyticsDisabled);
     }
 }
 

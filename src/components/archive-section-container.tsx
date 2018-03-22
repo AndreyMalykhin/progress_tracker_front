@@ -5,7 +5,10 @@ import TrackableStatus from "models/trackable-status";
 import * as React from "react";
 import { compose } from "react-apollo";
 import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsEvent from "utils/analytics-event";
 import defaultId from "utils/default-id";
+import makeLog from "utils/make-log";
 import routes from "utils/routes";
 
 interface IRouteParams {
@@ -15,6 +18,8 @@ interface IRouteParams {
 
 interface IArchiveSectionContainerProps extends
     RouteComponentProps<IRouteParams> {}
+
+const log = makeLog("archive-section-container");
 
 const approvedTrackablesRoute = routes.profileArchive.path.replace(
     ":trackableStatus", TrackableStatus.Approved);
@@ -58,18 +63,24 @@ class ArchiveSectionContainer extends
                 matchExact: routes.profileArchive.exact,
                 matchPath: approvedTrackablesRoute,
                 navigateToPath: approvedTrackablesRoute.replace(":id", userId),
+                onPreSelect: () => Analytics.log(
+                    AnalyticsEvent.ArchivePageOpenApprovedTrackables),
                 titleMsgId: "archiveNavigation.approvedTrackables",
             },
             {
                 matchExact: routes.profileArchive.exact,
                 matchPath: rejectedTrackablesRoute,
                 navigateToPath: rejectedTrackablesRoute.replace(":id", userId),
+                onPreSelect: () => Analytics.log(
+                    AnalyticsEvent.ArchivePageOpenRejectedTrackables),
                 titleMsgId: "archiveNavigation.rejectedTrackables",
             },
             {
                 matchExact: routes.profileArchive.exact,
                 matchPath: expiredTrackablesRoute,
                 navigateToPath: expiredTrackablesRoute.replace(":id", userId),
+                onPreSelect: () => Analytics.log(
+                    AnalyticsEvent.ArchivePageOpenExpiredTrackables),
                 titleMsgId: "archiveNavigation.expiredTrackables",
             },
         ];

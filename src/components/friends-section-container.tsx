@@ -12,8 +12,11 @@ import * as React from "react";
 import { compose, withApollo } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
+import Analytics from "utils/analytics";
+import AnalyticsEvent from "utils/analytics-event";
 import IconName from "utils/icon-name";
 import { IWithApolloProps } from "utils/interfaces";
+import makeLog from "utils/make-log";
 
 interface IFriendsSectionContainerProps extends
     IWithHeaderProps,
@@ -21,6 +24,8 @@ interface IFriendsSectionContainerProps extends
     IWithApolloProps,
     InjectedIntlProps,
     IWithDIContainerProps {}
+
+const log = makeLog("friends-section-container");
 
 class FriendsSectionContainer extends
     React.Component<IFriendsSectionContainerProps> {
@@ -50,7 +55,7 @@ class FriendsSectionContainer extends
                 {
                     iconName: IconName.Add,
                     isDisabled: !props.session.accessToken,
-                    msgId: "commands.share",
+                    msgId: "commands.invite",
                     onRun: this.onInvite,
                 },
             ],
@@ -60,14 +65,20 @@ class FriendsSectionContainer extends
 
     private onInvite = async () => {
         const { intl, client, diContainer } = this.props;
+        let isCancelled;
 
         try {
-            await share("share.app", intl);
+            isCancelled = !await share("share.app", intl);
         } catch (e) {
             if (!isApolloError(e)) {
                 addGenericErrorToast(client);
             }
+
+            return;
         }
+
+        Analytics.log(isCancelled ? AnalyticsEvent.FacebookShareAppPageCancel :
+            AnalyticsEvent.FacebookShareAppPageSubmit);
     }
 }
 

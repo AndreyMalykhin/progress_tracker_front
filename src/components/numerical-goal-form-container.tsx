@@ -33,6 +33,7 @@ import graphql from "react-apollo/graphql";
 import { withApollo } from "react-apollo/withApollo";
 import { FormattedMessage, injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
+import { numberToAnalyticsRange } from "utils/analytics-utils";
 import IconName from "utils/icon-name";
 import uuid from "utils/uuid";
 
@@ -174,6 +175,13 @@ class NumericalGoalFormContainer extends GoalFormContainer<
             maxProgress: String(maxProgress),
             progressDisplayMode,
         } as INumericalGoalFormContainerState;
+    }
+
+    protected getAnalyticsParamsForAdd() {
+        return {
+            ...super.getAnalyticsParamsForAdd(),
+            maxProgress: numberToAnalyticsRange(Number(this.state.maxProgress)),
+        };
     }
 
     private onChangeMaxProgress = (maxProgress: string) => {

@@ -7,6 +7,9 @@ import * as React from "react";
 import { compose } from "react-apollo";
 import { FormattedMessage, InjectedIntlProps, injectIntl } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsEvent from "utils/analytics-event";
+import makeLog from "utils/make-log";
 import routes from "utils/routes";
 
 interface IRouteParams {
@@ -15,6 +18,8 @@ interface IRouteParams {
 
 interface IPendingReviewSectionContainerProps extends
     IWithHeaderProps, RouteComponentProps<IRouteParams>, InjectedIntlProps {}
+
+const log = makeLog("pending-review-section-container");
 
 const globalAudienceRoute =
     routes.pendingReview.path.replace(":audience", Audience.Global);
@@ -27,18 +32,24 @@ const navItems: INavBarItem[] = [
         matchExact: routes.pendingReview.exact,
         matchPath: globalAudienceRoute,
         navigateToPath: globalAudienceRoute,
+        onPreSelect: () => Analytics.log(
+            AnalyticsEvent.PendingReviewPageOpenGlobalTrackables),
         titleMsgId: "reviewsNavigation.globalTrackables",
     },
     {
         matchExact: routes.pendingReview.exact,
         matchPath: friendsAudienceRoute,
         navigateToPath: friendsAudienceRoute,
+        onPreSelect: () => Analytics.log(
+            AnalyticsEvent.PendingReviewPageOpenFriendsTrackables),
         titleMsgId: "reviewsNavigation.friendsTrackables",
     },
     {
         matchExact: routes.pendingReview.exact,
         matchPath: myAudienceRoute,
         navigateToPath: myAudienceRoute,
+        onPreSelect: () => Analytics.log(
+            AnalyticsEvent.PendingReviewPageOpenMyTrackables),
         titleMsgId: "reviewsNavigation.myTrackables",
     },
 ];

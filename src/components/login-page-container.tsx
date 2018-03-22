@@ -11,11 +11,16 @@ import * as React from "react";
 import { compose, withApollo } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { MutationFunc } from "react-apollo/types";
+import Analytics from "utils/analytics";
+import AnalyticsEvent from "utils/analytics-event";
 import { IWithApolloProps } from "utils/interfaces";
+import makeLog from "utils/make-log";
 
 interface ILoginPageContainerProps extends IWithApolloProps {
     onSkip: () => void;
 }
+
+const log = makeLog("login-page-container");
 
 class LoginPageContainer extends React.Component<ILoginPageContainerProps> {
     public render() {
@@ -24,7 +29,10 @@ class LoginPageContainer extends React.Component<ILoginPageContainerProps> {
         );
     }
 
-    private onSkip = () => skipLogin(this.props.client);
+    private onSkip = () => {
+        Analytics.log(AnalyticsEvent.LoginPageSkip);
+        skipLogin(this.props.client);
+    }
 }
 
 export default compose(withDIContainer, withApollo)(LoginPageContainer);

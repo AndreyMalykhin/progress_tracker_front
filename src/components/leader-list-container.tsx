@@ -34,8 +34,12 @@ import * as React from "react";
 import { compose, QueryProps } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { RouteComponentProps, withRouter } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
 import defaultErrorPolicy from "utils/default-error-policy";
+import makeLog from "utils/make-log";
 import routes from "utils/routes";
 
 interface ILeaderListContainerProps extends
@@ -55,6 +59,8 @@ interface IOwnProps extends
 interface IGetDataResponse {
     getLeaders: IConnection<ILeaderListItemNode, number>;
 }
+
+const log = makeLog("leader-list-container");
 
 const getDataQuery = gql`
 query GetData($audience: Audience!, $cursor: Float) {
@@ -105,12 +111,13 @@ class LeaderListContainer extends React.Component<ILeaderListContainerProps> {
                 queryStatus={data.networkStatus}
                 onEndReached={onLoadMore}
                 onPressItem={this.onPressItem}
-                onRefresh={onRefresh}
+                onRefresh={onRefresh && this.onRefresh}
             />
         );
     }
 
     private onPressItem = (id: string) => {
+        Analytics.log(AnalyticsEvent.LeadersPageOpenUser);
         const historyState: IStackingSwitchHistoryState = {
             stackingSwitch: {
                 animation: StackingSwitchAnimation.SlideInRight,
@@ -119,13 +126,22 @@ class LeaderListContainer extends React.Component<ILeaderListContainerProps> {
         const route = routes.profileActiveTrackables.path.replace(":id", id);
         this.props.history.push(route, historyState);
     }
+
+    private onRefresh = () => {
+        Analytics.log(AnalyticsEvent.ListRefresh,
+            { context: AnalyticsContext.LeadersPage });
+        this.props.onRefresh!();
+    }
 }
 
 export default compose(
     withDIContainer,
     withSession,
-    withLogin<ILeaderListContainerProps>("leaderList.loginToSeeFriends",
-        (props) => props.audience === Audience.Friends),
+    withLogin<ILeaderListContainerProps>(
+        "leaderList.loginToSeeFriends",
+        AnalyticsContext.LeadersPage,
+        (props) => props.audience === Audience.Friends,
+    ),
     withRouter,
     withNetworkStatus,
     withSyncStatus,
@@ -157,6 +173,7 @@ export default compose(
     withEmptyList<ILeaderListContainerProps>(
         EmptyList, (props) => props.data.getLeaders),
     withLoadMore<ILeaderListContainerProps, IGetDataResponse>({
+        analyticsContext: AnalyticsContext.LeadersPage,
         dataField: "getLeaders",
         getQuery: (props) => props.data,
     }),

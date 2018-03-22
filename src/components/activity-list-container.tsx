@@ -38,9 +38,13 @@ import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
 import { RouteComponentProps, withRouter } from "react-router";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
 import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
+import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
 import routes from "utils/routes";
 
@@ -69,6 +73,8 @@ interface IOwnProps extends
 interface IGetDataResponse {
     getActivities: IConnection<IActivityListItemNode, number>;
 }
+
+const log = makeLog("activity-list-container");
 
 const getDataQuery = gql`
 query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
@@ -168,7 +174,7 @@ class ActivityListContainer extends
                 queryStatus={data.networkStatus}
                 onPressUser={this.onPressUser}
                 onEndReached={onLoadMore}
-                onRefresh={onRefresh}
+                onRefresh={onRefresh && this.onRefresh}
             />
         );
     }
@@ -210,6 +216,7 @@ class ActivityListContainer extends
     }
 
     private onPressUser = (id: string) => {
+        Analytics.log(AnalyticsEvent.ActivitiesPageOpenUser);
         const historyState: IStackingSwitchHistoryState = {
             stackingSwitch: {
                 animation: StackingSwitchAnimation.SlideInRight,
@@ -218,6 +225,12 @@ class ActivityListContainer extends
         const route = routes.profileActiveTrackables.path.replace(":id", id);
         this.props.history.push(route, historyState);
     }
+
+    private onRefresh = () => {
+        Analytics.log(AnalyticsEvent.ListRefresh,
+            { context: AnalyticsContext.ActivitiesPage });
+        this.props.onRefresh!();
+    }
 }
 
 export default compose(
@@ -225,6 +238,7 @@ export default compose(
     withSession,
     withLogin<IActivityListContainerProps>(
         "activityList.loginToSeeFriends",
+        AnalyticsContext.ActivitiesPage,
         (props) => props.audience === Audience.Friends,
     ),
     withRouter,
@@ -258,6 +272,7 @@ export default compose(
     withEmptyList<IActivityListContainerProps>(
         EmptyList, (props) => props.data.getActivities),
     withLoadMore<IActivityListContainerProps, IGetDataResponse>({
+        analyticsContext: AnalyticsContext.ActivitiesPage,
         dataField: "getActivities",
         getQuery: (props) => props.data,
     }),

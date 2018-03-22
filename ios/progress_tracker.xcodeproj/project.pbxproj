@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -40,6 +41,7 @@
 		458A38EBD43D487EB221D8E3 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB401D739EFF44048B6C8389 /* MaterialCommunityIcons.ttf */; };
 		4E48BC556BE4473AB0248F27 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2668A9155F4B45CF81B3E4CA /* Entypo.ttf */; };
 		5151183A1BF648429680E149 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98989FDEADF149ADBC76D6DC /* libRNVectorIcons.a */; };
+		5202CD082062994600126AFA /* libRNSentry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5202CD04206298F100126AFA /* libRNSentry.a */; };
 		524FC7AA204C19FF0026C3F7 /* goal-achieve.wav in Resources */ = {isa = PBXBuildFile; fileRef = 524FC7A9204C19FF0026C3F7 /* goal-achieve.wav */; };
 		524FC7AC204C1AA50026C3F7 /* progress-change.wav in Resources */ = {isa = PBXBuildFile; fileRef = 524FC7AB204C1AA50026C3F7 /* progress-change.wav */; };
 		525271B4200142F1000B803C /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525271B0200142F0000B803C /* FBSDKCoreKit.framework */; };
@@ -233,6 +235,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 3D3CD9181DE5FBD800167DC4;
 			remoteInfo = "jschelpers-tvOS";
+		};
+		5202CD03206298F100126AFA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5202CCD4206298F100126AFA /* RNSentry.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNSentry;
 		};
 		522E39CC1FFF040600D8C512 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -428,9 +437,11 @@
 		2C6C946D950A569BDAB15067 /* libPods-progress_tracker-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-progress_tracker-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E47B1E0B4A5D006451C7 /* progress_tracker-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "progress_tracker-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* progress_tracker-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "progress_tracker-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		34551B6E952444768732D460 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		4149E77F0B7F4982B64BDDFB /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
 		48FF9BEF2C6B47B183BF7663 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		51382D87DEEC44579D260C3B /* libRNDeviceInfo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNDeviceInfo.a; sourceTree = "<group>"; };
+		5202CCD4206298F100126AFA /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
 		524FC7A9204C19FF0026C3F7 /* goal-achieve.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = "goal-achieve.wav"; path = "../src/sounds/goal-achieve.wav"; sourceTree = "<group>"; };
 		524FC7AB204C1AA50026C3F7 /* progress-change.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = "progress-change.wav"; path = "../src/sounds/progress-change.wav"; sourceTree = "<group>"; };
 		525271B0200142F0000B803C /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
@@ -469,7 +480,6 @@
 		E9E0BAF49FBE3ACD00EB5A47 /* Pods-progress_tracker-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-progress_tracker-tvOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-progress_tracker-tvOSTests/Pods-progress_tracker-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EEEA1B02EDCF48809CCAF3AB /* Pods-progress_trackerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-progress_trackerTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-progress_trackerTests/Pods-progress_trackerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EF22DE44A6CA49D690509974 /* imageCropPicker.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = imageCropPicker.xcodeproj; path = "../node_modules/react-native-image-crop-picker/ios/imageCropPicker.xcodeproj"; sourceTree = "<group>"; };
-		34551B6E952444768732D460 /* libz.tbd */ = {isa = PBXFileReference; name = "libz.tbd"; path = "usr/lib/libz.tbd"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = sourcecode.text-based-dylib-definition; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -486,6 +496,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5202CD082062994600126AFA /* libRNSentry.a in Frameworks */,
 				52F2CF16204A302C00921419 /* libRNSound.a in Frameworks */,
 				52DD91432049A23500FA0B7C /* libSplashScreen.a in Frameworks */,
 				52DAF5E9204433D7001B764D /* libRNFS.a in Frameworks */,
@@ -674,6 +685,14 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		5202CCD5206298F100126AFA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5202CD04206298F100126AFA /* libRNSentry.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		522E39C61FFF040200D8C512 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -781,6 +800,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				5202CCD4206298F100126AFA /* RNSentry.xcodeproj */,
 				52F2CEE5204A301C00921419 /* RNSound.xcodeproj */,
 				52DD91132049A21D00FA0B7C /* SplashScreen.xcodeproj */,
 				52DAF5B820443399001B764D /* RNFS.xcodeproj */,
@@ -872,14 +892,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		8EACBDFEF3FB40BAB68D3AF0 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			path = Application;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -915,7 +927,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				1FB4C4871E47A7AB3796C75A /* [CP] Embed Pods Frameworks */,
 				A4AF3941E30E7D480D521A8B /* [CP] Copy Pods Resources */,
-				0C0C174513CE4D3098ACC78E /* Upload Debug Symbols to Sentry */,
+				D4126BCCBB9646C28F456440 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -980,6 +992,9 @@
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
+					};
+					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = 95CRJLJUB3;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -1067,6 +1082,10 @@
 				{
 					ProductGroup = 52DAF5B920443399001B764D /* Products */;
 					ProjectRef = 52DAF5B820443399001B764D /* RNFS.xcodeproj */;
+				},
+				{
+					ProductGroup = 5202CCD5206298F100126AFA /* Products */;
+					ProjectRef = 5202CCD4206298F100126AFA /* RNSentry.xcodeproj */;
 				},
 				{
 					ProductGroup = 52F2CEE6204A301C00921419 /* Products */;
@@ -1237,6 +1256,13 @@
 			fileType = archive.ar;
 			path = libjschelpers.a;
 			remoteRef = 3DAD3EAE1DF850E9000B6D8A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		5202CD04206298F100126AFA /* libRNSentry.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNSentry.a;
+			remoteRef = 5202CD03206298F100126AFA /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		522E39CD1FFF040600D8C512 /* libRCTBlob-tvOS.a */ = {
@@ -1601,12 +1627,13 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-progress_tracker/Pods-progress_tracker-resources.sh",
-				$PODS_CONFIGURATION_BUILD_DIR/QBImagePickerController/QBImagePicker.bundle,
+				"${PODS_CONFIGURATION_BUILD_DIR}/QBImagePickerController/QBImagePicker.bundle",
 				"${PODS_ROOT}/RSKImageCropper/RSKImageCropper/RSKImageCropperStrings.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/QBImagePicker.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RSKImageCropperStrings.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1649,6 +1676,20 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		D4126BCCBB9646C28F456440 /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym";
+		};
 		D75E91AFDACFED4C30AE4E79 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1678,20 +1719,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-progress_tracker-tvOSTests/Pods-progress_tracker-tvOSTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
-		};
-		0C0C174513CE4D3098ACC78E /* Upload Debug Symbols to Sentry */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			name = "Upload Debug Symbols to Sentry";
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			shellPath = /bin/sh;
-			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1834,6 +1861,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -1869,6 +1897,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

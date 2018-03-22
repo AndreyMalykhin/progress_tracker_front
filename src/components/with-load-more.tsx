@@ -2,6 +2,9 @@ import { IWithNetworkStatusProps } from "components/with-network-status";
 import { throttle } from "lodash";
 import * as React from "react";
 import { QueryProps } from "react-apollo/types";
+import Analytics from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
 import makeLog from "utils/make-log";
 import { isLoading } from "utils/query-status";
@@ -15,6 +18,7 @@ interface IData {
 }
 
 interface IOptions<TProps, TData> {
+    analyticsContext: AnalyticsContext;
     dataField: keyof TData;
     getQuery: (props: TProps) => QueryProps & TData;
 }
@@ -28,7 +32,7 @@ function withLoadMore<
     options: IOptions<TProps, TData>,
 ) {
     return (Component: React.ComponentType<TProps>) => {
-        const { dataField, getQuery } = options;
+        const { analyticsContext, dataField, getQuery } = options;
 
         class WithLoadMore extends React.Component<TProps> {
             public constructor(props: TProps, context: any) {
@@ -54,6 +58,9 @@ function withLoadMore<
                 ) {
                     return;
                 }
+
+                Analytics.log(AnalyticsEvent.ListLoadMore,
+                    { context: analyticsContext });
 
                 try {
                     fetchMore({

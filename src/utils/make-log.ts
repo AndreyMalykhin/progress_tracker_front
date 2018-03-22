@@ -33,4 +33,5 @@ function makeLog(namespace: string) {
     return new Log(namespace);
 }
 
+export { Log };
 export default makeLog;

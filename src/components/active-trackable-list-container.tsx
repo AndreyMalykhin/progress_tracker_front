@@ -113,8 +113,8 @@ import { recentDayCount } from "models/gym-exercise";
 import TrackableStatus from "models/trackable-status";
 import TrackableType from "models/trackable-type";
 import Type from "models/type";
-import { ReactNode } from "react";
 import * as React from "react";
+import { ReactNode } from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -131,6 +131,10 @@ import {
 } from "react-native";
 import ImagePicker, { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
+import Analytics, { IAnalyticsParams } from "utils/analytics";
+import AnalyticsContext from "utils/analytics-context";
+import AnalyticsEvent from "utils/analytics-event";
+import { numberToAnalyticsRange } from "utils/analytics-utils";
 import { IConnection } from "utils/connection";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultErrorPolicy from "utils/default-error-policy";
@@ -540,7 +544,7 @@ class ActiveTrackableListContainer extends React.Component<
             isReorderMode,
             itemsMeta,
         } = this.state;
-        const { onLoadMore, onRefresh, data, isRefreshing, isOnline } =
+        const { onLoadMore, data, isRefreshing, isOnline, onRefresh } =
             this.props;
         const { getActiveTrackables, networkStatus } = data;
         return (
@@ -581,7 +585,7 @@ class ActiveTrackableListContainer extends React.Component<
                 onGetDraggedItemId={this.onGetDraggedItemId}
                 onGetVisibleItemIds={this.onGetVisibleItemIds}
                 onIsItemProveable={this.onIsItemProveable}
-                onRefresh={onRefresh}
+                onRefresh={onRefresh && this.onRefresh}
             />
         );
     }
@@ -784,7 +788,7 @@ class ActiveTrackableListContainer extends React.Component<
                 run: () => this.onEditItem(id),
             },
             {
-                msgId: "commands.break",
+                msgId: "commands.unaggregate",
                 run: () => this.onBreakItem(id),
             },
         ] as ICommandBarItem[];
@@ -1060,7 +1064,11 @@ class ActiveTrackableListContainer extends React.Component<
             key: "activeTrackableListContainer.aggregate",
             leftCommand: {
                 msgId: "common.cancel",
-                onRun: () => this.onCancelAggregateItem(),
+                onRun: () => {
+                    this.logTrackableEvent(
+                        AnalyticsEvent.TrackableCancelAggregation);
+                    this.onCancelAggregateItem();
+                },
             },
             rightCommands: [
                 {
@@ -1071,6 +1079,8 @@ class ActiveTrackableListContainer extends React.Component<
             ],
         });
         setContextMode(true, this.props.client);
+        this.logTrackableEvent(AnalyticsEvent.TrackableAggregate,
+            { type: this.getTrackable(id)!.__typename });
         this.setState((prevState) => {
             const itemsMeta = this.updateItemMeta(
                 id, { isSelected: true }, prevState.itemsMeta);
@@ -1091,6 +1101,8 @@ class ActiveTrackableListContainer extends React.Component<
 
     private onCommitAggregateItem = async () => {
         const selectedItems = this.getSelectedItems();
+        this.logTrackableEvent(AnalyticsEvent.TrackableSubmitAggregation,
+            { selectedItemCount: selectedItems.length });
 
         if (selectedItems.length < 2) {
             this.onCancelAggregateItem();
@@ -1136,6 +1148,8 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onStartRemoveItem = (id: string) => {
+        this.logTrackableEvent(AnalyticsEvent.TrackableRemove,
+            { type: this.getTrackable(id)!.__typename });
         const msg = undefined;
         const { formatMessage } = this.props.intl;
         Alert.alert(formatMessage({ id: "common.areYouSure" }), msg, [
@@ -1171,6 +1185,10 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onToggleItemExpand = (id: string, isExpanded: boolean) => {
+        this.logTrackableEvent(AnalyticsEvent.TrackableSetExpanded, {
+            isExpanded: isExpanded ? 1 : 0,
+            type: this.getTrackable(id)!.__typename,
+        });
         this.setState((prevState) => {
             const itemsMeta = this.updateItemMeta(
                 id, { isExpanded }, prevState.itemsMeta);
@@ -1179,6 +1197,7 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onToggleItemSelect = (id: string, isSelected: boolean) => {
+        this.logTrackableEvent(AnalyticsEvent.TrackableSelect);
         this.setState((prevState) => {
             const itemsMeta = this.updateItemMeta(
                 id, { isSelected }, prevState.itemsMeta);
@@ -1192,24 +1211,50 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onStartAddCounterProgress = (id: string) => {
-        this.openNumericalEntryPopup(async (entry) => {
-            if (entry) {
-                await this.props.onCommitAddCounterProgress(id, entry);
-            }
+        this.logTrackableEvent(AnalyticsEvent.TrackableAddProgress,
+            { type: TrackableType.Counter });
+        this.openNumericalEntryPopup(
+            (entry) => this.onCommitAddCounterProgress(id, entry));
+    }
+
+    private onCommitAddCounterProgress = async (
+        id: string, progress?: number,
+    ) => {
+        if (!progress) {
+            Analytics.log(AnalyticsEvent.AddNumericalProgressFormCancel);
+            return;
+        }
+
+        Analytics.log(AnalyticsEvent.AddNumericalProgressFormSubmit, {
+            delta: numberToAnalyticsRange(progress),
+            trackableType: TrackableType.Counter,
         });
+        await this.props.onCommitAddCounterProgress(id, progress);
     }
 
     private onStartAddNumericalGoalProgress = (id: string) => {
-        this.openNumericalEntryPopup(async (entry) => {
-            if (!entry) {
-                return;
-            }
+        this.logTrackableEvent(AnalyticsEvent.TrackableAddProgress,
+            { type: TrackableType.NumericalGoal });
+        this.openNumericalEntryPopup(
+            (entry) => this.onCommitAddNumericalGoalProgress(id, entry));
+    }
 
-            const response =
-                await this.props.onCommitAddNumericalGoalProgress(id, entry);
-            this.tryShowGoalAchievedToast(
-                response.addNumericalGoalProgress.trackable.status);
+    private onCommitAddNumericalGoalProgress = async (
+        id: string, progress?: number,
+    ) => {
+        if (!progress) {
+            Analytics.log(AnalyticsEvent.AddNumericalProgressFormCancel);
+            return;
+        }
+
+        Analytics.log(AnalyticsEvent.AddNumericalProgressFormSubmit, {
+            delta: numberToAnalyticsRange(progress),
+            trackableType: TrackableType.NumericalGoal,
         });
+        const response =
+            await this.props.onCommitAddNumericalGoalProgress(id, progress);
+        this.tryShowGoalAchievedToast(
+            response.addNumericalGoalProgress.trackable.status);
     }
 
     private tryShowGoalAchievedToast(goalStatus: TrackableStatus) {
@@ -1222,16 +1267,33 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onStartNewGymExerciseEntry = (id: string) => {
-        this.openGymExerciseEntryPopup(async (entry) => {
-            if (entry) {
-                return await this.props.onCommitNewGymExerciseEntry(id, entry);
-            }
+        this.logTrackableEvent(AnalyticsEvent.TrackableAddProgress,
+            { type: TrackableType.GymExercise });
+        this.openGymExerciseEntryPopup(
+            (entry) => this.onCommitNewGymExerciseEntry(id, entry));
+    }
+
+    private onCommitNewGymExerciseEntry = async (
+        id: string, entry?: IGymExerciseEntryPopupResult,
+    ) => {
+        if (!entry) {
+            Analytics.log(AnalyticsEvent.AddGymExerciseEntryFormCancel);
+            return;
+        }
+
+        Analytics.log(AnalyticsEvent.AddGymExerciseEntryFormSubmit, {
+            repetitionCount: entry.repetitionCount,
+            setCount: entry.setCount,
+            weight: numberToAnalyticsRange(entry.weight),
         });
+        await this.props.onCommitNewGymExerciseEntry(id, entry);
     }
 
     private onStartProveItem = async (id: string) => {
         const { diContainer, client } = this.props;
         let image: Image|null;
+        const trackable = this.getTrackable(id)!;
+        this.logTrackableEvent(AnalyticsEvent.TrackableProve);
 
         try {
             image = await openImgPicker(diContainer.audioManager);
@@ -1241,9 +1303,12 @@ class ActiveTrackableListContainer extends React.Component<
         }
 
         if (!image) {
+            Analytics.log(AnalyticsEvent.ProofPickerCancel);
             return;
         }
 
+        Analytics.log(AnalyticsEvent.ProofPickerSubmit,
+            { trackableType: trackable.__typename });
         await this.commitProveItem(id, image);
     }
 
@@ -1303,12 +1368,16 @@ class ActiveTrackableListContainer extends React.Component<
             const dlgTitle = formatMessage({ id: "shareProvedGoal.title" });
             Alert.alert(dlgTitle, dlgMsg, [
                 {
-                    onPress: resolve,
+                    onPress: () => {
+                        Analytics.log(AnalyticsEvent.ShareProvedGoalPopupDecline);
+                        resolve();
+                    },
                     style: "cancel",
                     text: formatMessage({ id: "common.no" }),
                 },
                 {
                     onPress: async () => {
+                        Analytics.log(AnalyticsEvent.ShareProvedGoalPopupAccept);
                         await this.shareProvedGoal(response);
                         resolve();
                     },
@@ -1320,20 +1389,35 @@ class ActiveTrackableListContainer extends React.Component<
 
     private async shareProvedGoal(response: IProveTrackableResponse) {
         const { client, intl, diContainer } = this.props;
-        const fragmentId = dataIdFromObject(response.proveTrackable.trackable)!;
+        const { trackable } = response.proveTrackable;
+        const fragmentId = dataIdFromObject(trackable)!;
         const title = client.readFragment<IShareProvedGoalFragment>(
             { id: fragmentId, fragment: shareProvedGoalFragment })!.title;
+        let isCancelled;
 
         try {
-            await share("share.provedGoal", intl, { title });
+            isCancelled = !await share("share.provedGoal", intl, { title });
         } catch (e) {
             if (!isApolloError(e)) {
                 addGenericErrorToast(client);
             }
+
+            return;
+        }
+
+        if (isCancelled) {
+            Analytics.log(AnalyticsEvent.FacebookShareTrackablePageCancel);
+        } else {
+            Analytics.log(AnalyticsEvent.FacebookShareTrackablePageSubmit, {
+                context: AnalyticsContext.ActiveTrackablesPage,
+                trackableType: trackable.__typename,
+            });
         }
     }
 
     private onEditItem = (id: string) => {
+        this.logTrackableEvent(AnalyticsEvent.TrackableEdit,
+            { type: this.getTrackable(id)!.__typename });
         const historyState: IStackingSwitchHistoryState = {
             stackingSwitch: {
                 animation: StackingSwitchAnimation.SlideInUp,
@@ -1422,6 +1506,7 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onCommitReorderItem = async (srcId: string, destId: string) => {
+        this.logTrackableEvent(AnalyticsEvent.TrackableReorder);
         LayoutAnimation.easeInEaseOut();
 
         try {
@@ -1459,6 +1544,8 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onSetTaskDone = async (taskId: string, isDone: boolean) => {
+        this.logTrackableEvent(AnalyticsEvent.TrackableSetTaskDone,
+            { isDone: isDone ? 1 : 0 });
         let response;
 
         try {
@@ -1479,6 +1566,8 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onUnaggregateItem = async (id: string) => {
+        this.logTrackableEvent(AnalyticsEvent.TrackableUnaggregate,
+            { type: this.getTrackable(id)!.__typename });
         LayoutAnimation.easeInEaseOut();
 
         try {
@@ -1489,6 +1578,8 @@ class ActiveTrackableListContainer extends React.Component<
     }
 
     private onBreakItem = async (id: string) => {
+        this.logTrackableEvent(AnalyticsEvent.TrackableUnaggregate,
+            { type: TrackableType.Aggregate });
         LayoutAnimation.easeInEaseOut();
 
         try {
@@ -1496,6 +1587,37 @@ class ActiveTrackableListContainer extends React.Component<
         } catch (e) {
             // already reported
         }
+    }
+
+    private getTrackable(id: string) {
+        for (const { node } of this.props.data.getActiveTrackables.edges) {
+            if (node.id === id) {
+                return node;
+            }
+
+            if (node.__typename === Type.Aggregate) {
+                for (const child of (node as IAggregate).children) {
+                    if (child.id === id) {
+                        return child;
+                    }
+                }
+            }
+        }
+
+        return undefined;
+    }
+
+    private logTrackableEvent(
+        event: AnalyticsEvent, params?: IAnalyticsParams,
+    ) {
+        Analytics.log(event,
+            { ...params, context: AnalyticsContext.ActiveTrackablesPage });
+    }
+
+    private onRefresh = () => {
+        Analytics.log(AnalyticsEvent.ListRefresh,
+            { context: AnalyticsContext.ActiveTrackablesPage });
+        this.props.onRefresh!();
     }
 }
 
@@ -1546,9 +1668,8 @@ export default compose(
     withBreak,
     withAddToAggregate,
     withLoadMore<IActiveTrackableListContainerProps, IGetDataResponse>({
+        analyticsContext: AnalyticsContext.ActiveTrackablesPage,
         dataField: "getActiveTrackables",
         getQuery: (props) => props.data,
     }),
-    withLoginAction,
-    withEnsureUserLoggedIn,
 )(ActiveTrackableListContainer);
