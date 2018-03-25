@@ -38,7 +38,6 @@ import Analytics from "utils/analytics";
 import AnalyticsContext from "utils/analytics-context";
 import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
-import defaultErrorPolicy from "utils/default-error-policy";
 import { IWithApolloProps } from "utils/interfaces";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
@@ -106,7 +105,6 @@ const withData = graphql<
     {
         options: (ownProps) => {
             return {
-                errorPolicy: defaultErrorPolicy,
                 fetchPolicy: ownProps.fetchPolicy,
                 notifyOnNetworkStatusChange: true,
             };

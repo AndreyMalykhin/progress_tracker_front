@@ -7,6 +7,7 @@ import { addToast } from "actions/toast-helpers";
 import ActionSheet, { IActionSheetOption } from "components/action-sheet";
 import ActiveTrackableListContainer from "components/active-trackable-list-container";
 import ArchiveSectionContainer from "components/archive-section-container";
+import { listStyle } from "components/common-styles";
 import Error from "components/error";
 import {
     HeaderAnimation,
@@ -53,7 +54,6 @@ import { RouteComponentProps, withRouter } from "react-router";
 import Analytics from "utils/analytics";
 import AnalyticsContext from "utils/analytics-context";
 import AnalyticsEvent from "utils/analytics-event";
-import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import { NumberFormat } from "utils/formats";
 import IconName from "utils/icon-name";
@@ -166,7 +166,6 @@ const withRemoteData =
                 }
 
                 return {
-                    errorPolicy: defaultErrorPolicy,
                     fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                     variables: { userId },
@@ -429,6 +428,9 @@ export default compose(
     withLoader<IProfileSectionContainerProps, IGetRemoteDataResponse>(Loader, {
         dataField: "getUser",
         getQuery: (props) => props.remoteData,
+        props: {
+            style: { backgroundColor: listStyle.backgroundColor },
+        },
     }),
     withError<IProfileSectionContainerProps, IGetRemoteDataResponse>(Error, {
         dataField: "getUser",

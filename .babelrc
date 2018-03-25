@@ -1,22 +1,29 @@
 {
-  "presets": [
-    "babel-preset-react-native-stage-0/decorator-support"
-  ],
-  "plugins": [
-    "transform-inline-environment-variables"
-  ],
-  "env": {
-    "development": {
-      "plugins": [
-        "transform-react-jsx-source",
+    "presets": [
+        "babel-preset-react-native-stage-0/decorator-support"
+    ],
+    "plugins": [
+        "transform-inline-environment-variables",
         [
-          "module-resolver",
-          {
-            "root": ["build"],
-            "extensions": [".js", ".ios.js", ".android.js"]
-          }
+            "module-resolver",
+            {
+                "cwd": "babelrc",
+                "root": [
+                    "build"
+                ],
+                "extensions": [
+                    ".js",
+                    ".ios.js",
+                    ".android.js"
+                ]
+            }
         ]
-      ]
+    ],
+    "env": {
+        "development": {
+            "plugins": [
+                "transform-react-jsx-source"
+            ]
+        }
     }
-  }
 }

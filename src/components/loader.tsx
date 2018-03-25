@@ -13,7 +13,7 @@ interface ILoaderProps extends ActivityIndicatorProperties {
     isNoFillParent?: boolean;
 }
 
-class Loader extends React.Component<ILoaderProps> {
+class Loader extends React.PureComponent<ILoaderProps> {
     public render() {
         const { style, isNoFillParent, ...restProps } = this.props;
         const newStyle = [

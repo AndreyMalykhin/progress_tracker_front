@@ -73,7 +73,6 @@ import Analytics from "utils/analytics";
 import AnalyticsContext from "utils/analytics-context";
 import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
-import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
@@ -161,6 +160,7 @@ query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
             node {
                 id
                 status
+                statusChangeDate
                 creationDate
                 title
                 user @skip(if: $skipUser) {
@@ -197,7 +197,6 @@ const withData = graphql<
         options: (ownProps) => {
             const { audience, fetchPolicy } = ownProps;
             return {
-                errorPolicy: defaultErrorPolicy,
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: { audience, skipUser: audience === Audience.Me },

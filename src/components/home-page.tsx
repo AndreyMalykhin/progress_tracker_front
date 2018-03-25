@@ -1,5 +1,5 @@
 import ActivitiesSectionContainer from "components/activities-section-container";
-import { color } from "components/common-styles";
+import { color, listStyle } from "components/common-styles";
 import FriendsSectionContainer from "components/friends-section-container";
 import GlobalNav from "components/global-nav";
 import Header from "components/header";

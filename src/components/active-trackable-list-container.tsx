@@ -137,7 +137,6 @@ import AnalyticsEvent from "utils/analytics-event";
 import { numberToAnalyticsRange } from "utils/analytics-utils";
 import { IConnection } from "utils/connection";
 import dataIdFromObject from "utils/data-id-from-object";
-import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import DragStatus from "utils/drag-status";
 import IHsitoryState from "utils/history-state";
@@ -484,7 +483,6 @@ const withData =
                 }
 
                 return {
-                    errorPolicy: defaultErrorPolicy,
                     fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                     variables: { userId },

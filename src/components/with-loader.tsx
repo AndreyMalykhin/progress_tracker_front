@@ -1,3 +1,4 @@
+import { ILoaderProps } from "components/loader";
 import { IWithSessionProps } from "components/with-session";
 import * as React from "react";
 import { QueryProps } from "react-apollo";
@@ -13,6 +14,7 @@ interface IOptions<TProps, TData> {
     minDuration?: number;
     showIfNoQuery?: boolean;
     getQuery: (props: TProps) => (QueryProps & TData) | undefined;
+    props?: ILoaderProps;
 }
 
 const log = makeLog("with-loader");
@@ -23,10 +25,10 @@ const defaultOptions: Partial< IOptions<any, any> > = {
 };
 
 function withLoader<TProps extends {}, TData extends {}>(
-    loader: React.ComponentType, options: IOptions<TProps, TData>,
+    Loader: React.ComponentType<ILoaderProps>, options: IOptions<TProps, TData>,
 ) {
     return (Component: React.ComponentType<TProps>) => {
-        const { minDuration, getQuery, showIfNoQuery, dataField } = {
+        const { minDuration, getQuery, showIfNoQuery, dataField, props } = {
             ...defaultOptions, ...options,
         };
 
@@ -36,7 +38,7 @@ function withLoader<TProps extends {}, TData extends {}>(
 
             public render() {
                 log.trace("render", "isVisible=%o", this.state.isVisible);
-                return this.state.isVisible ? React.createElement(loader) :
+                return this.state.isVisible ? <Loader {...props} /> :
                     <Component {...this.props} />;
             }
 

@@ -23,6 +23,11 @@ class ErrorLink extends ErrorLinkImpl {
                 log.trace("request", "retry");
                 const context = operation.getContext() as
                     IOfflineLinkOperationContext;
+
+                if (!context.optimisticResponse) {
+                    return;
+                }
+
                 context.enqueue = true;
                 operation.setContext(context);
                 subscription =

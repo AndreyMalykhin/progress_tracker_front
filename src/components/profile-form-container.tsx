@@ -49,7 +49,6 @@ import { Image } from "react-native-image-crop-picker";
 import { RouteComponentProps, withRouter } from "react-router";
 import Analytics from "utils/analytics";
 import AnalyticsEvent from "utils/analytics-event";
-import defaultErrorPolicy from "utils/default-error-policy";
 import { IWithApolloProps } from "utils/interfaces";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
@@ -136,7 +135,6 @@ const withData =
         {
             options: (ownProps) => {
                 return {
-                    errorPolicy: defaultErrorPolicy,
                     fetchPolicy: ownProps.fetchPolicy,
                     notifyOnNetworkStatusChange: true,
                 };

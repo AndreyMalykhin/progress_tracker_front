@@ -421,7 +421,7 @@
 		061A5A706F5C71AFDFE861BE /* Pods-progress_tracker-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-progress_tracker-tvOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-progress_tracker-tvOS/Pods-progress_tracker-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* progress_tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = progress_tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* completoo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = completoo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = progress_tracker/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = progress_tracker/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -860,7 +860,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* progress_tracker.app */,
+				13B07F961A680F5B00A75B9A /* completoo.app */,
 				00E356EE1AD99517003FC87E /* progress_trackerTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* progress_tracker-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* progress_tracker-tvOSTests.xctest */,
@@ -935,7 +935,7 @@
 			);
 			name = progress_tracker;
 			productName = "Hello World";
-			productReference = 13B07F961A680F5B00A75B9A /* progress_tracker.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* completoo.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2D02E47A1E0B4A5D006451C7 /* progress_tracker-tvOS */ = {
@@ -991,6 +991,7 @@
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = 95CRJLJUB3;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
@@ -998,10 +999,12 @@
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 95CRJLJUB3;
 						ProvisioningStyle = Automatic;
 					};
 					2D02E48F1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 95CRJLJUB3;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 2D02E47A1E0B4A5D006451C7;
 					};
@@ -1493,7 +1496,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "if [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n    export SKIP_BUNDLING=true\nfi\nexport SENTRY_PROPERTIES=sentry.properties\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
 		18EF309A7BDAE76E9401AE7C /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1790,6 +1793,7 @@
 			baseConfigurationReference = EEEA1B02EDCF48809CCAF3AB /* Pods-progress_trackerTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1817,7 +1821,7 @@
 					"-lc++",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/progress_tracker.app/progress_tracker";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/completoo.app/completoo";
 			};
 			name = Debug;
 		};
@@ -1827,6 +1831,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
@@ -1850,7 +1855,7 @@
 					"-lc++",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/progress_tracker.app/progress_tracker";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/completoo.app/completoo";
 			};
 			name = Release;
 		};
@@ -1886,7 +1891,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_NAME = progress_tracker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.completoo;
+				PRODUCT_NAME = completoo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1922,7 +1928,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_NAME = progress_tracker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.completoo;
+				PRODUCT_NAME = completoo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -1938,6 +1945,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				HEADER_SEARCH_PATHS = (
@@ -1961,7 +1969,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.progress_tracker-tvOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.completoo-tvOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -1981,6 +1989,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				GCC_NO_COMMON_BLOCKS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2003,7 +2012,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.progress_tracker-tvOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.completoo-tvOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -2021,6 +2030,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "progress_tracker-tvOSTests/Info.plist";
@@ -2052,6 +2062,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "progress_tracker-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";

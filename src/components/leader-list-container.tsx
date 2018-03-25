@@ -38,7 +38,6 @@ import Analytics from "utils/analytics";
 import AnalyticsContext from "utils/analytics-context";
 import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
-import defaultErrorPolicy from "utils/default-error-policy";
 import makeLog from "utils/make-log";
 import routes from "utils/routes";
 
@@ -92,7 +91,6 @@ const withData = graphql<
     {
         options: (ownProps) => {
             return {
-                errorPolicy: defaultErrorPolicy,
                 fetchPolicy: ownProps.fetchPolicy,
                 notifyOnNetworkStatusChange: true,
             };

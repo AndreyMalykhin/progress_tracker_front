@@ -45,8 +45,17 @@ function makeApollo(
         links.unshift(apolloLogger);
     }
 
-    const apollo = new ApolloClient<NormalizedCacheObject>(
-        { cache, link: ApolloLink.from(links) });
+    // any policy except "none" mitigates error handling bugs in Apollo
+    const errorPolicy = "all";
+    const apollo = new ApolloClient<NormalizedCacheObject>({
+        cache,
+        defaultOptions: {
+            query: { errorPolicy },
+            watchQuery: { errorPolicy },
+        },
+        link: ApolloLink.from(links),
+        queryDeduplication: false, // disabled because it's buggy
+    });
     offlineLink.start(apollo);
     return apollo;
 }

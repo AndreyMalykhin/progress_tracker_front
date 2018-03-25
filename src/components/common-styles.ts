@@ -104,7 +104,7 @@ const typographyStyle = {
 };
 
 const listStyle = {
-    backgroundColor: shadeColor.light2,
+    backgroundColor: shadeColor.light,
 };
 
 const cardStyle = {
@@ -157,7 +157,7 @@ const progressBarStyle = {
 };
 
 const headerStyle = {
-    backgroundColor: shadeColor.light,
+    backgroundColor: shadeColor.light2,
     borderColor: shadeColor.normal,
 };
 

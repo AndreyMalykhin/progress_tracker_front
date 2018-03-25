@@ -36,7 +36,6 @@ import Analytics from "utils/analytics";
 import AnalyticsContext from "utils/analytics-context";
 import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
-import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import isMyId from "utils/is-my-id";
 import makeLog from "utils/make-log";
@@ -119,7 +118,6 @@ const withData = graphql<
             }
 
             return {
-                errorPolicy: defaultErrorPolicy,
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: {

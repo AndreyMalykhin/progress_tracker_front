@@ -3,7 +3,7 @@ enum IconName {
     Add = "plus",
     Approve = "thumb-up",
     Archive = "archive",
-    Back = "keyboard-backspace",
+    Back = "chevron-left",
     Checked = "check-circle",
     Collapsed = "chevron-down",
     Commands = "dots-horizontal",

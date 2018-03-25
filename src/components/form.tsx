@@ -220,9 +220,13 @@ class FormHint extends React.PureComponent<IFormHintProps> {
 // tslint:disable-next-line:max-classes-per-file
 class FormButtonOk extends React.PureComponent<IFormButtonOkProps> {
     public render() {
-        const { disabled } = this.props;
+        const { disabled, style, ...restProps } = this.props;
         return (
-            <Button {...this.props}>
+            <Button
+                style={[styles.buttonOk, style]}
+                disabled={disabled}
+                {...restProps}
+            >
                 <ButtonTitle
                     primary={true}
                     disabled={disabled}
@@ -236,9 +240,13 @@ class FormButtonOk extends React.PureComponent<IFormButtonOkProps> {
 // tslint:disable-next-line:max-classes-per-file
 class FormButtonCancel extends React.PureComponent<IFormButtonCancelProps> {
     public render() {
-        const { disabled } = this.props;
+        const { disabled, style, ...restProps } = this.props;
         return (
-            <Button {...this.props}>
+            <Button
+                style={[styles.buttonCancel, style]}
+                disabled={disabled}
+                {...restProps}
+            >
                 <ButtonTitle disabled={disabled} msgId="common.cancel" />
             </Button>
         );
@@ -247,6 +255,12 @@ class FormButtonCancel extends React.PureComponent<IFormButtonCancelProps> {
 
 const styles = StyleSheet.create({
     body: {},
+    buttonCancel: {
+        flex: 1,
+    },
+    buttonOk: {
+        flex: 1,
+    },
     error: {
         marginTop: gap.single,
     },

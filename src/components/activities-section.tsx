@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     nav: {
-        backgroundColor: shadeColor.light2,
+        backgroundColor: shadeColor.light,
     },
 });
 

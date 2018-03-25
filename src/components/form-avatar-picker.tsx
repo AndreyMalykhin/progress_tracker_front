@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     },
     container: {
         alignItems: "center",
-        backgroundColor: shadeColor.light2,
+        backgroundColor: shadeColor.light,
         borderBottomWidth: 1,
         borderColor: shadeColor.light3,
     },

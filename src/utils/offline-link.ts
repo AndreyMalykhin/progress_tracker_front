@@ -93,13 +93,13 @@ class OfflineLink extends ApolloLink {
         const { optimisticResponse, isOfflineOperation, enqueue } =
             operation.getContext() as IOfflineLinkOperationContext;
 
-        if (enqueue
-            || (!isOfflineOperation
-                && optimisticResponse
-                && this.apollo
-                && (this.isOnline === false
-                    || this.isDraining
-                    || isAnonymous(this.session)))
+        if (!isOfflineOperation
+            && optimisticResponse
+            && this.apollo
+            && (this.isOnline === false
+                || this.isDraining
+                || isAnonymous(this.session)
+                || enqueue)
         ) {
             InteractionManager.runAfterInteractions(
                 () => this.enqueue(operation));

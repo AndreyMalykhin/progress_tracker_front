@@ -42,7 +42,6 @@ import Analytics from "utils/analytics";
 import AnalyticsContext from "utils/analytics-context";
 import AnalyticsEvent from "utils/analytics-event";
 import { IConnection } from "utils/connection";
-import defaultErrorPolicy from "utils/default-error-policy";
 import defaultId from "utils/default-id";
 import makeLog from "utils/make-log";
 import QueryStatus from "utils/query-status";
@@ -149,7 +148,6 @@ const withData = graphql<
         options: (ownProps) => {
             const { audience, session, fetchPolicy } = ownProps;
             return {
-                errorPolicy: defaultErrorPolicy,
                 fetchPolicy,
                 notifyOnNetworkStatusChange: true,
                 variables: { audience, skipUser: audience === Audience.Me },
