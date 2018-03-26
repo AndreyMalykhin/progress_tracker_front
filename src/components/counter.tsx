@@ -2,6 +2,7 @@ import AnimatedNumber from "components/animated-number";
 import { ICommandBarItem } from "components/command-bar";
 import { gap, touchableStyle } from "components/common-styles";
 import Text from "components/text";
+import TouchableWithFeedback from "components/touchable-with-feedback";
 import Trackable from "components/trackable";
 import { BodyText, CalloutText } from "components/typography";
 import TrackableStatus from "models/trackable-status";
@@ -42,25 +43,37 @@ interface ICounterProps {
     onSelectChange?: (id: string, isSelected: boolean) => void;
     onLongPress?: (id: string, parentId?: string) => void;
     onPressOut?: (id: string) => void;
+    onPressProgress?: (id: string) => void;
     onLayout?: (id: string, layout?: LayoutRectangle) => void;
     onGetLayoutRef?: () => View | undefined;
 }
 
 class Counter extends React.PureComponent<ICounterProps> {
     public render() {
-        const { progress, ...restProps } = this.props;
+        const { progress, isDisabled, onPressProgress, ...restProps } =
+            this.props;
         return (
-            <Trackable {...restProps}>
-                <AnimatedNumber
-                    value={progress}
-                    onRender={this.onRenderNumber}
-                />
+            <Trackable isDisabled={isDisabled} {...restProps}>
+                <TouchableWithFeedback
+                    disabled={isDisabled || !onPressProgress}
+                    onPress={this.onPressProgress}
+                >
+                    <AnimatedNumber
+                        value={progress}
+                        onRender={this.onRenderNumber}
+                    />
+                </TouchableWithFeedback>
             </Trackable>
         );
     }
 
     private onRenderNumber = (value: string) => {
         return <CalloutText style={styles.progress}>{value}</CalloutText>;
+    }
+
+    private onPressProgress = () => {
+        const { onPressProgress, id } = this.props;
+        onPressProgress!(id);
     }
 }
 

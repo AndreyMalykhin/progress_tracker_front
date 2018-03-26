@@ -170,6 +170,9 @@ interface IActiveTrackableListProps extends IExtraData, IWithRefreshProps {
     onGetVisibleItemIds: () => string[];
     onGetDraggedItemId: () => string;
     onIsItemProveable: (status: TrackableStatus) => boolean;
+    onPressCounterProgress: (id: string) => void;
+    onPressGymExerciseProgress: (id: string) => void;
+    onPressNumericalGoalProgress: (id: string) => void;
 }
 
 const log = makeLog("active-trackable-list");
@@ -339,9 +342,16 @@ class ActiveTrackableList extends
             onLongPressItem,
             onItemLayout,
             onPressOutItem,
+            onPressCounterProgress,
         } = this.props;
         const { isDisabled, isSelected, dragStatus } = itemsMeta[id];
         const isAggregated = parent != null;
+        const onPressProgress = this.makeOnPressProgress(
+            onPressCounterProgress,
+            status,
+            isReorderMode,
+            isAggregationMode,
+        );
         return (
             <Counter
                 key={id}
@@ -358,13 +368,14 @@ class ActiveTrackableList extends
                 isReorderMode={isReorderMode && !isAggregated}
                 isLast={isLast}
                 isFirst={isFirst}
-                isNested={parent != null}
+                isNested={isAggregated}
                 status={status}
                 commands={onGetCounterCommands(id, isAggregated)}
                 statusDuration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
                 onLongPress={onLongPressItem}
                 onPressOut={onPressOutItem}
+                onPressProgress={onPressProgress}
                 onLayout={onItemLayout}
             />
         );
@@ -388,11 +399,18 @@ class ActiveTrackableList extends
             onIsGymExerciseExpandable,
             onItemLayout,
             onPressOutItem,
+            onPressGymExerciseProgress,
         } = this.props;
         const { isExpanded, isDisabled, isSelected, dragStatus } =
             itemsMeta[id];
         const gymExerciseItems =
             onGetGymExerciseItems(id, recentEntries, isExpanded!);
+        const onPressProgress = this.makeOnPressProgress(
+            onPressGymExerciseProgress,
+            status,
+            isReorderMode,
+            isAggregationMode,
+        );
         return (
             <GymExercise
                 key={id}
@@ -418,6 +436,7 @@ class ActiveTrackableList extends
                 onExpandChange={onToggleItemExpand}
                 onLayout={onItemLayout}
                 onPressOut={onPressOutItem}
+                onPressProgress={onPressProgress}
             />
         );
     }
@@ -449,11 +468,18 @@ class ActiveTrackableList extends
             onItemLayout,
             onPressOutItem,
             onIsItemProveable,
+            onPressNumericalGoalProgress,
         } = this.props;
         const { isDisabled, isSelected, isProving, dragStatus } = itemsMeta[id];
         const isAggregated = parent != null;
         const commands =
             onGetNumericalGoalCommands(id, isAggregated, status);
+        const onPressProgress = this.makeOnPressProgress(
+            onPressNumericalGoalProgress,
+            status,
+            isReorderMode,
+            isAggregationMode,
+        );
         return (
             <NumericalGoal
                 key={id}
@@ -475,7 +501,7 @@ class ActiveTrackableList extends
                 isProving={isProving}
                 isLast={isLast}
                 isFirst={isFirst}
-                isNested={parent != null}
+                isNested={isAggregated}
                 status={status}
                 commands={commands}
                 statusDuration={Date.now() - creationDate}
@@ -484,6 +510,7 @@ class ActiveTrackableList extends
                 onProve={onProveItem}
                 onLayout={onItemLayout}
                 onPressOut={onPressOutItem}
+                onPressProgress={onPressProgress}
             />
         );
     }
@@ -552,7 +579,7 @@ class ActiveTrackableList extends
                 isReorderMode={isReorderMode && !isAggregated}
                 isLast={isLast}
                 isFirst={isFirst}
-                isNested={parent != null}
+                isNested={isAggregated}
                 status={status}
                 statusDuration={Date.now() - creationDate}
                 onSelectChange={onToggleItemSelect}
@@ -617,6 +644,22 @@ class ActiveTrackableList extends
 
     private getItemKey(item: IActiveTrackableListItem) {
         return item.node.id;
+    }
+
+    private makeOnPressProgress(
+        handler: (trackableId: string) => void,
+        trackableStatus: TrackableStatus,
+        isReorderMode?: boolean,
+        isAggregationMode?: boolean,
+    ) {
+        if (trackableStatus !== TrackableStatus.Active
+            || isAggregationMode
+            || isReorderMode
+        ) {
+            return undefined;
+        }
+
+        return handler;
     }
 }
 

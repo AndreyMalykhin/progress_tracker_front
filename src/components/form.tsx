@@ -71,7 +71,9 @@ type IFormHintProps = IMessageProps & {
     disabled?: boolean;
 };
 
-type IFormButtonOkProps = IButtonProps;
+interface IFormButtonOkProps extends IButtonProps {
+    msgId?: string;
+}
 
 type IFormButtonCancelProps = IButtonProps;
 
@@ -220,7 +222,7 @@ class FormHint extends React.PureComponent<IFormHintProps> {
 // tslint:disable-next-line:max-classes-per-file
 class FormButtonOk extends React.PureComponent<IFormButtonOkProps> {
     public render() {
-        const { disabled, style, ...restProps } = this.props;
+        const { disabled, style, msgId, ...restProps } = this.props;
         return (
             <Button
                 style={[styles.buttonOk, style]}
@@ -230,7 +232,7 @@ class FormButtonOk extends React.PureComponent<IFormButtonOkProps> {
                 <ButtonTitle
                     primary={true}
                     disabled={disabled}
-                    msgId="common.ok"
+                    msgId={msgId || "common.ok"}
                 />
             </Button>
         );

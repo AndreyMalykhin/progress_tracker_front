@@ -5,7 +5,7 @@ import ModalImpl, { ModalProps } from "react-native-modal";
 
 type IModalProps = ModalProps;
 
-class Modal extends React.Component<IModalProps> {
+class Modal extends React.PureComponent<IModalProps> {
     public render() {
         const { children, ...restProps } = this.props;
         return (

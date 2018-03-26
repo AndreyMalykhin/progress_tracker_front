@@ -18,7 +18,7 @@ import { IOfflineLinkOperationContext } from "utils/offline-link";
 interface IErrorHandlerProps extends IWithDIContainerProps, InjectedIntlProps {}
 
 interface IOperationContext extends IOfflineLinkOperationContext {
-    response: Response;
+    response?: Response;
 }
 
 const log = makeLog("error-handler");
@@ -26,8 +26,7 @@ const log = makeLog("error-handler");
 class ErrorHandler extends React.PureComponent<IErrorHandlerProps> {
     public constructor(props: IErrorHandlerProps, context: any) {
         super(props, context);
-        this.goOffline = throttle(this.goOffline,
-            props.diContainer.envConfig.pingPeriod, { trailing: false });
+        this.showError = throttle(this.showError, 1024, { trailing: false });
         this.refreshAccessToken = throttle(
             this.refreshAccessToken, 32000, { trailing: false });
     }
@@ -41,42 +40,49 @@ class ErrorHandler extends React.PureComponent<IErrorHandlerProps> {
     }
 
     private onError: ApolloErrorHandler = (error) => {
+        const { networkError, operation, response } = error;
+        const { isOfflineOperation, response: httpResponse } =
+            operation.getContext() as IOperationContext;
         const queryLoc = error.operation.query.loc;
         log.error(
             "onError",
             `Operation failed: ${queryLoc && queryLoc.source.body}`,
-            error,
+            { httpResponse, isOfflineOperation, error },
         );
-        const { networkError, operation, response } = error;
-        const { isOfflineOperation, response: httpResponse } =
-            operation.getContext() as IOperationContext;
-        const httpResponse2: Response | undefined =
-            networkError && (networkError as any).response;
-        const status = (httpResponse && httpResponse.status)
-            || (httpResponse2 && httpResponse2.status);
+        const httpStatus = httpResponse && httpResponse.status;
         const { apollo } = this.props.diContainer;
 
-        if (status === 401) {
+        if (httpStatus === 401) {
             this.refreshAccessToken(apollo);
             return;
         }
 
-        if (networkError) {
+        if (networkError && !httpStatus) {
             this.goOffline(apollo);
             return;
         }
 
         if (!isOfflineOperation) {
-            addGenericErrorToast(apollo);
+            this.showError(apollo);
         }
     }
 
+    private showError = (apollo: ApolloClient<NormalizedCacheObject>) =>
+        addGenericErrorToast(apollo)
+
     private goOffline = (apollo: ApolloClient<NormalizedCacheObject>) => {
-        this.props.diContainer.networkTracker.setOnline(false);
-        addToast(
-            { msgId: "common.offline", severity: ToastSeverity.Danger },
-            apollo,
-        );
+        const { networkTracker } = this.props.diContainer;
+
+        if (!networkTracker.online) {
+            return;
+        }
+
+        networkTracker.online = false;
+        const toast = {
+            msgId: "notifications.disconnected",
+            severity: ToastSeverity.Danger,
+        };
+        addToast(toast, apollo);
     }
 
     private refreshAccessToken = (

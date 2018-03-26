@@ -2,7 +2,7 @@ import { FormBody } from "components/form";
 import FormTextInput from "components/form-text-input";
 import * as React from "react";
 import {
-    KeyboardAwareScrollView,
+    KeyboardAwareScrollView, KeyboardAwareScrollViewProps,
 } from "react-native-keyboard-aware-scroll-view";
 
 interface ITrackableFormProps {
@@ -12,7 +12,16 @@ interface ITrackableFormProps {
     titlePlaceholderMsgId: string;
     onChangeTitle: (value: string) => void;
     onRenderChildren?: () => JSX.Element;
+    onRef?: (ref?: KeyboardAwareScrollView) => void;
 }
+
+interface IKeyboardAwareScrollViewImplProps extends
+    KeyboardAwareScrollViewProps {
+    innerRef?: (ref?: KeyboardAwareScrollView) => void;
+}
+
+const KeyboardAwareScrollViewImpl = KeyboardAwareScrollView as
+    React.ComponentType<IKeyboardAwareScrollViewImplProps>;
 
 class TrackableForm extends React.Component<ITrackableFormProps> {
     public render() {
@@ -23,10 +32,10 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
             titlePlaceholderMsgId,
             onRenderChildren,
             onChangeTitle,
+            onRef,
         } = this.props;
-
         return (
-            <KeyboardAwareScrollView>
+            <KeyboardAwareScrollViewImpl innerRef={onRef}>
                 <FormBody>
                     <FormTextInput
                         labelMsgId={titleLabelMsgId}
@@ -37,7 +46,7 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
                     />
                     {onRenderChildren && onRenderChildren()}
                 </FormBody>
-            </KeyboardAwareScrollView>
+            </KeyboardAwareScrollViewImpl>
         );
     }
 }

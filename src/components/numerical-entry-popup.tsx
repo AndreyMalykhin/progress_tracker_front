@@ -45,6 +45,7 @@ class NumericalEntryPopup
                 <FormFooter>
                     <FormButtonCancel onPress={onCancel}/>
                     <FormButtonOk
+                        msgId="common.add"
                         disabled={!isValid}
                         sound={Sound.ProgressChange}
                         onPress={onSubmit}

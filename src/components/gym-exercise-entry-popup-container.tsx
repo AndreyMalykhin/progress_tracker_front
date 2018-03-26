@@ -72,7 +72,9 @@ class GymExerciseEntryPopupContainer extends React.Component<
         this.setState((prevState) => {
             const repetitionCount = parseInt(prevState.repetitionCount!, 10);
             const repetitionCountError = isNaN(repetitionCount!) ||
-                repetitionCount! <= 0 ? "errors.zeroOrNegativeOrNotInteger" : null;
+                repetitionCount! <= 0 ?
+                "errors.zeroOrNegativeOrNotInteger" :
+                null;
             return { repetitionCountError };
         });
     }

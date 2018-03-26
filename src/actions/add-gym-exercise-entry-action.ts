@@ -35,18 +35,8 @@ interface IAddGymExerciseEntryResponse {
 }
 
 const addGymExerciseEntryQuery = gql`
-mutation AddGymExerciseEntry(
-    $id: ID!,
-    $setCount: Int!,
-    $repetitionCount: Int!,
-    $weight: Float!
-) {
-    addGymExerciseEntry(
-        id: $id,
-        setCount: $setCount,
-        repetitionCount: $repetitionCount,
-        weight: $weight
-    ) {
+mutation AddGymExerciseEntry($entry: AddGymExerciseEntryInput!) {
+    addGymExerciseEntry(entry: $entry) {
         entry {
             id
             gymExercise {

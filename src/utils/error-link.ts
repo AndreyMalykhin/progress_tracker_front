@@ -4,6 +4,10 @@ import { ErrorHandler, ErrorLink as ErrorLinkImpl } from "apollo-link-error";
 import makeLog from "utils/make-log";
 import { IOfflineLinkOperationContext } from "utils/offline-link";
 
+interface IOperationContext extends IOfflineLinkOperationContext {
+    response?: Response;
+}
+
 const log = makeLog("error-link");
 
 class ErrorLink extends ErrorLinkImpl {
@@ -20,16 +24,6 @@ class ErrorLink extends ErrorLinkImpl {
     public request(operation: Operation, forward: NextLink) {
         return new Observable((subscriber) => {
             const onRetry = () => {
-                log.trace("request", "retry");
-                const context = operation.getContext() as
-                    IOfflineLinkOperationContext;
-
-                if (!context.optimisticResponse) {
-                    return;
-                }
-
-                context.enqueue = true;
-                operation.setContext(context);
                 subscription =
                     this.doRequest(operation, forward, subscriber);
             };
@@ -54,8 +48,18 @@ class ErrorLink extends ErrorLinkImpl {
             error: (e) => {
                 if (this.isMutation(operation)) {
                     if (onRetry) {
-                        onRetry!();
-                        return;
+                        const context = operation.getContext() as
+                            IOperationContext;
+                        const httpStatus =
+                            context.response && context.response.status;
+
+                        if (context.optimisticResponse && !httpStatus) {
+                            context.enqueue = true;
+                            operation.setContext(context);
+                            log.trace("doRequest", "retry");
+                            onRetry();
+                            return;
+                        }
                     }
 
                     subscriber.error(e);

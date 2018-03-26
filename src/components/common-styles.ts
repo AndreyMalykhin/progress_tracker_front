@@ -7,6 +7,7 @@ const color = {
     blueGrayDark: "#546e7a", // 600
     blueGrayLight: "#eceff1", // 50
     blueGrayLight2: "#cfd8dc", // 100
+    blueGrayLight3: "#b0bec5", // 200
     brown: "#795548",
     brownDark: "#4e342e",
     brownLight: "#d7ccc8",

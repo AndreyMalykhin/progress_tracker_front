@@ -2,6 +2,9 @@ import PrimitiveTrackableForm from "components/primitive-trackable-form";
 import Type from "models/type";
 import * as React from "react";
 import * as Animatable from "react-native-animatable";
+import {
+    KeyboardAwareScrollView,
+} from "react-native-keyboard-aware-scroll-view";
 
 interface IGymExerciseFormProps {
     title?: string;
@@ -20,6 +23,7 @@ interface IGymExerciseFormProps {
     onChangePublic: (value: boolean) => void;
     onIconPickerRef: (ref?: Animatable.View) => void;
     onChangeIcon: (name: string) => void;
+    onRef?: (ref?: KeyboardAwareScrollView) => void;
 }
 
 class GymExerciseForm extends React.Component<IGymExerciseFormProps> {

@@ -32,9 +32,10 @@ interface IStackingSwitchHistoryState {
 
 interface IStackEntryProps {
     isHidden?: boolean;
-    onRef?: (ref?: Animatable.View) => void;
     children: IChildren;
     location: Location;
+    animation?: Animatable.Animation;
+    onRef?: (ref?: Animatable.View) => void;
 }
 
 type IChildren = Array< React.ReactElement<RouteProps> >;
@@ -77,6 +78,7 @@ class StackingSwitch extends
                     key={i}
                     isHidden={i !== lastEntryIndex}
                     location={entry.location}
+                    animation={entry.enterAnimation}
                     onRef={entry.onRef}
                 >
                     {entry.children}
@@ -258,12 +260,6 @@ class StackingSwitch extends
         ref?: Animatable.View,
     ) => {
         entry.ref = ref;
-
-        if (ref && animation) {
-            this.transition = ref[animation]!();
-            await this.transition;
-            this.transition = undefined;
-        }
     }
 
     private mapAnimation(animation?: StackingSwitchAnimation) {
@@ -299,16 +295,21 @@ class StackEntry extends React.Component<IStackEntryProps> {
     };
 
     public render() {
-        const { children, location, onRef } = this.props;
+        const { children, location, animation, onRef } = this.props;
         return (
             <AnimatableView
                 onRef={onRef as any}
                 style={styles.stackEntry}
                 duration={stackingSwitchAnimationDuration}
+                animation={animation}
             >
                 <Switch location={location}>{children}</Switch>
             </AnimatableView>
         );
+    }
+
+    public componentDidMount() {
+        log.trace("componentDidMount", "entry");
     }
 
     public shouldComponentUpdate(nextProps: IStackEntryProps) {

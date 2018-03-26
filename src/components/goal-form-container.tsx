@@ -9,7 +9,7 @@ import { debounce, throttle } from "lodash";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import * as React from "react";
-import { LayoutAnimation } from "react-native";
+import { LayoutAnimation, View } from "react-native";
 import Analytics from "utils/analytics";
 import AnalyticsEvent from "utils/analytics-event";
 import { dateRangeToAnalyticsRange } from "utils/analytics-utils";
@@ -124,7 +124,13 @@ abstract class GoalFormContainer<
     protected onChangeExpanded = (isExpanded: boolean) => {
         LayoutAnimation.easeInEaseOut();
         Analytics.log(AnalyticsEvent.TrackableFormToggleAdvanced);
-        this.setState({ isExpanded });
+        this.setState({ isExpanded }, () => {
+            requestAnimationFrame(() => {
+                if (isExpanded && this.ref) {
+                    (this.ref.props as any).scrollToEnd();
+                }
+            });
+        });
     }
 
     protected onChangeDifficulty = (difficulty: Difficulty) => {

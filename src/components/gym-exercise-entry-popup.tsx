@@ -53,6 +53,7 @@ class GymExerciseEntryPopup
                 <FormBody>
                     <FormTextInput
                         autoFocus={true}
+                        labelMsgId="gymExerciseEntryForm.setCountLabel"
                         placeholderMsgId="gymExerciseEntryForm.setCountPlaceholder"
                         keyboardType="numeric"
                         onChangeText={onChangeSetCount}
@@ -60,6 +61,7 @@ class GymExerciseEntryPopup
                         errorMsgId={setCountError}
                     />
                     <FormTextInput
+                        labelMsgId="gymExerciseEntryForm.repetitionCountLabel"
                         placeholderMsgId="gymExerciseEntryForm.repetitionCountPlaceholder"
                         keyboardType="numeric"
                         onChangeText={onChangeRepetitionCount}
@@ -67,6 +69,7 @@ class GymExerciseEntryPopup
                         errorMsgId={repetitionCountError}
                     />
                     <FormTextInput
+                        labelMsgId="gymExerciseEntryForm.weightLabel"
                         placeholderMsgId="gymExerciseEntryForm.weightPlaceholder"
                         keyboardType="numeric"
                         onChangeText={onChangeWeight}
@@ -75,8 +78,9 @@ class GymExerciseEntryPopup
                     />
                 </FormBody>
                 <FormFooter>
-                    <FormButtonCancel onPress={onCancel}/>
+                    <FormButtonCancel onPress={onCancel} />
                     <FormButtonOk
+                        msgId="common.add"
                         sound={Sound.ProgressChange}
                         disabled={!isValid}
                         onPress={onSubmit}

@@ -5,6 +5,7 @@ import {
     typographyStyle,
 } from "components/common-styles";
 import Text from "components/text";
+import TouchableWithFeedback from "components/touchable-with-feedback";
 import Trackable from "components/trackable";
 import {
     BodyText,
@@ -65,19 +66,36 @@ interface IGymExerciseProps {
     onSelectChange?: (id: string, isSelected: boolean) => void;
     onLongPress?: (id: string, parentId?: string) => void;
     onPressOut?: (id: string) => void;
+    onPressProgress?: (id: string) => void;
     onLayout?: (id: string, layout?: LayoutRectangle) => void;
 }
 
 class GymExercise extends React.PureComponent<IGymExerciseProps> {
     public render() {
-        const { items, isExpanded, ...restProps } = this.props;
-        const table = items.length ?
-            <Table items={items} isExpanded={isExpanded} /> : null;
+        const { items, isExpanded, isDisabled, onPressProgress, ...restProps } =
+            this.props;
+        const table = items.length ? (
+            <TouchableWithFeedback
+                disabled={isDisabled || !onPressProgress}
+                onPress={this.onPressProgress}
+            >
+                <Table items={items} isExpanded={isExpanded} />
+            </TouchableWithFeedback>
+        ) : null;
         return (
-            <Trackable isExpanded={isExpanded} {...restProps}>
+            <Trackable
+                isExpanded={isExpanded}
+                isDisabled={isDisabled}
+                {...restProps}
+            >
                 {table}
             </Trackable>
         );
+    }
+
+    private onPressProgress = () => {
+        const { onPressProgress, id } = this.props;
+        onPressProgress!(id);
     }
 }
 

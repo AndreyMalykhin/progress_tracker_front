@@ -9,6 +9,9 @@ import TrackableType from "models/trackable-type";
 import * as React from "react";
 import { InjectedIntlProps } from "react-intl";
 import { LayoutAnimation } from "react-native";
+import {
+    KeyboardAwareScrollView,
+} from "react-native-keyboard-aware-scroll-view";
 import { RouteComponentProps } from "react-router";
 import Analytics, { IAnalyticsParams } from "utils/analytics";
 import AnalyticsEvent from "utils/analytics-event";
@@ -50,6 +53,7 @@ abstract class TrackableFormContainer<
 > extends React.Component<TProps, TState> {
     public state = {} as TState;
     protected saveDelay = formSaveDelay;
+    protected ref?: KeyboardAwareScrollView;
 
     public constructor(props: TProps, context: any) {
         super(props, context);
@@ -91,6 +95,7 @@ abstract class TrackableFormContainer<
         const isNew = this.isNew();
         return {
             onChangeTitle: this.onChangeTitle,
+            onRef: this.onRef,
             title,
             titleError,
         } as ITrackableFormProps;
@@ -219,6 +224,8 @@ abstract class TrackableFormContainer<
         Analytics.log(AnalyticsEvent.TrackableFormClose,
             { isNew: isNewTrackable ? 1 : 0 });
     }
+
+    private onRef = (ref?: KeyboardAwareScrollView) => this.ref = ref;
 }
 
 export {

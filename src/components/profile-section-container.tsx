@@ -253,7 +253,9 @@ class ProfileSectionContainer
             return;
         }
 
-        if (prevUser.id !== nextUser.id
+        if (!prevUser
+            || !nextUser
+            || prevUser.id !== nextUser.id
             || prevUser.rating !== nextUser.rating
             || prevUser.name !== nextUser.name
             || prevUser.isReported !== nextUser.isReported
@@ -297,7 +299,7 @@ class ProfileSectionContainer
 
     private updateHeader(props: IProfileSectionContainerProps) {
         const { remoteData, header, session, match, intl } = props;
-        const user = remoteData.getUser;
+        const user = remoteData && remoteData.getUser;
         const isMe = !match.params.id
             || match.params.id === defaultId
             || match.params.id === session.userId
@@ -425,13 +427,6 @@ export default compose(
     }),
     withRemoteData,
     withNoUpdatesInBackground,
-    withLoader<IProfileSectionContainerProps, IGetRemoteDataResponse>(Loader, {
-        dataField: "getUser",
-        getQuery: (props) => props.remoteData,
-        props: {
-            style: { backgroundColor: listStyle.backgroundColor },
-        },
-    }),
     withError<IProfileSectionContainerProps, IGetRemoteDataResponse>(Error, {
         dataField: "getUser",
         getQuery: (props) => props.remoteData,

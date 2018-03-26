@@ -584,6 +584,9 @@ class ActiveTrackableListContainer extends React.Component<
                 onGetVisibleItemIds={this.onGetVisibleItemIds}
                 onIsItemProveable={this.onIsItemProveable}
                 onRefresh={onRefresh && this.onRefresh}
+                onPressCounterProgress={this.onStartAddCounterProgress}
+                onPressGymExerciseProgress={this.onStartNewGymExerciseEntry}
+                onPressNumericalGoalProgress={this.onStartAddNumericalGoalProgress}
             />
         );
     }

@@ -77,7 +77,7 @@ class Bootstrap extends React.Component<{}, IBootstrapState> {
         Sentry.setUserContext(
             { id: getSession(this.diContainer.apollo).userId });
         await this.initAudio();
-        await this.diContainer.networkTracker.start();
+        this.diContainer.networkTracker.start();
         await this.diContainer.deadlineTracker.start();
         this.setState({ isDone: true });
     }

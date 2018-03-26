@@ -33,7 +33,7 @@ const offlineFragmentId =
 
 class NetworkTracker {
     private apollo: ApolloClient<NormalizedCacheObject>;
-    private isOnline?: boolean;
+    private isOnline = true;
     private isPinging = false;
     private envConfig: IEnvConfig;
     private timerId?: NodeJS.Timer;
@@ -46,11 +46,15 @@ class NetworkTracker {
     }
 
     public async start() {
-        this.isOnline = true;
+        await this.ping();
         this.ensureCorrectStatusInStore();
     }
 
-    public setOnline(isOnline: boolean) {
+    public get online() {
+        return this.isOnline;
+    }
+
+    public set online(isOnline: boolean) {
         if (this.isOnline === isOnline) {
             return;
         }
@@ -85,12 +89,10 @@ class NetworkTracker {
 
     private saveStatus() {
         log.trace("saveStatus", "isOnline=%o", this.isOnline);
-        InteractionManager.runAfterInteractions(() => {
-            this.apollo.writeFragment({
-                data: { __typename: Type.Offline, isOnline: this.isOnline },
-                fragment: offlineFragment,
-                id: offlineFragmentId,
-            });
+        this.apollo.writeFragment({
+            data: { __typename: Type.Offline, isOnline: this.isOnline },
+            fragment: offlineFragment,
+            id: offlineFragmentId,
         });
     }
 
@@ -100,8 +102,7 @@ class NetworkTracker {
         }
 
         this.isPinging = true;
-        const isOnline = await this.doPing();
-        this.setOnline(isOnline);
+        this.online = await this.doPing();
         this.isPinging = false;
     }
 
