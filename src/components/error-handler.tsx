@@ -3,7 +3,7 @@ import { addGenericErrorToast, addToast } from "actions/toast-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client";
 import { ErrorHandler as ApolloErrorHandler } from "apollo-link-error";
-import { ToastSeverity } from "components/toast";
+import Toast, { ToastSeverity } from "components/toast";
 import withDIContainer, {
     IWithDIContainerProps,
 } from "components/with-di-container";
@@ -26,7 +26,8 @@ const log = makeLog("error-handler");
 class ErrorHandler extends React.PureComponent<IErrorHandlerProps> {
     public constructor(props: IErrorHandlerProps, context: any) {
         super(props, context);
-        this.showError = throttle(this.showError, 1024, { trailing: false });
+        this.showError = throttle(
+            this.showError, Toast.defaultProps.duration, { trailing: false });
         this.refreshAccessToken = throttle(
             this.refreshAccessToken, 32000, { trailing: false });
     }
@@ -71,13 +72,7 @@ class ErrorHandler extends React.PureComponent<IErrorHandlerProps> {
         addGenericErrorToast(apollo)
 
     private goOffline = (apollo: ApolloClient<NormalizedCacheObject>) => {
-        const { networkTracker } = this.props.diContainer;
-
-        if (!networkTracker.online) {
-            return;
-        }
-
-        networkTracker.online = false;
+        this.props.diContainer.networkTracker.online = false;
         const toast = {
             msgId: "notifications.disconnected",
             severity: ToastSeverity.Danger,
