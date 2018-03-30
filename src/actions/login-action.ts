@@ -49,7 +49,7 @@ async function login(
 
     try {
         result = await LoginManager.logInWithReadPermissions(
-            ["public_profile"]);
+            ["public_profile", "user_friends"]);
     } catch (e) {
         log.error("login", e);
         throw e;

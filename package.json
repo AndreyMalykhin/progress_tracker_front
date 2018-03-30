@@ -1,6 +1,6 @@
 {
-  "name": "progress_tracker",
-  "version": "0.1.0",
+  "name": "progress_tracker_front",
+  "version": "1.0.0",
   "private": true,
   "devDependencies": {
     "@types/": "yfuks/react-native-action-sheet",
@@ -48,7 +48,6 @@
     "ios-device-prod": "env-cmd ./.env.production.local react-native run-ios --device --configuration=Release",
     "test": "node node_modules/jest/bin/jest.js --watch",
     "dev": "yarn extract-fragment-types && yarn copy-resources && tsc --watch",
-    "lint": "tslint -p . --fix",
     "precommit": "lint-staged",
     "copy-resources": "cp -r ./src/images ./build/",
     "extract-fragment-types": "node src/scripts/extract-fragment-types.js"
