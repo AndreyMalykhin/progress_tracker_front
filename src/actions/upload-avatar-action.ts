@@ -17,8 +17,10 @@ interface IUploadAvatarResponse {
 
 const uploadAvatarOperationName = "UploadAvatar";
 const uploadAvatarQuery = gql`
-mutation ${uploadAvatarOperationName}($filePath: String!, $mimeType: String!) {
-    uploadAvatar(filePath: $filePath, mimeType: $mimeType) {
+mutation ${uploadAvatarOperationName}(
+    $filePath: String!, $mimeType: String!, $id: ID
+) {
+    uploadAvatar(filePath: $filePath, mimeType: $mimeType, id: $id) {
         avatar {
             id
             urlSmall
@@ -32,10 +34,15 @@ async function uploadAvatar(
     mimeType: string,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
+    const optimisticResponse = getOptimisticResponse(filePath);
     const response = await apollo.mutate({
         mutation: uploadAvatarQuery,
-        optimisticResponse: getOptimisticResponse(filePath),
-        variables: { filePath, mimeType },
+        optimisticResponse,
+        variables: {
+            filePath,
+            id: optimisticResponse.uploadAvatar.avatar.id,
+            mimeType,
+        },
     });
     return response.data as IUploadAvatarResponse;
 }

@@ -23,19 +23,20 @@ class UploadLink extends ApolloLink {
         const apollo: DataProxy = operation.getContext().cache;
 
         if (operationName === uploadAssetOperationName) {
-            const { filePath, mimeType } = operation.variables;
+            const { id, filePath, mimeType } = operation.variables;
             return this.uploadFile(
-                filePath, mimeType, "/assets", operation, apollo);
+                id, filePath, mimeType, "/assets", operation, apollo);
         } else if (operation.operationName === uploadAvatarOperationName) {
-            const { filePath, mimeType } = operation.variables;
+            const { id, filePath, mimeType } = operation.variables;
             return this.uploadFile(
-                filePath, mimeType, "/avatars", operation, apollo);
+                id, filePath, mimeType, "/avatars", operation, apollo);
         }
 
         return forward!(operation);
     }
 
     private uploadFile(
+        id: string,
         filePath: string,
         mimeType: string,
         endpoint: string,
@@ -49,6 +50,7 @@ class UploadLink extends ApolloLink {
                 type: mimeType,
                 uri: filePath,
             } as any);
+            body.append("id", id);
             const { accessToken } = getSession(apollo);
             fetch(this.envConfig.serverUrl + endpoint, {
                 body,

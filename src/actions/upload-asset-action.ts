@@ -16,8 +16,10 @@ interface IUploadAssetResponse {
 
 const uploadAssetOperationName = "UploadAsset";
 const uploadAssetQuery = gql`
-mutation ${uploadAssetOperationName}($filePath: String!, $mimeType: String!) {
-    uploadAsset(filePath: $filePath, mimeType: $mimeType) {
+mutation ${uploadAssetOperationName}(
+    $filePath: String!, $mimeType: String!, $id: ID
+) {
+    uploadAsset(filePath: $filePath, mimeType: $mimeType, id: $id) {
         asset {
             id
             urlMedium
@@ -30,10 +32,15 @@ async function uploadAsset(
     mimeType: string,
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
+    const optimisticResponse = getOptimisticResponse(filePath);
     const response = await apollo.mutate({
         mutation: uploadAssetQuery,
-        optimisticResponse: getOptimisticResponse(filePath),
-        variables: { filePath, mimeType },
+        optimisticResponse,
+        variables: {
+            filePath,
+            id: optimisticResponse.uploadAsset.asset.id,
+            mimeType,
+        },
     });
     return response.data as IUploadAssetResponse;
 }
