@@ -119,6 +119,7 @@ async function addAggregate(
                     return { id: childId };
                 }),
                 id: optimisticResponse.addAggregate.trackable.id,
+                title: aggregate.title,
             },
         },
     });
