@@ -235,6 +235,10 @@ const rejectReasons: Array< IActionSheetOption<RejectReason> > = [
         msgId: "reasons.spam",
     },
     {
+        id: RejectReason.Fake,
+        msgId: "reasons.fake",
+    },
+    {
         id: RejectReason.Other,
         msgId: "reasons.other",
     },

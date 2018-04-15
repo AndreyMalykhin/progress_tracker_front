@@ -131,6 +131,7 @@ export default {
     "profileForm.title": "Profile",
     "reasons.abuse": "Abuse",
     "reasons.cheating": "Cheating",
+    "reasons.fake": "Fake",
     "reasons.other": "Other",
     "reasons.spam": "Spam",
     "refreshSession.msg":
