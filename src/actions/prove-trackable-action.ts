@@ -6,7 +6,7 @@ import {
 } from "actions/aggregate-helpers";
 import { prependArchivedTrackables } from "actions/archived-trackables-helpers";
 import {
-    prependPendingReviewTrackables,
+    appendPendingReviewTrackables,
 } from "actions/pending-review-trackables-helpers";
 import { getSession } from "actions/session-helpers";
 import { uploadAsset } from "actions/upload-asset-action";
@@ -159,7 +159,7 @@ function updateApprovedTrackables(
 function updatePendingReviewTrackables(
     response: IProveTrackableResponse, apollo: DataProxy,
 ) {
-    prependPendingReviewTrackables(
+    appendPendingReviewTrackables(
         [response.proveTrackable.trackable], Audience.Me, apollo);
 }
 

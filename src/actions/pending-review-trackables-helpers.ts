@@ -52,12 +52,12 @@ query GetPendingReviewTrackables($audience: Audience!) {
     }
 }`;
 
-function prependPendingReviewTrackables(
+function appendPendingReviewTrackables(
     trackables: ISplicePendingReviewTrackablesFragment[],
     audience: Audience,
     apollo: DataProxy,
 ) {
-    splicePendingReviewTrackables([], trackables, [], audience, apollo);
+    splicePendingReviewTrackables([], [], trackables, audience, apollo);
 }
 
 function splicePendingReviewTrackables(
@@ -72,6 +72,10 @@ function splicePendingReviewTrackables(
 
     if (!pendingReviewTrackablesResponse) {
         return;
+    }
+
+    if (pendingReviewTrackablesResponse.getPendingReviewTrackables.pageInfo.hasNextPage) {
+        trackablesToAppend = [];
     }
 
     const cursorField = "statusChangeDate";
@@ -145,7 +149,6 @@ function initPendingReviewTrackables(apollo: DataProxy) {
 }
 
 export {
-    prependPendingReviewTrackables,
-    splicePendingReviewTrackables,
+    appendPendingReviewTrackables,
     initPendingReviewTrackables,
 };
