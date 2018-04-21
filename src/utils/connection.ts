@@ -27,7 +27,7 @@ function spliceConnection<TNode extends ISpliceConnectionFragment, TCursor>(
     idsToRemove: string[],
     objectsToPrepend: TNode[],
     objectsToAppend: TNode[],
-    cursorField: keyof TNode,
+    cursorField: (keyof TNode) | ((node: TNode) => TCursor),
     edgeType: Type,
     sort: boolean = false,
     comparator?: (lhs: TNode, rhs: TNode) => number,
@@ -46,7 +46,8 @@ function spliceConnection<TNode extends ISpliceConnectionFragment, TCursor>(
         const edgesToPrepend = objectsToPrepend.map((object) => {
             return {
                 __typename: edgeType,
-                cursor: object[cursorField],
+                cursor: typeof cursorField === "function" ? cursorField(object)
+                    : object[cursorField],
                 node: object,
             };
         });
@@ -57,7 +58,8 @@ function spliceConnection<TNode extends ISpliceConnectionFragment, TCursor>(
         const edgesToAppend = objectsToAppend.map((object) => {
             return {
                 __typename: edgeType,
-                cursor: object[cursorField],
+                cursor: typeof cursorField === "function" ? cursorField(object)
+                    : object[cursorField],
                 node: object,
             };
         });
@@ -75,14 +77,15 @@ function spliceConnection<TNode extends ISpliceConnectionFragment, TCursor>(
 
 function sortConnection<TNode extends ISpliceConnectionFragment, TCursor>(
     connection: IConnection<TNode, TCursor>,
-    cursorField: keyof TNode,
+    cursorField: (keyof TNode) | ((node: TNode) => TCursor),
     comparator: (lhs: TNode, rhs: TNode) => number,
 ) {
     connection.edges.sort((lhs, rhs) => comparator(lhs.node, rhs.node));
     const { edges, pageInfo } = connection;
 
     for (const edge of edges) {
-        edge.cursor = edge.node[cursorField];
+        edge.cursor = typeof cursorField === "function" ?
+            cursorField(edge.node) : edge.node[cursorField];
     }
 
     pageInfo.endCursor =

@@ -13,7 +13,7 @@ interface ISplicePendingReviewTrackablesFragment {
 
 interface IGetPendingReviewTrackablesResponse {
     getPendingReviewTrackables:
-        IConnection<ISplicePendingReviewTrackablesFragment, number>;
+        IConnection<ISplicePendingReviewTrackablesFragment, string>;
 }
 
 const log = makeLog("pending-review-trackables-helpers");
@@ -78,7 +78,8 @@ function splicePendingReviewTrackables(
         trackablesToAppend = [];
     }
 
-    const cursorField = "statusChangeDate";
+    const cursorField = (trackable: ISplicePendingReviewTrackablesFragment) =>
+        `${trackable.statusChangeDate}_${trackable.id}`;
     spliceConnection(
         pendingReviewTrackablesResponse.getPendingReviewTrackables,
         idsToRemove,
@@ -113,19 +114,6 @@ function setPendingReviewTrackables(
         query: getPendingReviewTrackablesQuery,
         variables: { audience },
     });
-}
-
-function compareTrackables(
-    lhs: ISplicePendingReviewTrackablesFragment,
-    rhs: ISplicePendingReviewTrackablesFragment,
-) {
-    const result = rhs.statusChangeDate - lhs.statusChangeDate;
-
-    if (result === 0) {
-        return 0;
-    }
-
-    return result < 0 ? -1 : 1;
 }
 
 function initPendingReviewTrackables(apollo: DataProxy) {

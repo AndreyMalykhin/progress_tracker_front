@@ -16,7 +16,7 @@ interface ISpliceArchivedTrackablesFragment {
 
 interface IGetArchivedTrackablesResponse {
     getArchivedTrackables:
-        IConnection<ISpliceArchivedTrackablesFragment, number>;
+        IConnection<ISpliceArchivedTrackablesFragment, string>;
 }
 
 const getArchivedTrackablesQuery = gql`
@@ -73,7 +73,8 @@ function spliceArchivedTrackables(
         return;
     }
 
-    const cursorField = "statusChangeDate";
+    const cursorField = (trackable: ISpliceArchivedTrackablesFragment) =>
+        `${trackable.statusChangeDate}_${trackable.id}`;
     spliceConnection(
         archivedTrackablesResponse.getArchivedTrackables,
         idsToRemove,
@@ -109,19 +110,6 @@ function setArchivedTrackables(
     });
 }
 
-function compareTrackables(
-    lhs: ISpliceArchivedTrackablesFragment,
-    rhs: ISpliceArchivedTrackablesFragment,
-) {
-    const result = rhs.statusChangeDate - lhs.statusChangeDate;
-
-    if (result === 0) {
-        return 0;
-    }
-
-    return result < 0 ? -1 : 1;
-}
-
 function initArchivedTrackables(apollo: DataProxy) {
     const data = {
         __typename: Type.Query,
@@ -151,7 +139,6 @@ function initArchivedTrackables(apollo: DataProxy) {
 }
 
 export {
-    spliceArchivedTrackables,
     prependArchivedTrackables,
     getArchivedTrackables,
     initArchivedTrackables,

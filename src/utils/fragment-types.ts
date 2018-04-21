@@ -7,34 +7,31 @@ export default {
                 "name": "IActivity",
                 "possibleTypes": [
                     {
-                        "name": "TrackableAddedActivity"
-                    },
-                    {
-                        "name": "CounterProgressChangedActivity"
-                    },
-                    {
-                        "name": "NumericalGoalProgressChangedActivity"
-                    },
-                    {
-                        "name": "TaskGoalProgressChangedActivity"
-                    },
-                    {
-                        "name": "GymExerciseEntryAddedActivity"
-                    },
-                    {
-                        "name": "GoalApprovedActivity"
-                    },
-                    {
-                        "name": "GoalRejectedActivity"
+                        "name": "ExternalGoalReviewedActivity"
                     },
                     {
                         "name": "GoalAchievedActivity"
                     },
                     {
-                        "name": "GoalExpiredActivity"
+                        "name": "GoalRejectedActivity"
                     },
                     {
-                        "name": "ExternalGoalReviewedActivity"
+                        "name": "GoalApprovedActivity"
+                    },
+                    {
+                        "name": "GymExerciseEntryAddedActivity"
+                    },
+                    {
+                        "name": "TaskGoalProgressChangedActivity"
+                    },
+                    {
+                        "name": "NumericalGoalProgressChangedActivity"
+                    },
+                    {
+                        "name": "CounterProgressChangedActivity"
+                    },
+                    {
+                        "name": "TrackableAddedActivity"
                     }
                 ]
             },
@@ -43,13 +40,13 @@ export default {
                 "name": "ITrackable",
                 "possibleTypes": [
                     {
+                        "name": "Aggregate"
+                    },
+                    {
                         "name": "GymExercise"
                     },
                     {
                         "name": "Counter"
-                    },
-                    {
-                        "name": "Aggregate"
                     },
                     {
                         "name": "NumericalGoal"
@@ -109,34 +106,31 @@ export default {
                 "name": "ITrackableActivity",
                 "possibleTypes": [
                     {
-                        "name": "TrackableAddedActivity"
-                    },
-                    {
-                        "name": "CounterProgressChangedActivity"
-                    },
-                    {
-                        "name": "NumericalGoalProgressChangedActivity"
-                    },
-                    {
-                        "name": "TaskGoalProgressChangedActivity"
-                    },
-                    {
-                        "name": "GymExerciseEntryAddedActivity"
-                    },
-                    {
-                        "name": "GoalApprovedActivity"
-                    },
-                    {
-                        "name": "GoalRejectedActivity"
+                        "name": "ExternalGoalReviewedActivity"
                     },
                     {
                         "name": "GoalAchievedActivity"
                     },
                     {
-                        "name": "GoalExpiredActivity"
+                        "name": "GoalRejectedActivity"
                     },
                     {
-                        "name": "ExternalGoalReviewedActivity"
+                        "name": "GoalApprovedActivity"
+                    },
+                    {
+                        "name": "GymExerciseEntryAddedActivity"
+                    },
+                    {
+                        "name": "TaskGoalProgressChangedActivity"
+                    },
+                    {
+                        "name": "NumericalGoalProgressChangedActivity"
+                    },
+                    {
+                        "name": "CounterProgressChangedActivity"
+                    },
+                    {
+                        "name": "TrackableAddedActivity"
                     }
                 ]
             }
