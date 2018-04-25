@@ -258,7 +258,14 @@ class ProfileFormContainer extends
     }
 
     private saveName = (name: string) => {
-        const nameError = !name ? "errors.emptyValue" : null;
+        let nameError: string | null = null;
+
+        if (!name) {
+            nameError = "errors.empty";
+        } else if (name.length > 128) {
+            nameError = "errors.tooLong";
+        }
+
         this.setState({ nameError });
 
         if (!nameError) {

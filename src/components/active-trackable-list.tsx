@@ -684,8 +684,8 @@ const styles = StyleSheet.create({
     list: {},
     listContent: {},
     reorderablePlaceholder: {
-        backgroundColor: color.white,
-        opacity: 0.5,
+        backgroundColor: shadeColor.light3,
+        opacity: 0.75,
     },
 });
 

@@ -139,7 +139,13 @@ abstract class TrackableFormContainer<
     }
 
     private saveTitle = (title: string) => {
-        const titleError = !title ? "errors.emptyValue" : null;
+        let titleError: string | null = null;
+
+        if (!title) {
+            titleError = "errors.empty";
+        } else if (title.length > 255) {
+            titleError = "errors.tooLong";
+        }
 
         // TODO fix unmounted component scenario
         this.setState({ titleError });

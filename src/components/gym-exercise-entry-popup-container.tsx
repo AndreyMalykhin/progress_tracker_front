@@ -71,10 +71,11 @@ class GymExerciseEntryPopupContainer extends React.Component<
     private validateRepetitionCount = () => {
         this.setState((prevState) => {
             const repetitionCount = parseInt(prevState.repetitionCount!, 10);
-            const repetitionCountError = isNaN(repetitionCount!) ||
-                repetitionCount! <= 0 ?
-                "errors.zeroOrNegativeOrNotInteger" :
-                null;
+            const repetitionCountError = isNaN(repetitionCount!)
+                || repetitionCount <= 0
+                || repetitionCount > 1024
+                ? "errors.invalidNumber"
+                : null;
             return { repetitionCountError };
         });
     }
@@ -87,8 +88,11 @@ class GymExerciseEntryPopupContainer extends React.Component<
     private validateSetCount = () => {
         this.setState((prevState) => {
             const setCount = parseInt(prevState.setCount!, 10);
-            const setCountError = isNaN(setCount!) || setCount! <= 0 ?
-                "errors.zeroOrNegativeOrNotInteger" : null;
+            const setCountError = isNaN(setCount!)
+                || setCount <= 0
+                || setCount > 1024
+                ? "errors.invalidNumber"
+                : null;
             return { setCountError };
         });
     }
@@ -101,8 +105,8 @@ class GymExerciseEntryPopupContainer extends React.Component<
     private validateWeight = () => {
         this.setState((prevState) => {
             const weight = parseFloat(prevState.weight!);
-            const weightError = isNaN(weight!) || weight! < 0 ?
-                "errors.negativeOrNotNumber" : null;
+            const weightError = isNaN(weight!) || weight < 0 || weight > 2048 ?
+                "errors.invalidNumber" : null;
             return { weightError };
         });
     }

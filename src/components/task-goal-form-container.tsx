@@ -277,10 +277,15 @@ class TaskGoalFormContainer extends GoalFormContainer<
     }
 
     private saveTaskTitle = (id: string, title: string) => {
-        let error: string|null;
+        let error: string | null = null;
 
         this.setState((prevState) => {
-            error = !title ? "errors.emptyValue" : null;
+            if (!title) {
+                error = "errors.empty";
+            } else if (title.length > 255) {
+                error = "errors.tooLong";
+            }
+
             const taskErrors = { ...prevState.taskErrors, [id]: error };
             return { taskErrors };
         }, () => {
