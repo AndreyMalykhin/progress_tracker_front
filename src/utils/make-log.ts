@@ -16,8 +16,11 @@ class Log {
 
     public error(funcName: string, e: Error | string, info?: object) {
         this.trace(funcName, "error=%o; info=%o", e, info);
+        const namespacedFuncName = `${this.namespace}.${funcName}`;
         const options = {
-            culprit: `${this.namespace}.${funcName}`, extra: info,
+            extra: info,
+            fingerprint: ["{{ default }}", namespacedFuncName],
+            tags: { func: namespacedFuncName },
         };
 
         if (typeof e === "string") {
