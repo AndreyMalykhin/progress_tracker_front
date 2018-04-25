@@ -47,7 +47,7 @@
     "ios-device": "react-native run-ios --device",
     "ios-device-prod": "env-cmd ./.env.production.local react-native run-ios --device --configuration=Release",
     "test": "node node_modules/jest/bin/jest.js --watch",
-    "dev": "yarn extract-fragment-types && yarn copy-resources && tsc --watch",
+    "dev": "yarn extract-fragment-types && yarn copy-resources && tsc --watch --pretty",
     "precommit": "lint-staged",
     "copy-resources": "cp -r ./src/images ./build/",
     "extract-fragment-types": "node src/scripts/extract-fragment-types.js"

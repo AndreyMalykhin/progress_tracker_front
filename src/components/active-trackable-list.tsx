@@ -82,8 +82,10 @@ interface IGymExercise extends IPrimitiveNode {
 interface IAggregate extends IBaseNode {
     progress: number;
     maxTotalProgress?: number;
-    children: Array<ITaskGoal|ICounter|INumericalGoal>;
+    children: IAggregateChild[];
 }
+
+type IAggregateChild = ITaskGoal|ICounter|INumericalGoal;
 
 interface IGoalNode extends IPrimitiveNode {
     progress: number;
@@ -596,8 +598,7 @@ class ActiveTrackableList extends
     private renderAggregate(
         item: IAggregate, index: number, isFirst: boolean, isLast: boolean,
     ): JSX.Element {
-        const { id, progress, maxTotalProgress, children, status, title } =
-            item;
+        const { id, progress, maxTotalProgress, status, title } = item;
         const {
             items,
             isAggregationMode,
@@ -610,11 +611,6 @@ class ActiveTrackableList extends
             onPressOutItem,
         } = this.props;
         const { isDisabled, isSelected, dragStatus } = itemsMeta[id];
-        const childrenElements = children.map((child, i) => {
-            const isFirstChild = !i;
-            const isLastChild = i === children.length - 1;
-            return this.renderNode(child, index, isFirstChild, isLastChild);
-        });
         return (
             <Aggregate
                 key={id}
@@ -637,9 +633,27 @@ class ActiveTrackableList extends
                 onLayout={onItemLayout}
                 onPressOut={onPressOutItem}
             >
-                {childrenElements}
+                {this.renderAggregateChildren(item, index)}
             </Aggregate>
         );
+    }
+
+    private renderAggregateChildren(aggregate: IAggregate, index: number) {
+        const children: IAggregateChild[]  = [];
+
+        for (const child of aggregate.children) {
+            if (child.status === TrackableStatus.Active
+                || child.status === TrackableStatus.PendingProof
+            ) {
+                children.push(child);
+            }
+        }
+
+        return children.map((child, i) => {
+            const isFirstChild = !i;
+            const isLastChild = i === children.length - 1;
+            return this.renderNode(child, index, isFirstChild, isLastChild);
+        });
     }
 
     private getItemKey(item: IActiveTrackableListItem) {

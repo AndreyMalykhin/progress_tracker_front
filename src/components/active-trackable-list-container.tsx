@@ -1141,7 +1141,7 @@ class ActiveTrackableListContainer extends React.Component<
             const historyState: IHsitoryState = {
                 aggregateFormContainer: { trackableIds: childIds },
                 stackingSwitch: {
-                    animation: StackingSwitchAnimation.SlideInRight,
+                    animation: StackingSwitchAnimation.SlideInUp,
                 },
             };
             this.props.history.push(route, historyState);

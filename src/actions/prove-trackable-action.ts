@@ -1,8 +1,11 @@
 import { removeActiveTrackables } from "actions/active-trackables-helpers";
 import {
     IRemoveChildFragment,
+    ISetChildStatusAggregateFragment,
     removeChild,
     removeChildFragment,
+    setChildStatus,
+    setChildStatusFragment,
 } from "actions/aggregate-helpers";
 import { prependArchivedTrackables } from "actions/archived-trackables-helpers";
 import {
@@ -28,13 +31,6 @@ const log = makeLog("prove-trackable-action");
 interface IProveTrackableResponse {
     proveTrackable: {
         removedAggregateId?: string;
-        aggregate?: {
-            id: string;
-            progress: number;
-            children: Array<{
-                id: string;
-            }>;
-        },
         trackable: {
             __typename: Type;
             id: string;
@@ -42,7 +38,7 @@ interface IProveTrackableResponse {
             proofPhotoUrlMedium: string;
             status: TrackableStatus;
             statusChangeDate: number;
-            parent: null;
+            parent: { id: string; } | null;
             approveCount: number|null;
             rejectCount: number|null;
             rating: number|null;
@@ -54,11 +50,9 @@ interface IGetTrackableByIdResponse {
     getTrackable: {
         __typename: Type;
         id: string;
-        isPublic: boolean
-        proofPhotoUrl?: string;
         status: TrackableStatus;
-        statusChangeDate: number;
-        parent?: IRemoveChildFragment;
+        isPublic: boolean
+        parent: ISetChildStatusAggregateFragment | null;
     };
 }
 
@@ -66,13 +60,6 @@ const proveTrackableQuery = gql`
 mutation ProveTrackable($id: ID!, $assetId: ID!) {
     proveTrackable(id: $id, assetId: $assetId) {
         removedAggregateId
-        aggregate {
-            id
-            progress
-            children {
-                id
-            }
-        }
         trackable {
             id
             ... on IGoal {
@@ -94,7 +81,7 @@ mutation ProveTrackable($id: ID!, $assetId: ID!) {
 }`;
 
 const getTrackableQuery = gql`
-${removeChildFragment}
+${setChildStatusFragment}
 
 query GetTrackableById($id: ID!) {
     getTrackable(id: $id) {
@@ -102,7 +89,7 @@ query GetTrackableById($id: ID!) {
         isPublic
         ... on IAggregatable {
             parent {
-                ...RemoveChildAggregateFragment
+                ...SetChildStatusAggregateFragment
             }
         }
     }
@@ -172,27 +159,23 @@ function getOptimisticResponse(
         query: getTrackableQuery,
         variables: { id: trackableId },
     })!.getTrackable;
-    const { parent, isPublic, __typename } = trackable;
+    const { parent, isPublic } = trackable;
     const status =
         isPublic ? TrackableStatus.PendingReview : TrackableStatus.Approved;
-    const removedAggregateId =
-        parent && removeChild(trackableId, parent) ? parent.id : null;
+    const removedAggregateId = parent &&
+        !setChildStatus(parent, trackable, status) ? parent.id : null;
     return {
         __typename: Type.Mutation,
         proveTrackable: {
             __typename: Type.ProveTrackableResponse,
-            aggregate: removedAggregateId ? null : parent,
             removedAggregateId,
             trackable: {
-                __typename,
+                ...trackable,
                 approveCount: status === TrackableStatus.Approved ? null : 0,
-                id: trackableId,
                 myReviewStatus: null,
-                parent: null,
                 proofPhotoUrlMedium,
                 rating: null,
                 rejectCount: status === TrackableStatus.Approved ? null : 0,
-                status,
                 statusChangeDate: Date.now(),
             },
         },

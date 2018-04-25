@@ -1,7 +1,19 @@
 import { DataProxy } from "apollo-cache";
 import gql from "graphql-tag";
+import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import dataIdFromObject from "utils/data-id-from-object";
+
+interface ISetChildStatusChildFragment {
+    id: string;
+    status: TrackableStatus;
+    parent: { id: string; } | null;
+}
+
+interface ISetChildStatusAggregateFragment {
+    id: string;
+    children: ISetChildStatusChildFragment[];
+}
 
 interface IUpdateProgressAggregateFragment {
     id: string;
@@ -28,6 +40,18 @@ interface IGetProgressFragment {
     progress: number;
     maxProgress?: number;
 }
+
+const setChildStatusFragment = gql`
+fragment SetChildStatusAggregateFragment on Aggregate {
+    id
+    children {
+        id
+        status
+        parent {
+            id
+        }
+    }
+}`;
 
 const updateProgressFragment = gql`
 fragment UpdateProgressAggregateFragment on Aggregate {
@@ -85,7 +109,7 @@ function removeChild(id: string, parent: IRemoveChildFragment) {
 
 function updateProgress(
     aggregate: IUpdateProgressAggregateFragment,
-    childToUpdate: IUpdateProgressChildFragment,
+    childToUpdate?: IUpdateProgressChildFragment,
 ) {
     if (childToUpdate) {
         for (const child of aggregate.children) {
@@ -122,7 +146,38 @@ function getProgress(aggregateChildren: IGetProgressFragment[]) {
     return { current, max };
 }
 
+function setChildStatus(
+    aggregate: ISetChildStatusAggregateFragment,
+    child: ISetChildStatusChildFragment,
+    status: TrackableStatus,
+) {
+    let hasActiveChildren = false;
+
+    for (const currentChild of aggregate.children) {
+        if (child.id === currentChild.id) {
+            child.status = currentChild.status = status;
+        }
+
+        if (currentChild.status === TrackableStatus.Active
+            || currentChild.status === TrackableStatus.PendingProof
+        ) {
+            hasActiveChildren = true;
+        }
+    }
+
+    if (!hasActiveChildren) {
+        for (const currentChild of aggregate.children) {
+            currentChild.parent = null;
+        }
+    }
+
+    return hasActiveChildren;
+}
+
 export {
+    setChildStatus,
+    setChildStatusFragment,
+    ISetChildStatusAggregateFragment,
     updateProgress,
     updateProgressFragment,
     IUpdateProgressAggregateFragment,
