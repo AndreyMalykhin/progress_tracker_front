@@ -220,14 +220,16 @@ class OfflineLink extends ApolloLink {
                 && networkError.response
                 && networkError.response.status;
 
-            if (status
-                && status >= 400
-                && status !== 401
-                && status < 500
-                && startDate + this.envConfig.syncRetryTimeout <= Date.now()
-            ) {
-                log.error("runOperation", "Retry timeout");
-                return true;
+            if (status) {
+                if (status >= 400 && status < 500 && status !== 401) {
+                    log.error("runOperation", "Client error");
+                    return true;
+                } else if (status >= 500
+                    && startDate + this.envConfig.syncRetryTimeout <= Date.now()
+                ) {
+                    log.error("runOperation", "Retry timeout");
+                    return true;
+                }
             }
 
             await this.wait(retryDelay);

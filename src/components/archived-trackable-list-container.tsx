@@ -67,7 +67,7 @@ query GetData(
     $trackableStatus: TrackableStatus!,
     $skipProofedGoalFields: Boolean!,
     $userId: ID,
-    $cursor: Float
+    $cursor: ID
 ) {
     getArchivedTrackables(
         userId: $userId, status: $trackableStatus, after: $cursor

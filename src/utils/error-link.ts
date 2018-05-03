@@ -5,7 +5,7 @@ import makeLog from "utils/make-log";
 import { IOfflineLinkOperationContext } from "utils/offline-link";
 
 interface IOperationContext extends IOfflineLinkOperationContext {
-    response?: Response;
+    res?: Response;
 }
 
 const log = makeLog("error-link");
@@ -50,8 +50,9 @@ class ErrorLink extends ErrorLinkImpl {
                     if (onRetry) {
                         const context = operation.getContext() as
                             IOperationContext;
-                        const httpStatus =
-                            context.response && context.response.status;
+                        const response = context.res || e.response;
+                        const httpStatus: number | undefined =
+                            response && response.status;
 
                         if (context.optimisticResponse && !httpStatus) {
                             context.enqueue = true;

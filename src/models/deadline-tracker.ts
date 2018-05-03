@@ -3,9 +3,7 @@ import {
 } from "actions/active-trackables-helpers";
 import { prependActivity } from "actions/activity-helpers";
 import {
-    ISetChildStatusAggregateFragment,
-    setChildStatus,
-    setChildStatusFragment,
+    IUpdateAggregateFragment, setChildStatus, updateAggregateFragment,
 } from "actions/aggregate-helpers";
 import { prependArchivedTrackables } from "actions/archived-trackables-helpers";
 import { getSession } from "actions/session-helpers";
@@ -30,9 +28,11 @@ interface IActiveTrackableFragment {
     parent: { id: string; } | null;
 }
 
-interface IAggregateFragment extends IActiveTrackableFragment {
+type IAggregateFragment = IUpdateAggregateFragment | {
+    __typename: Type;
+    id: string;
     children: IActiveTrackableFragment[];
-}
+};
 
 interface IExpiredTrackableFragment extends IActiveTrackableFragment {
     deadlineDate: number;
@@ -40,12 +40,15 @@ interface IExpiredTrackableFragment extends IActiveTrackableFragment {
 }
 
 interface IGetActiveTrackablesResponse {
-    getActiveTrackables: IConnection<IActiveTrackableFragment, number>;
+    getActiveTrackables:
+        IConnection<IActiveTrackableFragment | IAggregateFragment, number>;
 }
 
 const log = makeLog("deadline-tracker");
 
 const getActiveTrackablesQuery = gql`
+${updateAggregateFragment}
+
 fragment DeadlineTrackerActiveTrackableFragment on ITrackable {
     id
     status
@@ -68,6 +71,7 @@ query GetActiveTrackables($userId: ID) {
             node {
                 ...DeadlineTrackerActiveTrackableFragment
                 ... on Aggregate {
+                    ...UpdateAggregateFragment
                     children {
                         ...DeadlineTrackerActiveTrackableFragment
                     }
@@ -175,14 +179,22 @@ class DeadlineTracker {
                     if (child.status === TrackableStatus.Active
                         || child.status === TrackableStatus.PendingProof
                     ) {
-                        this.tryExpireTrackable(child, aggregate,
-                            expiredTrackables, removedAggregateIds);
+                        this.tryExpireTrackable(
+                            child as IActiveTrackableFragment,
+                            aggregate,
+                            expiredTrackables,
+                            removedAggregateIds,
+                        );
                     }
                 }
             } else {
                 const aggregate = undefined;
                 this.tryExpireTrackable(
-                    node, aggregate, expiredTrackables, removedAggregateIds);
+                    node as IActiveTrackableFragment,
+                    aggregate,
+                    expiredTrackables,
+                    removedAggregateIds,
+                );
             }
         }
 
@@ -218,7 +230,11 @@ class DeadlineTracker {
         let isAggregateRemoved = false;
 
         if (aggregate
-            && !setChildStatus(aggregate, trackable, trackable.status)
+            && !setChildStatus(
+                aggregate as IUpdateAggregateFragment,
+                trackable.id,
+                trackable.status,
+            )
         ) {
             isAggregateRemoved = true;
             (trackable as IExpiredTrackableFragment).parent = null;

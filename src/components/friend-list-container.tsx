@@ -78,7 +78,7 @@ const withSetMuted = graphql<
 );
 
 const getDataQuery = gql`
-query GetData($cursor: Float) {
+query GetData($cursor: ID) {
     getFriends(after: $cursor) @connection(key: "getFriends") {
         edges {
             cursor

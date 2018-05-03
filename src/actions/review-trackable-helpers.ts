@@ -18,6 +18,7 @@ interface IReviewTrackableResponseFragment {
 interface IUserFragment {
     __typename: Type;
     id: string;
+    rating: number;
     rewardableReviewsLeft: number;
 }
 
@@ -41,6 +42,7 @@ fragment ReviewTrackableFragment on ITrackable {
 const userFragment = gql`
 fragment ReviewTrackableUserFragment on User {
     id
+    rating
     rewardableReviewsLeft
 }`;
 
@@ -94,6 +96,7 @@ function getOptimisticResponse(
     if (user.rewardableReviewsLeft > 0) {
         --user.rewardableReviewsLeft;
         bonusRating = 1;
+        user.rating += bonusRating;
     }
 
     return {

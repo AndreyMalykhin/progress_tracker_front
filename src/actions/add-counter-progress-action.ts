@@ -1,8 +1,6 @@
 import { prependActivity } from "actions/activity-helpers";
 import {
-    IUpdateProgressAggregateFragment,
-    updateProgress,
-    updateProgressFragment,
+    IUpdateAggregateFragment, setChildProgress, updateAggregateFragment,
 } from "actions/aggregate-helpers";
 import { getSession } from "actions/session-helpers";
 import { DataProxy } from "apollo-cache";
@@ -31,17 +29,17 @@ interface IAddCounterProgressResponse {
 interface ICounterFragment {
     id: string;
     progress: number;
-    parent?: IUpdateProgressAggregateFragment;
+    parent?: IUpdateAggregateFragment;
 }
 
 const counterFragment = gql`
-${updateProgressFragment}
+${updateAggregateFragment}
 
 fragment AddCounterProgressCounterFragment on Counter {
     id
     progress
     parent {
-        ...UpdateProgressAggregateFragment
+        ...UpdateAggregateFragment
     }
 }`;
 
@@ -126,7 +124,7 @@ function getOptimisticResponse(
     counter.progress += value;
 
     if (counter.parent) {
-        updateProgress(counter.parent, counter);
+        setChildProgress(counter.parent, counter.id, counter.progress);
     }
 
     return {

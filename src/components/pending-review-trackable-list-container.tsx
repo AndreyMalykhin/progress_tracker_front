@@ -149,7 +149,7 @@ const withReject = graphql<
 );
 
 const getDataQuery = gql`
-query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
+query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: ID) {
     getPendingReviewTrackables(
         audience: $audience, after: $cursor
     ) @connection(

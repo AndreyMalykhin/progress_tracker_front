@@ -62,7 +62,7 @@ interface IGetDataResponse {
 const log = makeLog("leader-list-container");
 
 const getDataQuery = gql`
-query GetData($audience: Audience!, $cursor: Float) {
+query GetData($audience: Audience!, $cursor: ID) {
     getLeaders(
         audience: $audience, after: $cursor
     ) @connection(key: "getLeaders", filter: ["audience"]) {

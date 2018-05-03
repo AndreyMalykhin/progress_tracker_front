@@ -448,7 +448,7 @@ fragment ActiveTrackableListAggregateFragment on Aggregate {
     }
 }
 
-query GetData($userId: ID, $cursor: Float) {
+query GetData($userId: ID, $cursor: ID) {
     getActiveTrackables(
         userId: $userId, after: $cursor
     ) @connection(key: "getActiveTrackables", filter: ["userId"]) {
@@ -587,6 +587,7 @@ class ActiveTrackableListContainer extends React.Component<
                 onPressCounterProgress={this.onStartAddCounterProgress}
                 onPressGymExerciseProgress={this.onStartNewGymExerciseEntry}
                 onPressNumericalGoalProgress={this.onStartAddNumericalGoalProgress}
+                onCanPressProgress={this.onCanPressProgress}
             />
         );
     }
@@ -1619,6 +1620,17 @@ class ActiveTrackableListContainer extends React.Component<
         Analytics.log(AnalyticsEvent.ListRefresh,
             { context: AnalyticsContext.ActiveTrackablesPage });
         this.props.onRefresh!();
+    }
+
+    private onCanPressProgress = (
+        trackableStatus: TrackableStatus,
+        isReorderMode?: boolean,
+        isAggregationMode?: boolean,
+    ) => {
+        return this.isMy()
+            && trackableStatus === TrackableStatus.Active
+            && !this.state.isAggregationMode
+            && !this.state.isReorderMode;
     }
 }
 

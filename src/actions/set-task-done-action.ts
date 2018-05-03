@@ -1,7 +1,10 @@
-import { prependActivity, prependGoalAchievedActivity } from "actions/activity-helpers";
 import {
-    IUpdateProgressAggregateFragment,
-    updateProgressFragment,
+    prependActivity,
+    prependGoalAchievedActivity,
+} from "actions/activity-helpers";
+import {
+    IUpdateAggregateFragment,
+    updateAggregateFragment,
 } from "actions/aggregate-helpers";
 import { addProgress } from "actions/goal-helpers";
 import { getSession } from "actions/session-helpers";
@@ -58,12 +61,12 @@ interface ITaskFragment {
         status: TrackableStatus;
         achievementDate: number;
         statusChangeDate: number;
-        parent?: IUpdateProgressAggregateFragment;
+        parent?: IUpdateAggregateFragment;
     };
 }
 
 const taskFragment = gql`
-${updateProgressFragment}
+${updateAggregateFragment}
 
 fragment SetTaskDoneTaskFragment on Task {
     id
@@ -76,7 +79,7 @@ fragment SetTaskDoneTaskFragment on Task {
         achievementDate
         statusChangeDate
         parent {
-            ...UpdateProgressAggregateFragment
+            ...UpdateAggregateFragment
         }
     }
 }`;

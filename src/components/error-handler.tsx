@@ -41,9 +41,12 @@ class ErrorHandler extends React.PureComponent<IErrorHandlerProps> {
     }
 
     private onError: ApolloErrorHandler = (error) => {
-        const { networkError, operation, response } = error;
-        const { isOfflineOperation, response: httpResponse } =
+        const { networkError, operation } = error;
+        const { isOfflineOperation } =
             operation.getContext() as IOperationContext;
+        const httpResponse =
+            (operation.getContext() as IOperationContext).response
+            || (networkError && (networkError as any).response);
         const queryLoc = error.operation.query.loc;
         log.error(
             "onError",

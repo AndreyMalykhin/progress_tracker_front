@@ -4,62 +4,45 @@ import TrackableStatus from "models/trackable-status";
 import Type from "models/type";
 import dataIdFromObject from "utils/data-id-from-object";
 
-interface ISetChildStatusChildFragment {
-    id: string;
-    status: TrackableStatus;
-    parent: { id: string; } | null;
-}
-
-interface ISetChildStatusAggregateFragment {
-    id: string;
-    children: ISetChildStatusChildFragment[];
-}
-
-interface IUpdateProgressAggregateFragment {
+interface IUpdateAggregateFragment {
+    __typename: Type;
     id: string;
     progress: number;
-    maxProgress?: number;
+    maxProgress: number | null;
     children: Array<{
         __typename: Type;
+        status: TrackableStatus;
         id: string;
         progress: number;
-        maxProgress?: number;
+        maxProgress: number | null;
+        parent: { id: string; } | null;
     }>;
 }
 
-interface IUpdateProgressChildFragment {
-    id: string;
-    progress: number;
+interface IUnaggregateChildrenFragment {
+    children: Array<{ parent: object | null }>;
 }
-
-type IRemoveChildFragment = IUpdateProgressAggregateFragment;
 
 interface IGetProgressFragment {
     __typename: Type;
     id: string;
     progress: number;
-    maxProgress?: number;
+    maxProgress: number | null;
 }
 
-const setChildStatusFragment = gql`
-fragment SetChildStatusAggregateFragment on Aggregate {
+const updateAggregateFragment = gql`
+fragment UpdateAggregateFragment on Aggregate {
     id
+    progress
+    maxProgress
     children {
         id
         status
-        parent {
-            id
+        ... on IAggregatable {
+            parent {
+                id
+            }
         }
-    }
-}`;
-
-const updateProgressFragment = gql`
-fragment UpdateProgressAggregateFragment on Aggregate {
-    id
-    progress
-    maxProgress
-    children {
-        id
         ... on Counter {
             progress
         }
@@ -70,25 +53,11 @@ fragment UpdateProgressAggregateFragment on Aggregate {
     }
 }`;
 
-const removeChildFragment = gql`
-fragment RemoveChildAggregateFragment on Aggregate {
-    id
-    progress
-    maxProgress
-    children {
-        id
-        ... on Counter {
-            progress
-        }
-        ... on IGoal {
-            progress
-            maxProgress
-        }
-    }
-}`;
-
-function removeChild(id: string, parent: IRemoveChildFragment) {
-    const { children } = parent;
+/**
+ * @returns False if aggregate is removed
+ */
+function removeChild(aggregate: IUpdateAggregateFragment, id: string) {
+    const { children } = aggregate;
 
     for (let i = 0; i < children.length; ++i) {
         if (children[i].id === id) {
@@ -97,46 +66,36 @@ function removeChild(id: string, parent: IRemoveChildFragment) {
         }
     }
 
-    if (children.length) {
-        const { current, max } = getProgress(children);
-        parent.progress = current;
-        parent.maxProgress = max;
-        return false;
-    }
-
-    return true;
+    return updateAggregate(aggregate);
 }
 
-function updateProgress(
-    aggregate: IUpdateProgressAggregateFragment,
-    childToUpdate?: IUpdateProgressChildFragment,
+function setChildProgress(
+    aggregate: IUpdateAggregateFragment,
+    childId: string,
+    progress: number,
 ) {
-    if (childToUpdate) {
-        for (const child of aggregate.children) {
-            if (child.id === childToUpdate.id) {
-                child.progress = childToUpdate.progress;
-            }
+    for (const currentChild of aggregate.children) {
+        if (currentChild.id === childId) {
+            currentChild.progress = progress;
         }
     }
 
-    const { current, max } = getProgress(aggregate.children);
-    aggregate.progress = current;
-    aggregate.maxProgress = max;
+    updateAggregate(aggregate);
 }
 
-function getProgress(aggregateChildren: IGetProgressFragment[]) {
+function getProgress(children: IGetProgressFragment[]) {
     let current = 0;
-    let max;
+    let max: number | null = null;
 
-    if (aggregateChildren[0].__typename === Type.Counter) {
-        for (const child of aggregateChildren) {
+    if (children[0].__typename === Type.Counter) {
+        for (const child of children) {
             current += child.progress;
         }
     } else {
-        const childrenCount = aggregateChildren.length;
+        const childrenCount = children.length;
         max = 1;
 
-        for (const child of aggregateChildren) {
+        for (const child of children) {
             const childNormalizedProgress =
                 child.progress / child.maxProgress!;
             current += childNormalizedProgress / childrenCount;
@@ -146,43 +105,70 @@ function getProgress(aggregateChildren: IGetProgressFragment[]) {
     return { current, max };
 }
 
+/**
+ * @returns False if aggregate is removed
+ */
 function setChildStatus(
-    aggregate: ISetChildStatusAggregateFragment,
-    child: ISetChildStatusChildFragment,
+    aggregate: IUpdateAggregateFragment,
+    childId: string,
     status: TrackableStatus,
 ) {
-    let hasActiveChildren = false;
-
     for (const currentChild of aggregate.children) {
-        if (child.id === currentChild.id) {
-            child.status = currentChild.status = status;
-        }
-
-        if (currentChild.status === TrackableStatus.Active
-            || currentChild.status === TrackableStatus.PendingProof
-        ) {
-            hasActiveChildren = true;
+        if (currentChild.id === childId) {
+            currentChild.status = status;
+            break;
         }
     }
 
-    if (!hasActiveChildren) {
-        for (const currentChild of aggregate.children) {
-            currentChild.parent = null;
+    return updateAggregate(aggregate);
+}
+
+/**
+ * @returns False if aggregate is removed
+ */
+function updateAggregate(aggregate: IUpdateAggregateFragment) {
+    let hasActiveChildren = false;
+    const { children } = aggregate;
+
+    if (children.length) {
+        for (const child of children) {
+            if (
+                child.status === TrackableStatus.Active ||
+                child.status === TrackableStatus.PendingProof
+            ) {
+                hasActiveChildren = true;
+                break;
+            }
         }
+
+        if (hasActiveChildren) {
+            const { current, max } = getProgress(children);
+            aggregate.progress = current;
+            aggregate.maxProgress = max;
+            return true;
+        } else {
+            unaggregateChildren(aggregate);
+            return false;
+        }
+    } else {
+        unaggregateChildren(aggregate);
+        return false;
+    }
+}
+
+function unaggregateChildren(aggregate: IUnaggregateChildrenFragment) {
+    for (const child of aggregate.children) {
+        child.parent = null;
     }
 
-    return hasActiveChildren;
+    aggregate.children = [];
 }
 
 export {
     setChildStatus,
-    setChildStatusFragment,
-    ISetChildStatusAggregateFragment,
-    updateProgress,
-    updateProgressFragment,
-    IUpdateProgressAggregateFragment,
+    setChildProgress,
     getProgress,
     removeChild,
-    removeChildFragment,
-    IRemoveChildFragment,
+    updateAggregateFragment,
+    IUpdateAggregateFragment,
 };

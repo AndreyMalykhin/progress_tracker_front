@@ -46,7 +46,7 @@ class UploadLink extends ApolloLink {
         return new Observable((observer) => {
             const body = new FormData();
             body.append("file", {
-                name: null,
+                name: "file",
                 type: mimeType,
                 uri: filePath,
             } as any);

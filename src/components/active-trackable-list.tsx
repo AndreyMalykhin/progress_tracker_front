@@ -175,6 +175,7 @@ interface IActiveTrackableListProps extends IExtraData, IWithRefreshProps {
     onPressCounterProgress: (id: string) => void;
     onPressGymExerciseProgress: (id: string) => void;
     onPressNumericalGoalProgress: (id: string) => void;
+    onCanPressProgress: (trackableStatus: TrackableStatus) => boolean;
 }
 
 const log = makeLog("active-trackable-list");
@@ -349,11 +350,7 @@ class ActiveTrackableList extends
         const { isDisabled, isSelected, dragStatus } = itemsMeta[id];
         const isAggregated = parent != null;
         const onPressProgress = this.makeOnPressProgress(
-            onPressCounterProgress,
-            status,
-            isReorderMode,
-            isAggregationMode,
-        );
+            onPressCounterProgress, status);
         return (
             <Counter
                 key={id}
@@ -408,11 +405,7 @@ class ActiveTrackableList extends
         const gymExerciseItems =
             onGetGymExerciseItems(id, recentEntries, isExpanded!);
         const onPressProgress = this.makeOnPressProgress(
-            onPressGymExerciseProgress,
-            status,
-            isReorderMode,
-            isAggregationMode,
-        );
+            onPressGymExerciseProgress, status);
         return (
             <GymExercise
                 key={id}
@@ -477,11 +470,7 @@ class ActiveTrackableList extends
         const commands =
             onGetNumericalGoalCommands(id, isAggregated, status);
         const onPressProgress = this.makeOnPressProgress(
-            onPressNumericalGoalProgress,
-            status,
-            isReorderMode,
-            isAggregationMode,
-        );
+            onPressNumericalGoalProgress, status);
         return (
             <NumericalGoal
                 key={id}
@@ -663,17 +652,9 @@ class ActiveTrackableList extends
     private makeOnPressProgress(
         handler: (trackableId: string) => void,
         trackableStatus: TrackableStatus,
-        isReorderMode?: boolean,
-        isAggregationMode?: boolean,
     ) {
-        if (trackableStatus !== TrackableStatus.Active
-            || isAggregationMode
-            || isReorderMode
-        ) {
-            return undefined;
-        }
-
-        return handler;
+        return this.props.onCanPressProgress(trackableStatus) ?
+            handler : undefined;
     }
 }
 

@@ -1,8 +1,6 @@
 import { removeActiveTrackables } from "actions/active-trackables-helpers";
 import {
-    IRemoveChildFragment,
-    removeChild,
-    removeChildFragment,
+    IUpdateAggregateFragment, removeChild, updateAggregateFragment,
 } from "actions/aggregate-helpers";
 import { DataProxy } from "apollo-cache";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
@@ -28,7 +26,7 @@ interface IGetTrackableByIdResponse {
     getTrackable: {
         __typename: Type;
         id: string;
-        parent?: IRemoveChildFragment;
+        parent?: IUpdateAggregateFragment;
     };
 }
 
@@ -47,14 +45,14 @@ mutation RemoveTrackable($id: ID!) {
 }`;
 
 const getTrackableQuery = gql`
-${removeChildFragment}
+${updateAggregateFragment}
 
 query GetTrackableById($id: ID!) {
     getTrackable(id: $id) {
         id
         ... on IAggregatable {
             parent {
-                ...RemoveChildAggregateFragment
+                ...UpdateAggregateFragment
             }
         }
     }
@@ -95,7 +93,7 @@ function getOptimisticResponse(
         { query: getTrackableQuery, variables: { id: trackableId } })!;
     const parent = trackableByIdResponse.getTrackable.parent || null;
     const removedAggregateId =
-        parent && removeChild(trackableId, parent) ? parent.id : null;
+        parent && !removeChild(parent, trackableId) ? parent.id : null;
     return {
         __typename: Type.Mutation,
         removeTrackable: {

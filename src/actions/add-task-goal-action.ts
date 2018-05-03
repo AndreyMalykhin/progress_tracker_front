@@ -103,6 +103,7 @@ async function addTaskGoal(
     apollo: ApolloClient<NormalizedCacheObject>,
 ) {
     const optimisticResponse = getOptimisticResponse(goal, apollo);
+    const { id, tasks } = optimisticResponse.addTaskGoal.trackable;
     return await mutate({
         optimisticResponse,
         update: (proxy, response) => {
@@ -111,7 +112,13 @@ async function addTaskGoal(
             updateActivities(responseData, proxy);
         },
         variables: {
-            goal: { ...goal, id: optimisticResponse.addTaskGoal.trackable.id },
+            goal: {
+                ...goal,
+                id,
+                tasks: tasks.map((task) => {
+                    return { id: task.id, title: task.title };
+                }),
+            },
         },
     });
 }

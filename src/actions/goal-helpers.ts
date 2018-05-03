@@ -1,6 +1,5 @@
 import {
-    IUpdateProgressAggregateFragment,
-    updateProgress,
+    IUpdateAggregateFragment, setChildProgress,
 } from "actions/aggregate-helpers";
 import TrackableStatus from "models/trackable-status";
 
@@ -11,7 +10,7 @@ interface ISetProgressFragment {
     status: TrackableStatus;
     achievementDate?: number;
     statusChangeDate?: number;
-    parent?: IUpdateProgressAggregateFragment;
+    parent?: IUpdateAggregateFragment;
 }
 
 type IAddProgressFragment = ISetProgressFragment;
@@ -31,7 +30,7 @@ function setProgress(goal: ISetProgressFragment, value: number) {
     }
 
     if (goal.parent) {
-        updateProgress(goal.parent, goal);
+        setChildProgress(goal.parent, goal.id, goal.progress);
     }
 }
 

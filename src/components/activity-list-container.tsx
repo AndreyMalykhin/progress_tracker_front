@@ -76,7 +76,7 @@ interface IGetDataResponse {
 const log = makeLog("activity-list-container");
 
 const getDataQuery = gql`
-query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: Float) {
+query GetData($audience: Audience!, $skipUser: Boolean!, $cursor: ID) {
     getActivities(
         audience: $audience, after: $cursor
     ) @connection(key: "getActivities", filter: ["audience"]) {

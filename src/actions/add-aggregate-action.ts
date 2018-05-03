@@ -47,7 +47,7 @@ interface IGetTrackablesByIdsResponse {
         __typename: Type;
         id: string;
         progress: number;
-        maxProgress?: number;
+        maxProgress: number | null;
         order: number;
         isPublic: boolean;
         creationDate: number;

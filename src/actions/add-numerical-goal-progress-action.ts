@@ -3,8 +3,8 @@ import {
     prependGoalAchievedActivity,
 } from "actions/activity-helpers";
 import {
-    IUpdateProgressAggregateFragment,
-    updateProgressFragment,
+    IUpdateAggregateFragment,
+    updateAggregateFragment,
 } from "actions/aggregate-helpers";
 import { addProgress } from "actions/goal-helpers";
 import { getSession } from "actions/session-helpers";
@@ -43,11 +43,11 @@ interface IGoalFragment {
     status: TrackableStatus;
     statusChangeDate?: number;
     achievementDate?: number;
-    parent?: IUpdateProgressAggregateFragment;
+    parent?: IUpdateAggregateFragment;
 }
 
 const goalFragment = gql`
-${updateProgressFragment}
+${updateAggregateFragment}
 
 fragment AddNumericalGoalProgressFragment on NumericalGoal {
     id
@@ -57,7 +57,7 @@ fragment AddNumericalGoalProgressFragment on NumericalGoal {
     statusChangeDate
     achievementDate
     parent {
-        ...UpdateProgressAggregateFragment
+        ...UpdateAggregateFragment
     }
 }`;
 

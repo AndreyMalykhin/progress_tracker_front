@@ -29,7 +29,7 @@ interface IPrimitiveTrackable {
     __typename: Type;
     id: string;
     progress: number;
-    maxProgress?: number;
+    maxProgress: number | null;
     parent?: {
         __typename: Type;
         id: string;

@@ -1,11 +1,6 @@
 import { removeActiveTrackables } from "actions/active-trackables-helpers";
 import {
-    IRemoveChildFragment,
-    ISetChildStatusAggregateFragment,
-    removeChild,
-    removeChildFragment,
-    setChildStatus,
-    setChildStatusFragment,
+    IUpdateAggregateFragment, setChildStatus, updateAggregateFragment,
 } from "actions/aggregate-helpers";
 import { prependArchivedTrackables } from "actions/archived-trackables-helpers";
 import {
@@ -52,7 +47,7 @@ interface IGetTrackableByIdResponse {
         id: string;
         status: TrackableStatus;
         isPublic: boolean
-        parent: ISetChildStatusAggregateFragment | null;
+        parent: IUpdateAggregateFragment | null;
     };
 }
 
@@ -81,7 +76,7 @@ mutation ProveTrackable($id: ID!, $assetId: ID!) {
 }`;
 
 const getTrackableQuery = gql`
-${setChildStatusFragment}
+${updateAggregateFragment}
 
 query GetTrackableById($id: ID!) {
     getTrackable(id: $id) {
@@ -89,7 +84,7 @@ query GetTrackableById($id: ID!) {
         isPublic
         ... on IAggregatable {
             parent {
-                ...SetChildStatusAggregateFragment
+                ...UpdateAggregateFragment
             }
         }
     }
@@ -159,23 +154,27 @@ function getOptimisticResponse(
         query: getTrackableQuery,
         variables: { id: trackableId },
     })!.getTrackable;
-    const { parent, isPublic } = trackable;
+    const { parent, isPublic, __typename } = trackable;
     const status =
         isPublic ? TrackableStatus.PendingReview : TrackableStatus.Approved;
     const removedAggregateId = parent &&
-        !setChildStatus(parent, trackable, status) ? parent.id : null;
+        !setChildStatus(parent, trackableId, status) ? parent.id : null;
     return {
         __typename: Type.Mutation,
         proveTrackable: {
             __typename: Type.ProveTrackableResponse,
             removedAggregateId,
             trackable: {
-                ...trackable,
+                __typename,
                 approveCount: status === TrackableStatus.Approved ? null : 0,
+                id: trackableId,
+                isPublic,
                 myReviewStatus: null,
+                parent: removedAggregateId ? null : parent,
                 proofPhotoUrlMedium,
                 rating: null,
                 rejectCount: status === TrackableStatus.Approved ? null : 0,
+                status,
                 statusChangeDate: Date.now(),
             },
         },
