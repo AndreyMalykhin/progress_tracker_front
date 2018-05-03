@@ -1,4 +1,5 @@
 import { login } from "actions/login-action";
+import { getSession } from "actions/session-helpers";
 import { addGenericErrorToast, addToast } from "actions/toast-helpers";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import ApolloClient from "apollo-client";
@@ -18,7 +19,7 @@ import { IOfflineLinkOperationContext } from "utils/offline-link";
 interface IErrorHandlerProps extends IWithDIContainerProps, InjectedIntlProps {}
 
 interface IOperationContext extends IOfflineLinkOperationContext {
-    response?: Response;
+    res?: Response;
 }
 
 const log = makeLog("error-handler");
@@ -45,7 +46,7 @@ class ErrorHandler extends React.PureComponent<IErrorHandlerProps> {
         const { isOfflineOperation } =
             operation.getContext() as IOperationContext;
         const httpResponse =
-            (operation.getContext() as IOperationContext).response
+            (operation.getContext() as IOperationContext).res
             || (networkError && (networkError as any).response);
         const queryLoc = error.operation.query.loc;
         log.error(
@@ -56,7 +57,7 @@ class ErrorHandler extends React.PureComponent<IErrorHandlerProps> {
         const httpStatus = httpResponse && httpResponse.status;
         const { apollo } = this.props.diContainer;
 
-        if (httpStatus === 401) {
+        if (httpStatus === 401 && getSession(apollo).accessToken) {
             this.refreshAccessToken(apollo);
             return;
         }
