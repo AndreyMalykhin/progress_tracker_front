@@ -42,8 +42,8 @@
   "scripts": {
     "start": "env-cmd ./.env.local react-native start",
     "android": "react-native run-android",
-    "ios-simulator": "react-native run-ios --simulator=\"iPhone 8\"",
-    "ios-simulator-prod": "env-cmd ./.env.production.local react-native run-ios --simulator=\"iPhone 8\" --configuration=Release",
+    "ios-simulator": "react-native run-ios --simulator=\"iPhone X\"",
+    "ios-simulator-prod": "env-cmd ./.env.production.local react-native run-ios --simulator=\"iPhone X\" --configuration=Release",
     "ios-device": "react-native run-ios --device",
     "ios-device-prod": "env-cmd ./.env.production.local react-native run-ios --device --configuration=Release",
     "test": "node node_modules/jest/bin/jest.js --watch",

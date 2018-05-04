@@ -1,4 +1,5 @@
 import ActivitiesSectionContainer from "components/activities-section-container";
+import BottomStatusBar from "components/bottom-status-bar";
 import { color, listStyle } from "components/common-styles";
 import FriendsSectionContainer from "components/friends-section-container";
 import GlobalNav from "components/global-nav";
@@ -8,6 +9,7 @@ import { INavBarItem } from "components/nav-bar";
 import PendingReviewSectionContainer from "components/pending-review-section-container";
 import ProfileSectionContainer from "components/profile-section-container";
 import StackingSwitch from "components/stacking-switch";
+import TopStatusBar from "components/top-status-bar";
 import Audience from "models/audience";
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
@@ -108,11 +110,13 @@ class HomePage extends React.Component {
         );
         return (
             <View style={styles.container}>
+                <TopStatusBar />
                 <Header />
                 <View style={styles.content}>
                     <StackingSwitch>{routeElements}</StackingSwitch>
                 </View>
                 <GlobalNav items={navItems} />
+                <BottomStatusBar />
             </View>
         );
     }

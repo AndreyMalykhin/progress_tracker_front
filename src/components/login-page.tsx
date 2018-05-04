@@ -49,6 +49,7 @@ class LoginPage extends React.Component<ILoginPageProps> {
 const styles = StyleSheet.create({
     container: {
         alignItems: "center",
+        backgroundColor: color.white,
         flex: 1,
     },
     logo: {

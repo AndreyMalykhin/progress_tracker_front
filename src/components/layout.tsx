@@ -16,14 +16,9 @@ interface ILayoutProps {}
 
 class Layout extends React.Component<ILayoutProps & IWithSessionProps> {
     public render() {
-        const statusBar = this.props.session.userId ? (
-            <View style={styles.statusBar}>
-                <StatusBar />
-            </View>
-        ) : <StatusBar hidden={true} />;
         return (
             <View style={styles.container}>
-                {statusBar}
+                <StatusBar hidden={true} />
                 <StackingSwitch>
                     <Route
                         exact={routes.trackableAdd.exact}
@@ -54,10 +49,6 @@ class Layout extends React.Component<ILayoutProps & IWithSessionProps> {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    statusBar: {
-        backgroundColor: headerStyle.backgroundColor,
-        height: Platform.OS === "ios" ? 20 : StatusBar.currentHeight,
     },
 });
 

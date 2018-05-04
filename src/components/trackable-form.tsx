@@ -1,3 +1,4 @@
+import BottomStatusBar from "components/bottom-status-bar";
 import { FormBody } from "components/form";
 import FormTextInput from "components/form-text-input";
 import * as React from "react";
@@ -46,6 +47,7 @@ class TrackableForm extends React.Component<ITrackableFormProps> {
                     />
                     {onRenderChildren && onRenderChildren()}
                 </FormBody>
+                <BottomStatusBar isTransparent={true} />
             </KeyboardAwareScrollViewImpl>
         );
     }

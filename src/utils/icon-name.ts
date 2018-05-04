@@ -10,7 +10,7 @@ enum IconName {
     Counter = "counter",
     Date = "clock",
     Expanded = "chevron-up",
-    Facebook = "facebook",
+    Facebook = "facebook-box",
     Friends = "account-multiple",
     GymExercise = "dumbbell",
     InProgress = "format-list-checks",

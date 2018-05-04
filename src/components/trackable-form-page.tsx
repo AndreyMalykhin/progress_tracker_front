@@ -15,6 +15,7 @@ import NumericalGoalFormContainer, {
 import TaskGoalFormContainer, {
     ITaskGoal,
 } from "components/task-goal-form-container";
+import TopStatusBar from "components/top-status-bar";
 import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
@@ -43,6 +44,7 @@ class TrackableFormPage extends React.Component<ITrackableFormPageProps> {
     public render() {
         return (
             <View style={styles.container}>
+                <TopStatusBar />
                 <Header />
                 {this.renderForm()}
             </View>
