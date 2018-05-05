@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const fs = require("fs");
 
-fetch("http://localhost:3000/graphql", {
+fetch(process.env.SERVER_URL + "/graphql", {
     body: JSON.stringify({
         query: `
         {

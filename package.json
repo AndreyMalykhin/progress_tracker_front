@@ -10,7 +10,6 @@
     "@types/graphql": "^0.12.4",
     "@types/jest": "^22.0.0",
     "@types/lodash": "^4.14.91",
-    "@types/node": "^9.4.0",
     "@types/prop-types": "^15.5.2",
     "@types/react": "^16.0.31",
     "@types/react-intl": "^2.3.3",
@@ -24,6 +23,8 @@
     "babel-plugin-module-resolver": "^3.0.0",
     "babel-plugin-transform-inline-environment-variables": "^0.2.0",
     "babel-preset-react-native-stage-0": "^1.0.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.1",
     "env-cmd": "^7.0.0",
     "enzyme": "^3.3.0",
     "husky": "^0.14.3",
@@ -35,23 +36,30 @@
     "react-test-renderer": "16.0.0",
     "reactotron-react-native": "^1.14.0",
     "ts-jest": "^22.0.0",
+    "ts-loader": "^4.2.0",
+    "tsconfig-paths-webpack-plugin": "^3.0.4",
     "tslint": "^5.8.0",
     "tslint-react": "^3.3.3",
-    "typescript": "^2.6.2"
+    "typescript": "^2.6.2",
+    "webpack": "^4.7.0",
+    "webpack-cli": "^2.1.2",
+    "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
     "start": "env-cmd ./.env.local react-native start",
     "android": "react-native run-android",
     "ios-simulator": "react-native run-ios --simulator=\"iPhone X\"",
-    "ios-simulator-prod": "env-cmd ./.env.production.local react-native run-ios --simulator=\"iPhone X\" --configuration=Release",
+    "ios-simulator-prod": "react-native run-ios --simulator=\"iPhone X\" --configuration=Release",
     "ios-device": "react-native run-ios --device",
-    "ios-device-prod": "env-cmd ./.env.production.local react-native run-ios --device --configuration=Release",
+    "ios-device-prod": "react-native run-ios --device --configuration=Release",
     "test": "node node_modules/jest/bin/jest.js --watch",
-    "dev": "yarn extract-fragment-types && yarn copy-resources && tsc --watch --pretty",
+    "dev": "yarn extract-fragment-types && env-cmd ./.env.local webpack --watch --display-modules",
+    "build": "yarn extract-fragment-types && env-cmd ./.env.local webpack --display-modules",
+    "build-prod": "yarn extract-fragment-types-prod && env-cmd ./.env.production.local webpack --display-modules",
     "fastlane-prod": "cd ios && env-cmd ./.env.production.local bundle exec fastlane",
     "precommit": "lint-staged",
-    "copy-resources": "cp -r ./src/images ./build/",
-    "extract-fragment-types": "node src/scripts/extract-fragment-types.js"
+    "extract-fragment-types": "env-cmd ./.env.local node src/scripts/extract-fragment-types.js",
+    "extract-fragment-types-prod": "env-cmd ./.env.production.local node src/scripts/extract-fragment-types.js"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [

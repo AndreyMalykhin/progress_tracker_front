@@ -36,7 +36,7 @@ class NetworkTracker {
     private isOnline = true;
     private isPinging = false;
     private envConfig: IEnvConfig;
-    private timerId?: NodeJS.Timer;
+    private intervalId?: NodeJS.Timer | number;
 
     public constructor(
         apollo: ApolloClient<NormalizedCacheObject>, envConfig: IEnvConfig,
@@ -70,11 +70,11 @@ class NetworkTracker {
     }
 
     private startPinging() {
-        this.timerId = setInterval(this.ping, this.envConfig.pingPeriod);
+        this.intervalId = setInterval(this.ping, this.envConfig.pingPeriod);
     }
 
     private stopPinging() {
-        clearInterval(this.timerId!);
+        clearInterval(this.intervalId! as number);
     }
 
     private ensureCorrectStatusInStore() {

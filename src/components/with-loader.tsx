@@ -34,7 +34,7 @@ function withLoader<TProps extends {}, TData extends {}>(
 
         class WithLoader extends React.Component<TProps, IState> {
             public state: IState = {};
-            private timeoutId?: NodeJS.Timer;
+            private timeoutId?: NodeJS.Timer | number;
 
             public render() {
                 log.trace("render", "isVisible=%o", this.state.isVisible);
@@ -64,7 +64,7 @@ function withLoader<TProps extends {}, TData extends {}>(
             }
 
             public componentWillUnmount() {
-                clearTimeout(this.timeoutId!);
+                clearTimeout(this.timeoutId! as number);
             }
 
             private updateVisibility(query?: QueryProps & TData) {
@@ -77,7 +77,7 @@ function withLoader<TProps extends {}, TData extends {}>(
                         isVisible = true;
 
                         if (this.timeoutId) {
-                            clearTimeout(this.timeoutId);
+                            clearTimeout(this.timeoutId as number);
                         }
 
                         this.timeoutId = setTimeout(() => {
