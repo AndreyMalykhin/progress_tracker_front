@@ -19,6 +19,10 @@ yarn-error.log*
 build/
 ios/build/
 ios/Pods/
+ios/fastlane/Appfile
+ios/fastlane/Matchfile
+ios/fastlane/report.xml
+ios/fastlane/README.md
 .jest/
 .vscode/
 package-lock.json
