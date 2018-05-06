@@ -251,10 +251,11 @@ class PendingReviewTrackableListContainer extends React.Component<
     public state: IPendingReviewTrackableListContainerState = { toasts: [] };
 
     public render() {
-        const { audience, data, isRefreshing, onLoadMore, onRefresh } =
+        const { session, audience, data, isRefreshing, onLoadMore, onRefresh } =
             this.props;
         return (
             <PendingReviewTrackableList
+                myUserId={session.userId!}
                 audience={audience}
                 items={data.getPendingReviewTrackables.edges}
                 queryStatus={data.networkStatus}

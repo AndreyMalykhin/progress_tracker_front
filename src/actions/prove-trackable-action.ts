@@ -141,8 +141,9 @@ function updateApprovedTrackables(
 function updatePendingReviewTrackables(
     response: IProveTrackableResponse, apollo: DataProxy,
 ) {
-    appendPendingReviewTrackables(
-        [response.proveTrackable.trackable], Audience.Me, apollo);
+    const { trackable } = response.proveTrackable;
+    appendPendingReviewTrackables([trackable], Audience.Me, apollo);
+    appendPendingReviewTrackables([trackable], Audience.Global, apollo);
 }
 
 function getOptimisticResponse(

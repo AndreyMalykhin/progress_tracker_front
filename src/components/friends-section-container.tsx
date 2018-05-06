@@ -66,9 +66,11 @@ class FriendsSectionContainer extends
     private onInvite = async () => {
         const { intl, client, diContainer } = this.props;
         let isCancelled;
+        const brand = intl.formatMessage({ id: "common.brand" });
 
         try {
-            isCancelled = !await share("share.app", intl);
+            isCancelled = !await share(
+                "share.app", intl, diContainer.envConfig, { brand });
         } catch (e) {
             if (!isApolloError(e)) {
                 addGenericErrorToast(client);

@@ -57,7 +57,7 @@ interface IPendingReviewTrackableListItemNode {
     achievementDate: number;
     proofPhotoUrlMedium: string;
     myReviewStatus: ReviewStatus;
-    user: {
+    user?: {
         id: string;
         name: string;
         avatarUrlSmall: string;
@@ -70,6 +70,7 @@ interface IPendingReviewTrackableListItem {
 
 interface IPendingReviewTrackableListProps extends
     ISharedProps, IWithRefreshProps {
+    myUserId: string;
     items: IPendingReviewTrackableListItem[];
     queryStatus: QueryStatus;
     onScroll?: (evt?: NativeSyntheticEvent<NativeScrollEvent>) => void;
@@ -115,6 +116,7 @@ class PendingReviewTrackableList extends
         itemInfo: ListRenderItemInfo<IPendingReviewTrackableListItem>,
     ) => {
         const {
+            myUserId,
             items,
             audience,
             onApproveItem,
@@ -124,12 +126,13 @@ class PendingReviewTrackableList extends
         } = this.props;
         const { index } = itemInfo;
         const { user, myReviewStatus, ...restProps } = itemInfo.item.node;
-        const isMy = audience === Audience.Me;
+        const isMy = audience === Audience.Me
+            || (user != null && user.id === myUserId);
         return (
             <Item
-                userId={isMy ? undefined : user.id}
-                userName={isMy ? undefined : user.name}
-                userAvatarUrl={isMy ? undefined : user.avatarUrlSmall}
+                userId={isMy ? undefined : user!.id}
+                userName={isMy ? undefined : user!.name}
+                userAvatarUrl={isMy ? undefined : user!.avatarUrlSmall}
                 myReviewStatus={myReviewStatus}
                 isReviewable={!isMy && !myReviewStatus}
                 isFirst={!index}

@@ -304,8 +304,12 @@ abstract class PrimitiveTrackableFormContainer<
 
     private async shareTrackable() {
         const trackableType = this.getTrackableType();
-        const isCancelled = !await share("share.newTrackable", this.props.intl,
-            { type: trackableType, title: this.state.title! });
+        const isCancelled = !await share(
+            "share.newTrackable",
+            this.props.intl,
+            this.props.diContainer.envConfig,
+            { type: trackableType, title: this.state.title! },
+        );
 
         if (isCancelled) {
             Analytics.log(AnalyticsEvent.FacebookShareTrackablePageCancel);

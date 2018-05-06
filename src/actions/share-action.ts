@@ -1,5 +1,6 @@
 import { InjectedIntl, MessageValue } from "react-intl";
 import { ShareDialog, ShareLinkContent } from "react-native-fbsdk";
+import { IEnvConfig } from "utils/env-config";
 import makeLog from "utils/make-log";
 
 const log = makeLog("share-action");
@@ -7,13 +8,14 @@ const log = makeLog("share-action");
 async function share(
     msgId: string,
     translator: InjectedIntl,
+    envConfig: IEnvConfig,
     msgValues?: { [key: string]: MessageValue },
 ) {
     const hashtag = "#" + translator.formatMessage({ id: "common.brand" });
     const shareContent: ShareLinkContent = {
         commonParameters: { hashtag },
         contentType: "link",
-        contentUrl: "https://completoo.com",
+        contentUrl: envConfig.landingUrl,
         quote: translator.formatMessage({ id: msgId }, msgValues),
     };
 

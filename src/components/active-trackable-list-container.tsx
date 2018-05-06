@@ -1398,7 +1398,8 @@ class ActiveTrackableListContainer extends React.Component<
         let isCancelled;
 
         try {
-            isCancelled = !await share("share.provedGoal", intl, { title });
+            isCancelled = !await share(
+                "share.provedGoal", intl, diContainer.envConfig, { title });
         } catch (e) {
             if (!isApolloError(e)) {
                 addGenericErrorToast(client);

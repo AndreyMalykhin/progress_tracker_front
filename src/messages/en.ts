@@ -142,7 +142,8 @@ export default {
     "reviewsNavigation.friendsTrackables": "Friends",
     "reviewsNavigation.globalTrackables": "Global",
     "reviewsNavigation.myTrackables": "My",
-    "share.app": "Yo, check this out!",
+    "share.app": "I use {brand} to track and share my goals and achievements " +
+        "with my friends, try it too!",
     "share.newTrackable": `I've created new {type, select,
         Counter {counter}
         GymExercise {gym exercise}
