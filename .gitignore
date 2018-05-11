@@ -23,6 +23,7 @@ ios/fastlane/Appfile
 ios/fastlane/Matchfile
 ios/fastlane/report.xml
 ios/fastlane/README.md
+ios/Preview.html
 .jest/
 .vscode/
 package-lock.json
