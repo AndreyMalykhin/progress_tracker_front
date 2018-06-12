@@ -3,7 +3,6 @@ import { ToastSeverity } from "components/toast";
 import gql from "graphql-tag";
 import Type from "models/type";
 import { MessageValue } from "react-intl";
-import AudioManager from "utils/audio-manager";
 import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
 import makeLog from "utils/make-log";
@@ -57,8 +56,12 @@ function addToast(toast: IAddToastFragment, apollo: DataProxy) {
 }
 
 function addGenericErrorToast(apollo: DataProxy) {
+    addErrorToast("errors.unexpected", apollo);
+}
+
+function addErrorToast(msgId: string, apollo: DataProxy) {
     const toast = {
-        msgId: "errors.unexpected",
+        msgId,
         severity: ToastSeverity.Danger,
         sound: Sound.Error,
     };
@@ -81,4 +84,4 @@ function setToasts(ui: IUIFragment, apollo: DataProxy) {
     apollo.writeFragment({ data: ui, fragment: uiFragment, id: fragmentId });
 }
 
-export { addToast, addGenericErrorToast, removeToast };
+export { addToast, addGenericErrorToast, addErrorToast, removeToast };

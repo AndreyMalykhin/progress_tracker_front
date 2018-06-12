@@ -74,7 +74,6 @@ import { IGymExerciseEntry, IGymExerciseItem } from "components/gym-exercise";
 import {
     IGymExerciseEntryPopupResult,
 } from "components/gym-exercise-entry-popup";
-import { IHeaderShape } from "components/header";
 import Loader from "components/loader";
 import Offline from "components/offline";
 import {
@@ -96,7 +95,6 @@ import withFetchPolicy, {
 import withHeader, { IWithHeaderProps } from "components/with-header";
 import withLoadMore, { IWithLoadMoreProps } from "components/with-load-more";
 import withLoader from "components/with-loader";
-import withLoginAction from "components/with-login-action";
 import withNetworkStatus, {
     IWithNetworkStatusProps,
 } from "components/with-network-status";
@@ -114,7 +112,6 @@ import TrackableStatus from "models/trackable-status";
 import TrackableType from "models/trackable-type";
 import Type from "models/type";
 import * as React from "react";
-import { ReactNode } from "react";
 import { compose } from "react-apollo";
 import graphql from "react-apollo/graphql";
 import { QueryProps } from "react-apollo/types";
@@ -140,13 +137,10 @@ import dataIdFromObject from "utils/data-id-from-object";
 import defaultId from "utils/default-id";
 import DragStatus from "utils/drag-status";
 import IHsitoryState from "utils/history-state";
-import { push, removeIndex } from "utils/immutable-utils";
 import { IWithApolloProps } from "utils/interfaces";
 import isMyId from "utils/is-my-id";
 import makeLog from "utils/make-log";
-import openImgPicker from "utils/open-img-picker";
-import QueryStatus from "utils/query-status";
-import { isLoading } from "utils/query-status";
+import openImgPicker, { ErrorCode } from "utils/open-img-picker";
 import routes from "utils/routes";
 import Sound from "utils/sound";
 
@@ -1300,6 +1294,12 @@ class ActiveTrackableListContainer extends React.Component<
         try {
             image = await openImgPicker(diContainer.audioManager);
         } catch (e) {
+            if (e.code === ErrorCode.NoPermission) {
+                this.showToast("errors.noPhotosPermission",
+                    Sound.Error, ToastSeverity.Danger);
+                return;
+            }
+
             addGenericErrorToast(client);
             return;
         }

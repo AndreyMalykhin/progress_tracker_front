@@ -1,9 +1,8 @@
-import { addGenericErrorToast } from "actions/toast-helpers";
+import { addErrorToast, addGenericErrorToast } from "actions/toast-helpers";
 import Avatar from "components/avatar";
 import Button, { ButtonTitle } from "components/button";
 import { cardStyle, color, gap, shadeColor } from "components/common-styles";
 import { FormGroup } from "components/form";
-import Image from "components/image";
 import Loader from "components/loader";
 import withDIContainer, {
     IWithDIContainerProps,
@@ -15,7 +14,7 @@ import ImagePicker, {
     Image as ImageInfo,
 } from "react-native-image-crop-picker";
 import { IWithApolloProps } from "utils/interfaces";
-import openImgPicker from "utils/open-img-picker";
+import openImgPicker, { ErrorCode } from "utils/open-img-picker";
 
 interface IFormAvatarPickerProps extends
     IWithApolloProps, IWithDIContainerProps {
@@ -78,6 +77,11 @@ class FormAvatarPicker extends React.PureComponent<IFormAvatarPickerProps> {
         try {
             image = await openImgPicker(diContainer.audioManager);
         } catch (e) {
+            if (e.code === ErrorCode.NoPermission) {
+                addErrorToast("errors.noPhotosPermission", client);
+                return;
+            }
+
             addGenericErrorToast(client);
             return;
         }

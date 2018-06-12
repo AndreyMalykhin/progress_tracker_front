@@ -5,6 +5,10 @@ import makeLog from "utils/make-log";
 import Sound from "utils/sound";
 import uuid from "utils/uuid";
 
+enum ErrorCode {
+    NoPermission = "E_PERMISSION_MISSING",
+}
+
 const log = makeLog("open-img-picker");
 
 async function openImgPicker(audioManager: AudioManager) {
@@ -44,4 +48,5 @@ async function openImgPicker(audioManager: AudioManager) {
     return img;
 }
 
+export { ErrorCode };
 export default openImgPicker;

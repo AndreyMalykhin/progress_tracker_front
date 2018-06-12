@@ -78,6 +78,8 @@ export default {
     "errors.empty": "Shouldn't be empty",
     "errors.invalidNumber": "Invalid number",
     "errors.negativeOrNotNumber": "Should be a positive number or zero",
+    "errors.noPhotosPermission":
+        "Access denied. Please allow access to the photo library",
     "errors.noTasks": "At least 1 task is required",
     "errors.tooLong": "Too long",
     "errors.unexpected": "Oops! Something went wrong",
