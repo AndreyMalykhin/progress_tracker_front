@@ -39,7 +39,7 @@ class Login extends React.Component<ILoginProps> {
                     <ButtonTitle
                         primary={true}
                         raised={true}
-                        msgId="common.login"
+                        msgId="common.loginViaFacebook"
                     />
                 </Button>
             </View>

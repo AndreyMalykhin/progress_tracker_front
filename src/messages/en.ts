@@ -58,6 +58,7 @@ export default {
     "common.loading": "Loading...",
     "common.login": "Login",
     "common.loginToDo": "Please login to do this",
+    "common.loginViaFacebook": "Login with Facebook",
     "common.logout": "Logout",
     "common.more": "More",
     "common.no": "No",
