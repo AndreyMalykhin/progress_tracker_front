@@ -53,7 +53,7 @@ class FriendsSectionContainer extends
             key: "friendsSectionContainer.index",
             rightCommands: [
                 {
-                    iconName: IconName.Add,
+                    iconName: IconName.Share,
                     isDisabled: !props.session.accessToken,
                     msgId: "commands.invite",
                     onRun: this.onInvite,

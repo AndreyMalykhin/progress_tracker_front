@@ -27,6 +27,7 @@ enum IconName {
     Remove = "close-circle",
     Report = "alert-circle",
     Review = "approval",
+    Share = "share-variant",
     TaskGoal = "format-list-bulleted",
     Unchecked = "checkbox-blank-circle-outline",
 }
