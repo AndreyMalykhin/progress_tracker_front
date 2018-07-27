@@ -1424,8 +1424,9 @@
 			baseConfigurationReference = E5F99774BFE44F3ADAE647A1 /* Pods-progress_tracker.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 12;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1454,7 +1455,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.completoo;
 				PRODUCT_NAME = completoo;
-				PROVISIONING_PROFILE = "27c53357-22d5-4508-8319-1101bdff58ca";
+				PROVISIONING_PROFILE = "5feeec6e-cc77-4876-b1ba-b10bc7b090c1";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development com.completoo";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1467,7 +1468,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = 95CRJLJUB3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1495,7 +1496,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.completoo;
 				PRODUCT_NAME = completoo;
-				PROVISIONING_PROFILE = "cb15c682-fd9f-45fc-9cc7-78cd2a93ec23";
+				PROVISIONING_PROFILE = "c03883b2-908b-4862-99d2-ee4d743433b9";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.completoo";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
